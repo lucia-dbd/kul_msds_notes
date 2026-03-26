@@ -1,0 +1,1128 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 — More than One Parameter</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async=""></script>
+<style>
+:root{
+  --primary:#1a3a5c;--accent:#2878b8;--accent2:#c0580a;
+  --bg:#f3f6fb;--card:#fff;--border:#cdd8e8;
+  --ok:#1e7e34;--ok-bg:#d4edda;--err:#a71d2a;--err-bg:#f8d7da;
+  --nb:#eef4fc;--text:#1c2a38;--muted:#5a6a7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.72;font-size:15px;}
+header{background:var(--primary);color:#fff;padding:26px 20px 18px;text-align:center;}
+header h1{font-size:1.55rem;letter-spacing:.3px;}
+header p{margin-top:5px;color:#aac8e4;font-size:.9rem;}
+.toc{background:var(--accent);display:flex;flex-wrap:wrap;gap:5px;padding:9px 18px;justify-content:center;}
+.toc a{color:#fff;text-decoration:none;font-size:.78rem;background:rgba(255,255,255,.15);
+  padding:4px 11px;border-radius:20px;transition:background .2s;}
+.toc a:hover{background:rgba(255,255,255,.32);}
+.wrap{max-width:940px;margin:0 auto;padding:26px 14px 70px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:20px 24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(30,60,100,.06);}
+.card h2{color:var(--primary);font-size:1.12rem;border-bottom:2px solid var(--accent);
+  padding-bottom:7px;margin-bottom:13px;}
+.card h3{color:var(--accent);font-size:.96rem;margin:15px 0 7px;}
+.card p{margin-bottom:9px;}
+.card ul{padding-left:20px;margin-bottom:9px;}
+.card li{margin-bottom:5px;}
+.nb{background:var(--nb);border-left:4px solid var(--accent);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.nb strong{color:var(--primary);}
+.warn{background:#fff8e8;border-left:4px solid var(--accent2);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.fbox{background:#f0f6ff;border:1px solid #aaccee;border-radius:6px;
+  padding:11px 15px;margin:11px 0;font-size:.9rem;overflow-x:auto;}
+.fbox p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin:11px 0;font-size:.86rem;}
+th{background:var(--primary);color:#fff;padding:8px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:var(--nb);}
+
+.score-bar{background:var(--card);border:2px solid var(--accent);border-radius:10px;
+  padding:13px 20px;margin-bottom:20px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:9px;}
+.score-bar span{font-size:.9rem;color:var(--muted);}
+#score-display{font-size:1.5rem;font-weight:700;color:var(--accent);}
+.reset-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;
+  padding:7px 18px;font-size:.83rem;cursor:pointer;font-weight:600;}
+.reset-btn:hover{background:#0f2540;}
+.qblock{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;box-shadow:0 1px 4px rgba(30,60,100,.05);}
+.qnum{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:5px;}
+.qtext{font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.opt{background:var(--nb);border:1px solid var(--border);border-radius:6px;
+  padding:7px 12px;text-align:left;cursor:pointer;font-size:.87rem;color:var(--text);
+  transition:background .15s,border-color .15s;}
+.opt:hover:not(:disabled){background:#dceeff;border-color:var(--accent);}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600;}
+.opt.bad{background:var(--err-bg);border-color:var(--err);color:var(--err);}
+.opt:disabled{cursor:default;}
+.fb{display:none;margin-top:7px;padding:7px 12px;border-radius:5px;font-size:.86rem;}
+.fb.ok-fb{display:block;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.fb.bad-fb{display:block;background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.saq{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;}
+.saq .qtext{margin-bottom:10px;}
+.reveal-btn{background:var(--accent2);color:#fff;border:none;border-radius:6px;
+  padding:7px 15px;font-size:.83rem;font-weight:700;cursor:pointer;transition:background .2s;}
+.reveal-btn:hover{background:#9e460a;}
+.ans-box{display:none;background:var(--ok-bg);border:1px solid var(--ok);border-radius:6px;
+  padding:12px 15px;margin-top:10px;font-size:.87rem;line-height:1.65;}
+.ans-box.shown{display:block;}
+.ans-box strong{color:var(--ok);}
+.aform{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:8px 12px;
+  margin:7px 0;font-size:.86rem;overflow-x:auto;}
+
+.sec-title{background:var(--primary);color:#fff;border-radius:8px;padding:10px 18px;
+  margin:28px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:.3px;}
+
+@media(max-width:600px){
+  .wrap{padding:12px 8px 50px;}
+  .card{padding:13px 11px;}
+  header h1{font-size:1.1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📗 Chapter 4 — More than One Parameter</h1>
+  <p>Bayesian Biostatistics · Lesaffre &amp; Lawson · Study Notes + 40 MCQ + 8 Short-Answer Questions</p>
+</header>
+
+<nav class="toc">
+  <a href="#s42">4.2 Joint vs Marginal</a>
+  <a href="#s43">4.3 Normal (μ,σ²)</a>
+  <a href="#s44">4.4 Multivariate</a>
+  <a href="#s45">4.5 Freq. Properties</a>
+  <a href="#s46">4.6 Method of Composition</a>
+  <a href="#s47">4.7 Bayesian LM</a>
+  <a href="#s48">4.8 BGLIM</a>
+  <a href="#mcq">40 MCQ</a>
+  <a href="#saq">8 Short Answer</a>
+</nav>
+
+<div class="wrap">
+
+<div class="sec-title">📖 Study Notes</div>
+
+<!-- 4.2 -->
+<div class="card" id="s42">
+  <h2>4.2 Joint versus Marginal Posterior Inference</h2>
+  <p>With a <em>d</em>-dimensional parameter vector \(\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)^T\), Bayes theorem yields the <strong>joint posterior</strong>:</p>
+  <div class="fbox">
+    <p>\[p(\boldsymbol{\theta} \mid \boldsymbol{y}) = \frac{L(\boldsymbol{\theta} \mid \boldsymbol{y})\,p(\boldsymbol{\theta})}{\int L(\boldsymbol{\theta} \mid \boldsymbol{y})\,p(\boldsymbol{\theta})\,d\boldsymbol{\theta}}\]</p>
+  </div>
+  <p>The posterior mode \(\hat{\boldsymbol{\theta}}_M\) and posterior mean \(\bar{\boldsymbol{\theta}}\) generalize directly. The posterior <strong>median</strong> is not uniquely defined in dimensions \(d &gt; 1\). The HPD region \(R\) of content \((1-\alpha)\) satisfies: (a) \(P(\boldsymbol{\theta} \in R \mid \boldsymbol{y}) = 1-\alpha\) and (b) for \(\boldsymbol{\theta}_1 \in R\) and \(\boldsymbol{\theta}_2 \notin R\): \(p(\boldsymbol{\theta}_1 \mid \boldsymbol{y}) \ge p(\boldsymbol{\theta}_2 \mid \boldsymbol{y})\).</p>
+
+  <h3>Marginal Posterior Distribution</h3>
+  <div class="fbox">
+    <p>\[p(\theta_1 \mid \boldsymbol{y}) = \int p(\theta_1, \theta_2 \mid \boldsymbol{y})\,d\theta_2 = \int p(\theta_1 \mid \theta_2, \boldsymbol{y})\,p(\theta_2 \mid \boldsymbol{y})\,d\theta_2\]</p>
+  </div>
+  <p>The marginal posterior of \(\theta_1\) is a <em>weighted average</em> of conditional posteriors \(p(\theta_1 \mid \theta_2, \boldsymbol{y})\), weighted by the marginal posterior \(p(\theta_2 \mid \boldsymbol{y})\). When \(\theta_2\) are nuisance parameters, marginalizing automatically incorporates uncertainty about \(\theta_2\) — analogous to integrating out, not maximizing.</p>
+
+  <div class="nb">
+    <strong>Key distinction from frequentist approach:</strong> The classical <em>profile likelihood</em> removes nuisance parameters by maximization: \(pL(\theta_1) = \max_{\theta_2} L(\theta_1, \theta_2)\). The Bayesian approach removes nuisance parameters by <strong>integration</strong>. Both "deal with uncertainty" but in fundamentally different ways: Bayesian via averaging, frequentist via maximizing.
+  </div>
+
+  <div class="warn">
+    <strong>Important result:</strong> The posterior mean of \(\boldsymbol{\theta}\) equals the vector of marginal posterior means — but this result does <em>NOT</em> hold for the posterior mode.
+  </div>
+</div>
+
+<!-- 4.3 -->
+<div class="card" id="s43">
+  <h2>4.3 The Normal Distribution with μ and σ² Unknown</h2>
+  <p>For \(\boldsymbol{y} = \{y_1, \ldots, y_n\}\) i.i.d. from \(\mathrm{N}(\mu, \sigma^2)\), the likelihood is:</p>
+  <div class="fbox">
+    <p>\[L(\mu, \sigma^2 \mid \boldsymbol{y}) = \frac{1}{(2\pi\sigma^2)^{n/2}} \exp\!\left[-\frac{1}{2\sigma^2}\sum_{i=1}^n (y_i - \mu)^2\right]\]</p>
+    <p>Using \(\sum(y_i-\mu)^2 = (n-1)s^2 + n(\bar{y}-\mu)^2\), so \(\bar{y}\) and \(s^2\) are the <strong>sufficient statistics</strong> for \(\mu\) and \(\sigma^2\).</p>
+  </div>
+
+  <h3>Case 1: Noninformative (NI) Prior — \(p(\mu, \sigma^2) \propto \sigma^{-2}\)</h3>
+  <div class="fbox">
+    <p>Joint posterior: \(\displaystyle p(\mu, \sigma^2 \mid \boldsymbol{y}) \propto \frac{1}{\sigma^{n+2}} \exp\!\left\{-\frac{1}{2\sigma^2}\left[(n-1)s^2 + n(\bar{y}-\mu)^2\right]\right\}\)</p>
+  </div>
+  <p>Note: \(\mu\) and \(\sigma^2\) are <em>independent a priori</em> but <em>dependent a posteriori</em>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Conditional/Marginal Posterior</th><th>Distribution</th><th>Key Implication</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>\(p(\mu \mid \sigma^2, \boldsymbol{y})\)</td><td>\(\mathrm{N}(\bar{y},\; \sigma^2/n)\)</td><td>Exact normal regardless of \(n\)</td></tr>
+      <tr><td>\(p(\mu \mid \boldsymbol{y})\)</td><td>\(t_{n-1}(\bar{y},\; s^2/n)\)</td><td>\((\mu - \bar{y})\,/\,(s/\sqrt{n}) \sim t_{n-1}\)</td></tr>
+      <tr><td>\(p(\sigma^2 \mid \boldsymbol{y})\)</td><td>\(\mathrm{Inv}\text{-}\chi^2(n-1,\; s^2)\)</td><td>\((n-1)s^2/\sigma^2 \sim \chi^2(n-1)\)</td></tr>
+    </tbody>
+  </table>
+
+  <p>The joint posterior is the <strong>normal-scaled-inverse chi-squared distribution</strong> N-Inv-\(\chi^2(\bar{y},\, n,\, n-1,\, s^2)\).</p>
+
+  <h3>Posterior Summary Measures (NI Prior)</h3>
+  <table>
+    <thead><tr><th>Parameter</th><th>Location</th><th>Variance</th><th>95% Equal Tail CI</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>\(\mu\)</td>
+        <td>All equal to \(\bar{y}\) (symmetric)</td>
+        <td>\(\dfrac{n-1}{n(n-2)}s^2\)</td>
+        <td>\(\bigl[\bar{y} - t_{0.025;n-1}\,s/\sqrt{n},\;\; \bar{y} + t_{0.025;n-1}\,s/\sqrt{n}\bigr]\)</td>
+      </tr>
+      <tr>
+        <td>\(\sigma^2\)</td>
+        <td>Mean: \(\dfrac{n-1}{n-3}s^2\); Mode: \(\dfrac{n-1}{n+1}s^2\); Median: \(\dfrac{(n-1)s^2}{\chi^2_{0.5,n-1}}\)</td>
+        <td>\(\dfrac{2(n-1)^2}{(n-3)^2(n-5)}s^4\)</td>
+        <td>\(\left[\dfrac{(n-1)s^2}{\chi^2_{0.975,n-1}},\;\; \dfrac{(n-1)s^2}{\chi^2_{0.025,n-1}}\right]\)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Important coincidence:</strong> The credible intervals for both \(\mu\) and \(\sigma^2\) under the NI prior are <em>identical</em> to the corresponding classical 95% confidence intervals. This demonstrates that with appropriate (NI) priors, a Bayesian analysis can reproduce frequentist results.
+  </div>
+
+  <p><strong>PPD (NI prior):</strong> \(\tilde{y} \mid \boldsymbol{y} \sim t_{n-1}\!\left(\bar{y},\; s^2\!\left(1 + \tfrac{1}{n}\right)\right)\). This is wider than the posterior of \(\mu\) because it also accounts for the variability of individual observations.</p>
+
+  <div class="nb">
+    <strong>Example IV.1 (ALP study, \(n = 250\)):</strong> Posterior for \(\mu\): all location measures = 7.11, variance = 0.0075, 95% CI = [6.94, 7.28]. For \(\sigma^2\): mean = 1.88, mode = 1.85, median = 1.87, 95% equal tail CI = [1.58, 2.24], 95% HPD = [1.56, 2.22]. PPD: \(t_{249}(7.11, 1.37)\), 95% normal range for \(y\) = [4.41, 9.80].
+  </div>
+
+  <h3>Case 2: Historical (Conjugate) Prior — N-Inv-\(\chi^2(\mu_0, \kappa_0, \nu_0, \sigma_0^2)\)</h3>
+  <p>The prior structure is \(\mu \mid \sigma^2 \sim \mathrm{N}(\mu_0, \sigma^2/\kappa_0)\) and \(\sigma^2 \sim \mathrm{Inv}\text{-}\chi^2(\nu_0, \sigma_0^2)\), where \(\mu_0 = \bar{y}_0\), \(\kappa_0 = n_0\), \(\nu_0 = n_0-1\), \(\sigma_0^2 = s_0^2\). Combining with the likelihood yields:</p>
+  <div class="fbox">
+    <p>\[\bar{\mu} = \frac{\kappa_0\mu_0 + n\bar{y}}{\kappa_0 + n}, \qquad \bar{\kappa} = \kappa_0 + n, \qquad \bar{\nu} = \nu_0 + n\]</p>
+    <p>\[\bar{\nu}\bar{\sigma}^2 = \nu_0\sigma_0^2 + (n-1)s^2 + \frac{\kappa_0\,n}{\kappa_0+n}(\bar{y}-\mu_0)^2\]</p>
+  </div>
+  <p>The posterior mean \(\bar{\mu}\) is again a weighted average of prior mean and sample mean — exhibiting <em>shrinkage</em> toward the prior mean. The posterior precision of \(\mu\) is <em>not</em> automatically increased when prior and data are in conflict (see Example IV.2).</p>
+
+  <div class="warn">
+    <strong>Example IV.2 (Conflicting priors):</strong> Using retrospective data (prior mean = 5.25) versus prospective sample mean (7.11): posterior variance of \(\mu\) = 0.0083 <em>exceeds</em> 0.0075 (NI prior). The prior information <em>increased</em> uncertainty because the prior mean was remote from the sample mean. Expression (4.13) shows the posterior variance includes a term \(\kappa_0 n/(\kappa_0+n)(\bar{y}-\mu_0)^2\) that grows with the prior-data discrepancy.
+  </div>
+
+  <h3>Case 3: Expert Knowledge — Product Prior (Non-Conjugate)</h3>
+  <p>Taking \(\mu \sim \mathrm{N}(\mu_0, \sigma_0^2)\) and \(\sigma^2 \sim \mathrm{Inv}\text{-}\chi^2(\nu_0, \tau_0^2)\) independently yields the <em>product prior</em> \(\mathrm{N}(\mu_0, \sigma_0^2)\,\mathrm{Inv}\text{-}\chi^2(\nu_0, \tau_0^2)\). This is <strong>not</strong> a normal-scaled-inverse chi-squared distribution — in the conjugate prior, \(\mu\) is dependent on \(\sigma^2\), but the product prior makes them independent a priori. Consequently:</p>
+  <ul>
+    <li>\(p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}(\bar{\mu}, \bar{\sigma}^2)\) is tractable (formula 4.18).</li>
+    <li>\(p(\sigma^2 \mid \boldsymbol{y})\) has <strong>no closed-form analytical expression</strong> — the integration constant is unknown.</li>
+    <li>The posterior must be approximated numerically (e.g., grid, sampling).</li>
+  </ul>
+</div>
+
+<!-- 4.4 -->
+<div class="card" id="s44">
+  <h2>4.4 Multivariate Distributions</h2>
+
+  <h3>4.4.1 Multivariate Normal (MVN)</h3>
+  <div class="fbox">
+    <p>\[p(\boldsymbol{y} \mid \boldsymbol{\mu}, \Sigma) = \frac{1}{(2\pi)^{p/2}|\Sigma|^{1/2}} \exp\!\left[-\frac{1}{2}(\boldsymbol{y}-\boldsymbol{\mu})^T \Sigma^{-1}(\boldsymbol{y}-\boldsymbol{\mu})\right]\]</p>
+  </div>
+  <p>Notation: \(\mathrm{N}_p(\boldsymbol{\mu}, \Sigma)\). Key property: all marginal and conditional distributions of an MVN are again normal, as are all linear combinations of the components.</p>
+
+  <h3>Multivariate Student's t-distribution</h3>
+  <p>Allows heavier tails than MVN. Notation: \(T_\nu(\boldsymbol{\mu}, \Sigma)\). Arises as the marginal posterior of \(\boldsymbol{\beta}\) in Bayesian linear regression with NI prior.</p>
+
+  <h3>Wishart Distribution</h3>
+  <p>The multivariate extension of the \(\chi^2\)-distribution. If \(S^2 = \sum_{i=1}^n (y_i - \bar{y})^2\), then \(S^2/\sigma^2 \sim \chi^2(n-1)\). When \(S^2\) is replaced by the matrix \(\mathbf{S} = \sum_{i=1}^n (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^T\), the Wishart distribution \(\mathrm{Wishart}(\Sigma, \nu)\) with \(\nu = n-1\) degrees of freedom is obtained.</p>
+
+  <div class="fbox">
+    <p>\[p(\mathbf{S} \mid \nu, \Sigma) = c\,|\Sigma|^{-\nu/2}\,|\mathbf{S}|^{(\nu-p-1)/2} \exp\!\left[-\tfrac{1}{2}\,\mathrm{tr}(\Sigma^{-1}\mathbf{S})\right]\]</p>
+    <p>The <strong>inverse Wishart</strong>: \(R \sim \mathrm{IW}(\Sigma, \nu)\) if \(R^{-1} \sim \mathrm{Wishart}(\Sigma, \nu)\). It is the conjugate prior for \(\Sigma\) in the MVN model.</p>
+  </div>
+
+  <h3>4.4.2 The Multinomial Distribution</h3>
+  <div class="fbox">
+    <p>\[p(\boldsymbol{y} \mid \boldsymbol{\theta}) = \frac{n!}{y_1!\, y_2!\cdots y_k!}\prod_{j=1}^k \theta_j^{y_j}\]</p>
+    <p>with \(n = \sum_{j=1}^k y_j\), \(\theta_j &gt; 0\), and \(\sum_{j=1}^k \theta_j = 1\).</p>
+  </div>
+  <ul>
+    <li>Binomial is a special case with \(k=2\).</li>
+    <li>Marginal distribution of \(y_j\) is \(\mathrm{Bin}(n, \theta_j)\).</li>
+    <li>Conjugate prior: <strong>Dirichlet</strong> \(\mathrm{Dir}(\boldsymbol{\alpha})\), yielding posterior \(\mathrm{Dir}(\boldsymbol{\alpha} + \boldsymbol{y})\).</li>
+    <li>1-D marginals of \(\mathrm{Dir}(\boldsymbol{\alpha})\) are Beta distributions: \(\theta_{ij} \sim \mathrm{Beta}(\alpha_{ij},\, \sum_{kl}\alpha_{kl} - \alpha_{ij})\).</li>
+  </ul>
+
+  <div class="nb">
+    <strong>Sampling from Dirichlet (key result):</strong> If \(W_{ij} \sim \mathrm{Gamma}(\alpha_{ij}, 1)\) independently and \(T = \sum_{ij} W_{ij}\), then \(Z_{ij} = W_{ij}/T \sim \mathrm{Dir}(\boldsymbol{\alpha})\). This provides an efficient way to sample the cross-ratio \(\psi = \theta_{11}\theta_{22}/(\theta_{12}\theta_{21})\) from its posterior.
+  </div>
+
+  <div class="nb">
+    <strong>Example IV.3 (Young adults, \(n = 501\)):</strong> Noninformative Dirichlet Dir(1,1,1,1) prior; posterior median for \(\psi\) = 1.299, 95% equal tail CI = [0.839, 2.014] — no conclusive evidence of positive association.
+  </div>
+</div>
+
+<!-- 4.5 -->
+<div class="card" id="s45">
+  <h2>4.5 Frequentist Properties of Bayesian Inference</h2>
+  <p>Although it is not a primary Bayesian concern whether procedures work well if a study is repeated, it is important to understand the long-run properties of Bayesian interval estimators.</p>
+  <ul>
+    <li>There is <strong>no guarantee</strong> that a 100(1−α)% credible interval achieves correct frequentist coverage in small samples.</li>
+    <li>For large samples, the Bayesian CLT ensures asymptotic correct coverage when there is a finite number of parameters.</li>
+    <li>For the NI prior on the normal model (Section 4.3.1), the credible intervals <em>exactly coincide</em> with classical 95% CIs — so coverage is guaranteed.</li>
+    <li>With strong subjective priors, coverage can deviate from 100(1−α)%; however, a well-chosen prior may yield <em>better</em> (higher) coverage than the nominal level.</li>
+  </ul>
+  <div class="nb">
+    <strong>Agresti &amp; Min (2005) findings for 2×2 tables:</strong> For the <em>risk difference</em>, all NI priors gave approximately correct frequentist coverage. For the <em>risk ratio</em> and <em>odds ratio</em>, the uniform prior gave too-low coverage. The recommendation is to use the <strong>Jeffreys prior</strong> for binomial parameters when correct frequentist coverage is desired.
+  </div>
+</div>
+
+<!-- 4.6 -->
+<div class="card" id="s46">
+  <h2>4.6 Sampling from the Posterior: The Method of Composition</h2>
+  <p>The <em>Method of Composition</em> uses the factorization of the joint posterior into marginal and conditional distributions:</p>
+  <div class="fbox">
+    <p>\[p(\theta_1, \ldots, \theta_d \mid \boldsymbol{y}) = p(\theta_d \mid \boldsymbol{y})\; p(\theta_{d-1} \mid \theta_d, \boldsymbol{y})\;\cdots\; p(\theta_1 \mid \theta_d, \ldots, \theta_2, \boldsymbol{y})\]</p>
+  </div>
+  <p><strong>Algorithm:</strong> Repeat \(K\) times: (1) sample \(\tilde{\theta}_d\) from \(p(\theta_d \mid \boldsymbol{y})\); (2) sample \(\tilde{\theta}_{d-1}\) from \(p(\theta_{d-1} \mid \tilde{\theta}_d, \boldsymbol{y})\); …; etc. This yields a sample of \(K\) <em>independent</em> observations from the joint posterior, and automatically from all marginal posteriors.</p>
+
+  <table>
+    <thead><tr><th>Property</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>Output</td><td>Independent sample from the joint posterior AND all marginals</td></tr>
+      <tr><td>Key advantage</td><td>Useful when marginal sampling is hard but conditional sampling is easy</td></tr>
+      <tr><td>Ordering</td><td>Any ordering is valid in principle; choose the one yielding simplest sampling</td></tr>
+      <tr><td>For PPD</td><td>Add a final step: sample \(\tilde{y}\) from \(p(\tilde{y} \mid \tilde{\theta}, \boldsymbol{y})\)</td></tr>
+      <tr><td>Limitation</td><td>Cannot handle non-standard conditional distributions without auxiliary algorithms</td></tr>
+    </tbody>
+  </table>
+
+  <h3>MoC for Normal Posterior — NI Prior (Case 1)</h3>
+  <p>To sample from \(p(\mu, \sigma^2 \mid \boldsymbol{y})\), repeat for \(k = 1, \ldots, K\):</p>
+  <ol style="padding-left:20px;margin:8px 0;">
+    <li>Sample \(\tilde{\chi}_k \sim \chi^2(n-1)\), then set \((\tilde{\sigma}^2)_k = (n-1)s^2/\tilde{\chi}_k\)</li>
+    <li>Sample \(\tilde{\mu}_k \sim \mathrm{N}(\bar{y},\; (\tilde{\sigma}^2)_k/n)\)</li>
+  </ol>
+  <p>The resulting \(\tilde{\mu}_1, \ldots, \tilde{\mu}_K\) form an independent sample from the marginal \(t_{n-1}(\bar{y}, s^2/n)\). For the PPD, add step 3: sample \(\tilde{y}_k \sim \mathrm{N}(\tilde{\mu}_k,\; (\tilde{\sigma}^2)_k)\).</p>
+
+  <div class="warn">
+    <strong>Expert knowledge case (Case 3):</strong> Since \(p(\sigma^2 \mid \boldsymbol{y})\) has no closed form with the product prior, standard routines cannot sample from it directly. Weighted resampling (importance sampling/SIR from Chapter 3) is used, with an approximating distribution (e.g., an Inv-\(\chi^2\) with matched mean and variance) as the proposal.
+  </div>
+
+  <div class="nb">
+    <strong>Example IV.5 (NI prior, \(K = 1000\)):</strong> Posterior mean (95% MC CI) for \(\mu\): 7.11 ([7.106, 7.117]); for \(\sigma^2\): 1.88 ([1.869, 1.890]). 95% equal tail CI for \(\mu\) = [6.95, 7.27]; for \(\sigma^2\) = [1.58, 2.23]. To increase accuracy, simply increase \(K\).
+  </div>
+</div>
+
+<!-- 4.7 -->
+<div class="card" id="s47">
+  <h2>4.7 Bayesian Linear Regression Models</h2>
+
+  <h3>4.7.1 Model Setup</h3>
+  <div class="fbox">
+    <p>Model: \(\boldsymbol{y} = \boldsymbol{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}\), \(\;\boldsymbol{\varepsilon} \sim \mathrm{N}(\boldsymbol{0}, \sigma^2 \boldsymbol{I})\)</p>
+    <p>Likelihood: \(L(\boldsymbol{\beta}, \sigma^2 \mid \boldsymbol{y}, \boldsymbol{X}) = \dfrac{1}{(2\pi\sigma^2)^{n/2}} \exp\!\left[-\dfrac{1}{2\sigma^2}(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})^T(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta})\right]\)</p>
+    <p>MLE = LSE: \(\hat{\boldsymbol{\beta}} = (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{y}\); \(\quad s^2 = S/(n-d-1)\) where \(S = (\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}})^T(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}})\)</p>
+  </div>
+
+  <h3>4.7.2 Noninformative Prior \(p(\boldsymbol{\beta}, \sigma^2) \propto \sigma^{-2}\)</h3>
+  <table>
+    <thead><tr><th>Distribution</th><th>Form</th></tr></thead>
+    <tbody>
+      <tr><td>Joint: \(p(\boldsymbol{\beta}, \sigma^2 \mid \boldsymbol{y})\)</td><td>\(\mathrm{N}_{d+1}\!\bigl[\boldsymbol{\beta} \mid \hat{\boldsymbol{\beta}},\, \sigma^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\bigr] \times \mathrm{Inv}\text{-}\chi^2(\sigma^2 \mid n-d-1, s^2)\)</td></tr>
+      <tr><td>Conditional: \(p(\boldsymbol{\beta} \mid \sigma^2, \boldsymbol{y})\)</td><td>\(\mathrm{N}_{d+1}\!\bigl[\boldsymbol{\beta} \mid \hat{\boldsymbol{\beta}},\, \sigma^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\bigr]\)</td></tr>
+      <tr><td>Marginal: \(p(\sigma^2 \mid \boldsymbol{y})\)</td><td>\(\mathrm{Inv}\text{-}\chi^2(\sigma^2 \mid n-d-1, s^2)\)</td></tr>
+      <tr><td>Marginal: \(p(\boldsymbol{\beta} \mid \boldsymbol{y})\)</td><td>\(T_{n-d-1}\!\bigl[\boldsymbol{\beta} \mid \hat{\boldsymbol{\beta}},\, s^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\bigr]\) — multivariate \(t\)-distribution</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.7.3 Posterior Summary Measures (NI Prior)</h3>
+  <ul>
+    <li><strong>Mean/mode/median of \(\beta_j\)</strong> = LSE \(\hat{\beta}_j\) (coincides with frequentist estimate).</li>
+    <li><strong>95% HPD interval for \(\beta_j\)</strong>: \(\hat{\beta}_j \pm s\,(\boldsymbol{X}^T\boldsymbol{X})_{jj}^{-1/2}\,t(0.025;\, n-d-1)\) — same as classical.</li>
+    <li><strong>Mode of \(\sigma^2\)</strong>: \(\dfrac{n-d-1}{n-d+1}s^2\) (not equal to MLE \(s^2\)).</li>
+    <li><strong>Mean of \(\sigma^2\)</strong>: \(\dfrac{n-d-1}{n-d-3}s^2\).</li>
+    <li><strong>HPD region for \(\boldsymbol{\beta}\)</strong>: \(C_\alpha(\boldsymbol{\beta}) = \left\{\boldsymbol{\beta}: (\boldsymbol{\beta}-\hat{\boldsymbol{\beta}})^T(\boldsymbol{X}^T\boldsymbol{X})(\boldsymbol{\beta}-\hat{\boldsymbol{\beta}}) \le d\,s^2\,F_\alpha(d+1, n-d-1)\right\}\)</li>
+    <li><strong>PPD</strong> for future \(\tilde{y}\) with covariate vector \(\tilde{\boldsymbol{x}}\): \(t_{n-d-1}\) with location \(\tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}\) and scale \(s^2(1 + \tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}})\); equivalently, \(\dfrac{\tilde{y} - \tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}}{s\sqrt{1 + \tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}}}} \sim t_{n-d-1}\).</li>
+  </ul>
+
+  <div class="nb">
+    <strong>Method of Composition for regression (2 steps):</strong> (1) Sample \(\tilde{\sigma}^2 \sim \mathrm{Inv}\text{-}\chi^2(n-d-1, s^2)\); (2) Sample \(\tilde{\boldsymbol{\beta}} \sim \mathrm{N}_{d+1}(\hat{\boldsymbol{\beta}},\, \tilde{\sigma}^2(\boldsymbol{X}^T\boldsymbol{X})^{-1})\). The 2-step MoC is simpler than directly sampling from the multivariate \(t\)-distribution \(p(\boldsymbol{\beta} \mid \boldsymbol{y})\).
+  </div>
+
+  <div class="nb">
+    <strong>Example IV.8 (Osteoporosis, \(n = 234\)):</strong> MoC with \(K = 1000\): sampled mean \(\hat{\boldsymbol{\beta}} = (0.816, 0.0403)\). 95% equal tail CIs: \(\beta_0\): [0.594, 1.040]; \(\beta_1\): [0.0317, 0.0486]. Posterior correlation of \(\beta_0, \beta_1\) ≈ −0.99 (high collinearity reflected in ridge in joint posterior).
+  </div>
+</div>
+
+<!-- 4.8 -->
+<div class="card" id="s48">
+  <h2>4.8 Bayesian Generalized Linear Models (BGLIM)</h2>
+  <p>A GLIM extends linear regression to a wide class of models. It has three components:</p>
+  <table>
+    <thead><tr><th>Component</th><th>Description</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Distributional part</strong></td>
+        <td>\(p(y \mid \theta; \phi) = \exp\!\left[\dfrac{y\theta - b(\theta)}{a(\phi)} + c(y;\phi)\right]\) — exponential family in canonical parameter \(\theta\). Mean: \(\mu = b'(\theta)\); Var: \(a(\phi)V(\mu)\) where \(V(\mu) = b''(\theta)\).</td>
+        <td>Normal, Poisson, Bernoulli</td>
+      </tr>
+      <tr>
+        <td><strong>Link function</strong></td>
+        <td>Monotone differentiable \(g\): \(g(\mu) = \eta = \boldsymbol{x}^T\boldsymbol{\beta}\). Canonical link: \(\eta = \theta\). Inverse: \(h = g^{-1}\).</td>
+        <td>Identity, log, logit</td>
+      </tr>
+      <tr>
+        <td><strong>Variance function</strong></td>
+        <td>\(V(\mu)\) describes how variance depends on the mean (via covariates through \(\mu\)). \(\phi\) is the dispersion/scale parameter.</td>
+        <td>\(V(\mu)=1\), \(V(\mu)=\mu\), \(V(\mu)=\mu(1-\mu)\)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead><tr><th>Model</th><th>Distribution</th><th>Link</th><th>\(\phi\)</th><th>\(V(\mu)\)</th></tr></thead>
+    <tbody>
+      <tr><td>Normal regression</td><td>\(\mathrm{N}(\mu_i, \sigma^2)\)</td><td>Identity: \(g(\mu)=\mu\)</td><td>1</td><td>\(\sigma^2\)</td></tr>
+      <tr><td>Poisson regression</td><td>\(\mathrm{Poisson}(\mu_i)\)</td><td>Log: \(g(\mu)=\log\mu\)</td><td>1</td><td>\(\mu\)</td></tr>
+      <tr><td>Logistic regression</td><td>\(\mathrm{Bern}(\mu_i)\)</td><td>Logit: \(g(\mu)=\log[\mu/(1-\mu)]\)</td><td>1</td><td>\(\mu(1-\mu)\)</td></tr>
+    </tbody>
+  </table>
+
+  <p>A <strong>BGLIM</strong> is obtained by specifying a prior distribution on all parameters of the GLIM. Binary response models (especially logistic regression) constitute the most important subclass in medical applications. For complex models (censoring, truncation, random effects), analytical posteriors generally do not exist — Markov chain Monte Carlo (MCMC) methods (Chapter 6) are needed.</p>
+</div>
+
+<!-- MCQ SECTION -->
+<div class="sec-title" id="mcq">✏️ 40 Multiple Choice Questions</div>
+
+<div class="score-bar">
+  <div>
+    <span>Score: </span><span id="score-display">0 / 0</span>
+    <span style="margin-left:14px;font-size:.82rem;">(out of 40 questions)</span>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+</div>
+
+<!-- Q1 -->
+<div class="qblock" id="q1">
+  <div class="qnum">Question 1 of 40 — Joint Posterior</div>
+  <div class="qtext">The joint posterior distribution for a \(d\)-dimensional parameter vector \(\boldsymbol{\theta}\) with prior \(p(\boldsymbol{\theta})\) and likelihood \(L(\boldsymbol{\theta} \mid \boldsymbol{y})\) is proportional to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q1',this)">A. &nbsp;\(L(\boldsymbol{\theta} \mid \boldsymbol{y})\; p(\boldsymbol{\theta})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">B. &nbsp;\(L(\boldsymbol{\theta} \mid \boldsymbol{y})\;/\; p(\boldsymbol{\theta})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">C. &nbsp;\(p(\boldsymbol{\theta})\;/\; L(\boldsymbol{\theta} \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">D. &nbsp;\(p(\boldsymbol{y}) \cdot p(\boldsymbol{\theta})\)</button>
+  </div>
+  <div class="fb" id="q1-fb"></div>
+</div>
+
+<!-- Q2 -->
+<div class="qblock" id="q2">
+  <div class="qnum">Question 2 of 40 — Marginal Posterior</div>
+  <div class="qtext">The marginal posterior distribution of \(\theta_1\) in a two-parameter model \(\boldsymbol{\theta} = (\theta_1, \theta_2)\) is obtained by:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">A. Maximizing the joint posterior over \(\theta_2\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q2',this)">B. Integrating the joint posterior \(p(\theta_1, \theta_2 \mid \boldsymbol{y})\) over \(\theta_2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">C. Substituting the posterior mode of \(\theta_2\) into the joint posterior</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">D. Dividing the joint posterior by the conditional posterior \(p(\theta_2 \mid \boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q2-fb"></div>
+</div>
+
+<!-- Q3 -->
+<div class="qblock" id="q3">
+  <div class="qnum">Question 3 of 40 — Posterior Mean of a Vector</div>
+  <div class="qtext">For a multivariate posterior distribution \(p(\boldsymbol{\theta} \mid \boldsymbol{y})\) with \(\boldsymbol{\theta} = (\theta_1, \theta_2)^T\), which statement about the posterior mean of \(\boldsymbol{\theta}\) is correct?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">A. The posterior mean of \(\boldsymbol{\theta}\) equals the vector of marginal posterior modes</button>
+    <button class="opt" data-correct="true" onclick="answer('q3',this)">B. The posterior mean of \(\boldsymbol{\theta}\) consists of the marginal posterior means, but this does NOT hold for the posterior mode</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">C. The posterior mean of \(\boldsymbol{\theta}\) does NOT consist of the marginal posterior means</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">D. Both the posterior mean and mode of \(\boldsymbol{\theta}\) consist of the respective marginal measures</button>
+  </div>
+  <div class="fb" id="q3-fb"></div>
+</div>
+
+<!-- Q4 -->
+<div class="qblock" id="q4">
+  <div class="qnum">Question 4 of 40 — Nuisance Parameter Treatment</div>
+  <div class="qtext">When \(\theta_2\) consists of nuisance parameters, the Bayesian approach eliminates them via integration (marginalizing), while the classical (frequentist) approach uses the <em>profile likelihood</em>, defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">A. \(pL(\theta_1) = \int L(\theta_1, \theta_2)\,p(\theta_2)\,d\theta_2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">B. \(pL(\theta_1) = \int L(\theta_1, \theta_2)\,d\theta_2\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q4',this)">C. \(pL(\theta_1) = \max_{\theta_2} L(\theta_1, \theta_2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">D. \(pL(\theta_1) = \min_{\theta_2} L(\theta_1, \theta_2)\)</button>
+  </div>
+  <div class="fb" id="q4-fb"></div>
+</div>
+
+<!-- Q5 -->
+<div class="qblock" id="q5">
+  <div class="qnum">Question 5 of 40 — Sufficient Statistics for Normal</div>
+  <div class="qtext">For a sample \(y_1, \ldots, y_n\) i.i.d. from \(\mathrm{N}(\mu, \sigma^2)\), the sufficient statistics for \((\mu, \sigma^2)\) are:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q5',this)">A. The sample mean \(\bar{y}\) and the sample variance \(s^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">B. The sample maximum and minimum</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">C. The sample mean and the sample range</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">D. The sum \(\sum y_i\) only</button>
+  </div>
+  <div class="fb" id="q5-fb"></div>
+</div>
+
+<!-- Q6 -->
+<div class="qblock" id="q6">
+  <div class="qnum">Question 6 of 40 — NI Prior for Normal Model</div>
+  <div class="qtext">The standard noninformative joint prior for \((\mu, \sigma^2)\) in the normal model is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">A. \(p(\mu, \sigma^2) \propto 1\) (flat)</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">B. \(p(\mu, \sigma^2) \propto \sigma^{-1}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q6',this)">C. \(p(\mu, \sigma^2) \propto \sigma^{-2}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">D. \(p(\mu, \sigma^2) \propto \sigma^{+2}\)</button>
+  </div>
+  <div class="fb" id="q6-fb"></div>
+</div>
+
+<!-- Q7 -->
+<div class="qblock" id="q7">
+  <div class="qnum">Question 7 of 40 — Conditional Posterior of μ</div>
+  <div class="qtext">Under the NI prior for the normal model, the conditional posterior \(p(\mu \mid \sigma^2, \boldsymbol{y})\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q7',this)">A. \(\mathrm{N}(\bar{y},\; \sigma^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">B. \(t_{n-1}(\bar{y},\; s^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">C. \(\mathrm{N}(\bar{y},\; s^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">D. \(\mathrm{Inv}\text{-}\chi^2(n-1, s^2)\)</button>
+  </div>
+  <div class="fb" id="q7-fb"></div>
+</div>
+
+<!-- Q8 -->
+<div class="qblock" id="q8">
+  <div class="qnum">Question 8 of 40 — Marginal Posterior of μ</div>
+  <div class="qtext">Under the NI prior, the marginal posterior \(p(\mu \mid \boldsymbol{y})\) follows:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">A. \(\mathrm{N}(\bar{y},\; s^2/n)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q8',this)">B. \(t_{n-1}(\bar{y},\; s^2/n)\), implying \((\mu - \bar{y})\,/\,(s/\sqrt{n}) \sim t_{n-1}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">C. \(\mathrm{Inv}\text{-}\chi^2(n-1, s^2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">D. \(\mathrm{N}(\bar{y},\; \sigma^2/n)\) with \(\sigma^2\) known</button>
+  </div>
+  <div class="fb" id="q8-fb"></div>
+</div>
+
+<!-- Q9 -->
+<div class="qblock" id="q9">
+  <div class="qnum">Question 9 of 40 — Marginal Posterior of σ²</div>
+  <div class="qtext">Under the NI prior, the marginal posterior \(p(\sigma^2 \mid \boldsymbol{y})\) is a scaled inverse chi-squared distribution \(\mathrm{Inv}\text{-}\chi^2(n-1, s^2)\). This implies that:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">A. \((n-1)s^2/\sigma^2 \sim t_{n-1}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">B. \(\sigma^2/(n-1)s^2 \sim \chi^2(n-1)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q9',this)">C. \((n-1)s^2/\sigma^2 \sim \chi^2(n-1)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">D. \(\sigma^2 \sim \mathrm{N}(s^2,\; 2s^4/n)\)</button>
+  </div>
+  <div class="fb" id="q9-fb"></div>
+</div>
+
+<!-- Q10 -->
+<div class="qblock" id="q10">
+  <div class="qnum">Question 10 of 40 — Joint Posterior Distribution Name</div>
+  <div class="qtext">The joint posterior \(p(\mu, \sigma^2 \mid \boldsymbol{y})\) under the NI prior for the normal model is called:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">A. Normal-gamma distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">B. Normal-inverse-gamma distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q10',this)">C. Normal-scaled-inverse chi-squared distribution (N-Inv-\(\chi^2\))</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">D. Bivariate normal distribution</button>
+  </div>
+  <div class="fb" id="q10-fb"></div>
+</div>
+
+<!-- Q11 -->
+<div class="qblock" id="q11">
+  <div class="qnum">Question 11 of 40 — Posterior Mode of σ²</div>
+  <div class="qtext">For the normal model with NI prior, the posterior mode of \(\sigma^2\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">A. \(\dfrac{n-1}{n-3}s^2\) (posterior mean)</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">B. \(s^2\) (MLE)</button>
+    <button class="opt" data-correct="true" onclick="answer('q11',this)">C. \(\dfrac{n-1}{n+1}s^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">D. \(\dfrac{n-1}{\chi^2_{0.5,n-1}}s^2\) (posterior median)</button>
+  </div>
+  <div class="fb" id="q11-fb"></div>
+</div>
+
+<!-- Q12 -->
+<div class="qblock" id="q12">
+  <div class="qnum">Question 12 of 40 — Bayesian CI vs Classical CI</div>
+  <div class="qtext">The 95% Bayesian credible interval for \(\mu\) under the NI prior for the normal model, \([\bar{y} - t_{0.025;n-1}\,s/\sqrt{n},\; \bar{y} + t_{0.025;n-1}\,s/\sqrt{n}]\), is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">A. Always wider than the classical confidence interval</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">B. Always narrower than the classical confidence interval</button>
+    <button class="opt" data-correct="true" onclick="answer('q12',this)">C. Identical to the classical 95% confidence interval</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">D. Identical to the HPD interval only when the posterior is symmetric</button>
+  </div>
+  <div class="fb" id="q12-fb"></div>
+</div>
+
+<!-- Q13 -->
+<div class="qblock" id="q13">
+  <div class="qnum">Question 13 of 40 — PPD for Normal Model (NI Prior)</div>
+  <div class="qtext">For the normal model with NI prior, the posterior predictive distribution (PPD) for a future observation \(\tilde{y}\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q13',this)">A. \(t_{n-1}\!\left(\bar{y},\; s^2\!\left(1 + \tfrac{1}{n}\right)\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">B. \(t_{n-1}(\bar{y},\; s^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">C. \(\mathrm{N}(\bar{y},\; \sigma^2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">D. \(\mathrm{N}(\bar{y},\; s^2)\)</button>
+  </div>
+  <div class="fb" id="q13-fb"></div>
+</div>
+
+<!-- Q14 -->
+<div class="qblock" id="q14">
+  <div class="qnum">Question 14 of 40 — Prior–Data Independence</div>
+  <div class="qtext">Under the NI prior for the normal model, \(\mu\) and \(\sigma^2\) are independent a priori. What happens a posteriori?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">A. They remain independent a posteriori</button>
+    <button class="opt" data-correct="true" onclick="answer('q14',this)">B. They become dependent a posteriori</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">C. Independence depends on the sample size \(n\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">D. They remain independent only if the data are normally distributed</button>
+  </div>
+  <div class="fb" id="q14-fb"></div>
+</div>
+
+<!-- Q15 -->
+<div class="qblock" id="q15">
+  <div class="qnum">Question 15 of 40 — Historical Prior Posterior Mean</div>
+  <div class="qtext">When a historical prior N-Inv-\(\chi^2(\mu_0, \kappa_0, \nu_0, \sigma_0^2)\) is combined with the normal likelihood, the posterior mean of \(\mu\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">A. \(\dfrac{\mu_0 + \bar{y}}{2}\) (simple average)</button>
+    <button class="opt" data-correct="true" onclick="answer('q15',this)">B. \(\dfrac{\kappa_0\mu_0 + n\bar{y}}{\kappa_0 + n}\) (weighted average)</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">C. \(\bar{y}\) (always equal to sample mean)</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">D. \(\mu_0\) (dominated by prior)</button>
+  </div>
+  <div class="fb" id="q15-fb"></div>
+</div>
+
+<!-- Q16 -->
+<div class="qblock" id="q16">
+  <div class="qnum">Question 16 of 40 — Conflicting Prior</div>
+  <div class="qtext">In Example IV.2, the posterior variance of \(\mu\) under the conjugate informative prior (prior mean = 5.25) was <em>larger</em> than under the NI prior (sample mean = 7.11). The cause of this is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">A. The informative prior had a larger sample size than the data</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">B. The prior variance of \(\mu\) was too wide</button>
+    <button class="opt" data-correct="true" onclick="answer('q16',this)">C. The prior mean was remote from the sample mean, adding a discrepancy term \(\kappa_0 n/(\kappa_0+n)(\bar{y}-\mu_0)^2\) to the posterior variance</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">D. The conjugate prior is always less informative than the NI prior</button>
+  </div>
+  <div class="fb" id="q16-fb"></div>
+</div>
+
+<!-- Q17 -->
+<div class="qblock" id="q17">
+  <div class="qnum">Question 17 of 40 — Expert Knowledge Prior</div>
+  <div class="qtext">Why does the product prior \(\mathrm{N}(\mu_0, \sigma_0^2)\,\mathrm{Inv}\text{-}\chi^2(\nu_0, \tau_0^2)\) for the normal model NOT yield an analytical posterior for \(\sigma^2\)?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">A. Because the product of two distributions is not a valid prior</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">B. Because the prior is improper (does not integrate to 1)</button>
+    <button class="opt" data-correct="true" onclick="answer('q17',this)">C. Because this product prior is not conjugate — it makes \(\mu\) and \(\sigma^2\) a priori independent, unlike the conjugate N-Inv-\(\chi^2\) prior where \(\mu\) depends on \(\sigma^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">D. Because \(\sigma^2\) cannot have a prior distribution</button>
+  </div>
+  <div class="fb" id="q17-fb"></div>
+</div>
+
+<!-- Q18 -->
+<div class="qblock" id="q18">
+  <div class="qnum">Question 18 of 40 — MVN Properties</div>
+  <div class="qtext">For a multivariate normal distribution \(\mathrm{N}_p(\boldsymbol{\mu}, \Sigma)\), which property holds?</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q18',this)">A. All marginal and conditional distributions are again normal, as are all linear combinations of the components</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">B. Marginal distributions are normal but conditional distributions are Student-\(t\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">C. Only the marginal distributions are normal; conditional distributions may not be</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">D. Linear combinations of MVN variables follow a chi-squared distribution</button>
+  </div>
+  <div class="fb" id="q18-fb"></div>
+</div>
+
+<!-- Q19 -->
+<div class="qblock" id="q19">
+  <div class="qnum">Question 19 of 40 — Wishart Distribution</div>
+  <div class="qtext">The Wishart distribution \(\mathrm{Wishart}(\Sigma, \nu)\) is best described as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">A. The multivariate extension of the normal distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">B. The multivariate extension of the beta distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q19',this)">C. The multivariate extension of the \(\chi^2\)-distribution, obtained from the sample cross-product matrix</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">D. The multivariate extension of the gamma distribution used for rates</button>
+  </div>
+  <div class="fb" id="q19-fb"></div>
+</div>
+
+<!-- Q20 -->
+<div class="qblock" id="q20">
+  <div class="qnum">Question 20 of 40 — Inverse Wishart</div>
+  <div class="qtext">The inverse Wishart distribution \(R \sim \mathrm{IW}(\Sigma, \nu)\) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">A. \(R \sim \mathrm{IW}(\Sigma, \nu)\) if \(R \sim \mathrm{Wishart}(\Sigma, \nu)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q20',this)">B. \(R \sim \mathrm{IW}(\Sigma, \nu)\) if \(R^{-1} \sim \mathrm{Wishart}(\Sigma, \nu)\), where \(\Sigma\) is a precision matrix</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">C. \(R \sim \mathrm{IW}(\Sigma, \nu)\) if \(\log R \sim \mathrm{Wishart}(\Sigma, \nu)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">D. \(R \sim \mathrm{IW}(\Sigma, \nu)\) if \(\nu R \sim \mathrm{Wishart}(\Sigma, \nu)\)</button>
+  </div>
+  <div class="fb" id="q20-fb"></div>
+</div>
+
+<!-- Q21 -->
+<div class="qblock" id="q21">
+  <div class="qnum">Question 21 of 40 — Multinomial Distribution</div>
+  <div class="qtext">For the multinomial distribution \(\mathrm{Mult}(n, \boldsymbol{\theta})\) with \(k\) categories, the marginal distribution of the count \(y_j\) for category \(j\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">A. \(\mathrm{Poisson}(n\theta_j)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q21',this)">B. \(\mathrm{Bin}(n, \theta_j)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">C. \(\mathrm{Beta}\text{-}\mathrm{Binomial}(n, \alpha_j, \sum_{kl}\alpha_{kl}-\alpha_j)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">D. \(\mathrm{Uniform}(0, n)\)</button>
+  </div>
+  <div class="fb" id="q21-fb"></div>
+</div>
+
+<!-- Q22 -->
+<div class="qblock" id="q22">
+  <div class="qnum">Question 22 of 40 — Conjugate Prior for Multinomial</div>
+  <div class="qtext">The conjugate prior for the multinomial distribution \(\mathrm{Mult}(n, \boldsymbol{\theta})\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">A. A product of independent Beta distributions \(\prod_j \mathrm{Beta}(\alpha_j, \beta_j)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">B. A multivariate normal distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q22',this)">C. The Dirichlet distribution \(\mathrm{Dir}(\boldsymbol{\alpha})\), yielding posterior \(\mathrm{Dir}(\boldsymbol{\alpha} + \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">D. The Wishart distribution</button>
+  </div>
+  <div class="fb" id="q22-fb"></div>
+</div>
+
+<!-- Q23 -->
+<div class="qblock" id="q23">
+  <div class="qnum">Question 23 of 40 — Sampling from Dirichlet</div>
+  <div class="qtext">To sample \(\boldsymbol{Z} \sim \mathrm{Dir}(\boldsymbol{\alpha})\) for a \(2\times2\) contingency table, one can use the result: if \(W_{ij} \sim \mathrm{Gamma}(\alpha_{ij}, 1)\) independently and \(T = \sum_{ij} W_{ij}\), then:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">A. \(T \cdot W_{ij} \sim \mathrm{Dir}(\boldsymbol{\alpha})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">B. \(W_{ij} - T \sim \mathrm{Dir}(\boldsymbol{\alpha})\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q23',this)">C. \(Z_{ij} = W_{ij}/T \sim \mathrm{Dir}(\boldsymbol{\alpha})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">D. \(W_{ij}/W_{11} \sim \mathrm{Dir}(\boldsymbol{\alpha})\)</button>
+  </div>
+  <div class="fb" id="q23-fb"></div>
+</div>
+
+<!-- Q24 -->
+<div class="qblock" id="q24">
+  <div class="qnum">Question 24 of 40 — Cross-ratio</div>
+  <div class="qtext">In a 2×2 contingency table with cell probabilities \(\theta_{ij}\), the cross-ratio (odds ratio) \(\psi\) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">A. \(\psi = \theta_{11} + \theta_{22} - \theta_{12} - \theta_{21}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q24',this)">B. \(\psi = \dfrac{\theta_{11}\,\theta_{22}}{\theta_{12}\,\theta_{21}}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">C. \(\psi = \dfrac{\theta_{11} + \theta_{22}}{\theta_{12} + \theta_{21}}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">D. \(\psi = \dfrac{\theta_{11}}{\theta_{12}}\)</button>
+  </div>
+  <div class="fb" id="q24-fb"></div>
+</div>
+
+<!-- Q25 -->
+<div class="qblock" id="q25">
+  <div class="qnum">Question 25 of 40 — Example IV.3 Results</div>
+  <div class="qtext">In Example IV.3 (Young adults study, \(n = 501\)), the posterior median of the cross-ratio \(\psi\) for the association between smoking and alcohol was 1.299, with 95% equal tail CI = [0.839, 2.014]. The appropriate conclusion is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">A. There is strong evidence of a positive association since the median exceeds 1</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">B. There is decisive evidence against any association</button>
+    <button class="opt" data-correct="true" onclick="answer('q25',this)">C. There is no conclusive evidence of a positive association, since 1 is within the 95% CI</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">D. The association is negative since the lower CI bound is less than 1</button>
+  </div>
+  <div class="fb" id="q25-fb"></div>
+</div>
+
+<!-- Q26 -->
+<div class="qblock" id="q26">
+  <div class="qnum">Question 26 of 40 — Frequentist Coverage of Credible Intervals</div>
+  <div class="qtext">Under the Bayesian CLT (large \(n\), finite parameter count), the asymptotic frequentist coverage of a 100(1−α)% Bayesian credible interval is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">A. Always exactly \(100(1-\alpha)\%\) for any prior and sample size</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">B. Less than \(100(1-\alpha)\%\) due to the Bayesian CLT</button>
+    <button class="opt" data-correct="true" onclick="answer('q26',this)">C. Asymptotically correct at \(100(1-\alpha)\%\), though there is no guarantee for small \(n\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">D. Always greater than \(100(1-\alpha)\%\)</button>
+  </div>
+  <div class="fb" id="q26-fb"></div>
+</div>
+
+<!-- Q27 -->
+<div class="qblock" id="q27">
+  <div class="qnum">Question 27 of 40 — Agresti &amp; Min Recommendation</div>
+  <div class="qtext">According to Agresti and Min (2005), which prior should be used for binomial parameters when correct frequentist coverage of a credible interval for the odds ratio is desired?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">A. Uniform (flat) prior, since it gives the best coverage for all measures</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">B. Haldane prior \(\theta^{-1}(1-\theta)^{-1}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q27',this)">C. Jeffreys prior for the binomial parameters</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">D. A highly informative conjugate prior from historical data</button>
+  </div>
+  <div class="fb" id="q27-fb"></div>
+</div>
+
+<!-- Q28 -->
+<div class="qblock" id="q28">
+  <div class="qnum">Question 28 of 40 — Method of Composition: Factorization</div>
+  <div class="qtext">The Method of Composition for a \(d\)-parameter joint posterior uses the factorization:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q28',this)">A. \(p(\theta_1,\ldots,\theta_d \mid \boldsymbol{y}) = p(\theta_d \mid \boldsymbol{y})\;p(\theta_{d-1} \mid \theta_d, \boldsymbol{y})\;\cdots\;p(\theta_1 \mid \theta_d, \ldots, \theta_2, \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">B. \(p(\theta_1,\ldots,\theta_d \mid \boldsymbol{y}) = \prod_{j=1}^d p(\theta_j \mid \boldsymbol{y})\) (product of marginals)</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">C. \(p(\theta_1,\ldots,\theta_d \mid \boldsymbol{y}) = p(\theta_1 \mid \boldsymbol{y})\;p(\theta_2 \mid \theta_1, \boldsymbol{y})\;\cdots\;p(\theta_d \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">D. \(p(\theta_1,\ldots,\theta_d \mid \boldsymbol{y}) = p(\theta_1 \mid \boldsymbol{y}) / p(\theta_d \mid \boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q28-fb"></div>
+</div>
+
+<!-- Q29 -->
+<div class="qblock" id="q29">
+  <div class="qnum">Question 29 of 40 — MoC Output</div>
+  <div class="qtext">When the Method of Composition is repeated \(K\) times with the correct ordering, the resulting \(K\) samples form:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">A. A dependent Markov chain sample from the joint posterior</button>
+    <button class="opt" data-correct="true" onclick="answer('q29',this)">B. An independent sample of size \(K\) from the joint posterior AND from all marginal posteriors</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">C. An independent sample only from the marginal posteriors, not from the joint</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">D. A sample from the prior distribution</button>
+  </div>
+  <div class="fb" id="q29-fb"></div>
+</div>
+
+<!-- Q30 -->
+<div class="qblock" id="q30">
+  <div class="qnum">Question 30 of 40 — MoC for NI Normal: First Step</div>
+  <div class="qtext">In the Method of Composition for the normal model with NI prior, the recommended first step is to sample from:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q30',this)">A. \(p(\sigma^2 \mid \boldsymbol{y})\) by sampling \(\tilde{\chi} \sim \chi^2(n-1)\) and setting \(\tilde{\sigma}^2 = (n-1)s^2/\tilde{\chi}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">B. \(p(\mu \mid \boldsymbol{y})\) by sampling directly from \(t_{n-1}(\bar{y}, s^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">C. The PPD by sampling \(\tilde{y} \sim \mathrm{N}(\bar{y}, s^2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">D. The prior \(p(\mu, \sigma^2) \propto \sigma^{-2}\)</button>
+  </div>
+  <div class="fb" id="q30-fb"></div>
+</div>
+
+<!-- Q31 -->
+<div class="qblock" id="q31">
+  <div class="qnum">Question 31 of 40 — MoC Advantage for Marginals</div>
+  <div class="qtext">The Method of Composition is particularly useful when:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">A. All marginal posteriors are easy to sample from directly</button>
+    <button class="opt" data-correct="true" onclick="answer('q31',this)">B. Sampling from a particular marginal is difficult, but sampling from another marginal and associated conditional posteriors is easier</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">C. The posterior is known analytically and no sampling is needed</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">D. Only one parameter is unknown</button>
+  </div>
+  <div class="fb" id="q31-fb"></div>
+</div>
+
+<!-- Q32 -->
+<div class="qblock" id="q32">
+  <div class="qnum">Question 32 of 40 — Bayesian Linear Regression: MLE = LSE</div>
+  <div class="qtext">In the normal linear regression model, the classical (frequentist) estimate of \(\boldsymbol{\beta}\) is the MLE, which is also equal to the least-squares estimate (LSE). The LSE is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">A. \(\hat{\boldsymbol{\beta}} = (\boldsymbol{X}^T\boldsymbol{X})\,\boldsymbol{X}^T\boldsymbol{y}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q32',this)">B. \(\hat{\boldsymbol{\beta}} = (\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{X}^T\boldsymbol{y}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">C. \(\hat{\boldsymbol{\beta}} = (\boldsymbol{X}\boldsymbol{X}^T)^{-1}\boldsymbol{X}\boldsymbol{y}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">D. \(\hat{\boldsymbol{\beta}} = \boldsymbol{X}(\boldsymbol{X}^T\boldsymbol{X})^{-1}\boldsymbol{y}\)</button>
+  </div>
+  <div class="fb" id="q32-fb"></div>
+</div>
+
+<!-- Q33 -->
+<div class="qblock" id="q33">
+  <div class="qnum">Question 33 of 40 — Marginal Posterior of β</div>
+  <div class="qtext">Under the NI prior \(p(\boldsymbol{\beta}, \sigma^2) \propto \sigma^{-2}\) for the normal linear regression model, the marginal posterior \(p(\boldsymbol{\beta} \mid \boldsymbol{y})\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">A. \(\mathrm{N}_{d+1}\!\left(\hat{\boldsymbol{\beta}},\; s^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">B. \(\mathrm{Inv}\text{-}\chi^2(n-d-1, s^2)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q33',this)">C. \(T_{n-d-1}\!\left(\hat{\boldsymbol{\beta}},\; s^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\right)\) — multivariate \(t\)-distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">D. A product of independent \(t\)-distributions, one for each \(\beta_j\)</button>
+  </div>
+  <div class="fb" id="q33-fb"></div>
+</div>
+
+<!-- Q34 -->
+<div class="qblock" id="q34">
+  <div class="qnum">Question 34 of 40 — Posterior Mode vs Mean of σ² in Regression</div>
+  <div class="qtext">In the Bayesian linear regression model with NI prior, the posterior mode of \(\sigma^2\) is \(\dfrac{n-d-1}{n-d+1}s^2\). How does this compare to the posterior mean of \(\sigma^2\)?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">A. They are equal</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">B. The mode exceeds the mean</button>
+    <button class="opt" data-correct="true" onclick="answer('q34',this)">C. The mode is less than the mean; the posterior mean of \(\sigma^2\) is \(\dfrac{n-d-1}{n-d-3}s^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">D. Neither mode nor mean equals \(s^2\); they are equal to each other but not to \(s^2\)</button>
+  </div>
+  <div class="fb" id="q34-fb"></div>
+</div>
+
+<!-- Q35 -->
+<div class="qblock" id="q35">
+  <div class="qnum">Question 35 of 40 — HPD Region for β</div>
+  <div class="qtext">The 100(1−α)% HPD region for \(\boldsymbol{\beta}\) in the Bayesian linear regression model is the set:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q35',this)">A. \(\left\{\boldsymbol{\beta}:\; (\boldsymbol{\beta}-\hat{\boldsymbol{\beta}})^T(\boldsymbol{X}^T\boldsymbol{X})(\boldsymbol{\beta}-\hat{\boldsymbol{\beta}}) \le d\,s^2\,F_\alpha(d+1, n-d-1)\right\}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">B. \(\left\{\boldsymbol{\beta}:\; (\boldsymbol{\beta}-\hat{\boldsymbol{\beta}})^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}(\boldsymbol{\beta}-\hat{\boldsymbol{\beta}}) \le d\,s^2\right\}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">C. \(\left\{\boldsymbol{\beta}:\; \|\boldsymbol{\beta} - \hat{\boldsymbol{\beta}}\|^2 \le s^2\,\chi^2_\alpha(d+1)\right\}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">D. A product of individual HPD intervals for each \(\beta_j\)</button>
+  </div>
+  <div class="fb" id="q35-fb"></div>
+</div>
+
+<!-- Q36 -->
+<div class="qblock" id="q36">
+  <div class="qnum">Question 36 of 40 — PPD for Linear Regression</div>
+  <div class="qtext">For a future observation \(\tilde{y}\) with covariate vector \(\tilde{\boldsymbol{x}}\) in Bayesian linear regression (NI prior), the PPD is a \(t_{n-d-1}\)-distribution. This implies:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">A. \(\dfrac{\tilde{y} - \tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}}{s} \sim t_{n-d-1}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q36',this)">B. \(\dfrac{\tilde{y} - \tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}}{s\sqrt{1 + \tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}}}} \sim t_{n-d-1}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">C. \(\dfrac{\tilde{y} - \tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}}{s\sqrt{\tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}}}} \sim t_{n-d-1}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">D. \(\tilde{y} \sim \mathrm{N}(\tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}},\; s^2)\)</button>
+  </div>
+  <div class="fb" id="q36-fb"></div>
+</div>
+
+<!-- Q37 -->
+<div class="qblock" id="q37">
+  <div class="qnum">Question 37 of 40 — MoC for Regression</div>
+  <div class="qtext">The Method of Composition for sampling from the Bayesian linear regression posterior (NI prior) proceeds as follows:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q37',this)">A. Step 1: sample \(\tilde{\sigma}^2 \sim \mathrm{Inv}\text{-}\chi^2(n-d-1, s^2)\); Step 2: sample \(\tilde{\boldsymbol{\beta}} \sim \mathrm{N}_{d+1}\!\left(\hat{\boldsymbol{\beta}},\, \tilde{\sigma}^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">B. Step 1: sample \(\tilde{\boldsymbol{\beta}} \sim T_{n-d-1}\!\left(\hat{\boldsymbol{\beta}},\, s^2(\boldsymbol{X}^T\boldsymbol{X})^{-1}\right)\); Step 2: sample \(\tilde{\sigma}^2\) from its marginal</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">C. Sample \((\tilde{\boldsymbol{\beta}}, \tilde{\sigma}^2)\) jointly from a multivariate normal</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">D. Sample \(\tilde{\boldsymbol{\beta}}\) from its marginal t-distribution; no need to sample \(\sigma^2\)</button>
+  </div>
+  <div class="fb" id="q37-fb"></div>
+</div>
+
+<!-- Q38 -->
+<div class="qblock" id="q38">
+  <div class="qnum">Question 38 of 40 — GLIM Components</div>
+  <div class="qtext">A generalized linear model (GLIM) is composed of three parts. Which option correctly identifies all three?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">A. Prior distribution, likelihood, posterior distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q38',this)">B. Distributional part (exponential family), link function \(g(\mu) = \eta = \boldsymbol{x}^T\boldsymbol{\beta}\), and variance function \(V(\mu)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">C. Mean model, covariance structure, and sampling distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">D. Response variable, design matrix, and error distribution</button>
+  </div>
+  <div class="fb" id="q38-fb"></div>
+</div>
+
+<!-- Q39 -->
+<div class="qblock" id="q39">
+  <div class="qnum">Question 39 of 40 — Canonical Link</div>
+  <div class="qtext">In a GLIM, the link function is called <em>canonical</em> when:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">A. The link function is the identity: \(g(\mu) = \mu\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">B. The link function is a monotone decreasing function</button>
+    <button class="opt" data-correct="true" onclick="answer('q39',this)">C. The linear predictor \(\eta\) equals the canonical parameter \(\theta\): \(\eta = \theta\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">D. The link function is derived from the Jeffreys prior</button>
+  </div>
+  <div class="fb" id="q39-fb"></div>
+</div>
+
+<!-- Q40 -->
+<div class="qblock" id="q40">
+  <div class="qnum">Question 40 of 40 — Osteoporosis Study</div>
+  <div class="qtext">In Example IV.8 (Osteoporosis study, \(n = 234\), regression TBBMC on BMI), the sampled posterior mean regression vector was approximately (0.816, 0.0403) with posterior correlation between \(\beta_0\) and \(\beta_1\) of approximately −0.99. This high posterior correlation is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">A. A numerical error in the sampling procedure</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">B. Due to the noninformative prior inflating uncertainty</button>
+    <button class="opt" data-correct="true" onclick="answer('q40',this)">C. A reflection of the near-collinearity between the intercept \(\beta_0\) and slope \(\beta_1\) caused by the un-centered design matrix, also seen in the LSE correlation of −0.99</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">D. Only present in the Bayesian analysis; the frequentist analysis shows uncorrelated estimates</button>
+  </div>
+  <div class="fb" id="q40-fb"></div>
+</div>
+
+
+<!-- SHORT ANSWER -->
+<div class="sec-title" id="saq">📝 8 Short Answer Questions</div>
+
+<!-- SA1 -->
+<div class="saq">
+  <div class="qnum">Short Answer 1 of 8 — Marginal Posterior and Nuisance Parameters</div>
+  <div class="qtext">Explain how the Bayesian approach handles nuisance parameters using marginal posterior distributions. How does this differ from the classical profile likelihood approach? Write the key formula for the marginal posterior of \(\theta_1\) and interpret it.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa1')">Reveal Answer</button>
+  <div class="ans-box" id="sa1">
+    <strong>Answer:</strong><br>
+    <p>The marginal posterior of \(\theta_1\) is obtained by integrating the joint posterior over the nuisance parameter \(\theta_2\):</p>
+    <div class="aform">\[p(\theta_1 \mid \boldsymbol{y}) = \int p(\theta_1, \theta_2 \mid \boldsymbol{y})\,d\theta_2 = \int p(\theta_1 \mid \theta_2, \boldsymbol{y})\,p(\theta_2 \mid \boldsymbol{y})\,d\theta_2\]</div>
+    <p>The second form shows the marginal posterior as a <em>weighted average</em> of conditional posteriors \(p(\theta_1 \mid \theta_2, \boldsymbol{y})\), where the weights are determined by the marginal posterior of \(\theta_2\). This means inference on \(\theta_1\) <strong>automatically accounts for the uncertainty in \(\theta_2\)</strong>.</p>
+    <p>The classical <em>profile likelihood</em> removes \(\theta_2\) by <strong>maximization</strong>: \(pL(\theta_1) = \max_{\theta_2} L(\theta_1, \theta_2)\), effectively substituting the best-fitting value of \(\theta_2\) for each fixed \(\theta_1\). This does not propagate uncertainty in \(\theta_2\).</p>
+    <p>The fundamental difference: <strong>Bayesian = integration (averaging over uncertainty)</strong>; <strong>frequentist = maximization (conditioning on the "best" nuisance value)</strong>. Bayesian marginalizing tends to produce wider and more honest intervals when there is genuine uncertainty about \(\theta_2\).</p>
+  </div>
+</div>
+
+<!-- SA2 -->
+<div class="saq">
+  <div class="qnum">Short Answer 2 of 8 — Normal Model Under NI Prior</div>
+  <div class="qtext">State all the key distributional results for the normal model under the NI prior \(p(\mu,\sigma^2) \propto \sigma^{-2}\): the joint posterior, both marginal posteriors, the key standardized pivots, and the 95% equal tail credible interval for \(\mu\). How do the credible intervals compare to classical CIs?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa2')">Reveal Answer</button>
+  <div class="ans-box" id="sa2">
+    <strong>Answer:</strong><br>
+    <p><strong>Joint posterior:</strong></p>
+    <div class="aform">\[p(\mu,\sigma^2 \mid \boldsymbol{y}) \propto \frac{1}{\sigma^{n+2}} \exp\!\left\{-\frac{1}{2\sigma^2}\left[(n-1)s^2 + n(\bar{y}-\mu)^2\right]\right\} = \text{N-Inv-}\chi^2(\bar{y},\, n,\, n-1,\, s^2)\]</div>
+    <p><strong>Conditional posterior of \(\mu\):</strong> \(p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}(\bar{y}, \sigma^2/n)\)</p>
+    <p><strong>Marginal posterior of \(\mu\):</strong> \(p(\mu \mid \boldsymbol{y}) = t_{n-1}(\bar{y}, s^2/n)\), with pivot \((\mu - \bar{y})/(s/\sqrt{n}) \sim t_{n-1}\)</p>
+    <p><strong>Marginal posterior of \(\sigma^2\):</strong> \(p(\sigma^2 \mid \boldsymbol{y}) = \mathrm{Inv}\text{-}\chi^2(n-1, s^2)\), with pivot \((n-1)s^2/\sigma^2 \sim \chi^2(n-1)\)</p>
+    <p><strong>95% equal tail CI for \(\mu\):</strong></p>
+    <div class="aform">\[\left[\bar{y} - t_{0.025;\,n-1}\,\frac{s}{\sqrt{n}},\;\; \bar{y} + t_{0.025;\,n-1}\,\frac{s}{\sqrt{n}}\right]\]</div>
+    <p><strong>Comparison:</strong> Both credible intervals (for \(\mu\) and \(\sigma^2\)) are <em>identical</em> to the corresponding classical 95% confidence intervals. This demonstrates that with the NI prior, the Bayesian analysis reproduces frequentist results, though the interpretation differs — the Bayesian CI is a probability statement about \(\mu\) given the data, whereas the frequentist CI has long-run coverage properties.</p>
+    <p><strong>Note on posterior measures:</strong> Prior independence (\(\mu \perp \sigma^2\)) is lost a posteriori — they become dependent in the joint posterior.</p>
+  </div>
+</div>
+
+<!-- SA3 -->
+<div class="saq">
+  <div class="qnum">Short Answer 3 of 8 — Effect of a Conflicting Informative Prior</div>
+  <div class="qtext">Explain why, in Example IV.2 (ALP study), the posterior variance of \(\mu\) under the informative conjugate prior (0.0083) was <em>larger</em> than under the NI prior (0.0075). Use the relevant formula to support your answer.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa3')">Reveal Answer</button>
+  <div class="ans-box" id="sa3">
+    <strong>Answer:</strong><br>
+    <p>The posterior variance for \(\mu\) is derived from the posterior scale parameter \(\bar{\sigma}^2\), which is determined by:</p>
+    <div class="aform">\[\bar{\nu}\bar{\sigma}^2 = \nu_0\sigma_0^2 + (n-1)s^2 + \frac{\kappa_0\, n}{\kappa_0 + n}(\bar{y} - \mu_0)^2\]</div>
+    <p>The third term on the right — \(\dfrac{\kappa_0\, n}{\kappa_0 + n}(\bar{y} - \mu_0)^2\) — is a <em>conflict term</em> that penalizes discrepancy between the prior mean \(\mu_0\) and the sample mean \(\bar{y}\).</p>
+    <p>In Example IV.2, \(\mu_0 = 5.25\) (from historical data) while the prospective sample mean was \(\bar{y} = 7.11\), a difference of 1.86. With \(\kappa_0 = 65\) and \(n = 250\), this conflict term adds substantial variance to the posterior estimate of \(\sigma^2\), which in turn inflates the posterior variance of \(\mu = \bar{\sigma}^2/\bar{\kappa}\).</p>
+    <p>The intuition: when prior and data are in conflict, the posterior cannot resolve the disagreement efficiently — it becomes <em>less certain</em> about \(\mu\) than if no prior had been used. The NI prior simply avoids this penalty entirely.</p>
+    <p><strong>Conclusion:</strong> An informative prior does not <em>always</em> reduce posterior uncertainty — it can increase it when the prior and data are discordant. This is an important distinction from the univariate known-\(\sigma^2\) case (Chapter 2) where an informative prior always increased precision.</p>
+  </div>
+</div>
+
+<!-- SA4 -->
+<div class="saq">
+  <div class="qnum">Short Answer 4 of 8 — Method of Composition Algorithm</div>
+  <div class="qtext">Describe the Method of Composition in general terms. State the key factorization it relies on, write out the algorithm for 3 steps (\(d = 3\)), and explain two key advantages over direct marginal sampling.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa4')">Reveal Answer</button>
+  <div class="ans-box" id="sa4">
+    <strong>Answer:</strong><br>
+    <p>The Method of Composition is a general step-by-step procedure to generate independent samples from a multivariate distribution by exploiting its factorization into marginal and conditional distributions.</p>
+    <p><strong>Key factorization (for \(d\) parameters):</strong></p>
+    <div class="aform">\[p(\theta_1,\ldots,\theta_d \mid \boldsymbol{y}) = p(\theta_d \mid \boldsymbol{y})\; p(\theta_{d-1} \mid \theta_d, \boldsymbol{y})\;\cdots\; p(\theta_1 \mid \theta_d, \ldots, \theta_2, \boldsymbol{y})\]</div>
+    <p><strong>Algorithm for \(d = 3\) (repeated \(K\) times, iteration \(k\)):</strong></p>
+    <ol style="padding-left:18px;margin:6px 0;">
+      <li>Sample \(\tilde{\theta}_3^{(k)} \sim p(\theta_3 \mid \boldsymbol{y})\)</li>
+      <li>Sample \(\tilde{\theta}_2^{(k)} \sim p(\theta_2 \mid \tilde{\theta}_3^{(k)}, \boldsymbol{y})\)</li>
+      <li>Sample \(\tilde{\theta}_1^{(k)} \sim p(\theta_1 \mid \tilde{\theta}_3^{(k)}, \tilde{\theta}_2^{(k)}, \boldsymbol{y})\)</li>
+    </ol>
+    <p><strong>Two key advantages:</strong></p>
+    <p><strong>(1) Handles difficult marginals:</strong> If \(p(\theta_3 \mid \boldsymbol{y})\) is not a standard distribution, it may still be accessible via importance sampling or ARS. The conditional \(p(\theta_2 \mid \theta_3, \boldsymbol{y})\) and \(p(\theta_1 \mid \theta_2, \theta_3, \boldsymbol{y})\) are often much simpler (e.g., normal), making the sequential approach tractable even when direct multivariate sampling is not.</p>
+    <p><strong>(2) Provides all marginal samples simultaneously:</strong> A single run of the MoC yields not only a sample from the joint posterior but automatically also from every marginal posterior \(p(\theta_j \mid \boldsymbol{y})\). In contrast, direct sampling from the multivariate \(t\)-distribution \(p(\boldsymbol{\beta} \mid \boldsymbol{y})\) in regression requires specialized functions, while the two-step MoC (normal then Inv-\(\chi^2\)) uses only standard distributions.</p>
+  </div>
+</div>
+
+<!-- SA5 -->
+<div class="saq">
+  <div class="qnum">Short Answer 5 of 8 — Bayesian Linear Regression with NI Prior</div>
+  <div class="qtext">Write out the four posterior distributions for the Bayesian linear regression model with NI prior \(p(\boldsymbol{\beta}, \sigma^2) \propto \sigma^{-2}\). State the posterior mean and mode of \(\sigma^2\) and explain why they are not equal to \(s^2\). Also describe the PPD for a scalar future observation \(\tilde{y}\).</div>
+  <button class="reveal-btn" onclick="toggleAns('sa5')">Reveal Answer</button>
+  <div class="ans-box" id="sa5">
+    <strong>Answer:</strong><br>
+    <p><strong>Four posterior distributions:</strong></p>
+    <div class="aform">Joint: p(β, σ²|y) = N_{d+1}[β | β̂, σ²(X^T X)⁻¹] × Inv-χ²(σ² | n−d−1, s²)
+
+Conditional: p(β | σ², y) = N_{d+1}[β | β̂, σ²(X^T X)⁻¹]
+
+Marginal σ²: p(σ² | y) = Inv-χ²(σ² | n−d−1, s²)
+
+Marginal β: p(β | y) = T_{n−d−1}[β | β̂, s²(X^T X)⁻¹]</div>
+    <p>The <em>j</em>th marginal of \(p(\boldsymbol{\beta} \mid \boldsymbol{y})\) is a univariate \(t_{n-d-1}\)-distribution with location \(\hat{\beta}_j\) and scale \(s(\boldsymbol{X}^T\boldsymbol{X})_{jj}^{-1/2}\).</p>
+    <p><strong>Posterior mode of \(\sigma^2\)</strong>: \(\dfrac{n-d-1}{n-d+1}s^2\) &lt; \(s^2\) — the mode undershoots \(s^2\) because the Inv-\(\chi^2\) density is right-skewed.</p>
+    <p><strong>Posterior mean of \(\sigma^2\)</strong>: \(\dfrac{n-d-1}{n-d-3}s^2\) &gt; \(s^2\) — the mean overshoots \(s^2\) due to the heavy right tail of the Inv-\(\chi^2\). Both differ from the MLE \(s^2\) because the posterior is asymmetric.</p>
+    <p><strong>PPD for \(\tilde{y}\):</strong> A \(t_{n-d-1}\)-distribution with location \(\tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}\) and scale \(s^2\!\left(1 + \tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}}\right)\):</p>
+    <div class="aform">\[\frac{\tilde{y} - \tilde{\boldsymbol{x}}^T\hat{\boldsymbol{\beta}}}{s\sqrt{1 + \tilde{\boldsymbol{x}}^T(\boldsymbol{X}^T\boldsymbol{X})^{-1}\tilde{\boldsymbol{x}}}} \sim t_{n-d-1}\]</div>
+    <p>This is the exact Bayesian prediction interval formula — and coincides with the classical prediction interval, illustrating again that the NI prior reproduces frequentist results.</p>
+  </div>
+</div>
+
+<!-- SA6 -->
+<div class="saq">
+  <div class="qnum">Short Answer 6 of 8 — Product Prior vs. Conjugate Prior for Normal Model</div>
+  <div class="qtext">Compare the N-Inv-\(\chi^2(\mu_0,\kappa_0,\nu_0,\sigma_0^2)\) conjugate prior and the product prior \(\mathrm{N}(\mu_0,\sigma_0^2)\,\mathrm{Inv}\text{-}\chi^2(\nu_0,\tau_0^2)\) for the normal model. What is the structural difference between them, and why does the product prior not yield an analytical posterior?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa6')">Reveal Answer</button>
+  <div class="ans-box" id="sa6">
+    <strong>Answer:</strong><br>
+    <p><strong>Structural difference:</strong> In the conjugate N-Inv-\(\chi^2(\mu_0,\kappa_0,\nu_0,\sigma_0^2)\) prior, the prior for \(\mu\) depends on \(\sigma^2\): \(\mu \mid \sigma^2 \sim \mathrm{N}(\mu_0, \sigma^2/\kappa_0)\). The variance of \(\mu\) is proportional to \(\sigma^2\) — \(\mu\) and \(\sigma^2\) are <em>a priori dependent</em>.</p>
+    <p>The product prior \(\mathrm{N}(\mu_0,\sigma_0^2)\,\mathrm{Inv}\text{-}\chi^2(\nu_0,\tau_0^2)\) makes \(\mu\) and \(\sigma^2\) <em>a priori independent</em>, with the prior variance of \(\mu\) fixed at \(\sigma_0^2\) regardless of \(\sigma^2\). This is more natural for <em>expert elicitation</em> (experts specify information on \(\mu\) and \(\sigma^2\) separately), but breaks the conjugacy structure.</p>
+    <p><strong>Why no analytical posterior:</strong> With the product prior, the conditional posterior of \(\mu\) given \(\sigma^2\) is tractable:
+    \[p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}(\bar{\mu}, \bar{\sigma}^2)\] where \(\bar{\mu}\) and \(\bar{\sigma}^2\) depend on \(\sigma^2\) (formula 4.18). However, for \(\sigma^2\), one must compute \(p(\sigma^2 \mid \boldsymbol{y}) \propto \int p(\sigma^2 \mid \boldsymbol{y}, \mu)\,p(\mu)\,d\mu\), which involves \(p(\sigma^2 \mid \boldsymbol{y}) \propto \bar{\sigma}\,\mathrm{N}(\bar{\mu} \mid \mu_0, \sigma_0^2)\,\mathrm{Inv}\text{-}\chi^2(\sigma^2 \mid \nu_0, \tau_0^2)\,\prod_i\mathrm{N}(y_i \mid \bar{\mu}, \sigma^2)\). The integration constant of this expression is <em>not analytically tractable</em>.</p>
+    <p><strong>Consequence:</strong> The posterior can only be evaluated on a grid or sampled (e.g., using SIR from Chapter 3.7.2), as illustrated in Example IV.6.</p>
+  </div>
+</div>
+
+<!-- SA7 -->
+<div class="saq">
+  <div class="qnum">Short Answer 7 of 8 — Wishart and Multinomial Distributions</div>
+  <div class="qtext">Describe the Wishart distribution as a multivariate generalization of the chi-squared distribution. Then state the multinomial distribution and its conjugate prior. Describe how to sample from the Dirichlet distribution.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa7')">Reveal Answer</button>
+  <div class="ans-box" id="sa7">
+    <strong>Answer:</strong><br>
+    <p><strong>Wishart distribution:</strong> In the univariate case, \(S^2/\sigma^2 \sim \chi^2(n-1)\) where \(S^2 = \sum_{i=1}^n (y_i - \bar{y})^2\). Replacing \(S^2\) by the sample cross-product matrix \(\mathbf{S} = \sum_{i=1}^n (\boldsymbol{y}_i - \bar{\boldsymbol{y}})(\boldsymbol{y}_i - \bar{\boldsymbol{y}})^T\) yields the Wishart distribution \(\mathrm{Wishart}(\Sigma, \nu)\) with \(\nu = n-1\) degrees of freedom and scale matrix \(\Sigma\). Its density is:</p>
+    <div class="aform">\[p(\mathbf{S} \mid \nu, \Sigma) = c\,|\Sigma|^{-\nu/2}\,|\mathbf{S}|^{(\nu-p-1)/2}\exp\!\left[-\tfrac{1}{2}\mathrm{tr}(\Sigma^{-1}\mathbf{S})\right]\]</div>
+    <p>The <strong>inverse Wishart</strong> \(\mathrm{IW}(\Sigma, \nu)\) is the conjugate prior for the covariance matrix \(\Sigma\) in MVN models.</p>
+    <p><strong>Multinomial distribution:</strong> For \(y = (y_1,\ldots,y_k)^T\) frequencies across \(k\) categories with total \(n = \sum_{j=1}^k y_j\):
+    \[p(\boldsymbol{y} \mid \boldsymbol{\theta}) = \frac{n!}{\prod_j y_j!}\prod_{j=1}^k \theta_j^{y_j}\]</p>
+    <p><strong>Conjugate prior:</strong> The Dirichlet distribution \(\mathrm{Dir}(\boldsymbol{\alpha})\), yielding posterior \(\mathrm{Dir}(\boldsymbol{\alpha} + \boldsymbol{y})\) after observing \(\boldsymbol{y}\).</p>
+    <p><strong>Sampling from Dirichlet:</strong> Generate \(W_j \sim \mathrm{Gamma}(\alpha_j, 1)\) independently for \(j = 1,\ldots,k\), compute \(T = \sum_{j=1}^k W_j\), and set \(Z_j = W_j/T\). Then \((Z_1, \ldots, Z_k) \sim \mathrm{Dir}(\boldsymbol{\alpha})\). This technique was used in Example IV.3 to sample 10,000 values of the cross-ratio \(\psi\) from its posterior.</p>
+  </div>
+</div>
+
+<!-- SA8 -->
+<div class="saq">
+  <div class="qnum">Short Answer 8 of 8 — Bayesian GLIMs</div>
+  <div class="qtext">Describe the three components of a Generalized Linear Model (GLIM) and write the distributional part in exponential family form. For the Poisson regression and logistic regression models, identify the distribution, link function, and variance function. Explain what a BGLIM is and what its limitation is in practice.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa8')">Reveal Answer</button>
+  <div class="ans-box" id="sa8">
+    <strong>Answer:</strong><br>
+    <p>A GLIM consists of three parts:</p>
+    <p><strong>(1) Distributional part:</strong> The response \(y\) belongs to the one-parameter exponential family:</p>
+    <div class="aform">\[p(y \mid \theta; \phi) = \exp\!\left[\frac{y\theta - b(\theta)}{a(\phi)} + c(y;\phi)\right]\]</div>
+    <p>where \(\theta\) is the canonical parameter, \(a(\phi) = \phi/w\) is a dispersion function, and \(b(\theta), c(y;\phi)\) are known functions. For \(\phi\) known: \(E(y) = \mu = b'(\theta)\) and \(\mathrm{var}(y) = a(\phi)V(\mu)\) with \(V(\mu) = b''(\theta)\).</p>
+    <p><strong>(2) Link function:</strong> A monotone differentiable function \(g\) linking the mean \(\mu\) to linear predictors: \(g(\mu) = \eta = \boldsymbol{x}^T\boldsymbol{\beta}\). The <em>canonical link</em> sets \(\eta = \theta\). The inverse \(h = g^{-1}\) is a CDF for binary models.</p>
+    <p><strong>(3) Variance function:</strong> \(V(\mu)\) describes how variance depends on the mean. The parameter \(\phi\) serves as an extra dispersion/scale parameter: \(\mathrm{var}(y) = a(\phi)V(\mu)\).</p>
+    <table style="margin:8px 0;">
+      <thead><tr><th>Model</th><th>Distribution</th><th>Link \(g(\mu)\)</th><th>\(\phi\)</th><th>\(V(\mu)\)</th></tr></thead>
+      <tbody>
+        <tr><td>Poisson regression</td><td>Poisson\((\mu_i)\)</td><td>\(\log\mu\) (canonical)</td><td>1</td><td>\(\mu\)</td></tr>
+        <tr><td>Logistic regression</td><td>Bernoulli\((\mu_i)\)</td><td>\(\mathrm{logit}(\mu)\) (canonical)</td><td>1</td><td>\(\mu(1-\mu)\)</td></tr>
+      </tbody>
+    </table>
+    <p><strong>BGLIM:</strong> A Bayesian GLIM (BGLIM) is obtained by specifying a prior distribution on all parameters \((\boldsymbol{\beta}, \phi)\) of the GLIM. Since GLIMs generally do not have conjugate priors for \(\boldsymbol{\beta}\), the posterior typically has no analytical form.</p>
+    <p><strong>Limitation:</strong> For complex models (censoring, truncation, random effects) and non-normal likelihoods, analytical posteriors almost invariably do not exist, and even simple numerical methods may be insufficient. In practice, <strong>Markov chain Monte Carlo (MCMC) methods</strong> (Chapter 6) are required for general Bayesian inference in GLIMs and beyond.</p>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+let score = 0, answered = 0;
+
+function answer(qId, btn) {
+  const block = document.getElementById(qId);
+  const buttons = block.querySelectorAll('.opt');
+  if (buttons[0].disabled) return;
+  const isCorrect = btn.dataset.correct === 'true';
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('ok');
+  });
+  const fb = document.getElementById(qId + '-fb');
+  if (isCorrect) {
+    score++;
+    fb.textContent = '✓ Correct!';
+    fb.className = 'fb ok-fb';
+  } else {
+    btn.classList.add('bad');
+    fb.textContent = '✗ Incorrect. The correct answer is highlighted above.';
+    fb.className = 'fb bad-fb';
+  }
+  answered++;
+  document.getElementById('score-display').textContent = score + ' / ' + answered;
+}
+
+function resetAll() {
+  score = 0; answered = 0;
+  document.getElementById('score-display').textContent = '0 / 0';
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('ok', 'bad');
+  });
+  document.querySelectorAll('.fb').forEach(f => {
+    f.className = 'fb';
+    f.textContent = '';
+  });
+}
+
+function toggleAns(id) {
+  const box = document.getElementById(id);
+  box.classList.toggle('shown');
+  const btn = box.previousElementSibling;
+  btn.textContent = box.classList.contains('shown') ? 'Hide Answer' : 'Reveal Answer';
+}
+</script>
+
+
+</body></html>

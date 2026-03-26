@@ -1,0 +1,1140 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 2 – Bayes Theorem: Computing the Posterior | Review Notes</title>
+  <style>
+    :root {
+      --primary: #1a3a5c;
+      --accent: #2e7db8;
+      --accent2: #e8a020;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d0dce8;
+      --correct: #1e7e34;
+      --correct-bg: #d4edda;
+      --wrong: #a71d2a;
+      --wrong-bg: #f8d7da;
+      --neutral-bg: #eef4fb;
+      --text: #1c2a38;
+      --muted: #5a6a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.6rem; letter-spacing: 0.5px; }
+    header p { margin-top: 6px; color: #b8d0e8; font-size: 0.95rem; }
+    .toc-bar {
+      background: var(--accent);
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 10px 20px; justify-content: center;
+    }
+    .toc-bar a {
+      color: #fff; text-decoration: none; font-size: 0.82rem;
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px; border-radius: 20px;
+      transition: background 0.2s;
+    }
+    .toc-bar a:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(30,60,100,0.06);
+    }
+    .section-card h2 {
+      color: var(--primary);
+      font-size: 1.18rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section-card h3 {
+      color: var(--accent);
+      font-size: 1rem;
+      margin: 18px 0 8px;
+    }
+    .section-card p { margin-bottom: 10px; }
+    .key-box {
+      background: var(--neutral-bg);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .key-box strong { color: var(--primary); }
+    .warning-box {
+      background: #fff8e8;
+      border-left: 4px solid var(--accent2);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .formula-box {
+      background: #f0f6ff;
+      border: 1px solid #b0ccee;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.9;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag {
+      background: var(--neutral-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 2px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    table {
+      width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem;
+    }
+    th {
+      background: var(--primary); color: #fff;
+      padding: 8px 12px; text-align: left;
+    }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--neutral-bg); }
+    .conj-table th { background: #2e6b3e; }
+    .q-section h2 {
+      color: var(--primary);
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--accent2);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+    .question-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px rgba(30,60,100,0.05);
+    }
+    .question-block .q-number {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+    .question-block .q-text {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .option-btn {
+      background: var(--neutral-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 14px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .option-btn:hover:not(:disabled) { background: #dceeff; border-color: var(--accent); }
+    .option-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 600; }
+    .option-btn.incorrect { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+    .option-btn:disabled { cursor: default; }
+    .reveal-btn {
+      background: var(--accent2);
+      color: #fff; border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .reveal-btn:hover { background: #c8870f; }
+    .answer-box {
+      display: none;
+      background: var(--correct-bg);
+      border: 1px solid var(--correct);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .answer-box.shown { display: block; }
+    .answer-box strong { color: var(--correct); }
+    .answer-box .formula-inline {
+      background: #e8f5e9;
+      border: 1px solid #a5d6a7;
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      display: block;
+      white-space: pre-wrap;
+    }
+    .feedback {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+    .feedback.correct-fb { display: block; background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct); }
+    .feedback.incorrect-fb { display: block; background: var(--wrong-bg); color: var(--wrong); border: 1px solid var(--wrong); }
+    .score-bar {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .score-bar span { font-size: 0.95rem; color: var(--muted); }
+    .score-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .reset-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .reset-btn:hover { background: #0f2540; }
+    .short-q { margin-bottom: 22px; }
+    .short-q .q-text { font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    .chapter-badge {
+      display: inline-block;
+      background: var(--accent2);
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 16px 10px 50px; }
+      .section-card { padding: 16px 14px; }
+      header h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📘 Chapter 2 — Bayes Theorem: Computing the Posterior Distribution</h1>
+  <p>Bayesian Biostatistics · Lesaffre &amp; Lawson · Exam Preparation Notes</p>
+</header>
+
+<nav class="toc-bar">
+  <a href="#bayes-versions">Bayes Versions</a>
+  <a href="#prob-context">Probability</a>
+  <a href="#binomial">Binomial Case</a>
+  <a href="#gaussian">Gaussian Case</a>
+  <a href="#poisson">Poisson Case</a>
+  <a href="#conjugacy">Conjugacy</a>
+  <a href="#vs-freq">Bayes vs Freq</a>
+  <a href="#modes">Modes</a>
+  <a href="#history">History</a>
+  <a href="#mcq">MCQ &amp; T/F</a>
+  <a href="#shortq">Short Answer</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== SECTION 2.1–2.5: BAYES THEOREM VERSIONS ===== -->
+  <div class="section-card" id="bayes-versions">
+    <h2>2.2–2.5 Versions of Bayes Theorem</h2>
+
+    <h3>The Binary Version (2.2)</h3>
+    <p>Generalizing from the diagnostic test setting: let θ = 1 (diseased) or θ = 0 (healthy), and y = 1 (positive test) or y = 0 (negative test).</p>
+    <div class="formula-box">Shorthand form:
+p(θ | y) = p(y | θ) · p(θ) / p(y)
+
+Key components:
+  p(θ)      = prior probability of θ
+  p(y | θ)  = likelihood (probability of data given θ)
+  p(y)      = averaged/marginal likelihood (normalizing constant)
+  p(θ | y)  = posterior probability of θ</div>
+    <div class="key-box">
+      <strong>Core insight:</strong> Bayes had the ingenious idea — novel 250 years ago — of treating parameters as stochastic quantities. In classical statistics, θ is fixed and unknown. In Bayesian statistics, θ is stochastic, representing our uncertainty about its true value θ₀.
+    </div>
+
+    <h3>The Categorical Version (2.4)</h3>
+    <p>When θ can take K &gt; 2 values (θ₁, θ₂, ..., θ_K):</p>
+    <div class="formula-box">p(θₖ | y) = p(y | θₖ) · p(θₖ) / Σₘ p(y | θₘ) · p(θₘ)</div>
+    <p>This is the foundation of Bayesian classification models — assigning individuals to diagnostic classes based on prior beliefs and observed data.</p>
+
+    <h3>The Continuous Version (2.5)</h3>
+    <p>For a continuous parameter θ with prior density p(θ) and likelihood L(θ|y):</p>
+    <div class="formula-box">p(θ | y) = L(θ | y) · p(θ) / ∫ L(θ | y) · p(θ) dθ
+
+Proportionality form (most useful for computations):
+p(θ | y) ∝ L(θ | y) · p(θ)    [Posterior ∝ Likelihood × Prior]
+
+The denominator ∫ L(θ|y)p(θ)dθ is called the "averaged likelihood" —
+a weighted average of L over all θ-values, weighted by the prior p(θ).</div>
+    <div class="warning-box">
+      <strong>When is θ supported a posteriori?</strong> Only when both the prior AND the likelihood support a given θ-value. If either the prior or the likelihood assigns low probability to a θ-value, the posterior will also assign it low probability.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.3: PROBABILITY ===== -->
+  <div class="section-card" id="prob-context">
+    <h2>2.3 Probability in a Bayesian Context</h2>
+    <table>
+      <thead><tr><th>Type</th><th>Definition</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Objective (Frequentist)</strong></td><td>Long-run proportion of times an event occurs in repeated experiments</td><td>Probability 0.50 that a fair coin shows heads — convergence over many tosses</td></tr>
+        <tr><td><strong>Subjective (Bayesian)</strong></td><td>Personal degree of belief that an event will happen or has happened</td><td>A physician's prior belief (e.g., 10%) that a specific patient has diabetes</td></tr>
+      </tbody>
+    </table>
+    <div class="key-box">
+      <strong>Requirement:</strong> Subjective probabilities must still satisfy the axioms of a coherent probability system (0 ≤ p(A) ≤ 1; p(S) = 1; additivity for mutually exclusive events; conditional probability rule). Lindley (2006) argues that probability is intrinsically personal — it depends on who is observing — hence "your probability" rather than "the probability."
+    </div>
+    <p>When prior information is personal (e.g., a physician's clinical intuition), the resulting posterior probabilities also carry a subjective flavor and do not have a long-run frequency interpretation. This is a fundamental departure from classical statistics.</p>
+  </div>
+
+  <!-- ===== SECTION 2.6: BINOMIAL CASE ===== -->
+  <div class="section-card" id="binomial">
+    <h2>2.6 The Binomial Case — Beta–Binomial Conjugacy</h2>
+    <p><span class="chapter-badge">Example II.1</span> ECASS 3 stroke study: monitoring incidence of symptomatic intracerebral hemorrhage (SICH) under rt-PA treatment. ECASS 2 provided prior data (y₀ = 8 successes out of n₀ = 100). ECASS 3 interim analysis: y = 10 SICH events out of n = 50 patients.</p>
+
+    <h3>Step 1: Specifying the Prior from ECASS 2</h3>
+    <p>The kernel of the binomial likelihood θ^y₀(1−θ)^(n₀−y₀) is proportional to a <strong>Beta density</strong>:</p>
+    <div class="formula-box">Beta density:  p(θ) = [1 / B(α₀, β₀)] · θ^(α₀−1) · (1−θ)^(β₀−1)
+
+where  B(α, β) = Γ(α)Γ(β) / Γ(α+β) = ∫ θ^(α−1)(1−θ)^(β−1) dθ
+
+For ECASS 2 prior:  α₀ = y₀ + 1 = 9,   β₀ = n₀ − y₀ + 1 = 93
+→ Prior: Beta(9, 93)</div>
+
+    <h3>Step 2: Constructing the Posterior</h3>
+    <div class="formula-box">Numerator: L(θ|y) · p(θ) ∝ θ^(α₀+y−1) · (1−θ)^(β₀+n−y−1)
+This is the kernel of Beta(ᾱ, β̄) where:
+  ᾱ = α₀ + y    (= 9 + 10 = 19)
+  β̄ = β₀ + n − y  (= 93 + 50 − 10 = 133)
+
+→ Posterior: Beta(19, 133)</div>
+
+    <h3>Key Properties of the Beta–Binomial Posterior</h3>
+    <table>
+      <thead><tr><th>Property</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Compromise</strong></td><td>Posterior mode is weighted average: θ̂_M = [n₀/(n₀+n)]·θ₀ + [n/(n₀+n)]·θ̂ — posterior lies between prior mode and MLE</td></tr>
+        <tr><td><strong>Shrinkage</strong></td><td>θ₀ ≤ θ̂_M ≤ θ̂ when y₀/n₀ ≤ y/n (posterior pulled toward prior when data show higher rate)</td></tr>
+        <tr><td><strong>More concentrated</strong></td><td>Posterior is more peaked than either prior or likelihood (except when they strongly conflict)</td></tr>
+        <tr><td><strong>Likelihood dominates</strong></td><td>As n → ∞, prior parameters α₀, β₀ become negligible relative to y and n−y</td></tr>
+        <tr><td><strong>Conjugacy</strong></td><td>Beta prior + Binomial likelihood → Beta posterior (same family)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Equivalence: Prior = Imaginary Data</h3>
+    <div class="key-box">
+      A Beta(α₀, β₀) prior is equivalent to adding (α₀ − 1) imaginary successes and (β₀ − 1) imaginary failures to the observed data. This allows frequentist software to be used for Bayesian estimation by augmenting the dataset.
+    </div>
+
+    <h3>Noninformative (Flat) Prior</h3>
+    <p>When no prior information is available, use the <strong>uniform prior U(0,1)</strong> = Beta(1,1). This yields a posterior equal to the scaled likelihood — only the observed data influence the inference.</p>
+  </div>
+
+  <!-- ===== SECTION 2.7: GAUSSIAN CASE ===== -->
+  <div class="section-card" id="gaussian">
+    <h2>2.7 The Gaussian Case — Normal–Normal Conjugacy</h2>
+    <p><span class="chapter-badge">Example II.2</span> IBBENS dietary study: n₀ = 563 bank employees, mean cholesterol ȳ₀ = 328 mg/day, SD = 120.3 mg/day. Follow-up IBBENS-2 (n = 50, ȳ = 318 mg/day) provides the data.</p>
+
+    <h3>Normal Likelihood (σ known)</h3>
+    <div class="formula-box">L(µ | y) ∝ exp[−½·(µ − ȳ)²/(σ²/n)]
+
+This is the kernel of N(µ | ȳ, σ²/n) — the likelihood for µ is
+a normal curve centered at the sample mean ȳ with variance σ²/n.</div>
+
+    <h3>Normal Prior (from IBBENS)</h3>
+    <div class="formula-box">p(µ) = N(µ | µ₀, σ₀²)   where µ₀ = ȳ₀ = 328 and σ₀ = σ/√n₀ = 5.072</div>
+
+    <h3>Normal Posterior</h3>
+    <div class="formula-box">p(µ | y) = N(µ | µ̄, σ̄²)
+
+Posterior mean (precision-weighted average):
+  µ̄ = (w₀·µ₀ + w₁·ȳ) / (w₀ + w₁)
+
+Posterior variance:
+  σ̄² = 1 / (w₀ + w₁)
+
+where:  w₀ = 1/σ₀²  (prior precision)
+        w₁ = n/σ²   (sample precision)
+
+Posterior precision = Prior precision + Sample precision:
+  1/σ̄² = w₀ + w₁</div>
+
+    <div class="warning-box">
+      <strong>Counterintuitive result:</strong> The posterior precision always equals the SUM of prior and sample precisions — even when prior and likelihood are in conflict. This means the posterior is always MORE concentrated (less uncertain) than either the prior or the likelihood alone. This only holds for the unrealistic case of known σ!
+    </div>
+
+    <h3>Key Properties</h3>
+    <table>
+      <thead><tr><th>Property</th><th>Normal Case</th></tr></thead>
+      <tbody>
+        <tr><td>Posterior mean</td><td>Precision-weighted average of µ₀ and ȳ</td></tr>
+        <tr><td>Posterior precision</td><td>w₀ + w₁ (sum of prior and sample precisions)</td></tr>
+        <tr><td>Large n</td><td>p(µ|y) ≈ N(µ | ȳ, σ²/n) — likelihood dominates prior</td></tr>
+        <tr><td>σ₀ → ∞</td><td>Noninformative limit: posterior = N(µ | ȳ, σ²/n) regardless of sample size</td></tr>
+        <tr><td>Conjugacy</td><td>Normal prior + Normal likelihood → Normal posterior</td></tr>
+        <tr><td>Discounted prior</td><td>Increase σ₀² to reduce prior influence on posterior</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Precision in WinBUGS</h3>
+    <div class="key-box">
+      WinBUGS (and much Bayesian software) parameterizes the normal as N(µ, 1/σ²) — using <strong>precision</strong> (= 1/variance) rather than variance. Be aware of this notation difference when interpreting software output.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.8: POISSON CASE ===== -->
+  <div class="section-card" id="poisson">
+    <h2>2.8 The Poisson Case — Gamma–Poisson Conjugacy</h2>
+    <p><span class="chapter-badge">Example II.3</span> Signal-Tandmobiel® study: n = 4351 children, caries experience measured by dmft-index, MLE = ȳ = 2.24.</p>
+
+    <h3>Poisson Distribution</h3>
+    <div class="formula-box">p(y | θ) = θʸ · e^(−θ) / y!     (for count data with equal exposure times)
+
+Extended form for unequal exposure tᵢ:
+p(yᵢ | θ) = (θtᵢ)^yᵢ · e^(−θtᵢ) / yᵢ!
+
+Mean = Variance = θ
+MLE: θ̂ = ȳ</div>
+
+    <h3>Gamma Prior and Posterior</h3>
+    <div class="formula-box">Gamma(α, β) prior:   p(θ) = [β^α / Γ(α)] · θ^(α−1) · e^(−βθ)
+  E(θ) = α/β,    Var(θ) = α/β²
+
+For ST study: α₀ = 3, β₀ = 1  →  Prior mean = 3, fairly diffuse
+
+Posterior: Gamma(ᾱ, β̄)  where:
+  ᾱ = Σyᵢ + α₀   (= 9758 + 3 = 9761)
+  β̄ = n + β₀     (= 4351 + 1 = 4352)
+
+Note: prior effect is minimal given the large sample size.</div>
+
+    <h3>Equivalence: Prior = Imaginary Data</h3>
+    <p>The Gamma(α₀, β₀) prior corresponds to an imaginary experiment of size β₀ where counts sum to (α₀ − 1). For the ST study prior Gamma(3,1): experiment of size 1 with count = 2.</p>
+
+    <h3>Overdispersion Warning</h3>
+    <div class="warning-box">
+      The dmft-index showed var(dmft)/mean(dmft) = 3.53 — far exceeding 1.0 (the Poisson mean = variance requirement). This Poisson overdispersion arises because caries in the same mouth are correlated. More appropriate distributions (e.g., negative binomial) should be used in practice.
+    </div>
+  </div>
+
+  <!-- ===== CONJUGACY SUMMARY ===== -->
+  <div class="section-card" id="conjugacy">
+    <h2>Conjugacy Summary Table</h2>
+    <p>When the prior and posterior belong to the same distributional family, the prior is called a <strong>conjugate prior</strong> for that likelihood. Conjugacy allows analytical computation of the posterior — no numerical integration needed.</p>
+    <table class="conj-table">
+      <thead><tr><th>Likelihood</th><th>Conjugate Prior</th><th>Posterior</th><th>Posterior Parameters</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Binomial Bin(n, θ)</td>
+          <td>Beta(α₀, β₀)</td>
+          <td>Beta(ᾱ, β̄)</td>
+          <td>ᾱ = α₀ + y; β̄ = β₀ + n − y</td>
+        </tr>
+        <tr>
+          <td>Normal N(µ, σ²) — σ known</td>
+          <td>Normal N(µ₀, σ₀²)</td>
+          <td>Normal N(µ̄, σ̄²)</td>
+          <td>µ̄ = (w₀µ₀ + w₁ȳ)/(w₀+w₁); 1/σ̄² = w₀ + w₁</td>
+        </tr>
+        <tr>
+          <td>Poisson(θ)</td>
+          <td>Gamma(α₀, β₀)</td>
+          <td>Gamma(ᾱ, β̄)</td>
+          <td>ᾱ = Σyᵢ + α₀; β̄ = n + β₀</td>
+        </tr>
+        <tr>
+          <td>Negative Binomial</td>
+          <td>Beta(α₀, β₀)</td>
+          <td>Beta(ᾱ, β̄)</td>
+          <td>Same form as binomial case</td>
+        </tr>
+        <tr>
+          <td>Exponential(θ)</td>
+          <td>Gamma(α₀, β₀)</td>
+          <td>Gamma(ᾱ, β̄)</td>
+          <td>ᾱ = n + α₀; β̄ = Σyᵢ + β₀</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Transformation of Parameters (Section 2.9)</h3>
+    <div class="formula-box">If ψ = h(θ) is a monotone transformation, then by the change-of-variables rule:
+  p(ψ | y) = p(h⁻¹(ψ)) · |dθ/dψ|
+
+Example (stroke study): ψ = log(θ) transforms the Beta(19,133) posterior
+for θ into a posterior for ψ = log(θ), useful for modeling on the log scale.</div>
+    <div class="warning-box">
+      <strong>Parameterization matters!</strong> Unlike the pure likelihood approach (which is invariant to monotone reparameterization), the Bayesian posterior changes when you put a flat prior on h(θ) versus on θ. This was Fisher's main objection to the Bayesian approach.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.10–2.11 ===== -->
+  <div class="section-card" id="vs-freq">
+    <h2>2.10–2.11 Bayesian vs. Likelihood vs. Frequentist</h2>
+    <table>
+      <thead><tr><th>Aspect</th><th>Frequentist</th><th>Likelihood</th><th>Bayesian</th></tr></thead>
+      <tbody>
+        <tr><td>Parameter nature</td><td>Fixed, unknown constant</td><td>Fixed, unknown constant</td><td>Stochastic (random variable)</td></tr>
+        <tr><td>Inference basis</td><td>Repeated sampling behavior</td><td>Likelihood function only</td><td>Posterior distribution (prior × likelihood)</td></tr>
+        <tr><td>LP1 (no fictive data)</td><td>✗ Requires fictive data for P-values</td><td>✓ Satisfied</td><td>✓ Satisfied</td></tr>
+        <tr><td>LP2 (proportional likelihoods)</td><td>✗ Violated (stopping rules matter)</td><td>✓ Satisfied</td><td>✓ Satisfied — proved: p₁(θ|y) = p₂(θ|y)</td></tr>
+        <tr><td>Computational key</td><td>Maximization (MLE, test statistics)</td><td>Maximization (MLE)</td><td>Integration (denominator of Bayes theorem)</td></tr>
+        <tr><td>Role of CLT</td><td>Essential for asymptotic theory</td><td>Used for large-sample approximations</td><td>Not central — posterior valid for any n</td></tr>
+        <tr><td>Stopping rules</td><td>Affects conclusions</td><td>Irrelevant</td><td>Irrelevant (acts like likelihood approach)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-box">
+      <strong>Bayesian satisfies both LPs:</strong> If L₂(θ|y) = c·L₁(θ|y), then p₂(θ|y) = c·L₁(θ|y)·p(θ) / ∫c·L₁p(θ)dθ = p₁(θ|y). The constant c cancels. Thus the Bayesian posterior is invariant to proportional changes in the likelihood, satisfying LP2.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.12: MODES ===== -->
+  <div class="section-card" id="modes">
+    <h2>2.12 The Different Modes of the Bayesian Approach</h2>
+    <table>
+      <thead><tr><th>Type of Bayesian</th><th>Prior Philosophy</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Subjective Bayesian</strong></td><td>Prior always reflects personal/group opinion; posterior depends on whose prior is used</td><td>Clinical decision-making, expert elicitation</td></tr>
+        <tr><td><strong>Objective Bayesian</strong></td><td>Prior chosen by a formal rule expressing "lack of knowledge" (default/reference prior)</td><td>Phase III RCTs where appearance of objectivity is required</td></tr>
+        <tr><td><strong>Pragmatic Bayesian</strong></td><td>Mix of subjective, objective, and frequentist ideas; goal is solving the practical problem</td><td>Most modern applied Bayesian analyses</td></tr>
+      </tbody>
+    </table>
+    <div class="key-box">
+      Spiegelhalter et al. (2004): "Bayesian methods explicitly allow for the possibility that the conclusions of an analysis may depend on who is conducting it and their available evidence and opinion." When little prior information is available, Bayesian results approximate frequentist results.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2.13: HISTORY ===== -->
+  <div class="section-card" id="history">
+    <h2>2.13 Historical Notes</h2>
+    <table>
+      <thead><tr><th>Figure</th><th>Dates</th><th>Key Contribution</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Thomas Bayes</strong></td><td>~1701–1761</td><td>Presbyterian minister; first formulated Inverse Probability; discovered beta distribution in two-stage binomial; paper published posthumously in 1763 by Richard Price</td></tr>
+        <tr><td><strong>Pierre-Simon Laplace</strong></td><td>1749–1827</td><td>True architect of Bayesian theory; derived general Bayes theorem; proved asymptotic normality of posteriors (CLT for inverse probability); introduced principle of insufficient reason (uniform priors)</td></tr>
+        <tr><td><strong>R.A. Fisher</strong></td><td>1890–1962</td><td>Most fervent opponent of Bayesian theory; argued flat priors are parameterization-dependent and arbitrary; introduced likelihood as alternative to inverse probability</td></tr>
+        <tr><td><strong>Bruno de Finetti</strong></td><td>1906–1985</td><td>Proved the Representation Theorem (1931) — foundational for Bayesian exchangeability</td></tr>
+        <tr><td><strong>Harold Jeffreys</strong></td><td>1891–1989</td><td>Developed system for noninformative (Jeffreys) priors; introduced Bayes factors for hypothesis testing</td></tr>
+        <tr><td><strong>BUGS/WinBUGS</strong></td><td>Late 1980s–1990s</td><td>MCMC computational breakthrough made Bayesian methods practically accessible; resolved the intractable denominator problem</td></tr>
+      </tbody>
+    </table>
+    <div class="key-box">
+      <strong>The main historical obstacle</strong> for Bayesian methods was computing the denominator ∫L(θ|y)p(θ)dθ. Markov chain Monte Carlo (MCMC) methods, introduced to statistics in the late 1980s, and the BUGS package (1989) solved this problem and launched the modern Bayesian revolution.
+    </div>
+  </div>
+
+  <!-- ===== MCQ SECTION ===== -->
+  <div class="section-card q-section" id="mcq">
+    <h2>🎯 Multiple Choice &amp; True/False Questions (30 Questions)</h2>
+
+    <div class="score-bar">
+      <div>
+        <span>Score: </span><span class="score-val" id="scoreDisplay">0 / 30</span>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block" data-q="1">
+      <div class="q-number">Question 1 · Multiple Choice</div>
+      <div class="q-text">In Bayes theorem p(θ|y) = p(y|θ)·p(θ)/p(y), the denominator p(y) is called the "averaged likelihood" because it is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The maximum value of the likelihood function</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) A weighted average of L(θ|y) over all θ-values, with weights given by the prior p(θ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The likelihood evaluated at the MLE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The sample size-adjusted likelihood</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" data-q="2">
+      <div class="q-number">Question 2 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Bayesian paradigm, treating a parameter θ as stochastic means that there is no true fixed value θ₀; the parameter simply fluctuates randomly in nature.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" data-q="3">
+      <div class="q-number">Question 3 · Multiple Choice</div>
+      <div class="q-text">In the ECASS 3 stroke study, the ECASS 2 prior was Beta(9, 93). The ECASS 3 interim data showed y = 10 SICH events out of n = 50 patients. What is the posterior distribution?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Beta(10, 50)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Beta(18, 132)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Beta(19, 133)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Beta(9, 93)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" data-q="4">
+      <div class="q-number">Question 4 · Multiple Choice</div>
+      <div class="q-text">The conjugate prior for a Binomial likelihood is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Normal distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Gamma distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Beta distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Dirichlet distribution</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" data-q="5">
+      <div class="q-number">Question 5 · True / False</div>
+      <div class="q-text">TRUE or FALSE: When using a flat (uniform) prior U(0,1) for a binomial parameter θ, the resulting posterior distribution is equal to the scaled binomial likelihood.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" data-q="6">
+      <div class="q-number">Question 6 · Multiple Choice</div>
+      <div class="q-text">In the Beta–Binomial model, the posterior mode θ̂_M equals (y + y₀)/(n + n₀). This shows that the posterior mode is a weighted average of the prior mode and the MLE with weights proportional to:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The sample variances of the prior and data experiments</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The sample sizes of the prior experiment (n₀) and the current data (n)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The P-values from the prior and current experiments</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The standard errors of the prior and likelihood</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" data-q="7">
+      <div class="q-number">Question 7 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Normal–Normal conjugate case (known σ), the posterior precision equals the sum of the prior precision and the sample precision.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" data-q="8">
+      <div class="q-number">Question 8 · Multiple Choice</div>
+      <div class="q-text">In the IBBENS dietary study (n₀ = 563, µ₀ = 328, σ₀ = 5.072) used as a prior for IBBENS-2 (n = 50, ȳ = 318), the posterior mean µ̄ = 327.2 is closer to µ₀ = 328 than to ȳ = 318 because:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The data were incorrectly measured in IBBENS-2</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The prior precision (from n₀ = 563) is much higher than the sample precision (from n = 50), so the prior dominates</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Bayesian methods always favor the prior over the data</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The posterior mean is always equal to the prior mean</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" data-q="9">
+      <div class="q-number">Question 9 · Multiple Choice</div>
+      <div class="q-text">The conjugate prior for a Poisson likelihood is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Beta distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Normal distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Gamma distribution</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Inverse Gamma distribution</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" data-q="10">
+      <div class="q-number">Question 10 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Gamma–Poisson conjugate model, if the prior is Gamma(α₀, β₀) and the data provide Σyᵢ total counts from n observations, then the posterior is Gamma(Σyᵢ + α₀, n + β₀).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-block" data-q="11">
+      <div class="q-number">Question 11 · Multiple Choice</div>
+      <div class="q-text">A "discounted prior" in the Gaussian case refers to:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Shifting the prior mean to reflect different population characteristics</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Increasing the prior variance σ₀² to reduce the influence of the prior on the posterior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Multiplying the prior density by a discount factor less than 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Replacing the prior with a uniform distribution</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-block" data-q="12">
+      <div class="q-number">Question 12 · True / False</div>
+      <div class="q-text">TRUE or FALSE: A Beta(α₀, β₀) prior in the binomial case is equivalent to adding (α₀ − 1) extra successes and (β₀ − 1) extra failures to the observed dataset.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-block" data-q="13">
+      <div class="q-number">Question 13 · Multiple Choice</div>
+      <div class="q-text">In the Bayesian paradigm, the property that the posterior belongs to the same family as the prior is called:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Shrinkage</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Exchangeability</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Conjugacy</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Proportionality</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-block" data-q="14">
+      <div class="q-number">Question 14 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Gaussian case with known σ, the posterior variance is always smaller than both the prior variance and the variance of the likelihood — even when prior and likelihood are in conflict.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-block" data-q="15">
+      <div class="q-number">Question 15 · Multiple Choice</div>
+      <div class="q-text">The noninformative prior in the Gaussian case is obtained when σ₀² → ∞. What does the posterior distribution become in this limit?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) It becomes a flat uniform distribution on all real numbers</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) N(µ | ȳ, σ²/n) — the posterior equals the likelihood, depending only on the data</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) It concentrates entirely at the prior mean µ₀</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) It becomes a t-distribution with n−1 degrees of freedom</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-block" data-q="16">
+      <div class="q-number">Question 16 · Multiple Choice</div>
+      <div class="q-text">In the Signal-Tandmobiel® caries study (n = 4351, Σyᵢ = 9758) with prior Gamma(3, 1), the posterior parameters ᾱ and β̄ are:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) ᾱ = 9758, β̄ = 4351</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) ᾱ = 9761, β̄ = 4351</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) ᾱ = 9761, β̄ = 4352</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) ᾱ = 3, β̄ = 1</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-block" data-q="17">
+      <div class="q-number">Question 17 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Bayesian approach satisfies Likelihood Principle 2 (LP2) — if two likelihoods are proportional, the posteriors derived from them with the same prior are identical.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-block" data-q="18">
+      <div class="q-number">Question 18 · Multiple Choice</div>
+      <div class="q-text">Fisher's main objection to the Bayesian approach with a flat prior was that:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Flat priors make the posterior equal to the prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Flat priors always bias the posterior toward extreme values</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The posterior obtained with a flat prior depends on the chosen parameterization — a flat prior on θ gives different results than a flat prior on h(θ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Flat priors violate Bayes theorem</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-block" data-q="19">
+      <div class="q-number">Question 19 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the frequentist approach, statistical inference relies on repeated sampling properties and maximization; in the Bayesian approach, inference relies on the posterior distribution and integration is central.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-block" data-q="20">
+      <div class="q-number">Question 20 · Multiple Choice</div>
+      <div class="q-text">Bayesian statistical inference is valid for any sample size because:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The Central Limit Theorem guarantees normality for any n in the Bayesian framework</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Inference is based on the exact posterior distribution, not on asymptotic approximations that require large n</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Bayesian methods only use sufficient statistics which are always unbiased</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The prior distribution guarantees proper coverage for small samples</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="question-block" data-q="21">
+      <div class="q-number">Question 21 · Multiple Choice</div>
+      <div class="q-text">Laplace's "principle of insufficient reason" (or principle of indifference) states that:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Prior distributions should be proportional to the Fisher information</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) When there is no reason to prefer one value of θ over another, assign uniform (flat) prior probabilities</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The posterior should be independent of the prior when n is large</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Posterior probabilities are always insufficient without historical data</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="question-block" data-q="22">
+      <div class="q-number">Question 22 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the caries study (dmft-index), the ratio var(dmft)/mean(dmft) = 3.53 indicates that the Poisson model is a perfect fit because the ratio should exceed 1.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q23 -->
+    <div class="question-block" data-q="23">
+      <div class="q-number">Question 23 · Multiple Choice</div>
+      <div class="q-text">When applying the change-of-variables rule to obtain the posterior distribution of ψ = h(θ), the Jacobian term |dθ/dψ| is needed because:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The Jacobian ensures the posterior still satisfies LP2</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Probability must be preserved under transformation — the density of ψ must integrate to 1, requiring adjustment for the change in scale from θ to ψ</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The Jacobian normalizes the likelihood to be a proper density</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) It ensures the posterior mean is preserved under reparameterization</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q24 -->
+    <div class="question-block" data-q="24">
+      <div class="q-number">Question 24 · True / False</div>
+      <div class="q-text">TRUE or FALSE: A "subjective" Bayesian probability and a "frequentist" probability both satisfy the same formal axioms of probability theory (non-negativity, normalization, additivity).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q25 -->
+    <div class="question-block" data-q="25">
+      <div class="q-number">Question 25 · Multiple Choice</div>
+      <div class="q-text">The "unit-information prior" in the Gaussian case is the prior with variance σ₀² = σ². This corresponds to adding how many extra observations?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Zero extra observations</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) One extra observation</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) n extra observations (doubling the sample)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Infinite extra observations</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q26 -->
+    <div class="question-block" data-q="26">
+      <div class="q-number">Question 26 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The assumption that ECASS 2 data can be used as a prior for the ECASS 3 study implies that the past and present data are exchangeable — i.e., the conditions under which both studies were conducted are assumed identical.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="question-block" data-q="27">
+      <div class="q-number">Question 27 · Multiple Choice</div>
+      <div class="q-text">Which of the following is NOT a valid alternative term for a "noninformative prior"?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Vague prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Diffuse prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Weakly informative prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">D) Conjugate prior</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="question-block" data-q="28">
+      <div class="q-number">Question 28 · Multiple Choice</div>
+      <div class="q-text">Thomas Bayes' work on inverse probability was published in 1763 in which journal?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Journal of the Royal Statistical Society</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Annals of Statistics</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Philosophical Transactions of the Royal Society</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Biometrika</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="question-block" data-q="29">
+      <div class="q-number">Question 29 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Gaussian case with known σ, if the prior and likelihood are "in conflict" (support very different µ values), the posterior variance will be LARGER than the prior variance.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q30 -->
+    <div class="question-block" data-q="30">
+      <div class="q-number">Question 30 · Multiple Choice</div>
+      <div class="q-text">WinBUGS parameterizes the normal distribution as N(µ, 1/σ²) rather than N(µ, σ²). This means that when WinBUGS specifies N(0, 0.001), this corresponds to a prior with:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Mean 0 and standard deviation 0.001 — a very tight prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Mean 0 and variance 0.001 — a fairly tight prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Mean 0 and variance 1/0.001 = 1000 — a very diffuse (vague) prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Precision 0 — an improper flat prior</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+  </div><!-- end MCQ section -->
+
+  <!-- ===== SHORT ANSWER SECTION ===== -->
+  <div class="section-card q-section" id="shortq">
+    <h2>✍️ Short Answer Questions (5 Questions)</h2>
+
+    <!-- SA1 -->
+    <div class="short-q">
+      <div class="q-number">Short Answer 1</div>
+      <div class="q-text">In the ECASS 3 stroke study (binomial case), fully derive the posterior distribution for θ (probability of SICH). Use: prior Beta(α₀, β₀) with α₀ = 9, β₀ = 93; data y = 10 successes out of n = 50. Show all algebraic steps, identify the posterior as a named distribution, and state all three key properties of the posterior (compromise, concentration, dominance). </div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Step 1 — Likelihood:</strong><br>
+        L(θ | y) = C(n,y) · θʸ(1−θ)^(n−y) ∝ θ¹⁰(1−θ)⁴⁰<br><br>
+        <strong>Step 2 — Prior:</strong><br>
+        p(θ) = Beta(9, 93) ∝ θ^(9−1)(1−θ)^(93−1) = θ⁸(1−θ)⁹²<br><br>
+        <strong>Step 3 — Numerator (posterior kernel):</strong><br>
+        <span class="formula-inline">p(θ|y) ∝ L(θ|y) · p(θ) ∝ θ¹⁰(1−θ)⁴⁰ · θ⁸(1−θ)⁹²
+         = θ^(10+8)(1−θ)^(40+92) = θ^18(1−θ)^132
+         = θ^(ᾱ−1)(1−θ)^(β̄−1)   where ᾱ = 19, β̄ = 133</span>
+        This is the kernel of a Beta(19, 133) distribution.<br><br>
+        <strong>Step 4 — Normalizing constant:</strong><br>
+        p(y) = C(n,y) · B(ᾱ, β̄) / B(α₀, β₀), which ensures p(θ|y) integrates to 1.<br><br>
+        <strong>→ Posterior: Beta(19, 133)</strong><br><br>
+        <strong>Three key properties:</strong><br>
+        1. <em>Compromise:</em> θ̂_M = (ᾱ−1)/(ᾱ+β̄−2) = 18/150 = 0.12, which lies between the prior mode θ₀ = 8/100 = 0.08 and the MLE θ̂ = 10/50 = 0.20. Numerically: θ̂_M = (n₀/(n₀+n))·θ₀ + (n/(n₀+n))·θ̂ = (100/150)·0.08 + (50/150)·0.20 = 0.053 + 0.067 = 0.12 ✓<br><br>
+        2. <em>Concentration:</em> The posterior is more peaked than either the prior or the scaled likelihood, as it combines both sources of information. Posterior ᾱ + β̄ = 152 &gt; prior α₀ + β₀ = 102 (more information → narrower distribution).<br><br>
+        3. <em>Likelihood dominates for large n:</em> As n → ∞, y → ∞, the parameters α₀ = 9 and β₀ = 93 become negligible relative to ᾱ = Σy+α₀ and β̄ = n−y+β₀, so the posterior converges to a distribution centered entirely on the MLE.
+      </div>
+    </div>
+
+    <!-- SA2 -->
+    <div class="short-q">
+      <div class="q-number">Short Answer 2</div>
+      <div class="q-text">For the Gaussian–Normal conjugate case, write the formula for the posterior mean µ̄ in terms of precisions w₀ and w₁. Then explain: (a) the concept of "precision" and why Bayesians prefer it over variance; (b) what happens to µ̄ as the sample size n → ∞; (c) what happens when σ₀² → ∞ (noninformative prior limit). Illustrate with the IBBENS dietary study numbers.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Posterior mean formula:</strong>
+        <span class="formula-inline">µ̄ = (w₀·µ₀ + w₁·ȳ) / (w₀ + w₁)
+
+where:  w₀ = 1/σ₀²  (prior precision)
+        w₁ = n/σ²   (sample precision)
+        σ₀² = prior variance, σ²/n = variance of sampling distribution of ȳ</span>
+
+        <strong>(a) Concept of precision:</strong><br>
+        Precision = 1/variance. A high-precision distribution is narrow and concentrated (strong information); a low-precision distribution is wide and diffuse (weak information). Bayesians prefer precision because: (i) the posterior precision formula is elegantly additive (posterior precision = prior + sample precision); (ii) WinBUGS and many software packages use precision parameterization N(µ, τ) where τ = 1/σ².<br><br>
+        <strong>(b) As n → ∞:</strong><br>
+        w₁ = n/σ² → ∞, while w₀ = 1/σ₀² remains fixed. Then:<br>
+        µ̄ = (w₀·µ₀ + w₁·ȳ)/(w₀ + w₁) → ȳ as w₁ dominates w₀.<br>
+        Also σ̄² = 1/(w₀ + w₁) → 0. The posterior concentrates on the data mean — likelihood dominates prior for large n.<br><br>
+        <strong>(c) Noninformative prior (σ₀² → ∞):</strong><br>
+        w₀ = 1/σ₀² → 0, so µ̄ → ȳ and σ̄² → σ²/n regardless of n.<br>
+        Posterior becomes N(µ | ȳ, σ²/n) — entirely determined by the data.<br><br>
+        <strong>IBBENS illustration:</strong>
+        <span class="formula-inline">σ₀ = 120.3/√563 = 5.072  →  w₀ = 1/5.072² = 0.03887
+n = 50, σ = 119.5:  w₁ = 50/119.5² = 0.003500
+µ̄ = (0.03887×328 + 0.003500×318) / (0.03887 + 0.003500)
+   = (12.75 + 1.113) / 0.04237 = 13.863 / 0.04237 ≈ 327.2 ✓
+σ̄² = 1/0.04237 ≈ 23.6,  σ̄ ≈ 4.86 ≈ 4.79 (reported)</span>
+        The prior precision (0.039) is ~11× the sample precision (0.0035), so µ̄ = 327.2 is much closer to µ₀ = 328 than to ȳ = 318.
+      </div>
+    </div>
+
+    <!-- SA3 -->
+    <div class="short-q">
+      <div class="q-number">Short Answer 3</div>
+      <div class="q-text">Explain the concept of "conjugacy" and its practical advantages. Using the three main examples from Chapter 2 (binomial, Gaussian, Poisson), create a summary showing: the likelihood family, the conjugate prior, and the posterior — including how the posterior parameters update. Why is conjugacy computationally important, and when might a non-conjugate prior be preferable?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Definition of Conjugacy:</strong><br>
+        A prior p(θ) is conjugate to a likelihood L(θ|y) if the posterior p(θ|y) belongs to the same parametric family as the prior. This occurs when the kernel of the likelihood has the same functional form as the prior kernel in θ.<br><br>
+        <strong>Summary Table:</strong>
+        <span class="formula-inline">Likelihood → Conjugate Prior → Posterior
+
+Binomial Bin(n, θ):
+  Prior:     Beta(α₀, β₀)
+  Posterior: Beta(α₀ + y,  β₀ + n − y)
+  Update:    add y successes and (n−y) failures to prior "counts"
+
+Normal N(µ, σ²), σ known:
+  Prior:     N(µ₀, σ₀²)  [precision w₀ = 1/σ₀²]
+  Posterior: N(µ̄, σ̄²)
+  Update:    µ̄ = precision-weighted average; 1/σ̄² = w₀ + n/σ²
+
+Poisson(θ):
+  Prior:     Gamma(α₀, β₀)
+  Posterior: Gamma(Σyᵢ + α₀,  n + β₀)
+  Update:    add observed total counts Σyᵢ to α₀; add n to β₀</span>
+
+        <strong>Computational advantages:</strong><br>
+        1. <em>Analytical tractability:</em> The posterior has a closed-form expression — no numerical integration or MCMC needed.<br>
+        2. <em>Iterative updating:</em> The posterior from one dataset becomes the prior for the next dataset. This is the natural sequential Bayesian learning mechanism.<br>
+        3. <em>Frequentist software:</em> The equivalence of the prior to "imaginary data" means standard software can be used with an augmented dataset.<br>
+        4. <em>Easy interpretation:</em> Parameters update in a transparent, interpretable way.<br><br>
+        <strong>When non-conjugate priors are preferable:</strong><br>
+        When the conjugate family cannot adequately represent actual prior knowledge. For example, if prior information strongly suggests a bimodal distribution for θ (e.g., two distinct populations), a conjugate unimodal prior would be inappropriate. In such cases, non-conjugate priors (e.g., mixture priors) are used, requiring numerical methods (MCMC) for posterior computation.
+      </div>
+    </div>
+
+    <!-- SA4 -->
+    <div class="short-q">
+      <div class="q-number">Short Answer 4</div>
+      <div class="q-text">Compare and contrast the objective Bayesian, subjective Bayesian, and pragmatic Bayesian approaches to specifying prior distributions. For the ECASS 3 stroke study scenario, give a concrete example of what each type of Bayesian would specify as a prior for θ (the probability of SICH), and discuss the implications for posterior inference.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Objective Bayesian:</strong><br>
+        The prior is chosen by a formal rule expressing ignorance — independent of the analyst's personal beliefs. For θ ∈ [0,1], this would be the flat (uniform) prior U(0,1) = Beta(1,1), or more formally, Jeffreys' prior Beta(0.5, 0.5). The prior conveys "I have no preference for any value of θ over another." This approach maintains the appearance of objectivity and reproducibility — two analysts using this approach with the same data would always reach the same conclusion. However, it ignores available ECASS 2 evidence.<br><br>
+        <strong>Result:</strong> Posterior = Beta(1+10, 1+40) = Beta(11, 41). Posterior mean = 11/52 ≈ 0.212 — driven entirely by the ECASS 3 interim data.<br><br>
+        <strong>Subjective Bayesian:</strong><br>
+        The prior reflects the personal beliefs of the DSMB neurologists. Based on ECASS 2 results and clinical experience, they believe SICH rates lie between 5% and 20%, centered around 8–10%. This could be encoded as Beta(9, 93) (derived from ECASS 2 data) or adjusted further — e.g., if they believe the ECASS 3 population is older and thus at higher risk, they might shift to a prior centered at ~12%: Beta(12, 88). Different experts may specify different priors, leading to different posteriors — the subjective Bayesian explicitly acknowledges this.<br><br>
+        <strong>Result using ECASS 2-derived prior:</strong> Posterior = Beta(19, 133). Mean = 19/152 ≈ 0.125 — a compromise between the ECASS 2 rate (0.08) and ECASS 3 interim rate (0.20).<br><br>
+        <strong>Pragmatic Bayesian:</strong><br>
+        Combines approaches flexibly. For a safety monitoring context, they would likely use the ECASS 2 data-derived prior (Beta(9,93)) as it is scientifically well-motivated, then conduct a sensitivity analysis using both the flat prior and a discounted version (e.g., Beta(4.5, 46.5) — halved information from ECASS 2) to assess robustness. They might also report the classical frequentist 95% CI alongside the Bayesian credible interval for comparison.<br><br>
+        <strong>Implication:</strong> The choice of prior affects the DSMB's decision about whether to stop the trial. With the flat prior, the SICH rate appears alarmingly high (posterior mean ≈ 21%); with the ECASS 2 prior, it is shrunk back toward the historical rate (12.5%). The pragmatic Bayesian's sensitivity analysis reveals how robust the conclusions are to prior choice.
+      </div>
+    </div>
+
+    <!-- SA5 -->
+    <div class="short-q">
+      <div class="q-number">Short Answer 5</div>
+      <div class="q-text">Explain the historical development of the Bayesian approach from Thomas Bayes to modern computational methods. Address: (a) Bayes' original contribution and why he is not solely credited; (b) Laplace's extensions; (c) why Bayesian methods were practically unavailable for nearly 200 years; (d) the breakthrough that made Bayesian methods accessible; (e) Fisher's opposition and why parameterization of the flat prior was problematic.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>(a) Bayes' original contribution:</strong><br>
+        Thomas Bayes (~1701–1761) was the first to formulate the problem of Inverse Probability — computing the probability of a parameter θ given observed data, rather than the probability of data given θ. He derived the distribution of the binomial parameter in a two-stage experiment and thereby discovered the beta distribution. His work was published posthumously in 1763 by Richard Price in the Philosophical Transactions of the Royal Society. However, attributing the theorem solely to Bayes is not fully justified — Bayes' treatment was informal and limited in scope.<br><br>
+        <strong>(b) Laplace's extensions:</strong><br>
+        Pierre-Simon Laplace (1749–1827) is more properly the "true architect" of Bayesian theory. He: (i) derived the general categorical version of Bayes theorem; (ii) proved the asymptotic normality of posterior distributions (what we now call the CLT for inverse probability, which preceded the classical CLT); (iii) initially adopted the principle of insufficient reason (uniform priors); (iv) later generalized to nonuniform priors; (v) assigned parameters and hypotheses stochastic behavior on equal footing with observations.<br><br>
+        <strong>(c) Why unavailable for ~200 years:</strong><br>
+        The main computational obstacle was evaluating the denominator of Bayes theorem: ∫L(θ|y)p(θ)dθ. For all but the simplest conjugate models, this integral is analytically intractable. In the early–mid 20th century, there was no reliable way to compute this high-dimensional integral for complex real problems. Additionally, Fisher, Neyman, and Pearson — the dominant figures in 20th century statistics — strongly opposed the Bayesian paradigm, which further discouraged its adoption in applied statistics.<br><br>
+        <strong>(d) The breakthrough — MCMC:</strong><br>
+        In the late 1980s, Markov chain Monte Carlo (MCMC) methods were introduced to statistical computing. MCMC allows sampling from a posterior distribution without needing to compute the normalizing constant analytically. The BUGS package (1989) and its Windows version WinBUGS implemented these algorithms accessibly, allowing practitioners to fit Bayesian models for virtually any problem. This computational revolution launched the modern Bayesian renaissance.<br><br>
+        <strong>(e) Fisher's parameterization objection:</strong><br>
+        Fisher showed that with a flat prior on θ, a reparameterization to ψ = h(θ) gives a different posterior than using a flat prior directly on ψ. Since the "flat prior" is not invariant to reparameterization, different but mathematically equivalent models give different Bayesian conclusions depending on how θ is parameterized — violating the scientific principle that conclusions should not depend on arbitrary mathematical choices. This led Fisher to conclude the Bayesian approach was inherently arbitrary. The solution (Jeffreys' noninformative prior, proportional to √|I(θ)|) was proposed later and IS parameterization-invariant, but this came after Fisher's opposition was already firmly established.
+      </div>
+    </div>
+
+  </div><!-- end short answer section -->
+
+</div><!-- end container -->
+
+<script>
+  let totalCorrect = 0;
+  let totalAnswered = 0;
+
+  function checkAnswer(btn, isCorrect) {
+    const block = btn.closest('.question-block');
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const allBtns = block.querySelectorAll('.option-btn');
+    allBtns.forEach(b => { b.disabled = true; });
+
+    const feedback = block.querySelector('.feedback');
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'feedback correct-fb';
+      totalCorrect++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b => {
+        const fn = b.getAttribute('onclick');
+        if (fn && fn.includes('true')) b.classList.add('correct');
+      });
+      feedback.textContent = '✗ Incorrect. The highlighted option is correct.';
+      feedback.className = 'feedback incorrect-fb';
+    }
+
+    totalAnswered++;
+    document.getElementById('scoreDisplay').textContent = totalCorrect + ' / 30';
+  }
+
+  function toggleAnswer(btn) {
+    const answerBox = btn.nextElementSibling;
+    if (answerBox.classList.contains('shown')) {
+      answerBox.classList.remove('shown');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      answerBox.classList.add('shown');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.question-block').forEach(block => {
+      delete block.dataset.answered;
+      block.querySelectorAll('.option-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect');
+      });
+      const fb = block.querySelector('.feedback');
+      fb.className = 'feedback';
+      fb.textContent = '';
+    });
+    totalCorrect = 0;
+    totalAnswered = 0;
+    document.getElementById('scoreDisplay').textContent = '0 / 30';
+  }
+</script>
+
+
+
+</body></html>

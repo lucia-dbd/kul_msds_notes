@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Supervised Learning Essentials I Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    border-radius: 12px;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 { color: #1a3a5c; font-size: 1.25em; font-weight: 700; border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0; }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin-top: 20px; }
+  .key-point { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .computation-note { background: #fdf3f3; border-left: 4px solid #e57373; padding: 12px 18px; margin: 14px 0; }
+  .formula-box { background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px; padding: 14px 20px; margin: 14px 0; text-align: center; font-size: 1.05em; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd) { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* MCQ */
+  .mcq-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-top: 0; }
+  .score-display { background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px; padding: 5px 18px; font-weight: 700; color: #856404; display: inline-block; font-size: 0.95em; }
+  .mcq-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .reset-btn-mcq { background: #2e6da4; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .reset-btn-mcq:hover { background: #1a3a5c; }
+  .mcq-card { background: #f9fafb; border: 1px solid #e5e9f2; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .mcq-card .question-label { font-size: 0.8em; font-weight: 700; color: #2e6da4; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+  .option-btn { display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea; border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left; cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s; }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* Short Answer */
+  .sa-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; border-bottom: 2px solid #e8d5ff; padding-bottom: 8px; margin-top: 0; }
+  .sa-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .sa-card { background: #faf9ff; border: 1px solid #e2dcf5; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin: 8px 0 14px 0; font-size: 1.0em; }
+  .reveal-btn { background: #6f42c1; color: #ffffff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel { background: #f3f0ff; border: 1px solid #d4c8f5; border-radius: 8px; padding: 18px 22px; margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none; }
+  .answer-panel strong { color: #4a148c; }
+  .reset-btn-sa { background: #6f42c1; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .reset-btn-sa:hover { background: #5a32a3; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin-bottom: 4px; }
+  code { background: #eef2fb; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Supervised Learning Essentials I: Preprocessing &amp; Basic Techniques — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#overview">Overview</a>
+  <a href="#preprocessing">Preprocessing</a>
+  <a href="#missing-outliers">Missing &amp; Outliers</a>
+  <a href="#transformations">Transformations</a>
+  <a href="#feature-eng">Feature Engineering</a>
+  <a href="#regression">Regression</a>
+  <a href="#regularization">Regularization</a>
+  <a href="#trees">Decision Trees</a>
+  <a href="#knn">K-NN</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ===================== STUDY NOTES ===================== -->
+
+<div class="notes-section" id="overview">
+  <h2>1. Supervised Learning – Recap</h2>
+  <div class="key-point">
+    <strong>Core idea:</strong> You have a labelled dataset. The goal is to learn a mapping from features to a target so predictions can be made on unseen data.
+  </div>
+  <h3>Task Types</h3>
+  <table>
+    <thead><tr><th>Task</th><th>Target type</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Binary classification</td><td>Categorical (2 classes)</td><td>Churn yes/no, fraud yes/no</td></tr>
+      <tr><td>Multiclass classification</td><td>Categorical (&gt;2)</td><td>Product category, sentiment</td></tr>
+      <tr><td>Ordinal classification</td><td>Ordered categorical</td><td>Credit ratings AAA–D</td></tr>
+      <tr><td>Multilabel classification</td><td>Multiple binary outputs</td><td>Tag assignment</td></tr>
+      <tr><td>Regression</td><td>Continuous</td><td>Price prediction, LTV</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box"><strong>⚠ Defining your target carefully matters:</strong> The same business problem can be cast as regression, classification, or ordinal classification. Each framing has different implications for model choice, evaluation, and calibration.</div>
+  <p>Most tabular modeling techniques assume a <strong>single feature matrix</strong> as input — relational and time-series data must be aggregated/featurized first.</p>
+</div>
+
+<div class="notes-section" id="preprocessing">
+  <h2>2. Data Preprocessing</h2>
+  <h3>Data Construction &amp; Selection</h3>
+  <ul>
+    <li>Merge data sources; resolve aggregation levels (household vs. individual)</li>
+    <li>Beware of <strong>future variables</strong>: variables that are only available <em>after</em> the outcome — this constitutes data leakage</li>
+    <li>Set aside a <strong>hold-out test set as early as possible</strong></li>
+    <li>Trade-off: large historical window (more data) vs. recent window (more relevant)</li>
+  </ul>
+  <h3>Data Types</h3>
+  <p>Master data, transactional data, external data (social media, macroeconomic, weather), and open data. Also distinguish: tabular vs. imagery vs. time series; small vs. big data; structured vs. unstructured.</p>
+  <h3>Exploratory Data Analysis (EDA)</h3>
+  <p>Visual analytics with boxplots, scatter plots, histograms, correlation plots. Tools: <code>pandas-profiling</code>, <code>AutoViz</code>, <code>SweetVIZ</code>. The Anscombe quartet illustrates why summary statistics alone are insufficient.</p>
+  <h3>Data Cleaning</h3>
+  <ul>
+    <li>Fix consistency issues (e.g., "K.U.L.", "KULeuven" → unified form)</li>
+    <li>Unify representations (Male / Man / MAN → M)</li>
+    <li>Remove or flag future/leaking variables</li>
+    <li>Duplicate rows: can be valid or invalid — treat accordingly</li>
+  </ul>
+</div>
+
+<div class="notes-section" id="missing-outliers">
+  <h2>3. Missing Values &amp; Outliers</h2>
+  <h3>Missing Values</h3>
+  <div class="key-point">
+    Distinguish <strong>MCAR</strong> (missing at random) from <strong>MNAR</strong> (missing not at random, e.g., age field blank because refused to disclose). The treatment differs: MNAR carries information.
+  </div>
+  <table>
+    <thead><tr><th>Strategy</th><th>When to use</th><th>Risk</th></tr></thead>
+    <tbody>
+      <tr><td>Delete row/column</td><td>Very high missingness rate</td><td>Loss of data</td></tr>
+      <tr><td>Impute with mean</td><td>Normal distribution, MCAR</td><td>Distorts variance</td></tr>
+      <tr><td>Impute with median/mode</td><td>Skewed or categorical</td><td>Less distortion than mean</td></tr>
+      <tr><td>Model-based imputation</td><td>Complex patterns</td><td>Expensive, rarely worth it</td></tr>
+      <tr><td>Add missingness indicator</td><td>When absence itself is informative</td><td>Adds dimensionality</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box"><strong>⚠ Production alert:</strong> Imputation rules learned on training data must be <em>frozen</em> and applied identically to validation and production data. Never recompute the median on new data — it becomes part of the model pipeline.</div>
+
+  <h3>Outliers</h3>
+  <p>Detection: histograms, z-scores, boxplots. Outliers can be valid (a genuine high-value customer) or invalid (data entry error).</p>
+  <div class="key-point">
+    Treatment options: (1) treat as missing if invalid; (2) keep as-is if valid and technique is robust; (3) <strong>truncate / cap</strong>; (4) <strong>categorize</strong> the feature. Note: some tasks (fraud detection) make <em>outlier detection the entire goal</em>.
+  </div>
+</div>
+
+<div class="notes-section" id="transformations">
+  <h2>4. Transformations &amp; Encodings</h2>
+  <h3>Standardization vs. Normalization</h3>
+  <div class="formula-box">
+    Standardization: \( x_{new} = \dfrac{x - \mu}{\sigma} \) &nbsp;&nbsp;&nbsp; Normalization: \( x_{new} = \dfrac{x - x_{min}}{x_{max} - x_{min}} \)
+  </div>
+  <div class="key-point">Standardization is required for distance-based methods (K-NN, SVM, neural nets, regularized regression). Decision trees are <strong>invariant</strong> to monotone transformations — scaling is useless for them.</div>
+
+  <h3>Categorical Encoding Summary</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Idea</th><th>Caveat</th></tr></thead>
+    <tbody>
+      <tr><td>Integer encoding</td><td>Map categories to 1, 2, 3…</td><td>Implies ordinal relationship — usually wrong</td></tr>
+      <tr><td>One-hot (dummy)</td><td>Binary indicator per category</td><td>Drop one column to avoid multicollinearity; curse of dimensionality with many levels</td></tr>
+      <tr><td>Binary encoding</td><td>Integer then convert to binary bits</td><td>More compact but less interpretable</td></tr>
+      <tr><td>Odds-based / WoE</td><td>Replace category by log-odds w.r.t. target</td><td>Uses target → must be done after train/test split</td></tr>
+      <tr><td>Frequency encoding</td><td>Replace category by its count in training data</td><td>Loses granular differences; same rule must apply in production</td></tr>
+      <tr><td>Embeddings</td><td>Learned dense vectors</td><td>Needs enough data; mostly from deep learning</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Weights of Evidence (WoE)</h3>
+  <div class="formula-box">
+    \( WoE_{cat} = \ln\!\left(\dfrac{p_{c1,cat}}{p_{c2,cat}}\right) \)
+    where \( p_{c1,cat} \) = share of class-1 instances in that category.
+  </div>
+  <div class="key-point">WoE &gt; 0 → category favours class 1. Information Value (IV) = \(\sum (p_G - p_B) \times WoE\). IV &gt; 0.1 signals a useful predictor. WoE encodes a <strong>monotonic relationship</strong> to the target.</div>
+  <div class="warning-box">⚠ Fewer instances per category → less stable WoE. Apply <strong>Laplace smoothing</strong> to avoid extreme values from rare categories.</div>
+
+  <h3>Mathematical Transformations</h3>
+  <p>Log, square root, Box-Cox, Yeo-Johnson power transforms — used to induce linearity or approximate normality. Interaction variables \( x_1 \times x_2 \) capture joint effects absent from marginals.</p>
+
+  <h3>Categorization (Binning)</h3>
+  <p>Equal-width vs. equal-frequency binning. Useful for: outlier treatment, improving interpretability, reducing dimensionality, injecting non-linearities into linear models.</p>
+
+  <h3>Ordinal Encoding</h3>
+  <p><strong>Thermometer coding:</strong> ordinal category C gets a vector of 1s up to its rank position. <strong>Percentile coding:</strong> assign the cumulative frequency as a continuous value.</p>
+</div>
+
+<div class="notes-section" id="feature-eng">
+  <h2>5. Feature Engineering</h2>
+  <div class="key-point">"The aim of feature engineering is to transform dataset variables into features to help analytical models achieve better performance in terms of predictive performance, interpretability, or both."</div>
+  <p>Any domain knowledge that helps a human understand the data can usually be encoded as a feature. Most models are relatively "dumb" — smart features compound gains across all model types.</p>
+
+  <h3>RFM Features</h3>
+  <p><strong>Recency, Frequency, Monetary</strong> — classic in marketing and fraud analytics. Recency can be modelled with exponential decay: \( recency = e^{-\gamma t} \).</p>
+
+  <h3>Time &amp; Date Features</h3>
+  <ul>
+    <li>Time is <strong>periodic</strong> — do not compute arithmetic mean of timestamps. Use sin/cos transforms or the von Mises distribution.</li>
+    <li>Convert raw dates to: days since event, quarter, month, week, day-of-week, is_weekend, is_holiday.</li>
+  </ul>
+
+  <h3>Trend &amp; Window Features</h3>
+  <div class="formula-box">
+    Absolute trend: \( F_t - F_{t-x} \) &nbsp;&nbsp;&nbsp; Relative trend: \( \dfrac{F_t - F_{t-x}}{F_{t-x}} \)
+  </div>
+  <div class="warning-box">⚠ Watch for zero denominators in relative trends. Applying higher weight on recent values (weighted windows) is often beneficial.</div>
+
+  <h3>Relational Data Featurization</h3>
+  <p>Denormalization: merge normalized tables into a single feature matrix, aggregating child table rows. Tools: <code>dm</code> (R), <code>skrub</code>, <code>featuretools</code> (automated feature engineering).</p>
+
+  <h3>Feature Selection</h3>
+  <ul>
+    <li>Filter methods: variance threshold, chi-square, information gain, IV, correlation</li>
+    <li>Wrapper methods: forward/backward/stepwise selection (use with caution — see Harrell critique)</li>
+    <li>Embedded methods: Lasso (L1), tree-based importance, regularization</li>
+    <li>Dimensionality reduction: PCA, t-SNE, UMAP</li>
+  </ul>
+  <div class="warning-box">⚠ Stepwise selection on the same dataset used for confirmation leads to biased coefficients, inflated R², and invalid p-values. Always use a proper train/validation/test setup.</div>
+</div>
+
+<div class="notes-section" id="regression">
+  <h2>6. (Logistic) Regression</h2>
+  <h3>Linear Regression</h3>
+  <div class="formula-box">
+    \( y = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p + \epsilon, \quad \epsilon \sim \mathcal{N}(0,\sigma) \)
+  </div>
+  <p>Parameters are estimated by minimising the <strong>Sum of Squared Errors (SSE)</strong> — the OLS criterion. SSE is convex and fully differentiable → unique closed-form solution when \(X\) has full rank. For large data, <strong>gradient descent</strong> is preferred (closed form is \(O(p^3)\)).</p>
+
+  <h3>Logistic Regression</h3>
+  <div class="formula-box">
+    \( P(y=1 | \mathbf{x}) = \dfrac{1}{1 + e^{-(\beta_0 + \beta_1 x_1 + \cdots)}} \)
+  </div>
+  <div class="key-point">
+    Output is a <strong>probability</strong> ∈ (0,1). The logit (log-odds) link makes the model linear in the parameters. A one-unit increase in \(x_i\) multiplies the odds by \(e^{\beta_i}\) (the <em>odds ratio</em>).
+  </div>
+  <p><strong>Loss function:</strong> Cross-entropy (log loss): \( -[y\log p + (1-y)\log(1-p)] \). Not MSE — binary targets violate OLS assumptions.</p>
+  <p><strong>Doubling amount</strong> for feature \(x_i\): \( \log(2)/\beta_i \) — the change required to double the odds of the outcome.</p>
+  <h3>Properties &amp; Limitations</h3>
+  <table>
+    <thead><tr><th>Strength</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td>Interpretable coefficients &amp; odds ratios</td><td>Linear decision boundary only</td></tr>
+      <tr><td>Well-calibrated probabilities</td><td>Sensitive to outliers &amp; correlated features</td></tr>
+      <tr><td>Statistical rigor (p-values, CIs)</td><td>Needs dummy encoding for categoricals</td></tr>
+      <tr><td>Fast to train</td><td>Curse of dimensionality</td></tr>
+    </tbody>
+  </table>
+  <h3>Extensions</h3>
+  <p><strong>Multinomial logistic regression:</strong> K classes → K−1 binary logistic models. <strong>Ordinal logistic regression (proportional odds model):</strong> one set of coefficients shared across K−1 intercept thresholds. <strong>PCR / PLS:</strong> apply PCA (or PLS) before regression to handle multicollinearity. <strong>LOESS / GAMs:</strong> non-parametric smoothers for non-linear relationships.</p>
+  <div class="warning-box">⚠ TLS (Total Least Squares) minimizes orthogonal distance — appropriate when both x and y contain measurement error. But predicting y from x using TLS can yield <em>worse</em> vertical errors than OLS.</div>
+</div>
+
+<div class="notes-section" id="regularization">
+  <h2>7. Regularization</h2>
+  <div class="key-point">Regularization penalizes large coefficient magnitudes to prevent overfitting and improve generalization. It constrains rather than reduces the number of parameters.</div>
+  <div class="formula-box">
+    Ridge (L2): \( \min_\beta \sum(y_i - \hat y_i)^2 + \lambda \sum_j \beta_j^2 \)<br>
+    Lasso (L1): \( \min_\beta \sum(y_i - \hat y_i)^2 + \lambda \sum_j |\beta_j| \)<br>
+    Elastic Net: \( \min_\beta \sum(y_i - \hat y_i)^2 + \lambda_1 \sum_j |\beta_j| + \lambda_2 \sum_j \beta_j^2 \)
+  </div>
+  <table>
+    <thead><tr><th></th><th>Ridge (L2)</th><th>Lasso (L1)</th><th>Elastic Net</th></tr></thead>
+    <tbody>
+      <tr><td>Coefficients → 0?</td><td>No (shrinks toward 0)</td><td>Yes (exact zeros)</td><td>Yes (sparse)</td></tr>
+      <tr><td>Variable selection</td><td>No</td><td>Yes, built-in</td><td>Yes</td></tr>
+      <tr><td>Correlated features</td><td>Distributes weight</td><td>Picks one arbitrarily</td><td>Groups them</td></tr>
+      <tr><td>λ tuning</td><td>Cross-validation</td><td>Cross-validation</td><td>Grid search on λ₁, λ₂</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ <strong>Normalize features before regularization</strong>. If features are on different scales, the penalty term will disproportionately shrink coefficients of large-scale features.</div>
+  <p>The intercept \(\beta_0\) is <strong>never penalized</strong>. Regularization extends naturally to logistic regression, SVMs, and neural networks (L2 = "weight decay").</p>
+</div>
+
+<div class="notes-section" id="trees">
+  <h2>8. Decision Trees</h2>
+  <div class="key-point">Decision trees partition the feature space recursively using axis-aligned splits, assigning a class label or regression value to each leaf. They handle non-linearities and interaction effects naturally.</div>
+
+  <h3>Impurity Measures</h3>
+  <div class="formula-box">
+    Entropy: \( H(S) = -\sum_{x \in X} p(x)\log_2 p(x) \)<br><br>
+    Gini: \( Gini(S) = 1 - \sum_{x \in X} p(x)^2 \)<br><br>
+    Information Gain: \( IG(A,S) = H(S) - \sum_{t \in T} p(t) H(t) \)
+  </div>
+  <p>Entropy and Gini produce similar results. Gini is slightly faster to compute and slightly preferred for continuous splits. Classification error is too coarse for split selection.</p>
+
+  <h3>Algorithms</h3>
+  <table>
+    <thead><tr><th>Algorithm</th><th>Key Features</th><th>Limitations</th></tr></thead>
+    <tbody>
+      <tr><td>ID3</td><td>Categorical only, max depth growth, entropy + IG</td><td>No continuous vars, no pruning, severe overfitting</td></tr>
+      <tr><td>C4.5</td><td>Continuous splits (binary threshold search), handles missing values, gain ratio, pruning</td><td>Slower than CART</td></tr>
+      <tr><td>CART</td><td>Binary splits always, Gini for classification, SSE for regression; pruning via cost-complexity</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Continuous Splits</h3>
+  <p>For a continuous feature, only distinct observed values in training are candidate thresholds. Each threshold creates a binary split (≤ vs. &gt;). Binary splits on categoricals are also possible (avoids IG bias toward multi-way splits).</p>
+
+  <h3>Overfitting Prevention</h3>
+  <ul>
+    <li><strong>Early stopping:</strong> minimum instances per leaf, maximum depth, validation set monitoring</li>
+    <li><strong>Pruning:</strong> grow full tree, then merge leaves with negligible gain (cost-complexity pruning governed by complexity parameter α)</li>
+  </ul>
+  <div class="warning-box">⚠ Deep trees ≠ always overfitting. Shallow trees ≠ not overfitting. Evaluate on held-out data. Fully-grown trees have pure leaves → poor probability estimates. Pruned/stopped trees give leaf-level proportions that serve as (uncalibrated) probabilities.</div>
+
+  <h3>Regression Trees (CART)</h3>
+  <p>Leaf prediction = mean of target values. Split criterion: minimize within-group variance (equivalent to maximizing between-group variance), i.e., minimize SSE across child nodes. Regression trees typically need greater depth than classification trees.</p>
+
+  <h3>Properties</h3>
+  <table>
+    <thead><tr><th>Advantage</th><th>Disadvantage</th></tr></thead>
+    <tbody>
+      <tr><td>Handles non-linearities &amp; interactions natively</td><td>Unstable — small data change → different tree</td></tr>
+      <tr><td>Robust to outliers &amp; monotone transforms</td><td>Poor calibration (probabilities)</td></tr>
+      <tr><td>No scaling needed</td><td>Linear relationships approximated as step function</td></tr>
+      <tr><td>Highly interpretable (IF-THEN rules)</td><td>Greedy — no guaranteed global optimum</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="knn">
+  <h2>9. K-Nearest Neighbors (K-NN)</h2>
+  <div class="key-point">"The data is the model." K-NN stores the entire training set and classifies/regresses new instances based on the K most similar training examples (by distance).</div>
+  <ul>
+    <li><strong>Classification:</strong> majority vote among K neighbors</li>
+    <li><strong>Regression:</strong> weighted or unweighted average (weights ∝ 1/distance)</li>
+    <li>Requires <strong>normalization/standardization</strong> — all distance-based methods are scale-sensitive</li>
+    <li>K is a hyperparameter; dynamic K-values and custom distance functions are possible</li>
+  </ul>
+  <h3>Lazy Learner Properties</h3>
+  <table>
+    <thead><tr><th>Advantage</th><th>Disadvantage</th></tr></thead>
+    <tbody>
+      <tr><td>No training phase (trivially easy)</td><td>Entire dataset must be stored and searched at inference</td></tr>
+      <tr><td>Naturally handles multiclass</td><td>Slow at prediction time (O(n·d))</td></tr>
+      <tr><td>Surprisingly good with large data</td><td>Sensitive to noisy features and choice of K</td></tr>
+      <tr><td>Easy to extend (custom distances, weights)</td><td>No interpretable model output (no formula/tree)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===================== MCQ ===================== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">↺ Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ===================== SHORT ANSWER ===================== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (10)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">↺ Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────
+// MCQ DATA
+// ─────────────────────────────────────────────────
+const mcqData = [
+  // PREPROCESSING
+  {q:"When building a predictive model, which of the following variables should be excluded to prevent data leakage?", opts:["A) Customer age computed from date of birth","B) Account balance 30 days before the target event","C) A 'days overdue' field that is updated after the default event occurs","D) Income at time of application"], ans:"C", exp:"'Days overdue' is updated after the outcome is known — this is a future variable that would not be available at prediction time, constituting leakage."},
+  {q:"TRUE or FALSE: Setting aside a hold-out test set after all preprocessing steps have been applied is the recommended approach.", opts:["True","False"], ans:"False", exp:"The test set should be set aside as early as possible, before any preprocessing decisions are made, to avoid leakage of distributional information."},
+  {q:"The Anscombe quartet demonstrates that:", opts:["A) Summary statistics (mean, variance) are always sufficient for EDA","B) Four datasets can have nearly identical summary statistics but radically different distributions","C) Scatter plots are unreliable for non-linear data","D) Correlation always implies causation"], ans:"B", exp:"Anscombe (1973) showed four datasets with almost identical means, variances, correlations, and regression lines but completely different shapes — highlighting why visual EDA is essential."},
+  {q:"A company encodes the feature 'Account Activity' as: high=1, medium=2, low=3. What is the primary problem with this?", opts:["A) It increases dimensionality","B) It implies a false ordinal or even metric relationship between the levels","C) It cannot be used in logistic regression","D) It violates the normalization assumption"], ans:"B", exp:"Integer encoding imposes an ordering and even equal spacing that does not exist, potentially misleading distance-based and linear models."},
+  {q:"Which imputation strategy preserves the most information when missingness itself is informative (MNAR)?", opts:["A) Delete the row","B) Impute with the global mean","C) Impute with median and add a binary indicator column for 'was missing'","D) Use the mode"], ans:"C", exp:"Adding a missingness indicator preserves the signal that the value was absent, which may itself be predictive (MNAR)."},
+  // TRANSFORMATIONS
+  {q:"TRUE or FALSE: Standardization (z-score) is useful as a preprocessing step before training a CART decision tree.", opts:["True","False"], ans:"False", exp:"Decision trees operate on splits, which are invariant to monotone transformations like standardization. Scaling has no effect on tree splits."},
+  {q:"In Weights of Evidence encoding, a WoE value of +1.5 for a category means:", opts:["A) The category has 1.5 times the instances of the reference category","B) Instances in this category are more likely to be in class 1 than class 2","C) The category has 1.5% more positives than negatives","D) The model weight assigned to this category is 1.5"], ans:"B", exp:"WoE = ln(p_c1 / p_c2). A positive WoE means the proportion of class-1 instances in this category exceeds the proportion of class-2 instances, indicating higher risk/probability of class 1."},
+  {q:"You have a postal code feature with 5,000 distinct values. Which approach is LEAST likely to work well with a logistic regression model?", opts:["A) One-hot encoding","B) Frequency-based encoding (replace by count in training data)","C) WoE encoding","D) Domain-knowledge-based grouping"], ans:"A", exp:"One-hot encoding would create 5,000 binary columns, causing severe dimensionality issues and near-singular design matrix for logistic regression."},
+  {q:"Laplace smoothing in WoE encoding is applied primarily to:", opts:["A) Stabilize WoE estimates for categories with very few instances","B) Convert WoE values to probabilities","C) Ensure WoE values are always positive","D) Handle multicollinearity between WoE-encoded features"], ans:"A", exp:"Small category counts make WoE estimates highly variable. Adding a smoothing constant n pulls extreme WoE values toward zero, trading bias for stability."},
+  {q:"Equal-frequency binning differs from equal-width binning in that:", opts:["A) Equal-frequency bins contain the same range of values; equal-width bins contain the same number of instances","B) Equal-frequency bins contain the same number of instances; equal-width bins span the same value range","C) Equal-frequency binning always produces better predictive performance","D) Equal-width binning automatically accounts for the outcome variable"], ans:"B", exp:"Equal-frequency (quantile) binning splits so each bin has the same number of instances. Equal-width splits the value range into equal intervals."},
+  {q:"Thermometer coding for an ordinal variable with levels A < B < C < D produces how many binary features?", opts:["A) 4","B) 3","C) 2","D) 1"], ans:"B", exp:"Thermometer coding for k levels produces k−1 binary features (the highest level gets all 1s, the lowest gets all 0s)."},
+  // FEATURE ENGINEERING
+  {q:"TRUE or FALSE: RFM features were originally proposed for use in fraud analytics in the 1970s.", opts:["True","False"], ans:"False", exp:"RFM (Recency, Frequency, Monetary) was popularized by Cullinan (1977) specifically for direct marketing, not fraud analytics."},
+  {q:"Why should you NOT compute the arithmetic mean of timestamps directly?", opts:["A) Timestamps are always stored in different time zones","B) Time is periodic — a mean of 23:00 and 01:00 should be midnight, not noon","C) Arithmetic means inflate recency values","D) Timestamps violate the normality assumption"], ans:"B", exp:"Time wraps around (23:00 and 01:00 are only 2 hours apart, not 22). Arithmetic means ignore this periodicity. The von Mises distribution or circular statistics are appropriate."},
+  {q:"Feature engineering of interaction terms (x₁ × x₂) is most critical for which type of model?", opts:["A) Deep neural networks","B) Linear regression or logistic regression","C) Decision trees","D) K-nearest neighbors"], ans:"B", exp:"Linear models cannot capture interaction effects unless they are explicitly encoded as additional features. Decision trees find interactions natively through recursive splitting."},
+  {q:"A relative trend feature is calculated as (F_t − F_{t−x}) / F_{t−x}. What is the primary numerical risk?", opts:["A) The feature will always be between −1 and 1","B) Division by zero when F_{t−x} = 0","C) The feature captures level effects rather than change","D) It requires standardization before use in trees"], ans:"B", exp:"If the denominator (past value) is zero, the relative trend is undefined. This must be handled explicitly (e.g., by adding an epsilon or using a conditional)."},
+  {q:"Automated feature engineering tools like featuretools are best described as:", opts:["A) Tools that replace manual domain knowledge entirely","B) Frameworks that apply systematic aggregation and transformation rules across relational/temporal data","C) Tools that select the best subset of features using cross-validation","D) Deep learning frameworks for feature extraction"], ans:"B", exp:"featuretools automates the application of aggregation primitives (sum, mean, max, etc.) and transform primitives across relational and temporal datasets to construct a feature matrix."},
+  // REGRESSION
+  {q:"In logistic regression, the odds ratio e^βᵢ for a feature xᵢ represents:", opts:["A) The probability that y=1 when xᵢ increases by 1","B) The multiplicative change in the odds of y=1 when xᵢ increases by 1 unit, holding all else constant","C) The absolute change in probability when xᵢ increases by 1","D) The information gain of feature xᵢ"], ans:"B", exp:"The logit is linear: a one-unit increase in xᵢ adds βᵢ to the logit, which multiplies the odds by e^βᵢ. This is not the change in probability, which is non-linear."},
+  {q:"Why is OLS linear regression inappropriate for predicting a binary outcome (0/1) directly?", opts:["A) It requires the features to be binary as well","B) Predictions are not bounded to [0,1] and residuals are not normally distributed","C) The SSE loss function becomes convex only for continuous targets","D) OLS cannot handle more than one predictor"], ans:"B", exp:"Linear regression can predict values outside [0,1] and the Bernoulli-distributed errors violate the OLS assumption of normally distributed residuals."},
+  {q:"The 'doubling amount' for a logistic regression coefficient βᵢ is log(2)/βᵢ. What does this measure?", opts:["A) The number of units xᵢ must increase to double the predicted probability","B) The number of units xᵢ must increase to double the odds of the event","C) The ratio of odds at the mean of xᵢ to the odds at zero","D) The variance inflation factor of feature xᵢ"], ans:"B", exp:"It measures the required increase in xᵢ to double the odds ratio — derived directly from the multiplicative relationship between xᵢ and the odds."},
+  {q:"TRUE or FALSE: Partial Least Squares (PLS) regression always outperforms Principal Component Regression (PCR) because it incorporates the response variable in component extraction.", opts:["True","False"], ans:"False", exp:"In many practical settings, PLS and PCR perform similarly because the variance of x often dominates. PLS does not always outperform PCR."},
+  {q:"Cross-entropy loss (log loss) is preferred over MSE for logistic regression because:", opts:["A) It is always convex for any model family","B) It is derived from maximum likelihood estimation under a Bernoulli distribution and penalizes confident wrong predictions heavily","C) It produces smaller numerical values than MSE","D) It requires fewer computations per iteration"], ans:"B", exp:"Log loss is the negative log-likelihood under the Bernoulli assumption and is the theoretically appropriate loss for binary probabilistic classifiers. It also penalizes extreme confident errors (predicting 0.99 for a true 0) far more than MSE would."},
+  {q:"Ordinal logistic regression differs from multinomial logistic regression in that:", opts:["A) It cannot handle more than 3 categories","B) It assumes a single set of feature coefficients shared across all category thresholds (proportional odds)","C) It uses MSE instead of cross-entropy","D) It requires one-hot encoding of the outcome"], ans:"B", exp:"The proportional odds model uses K−1 intercepts (thresholds) but a single common coefficient vector, assuming parallel logit curves for all outcome levels."},
+  // REGULARIZATION
+  {q:"Which regularization method tends to produce exactly zero coefficients, effectively performing variable selection?", opts:["A) Ridge (L2)","B) Lasso (L1)","C) Elastic Net only","D) Both Ridge and Lasso equally"], ans:"B", exp:"The L1 penalty's geometry (a diamond-shaped constraint region) tends to produce solutions at corners, where some coefficients are exactly zero."},
+  {q:"TRUE or FALSE: The intercept term β₀ should be penalized in ridge or lasso regression.", opts:["True","False"], ans:"False", exp:"By convention, the intercept is not regularized. Penalizing it would inappropriately shift predictions away from the mean of y."},
+  {q:"When features are highly correlated, Lasso regression tends to:", opts:["A) Distribute coefficients evenly among correlated features","B) Select one correlated feature arbitrarily and set others to zero","C) Eliminate all correlated features","D) Assign larger coefficients to correlated features"], ans:"B", exp:"Lasso's L1 penalty tends to pick one feature from a correlated group and zero out the rest. Ridge distributes the coefficient evenly. Elastic Net introduces grouping through the L2 component."},
+  {q:"Before applying regularization, features must be normalized primarily because:", opts:["A) Regularization only works on standardized features","B) Un-normalized features cause the penalty λ to affect coefficients unequally based on feature scale","C) Gradient descent diverges without normalization","D) The intercept term becomes biased otherwise"], ans:"B", exp:"The penalty term λΣ|βⱼ| or λΣβⱼ² treats all coefficients equally in scale. If features are on very different scales, the penalty unfairly shrinks the coefficient of a large-scale feature more."},
+  {q:"Elastic Net regression combines L1 and L2 penalties. Its primary advantage over using Lasso alone is:", opts:["A) Faster computation due to fewer hyperparameters","B) It groups correlated variables together rather than selecting one arbitrarily","C) It always achieves lower test MSE than Lasso","D) It does not require cross-validation"], ans:"B", exp:"The L2 component of Elastic Net encourages grouping: correlated features tend to have similar (non-zero) coefficients, unlike Lasso which picks one from each group."},
+  // DECISION TREES
+  {q:"Information gain is biased toward splits that produce many subsets. How does binary splitting address this?", opts:["A) By normalizing information gain by the number of subsets","B) By always producing exactly two child nodes regardless of the feature type","C) By using Gini instead of entropy","D) By pruning splits with more than three child nodes"], ans:"B", exp:"Binary splits always produce two child nodes, eliminating the bias toward attributes with many distinct values. C4.5's gain ratio is another correction for this bias."},
+  {q:"A decision tree is trained to full depth on a training set. At prediction time on new data, which statement best describes its behavior?", opts:["A) It will generalize well because it learned all patterns","B) It is likely to overfit — leaf-level predictions are based on very few or single training instances","C) It will have perfectly calibrated probabilities","D) It will be robust to noise in the test set"], ans:"B", exp:"A fully grown tree memorizes training data. Small leaf nodes may contain only 1–2 instances, leading to unreliable and overfit predictions."},
+  {q:"TRUE or FALSE: Decision trees are sensitive to outliers in feature values and typically require outlier removal before training.", opts:["True","False"], ans:"False", exp:"Decision trees split on thresholds. An outlier (e.g., age=241) only affects the split if it would be chosen as a threshold, but it doesn't distort other parts of the tree. Trees are generally robust to outliers."},
+  {q:"In a regression tree, the prediction for a new instance is:", opts:["A) The mode of target values in the leaf","B) The mean of target values in the leaf","C) The median of target values in the leaf","D) The maximum target value observed in the leaf"], ans:"B", exp:"CART regression trees use the mean of the training target values in the leaf node as the prediction."},
+  {q:"The CART algorithm selects regression tree splits by minimizing:", opts:["A) The sum of entropies of child nodes","B) The Gini impurity of child nodes","C) The sum of squared errors (SSE) across child nodes","D) The variance of feature values in child nodes"], ans:"C", exp:"For regression trees, CART finds the split that minimizes within-node SSE (equivalently, variance × n), producing the greatest reduction in total residual sum of squares."},
+  {q:"Why does the ID3 algorithm guarantee a locally but not globally optimal tree?", opts:["A) It uses information gain instead of Gini","B) It is greedy — it never backtracks to reconsider earlier split decisions","C) It only handles categorical features","D) It grows trees to a fixed maximum depth"], ans:"B", exp:"ID3 is greedy: at each node it makes the locally best split without considering downstream effects. Globally optimal tree induction is NP-hard and rarely attempted in practice."},
+  {q:"Cost-complexity pruning is controlled by a parameter α. Increasing α results in:", opts:["A) A deeper, more complex tree","B) A shallower, simpler tree with fewer splits","C) No change unless the tree is already fully grown","D) More accurate leaf-level probability estimates"], ans:"B", exp:"α penalizes each additional split. Higher α favors simpler trees by making the cost of additional complexity outweigh the gain in training fit."},
+  {q:"TRUE or FALSE: A binary split on a categorical feature (e.g., 'Humidity = high?') allows a feature to be reused multiple times in different parts of the tree.", opts:["True","False"], ans:"True", exp:"Binary splits allow reuse because each binary question leads to a yes/no branch. The same feature can appear in multiple nodes along different paths, enabling interaction capture."},
+  {q:"Which statement about the decision boundary of a decision tree is correct?", opts:["A) It is always a diagonal hyperplane in feature space","B) It consists of axis-aligned rectangular regions","C) It is equivalent to the decision boundary of logistic regression after many splits","D) It is a smooth curve in 2D feature space"], ans:"B", exp:"Decision trees partition the feature space into rectangular (hyper-rectangular) regions aligned with the coordinate axes, resulting in 'staircase' boundaries."},
+  // K-NN
+  {q:"K-NN is called a 'lazy learner' because:", opts:["A) It converges very slowly during training","B) It defers all computation to prediction time and stores training data instead of learning a model","C) It uses approximate rather than exact distance computations","D) It requires many preprocessing steps"], ans:"B", exp:"Unlike parametric models, K-NN has no explicit training phase. All learning (finding neighbors) happens at prediction time, requiring the full training dataset to be stored."},
+  {q:"TRUE or FALSE: Increasing K in K-NN always reduces variance but increases bias.", opts:["True","False"], ans:"True", exp:"Larger K averages over more neighbors, smoothing the decision boundary (lower variance) but potentially incorporating distant, less relevant points (higher bias). This is the classic bias-variance tradeoff in K-NN."},
+  {q:"For K-NN regression, a common approach to weighting neighbor contributions is:", opts:["A) Weight by the index position of the neighbor","B) Weight by 1/distance so closer neighbors contribute more","C) Use equal weights regardless of distance","D) Weight by the target value of the neighbor"], ans:"B", exp:"Distance-weighted K-NN assigns higher weight to nearer neighbors (weight ∝ 1/distance), giving more influence to the most similar instances."},
+  // MIXED / COMPARATIVE
+  {q:"Which of the following techniques does NOT require feature scaling (normalization/standardization) as a preprocessing step?", opts:["A) K-nearest neighbors","B) Logistic regression with L2 regularization","C) Support Vector Machine","D) CART decision tree"], ans:"D", exp:"Decision trees split on feature thresholds, which are invariant to monotone scaling. All distance or gradient-based methods (K-NN, SVM, regularized regression) are scale-sensitive."},
+  {q:"A practitioner fits a model that achieves 99% accuracy on training data but 55% on test data. This is most likely caused by:", opts:["A) Underfitting — the model is too simple","B) Overfitting — the model memorized training patterns that don't generalize","C) Data leakage in the test set","D) Incorrect loss function choice"], ans:"B", exp:"A large gap between training and test performance is the hallmark of overfitting. The model captured noise in the training set rather than the underlying signal."},
+  {q:"TRUE or FALSE: Stepwise variable selection (forward/backward) is a reliable method for identifying the true predictors in a dataset when used on the full dataset without a hold-out set.", opts:["True","False"], ans:"False", exp:"Frank Harrell and others demonstrated that stepwise selection on the same data used for model building yields inflated R², biased coefficients, invalid p-values, and confidence intervals that are too narrow."},
+  {q:"The Information Value (IV) of a feature is computed as Σ(p_G − p_B) × WoE. A feature is generally considered uninformative if its IV is:", opts:["A) Greater than 0.5","B) Between 0.1 and 0.3","C) Less than 0.1","D) Equal to 0"], ans:"C", exp:"By convention, IV < 0.1 indicates a weak predictor, IV 0.1–0.3 is medium, and IV > 0.3 is strong. IV = 0 means the feature provides no discrimination."},
+  {q:"When imputing missing values in a pipeline, which of the following constitutes a preprocessing leakage error?", opts:["A) Imputing the training set median computed from training data only","B) Imputing both train and test sets with the median computed from the combined train+test data","C) Adding a binary indicator for missingness before train/test split","D) Using mode imputation for categorical features"], ans:"B", exp:"Computing the median on combined train+test data 'leaks' information from the test set into training. The imputation statistic must be computed from training data only and then applied to test/production data."},
+  {q:"Multinomial logistic regression with K classes requires fitting how many binary logistic regression models?", opts:["A) K","B) K−1","C) K(K−1)/2","D) 2K"], ans:"B", exp:"K−1 binary models are needed (one per class against a reference class). The K-th class probability is determined by the constraint that all probabilities sum to 1."},
+  {q:"TRUE or FALSE: The Gini impurity measure and entropy lead to identical decision tree structures in all cases.", opts:["True","False"], ans:"False", exp:"While Gini and entropy usually produce very similar trees, they can differ especially in borderline split decisions. They are mathematically similar but not identical functions."},
+  {q:"Which of the following best explains why decision trees approximate linear relationships poorly?", opts:["A) Decision trees cannot handle continuous features","B) Decision trees use axis-aligned splits creating step-function approximations of diagonal boundaries","C) Decision trees only work for classification, not regression","D) Decision trees require linear separability of the data"], ans:"B", exp:"A linear relationship corresponds to a diagonal boundary in feature space. Decision trees can only cut parallel to the axes, requiring many shallow splits to approximate a line — a fundamental structural limitation."},
+  {q:"A model achieves high accuracy on a test set drawn from data collected in January, but fails in June. What is the most likely cause?", opts:["A) The model has high variance","B) Concept drift — the underlying data distribution or relationship changed over time","C) The January test set was too small","D) The model was underfitting"], ans:"B", exp:"Concept drift occurs when the statistical relationship between features and the target changes over time. This requires ongoing monitoring and model retraining (the 'monitoring' principle from the intermezzo slide)."},
+  {q:"TRUE or FALSE: In production, a K-NN model requires the entire training dataset to be stored and accessible at inference time.", opts:["True","False"], ans:"True", exp:"K-NN is a memory-based (lazy) learner. There is no summarizing model — predicting requires computing distances to all stored training instances."},
+  {q:"Principal Component Regression (PCR) differs from standard linear regression by:", opts:["A) Using a non-linear activation function","B) First projecting features into a lower-dimensional space via PCA, then regressing on the components","C) Minimizing L1 rather than L2 loss","D) Performing feature selection rather than dimensionality reduction"], ans:"B", exp:"PCR applies PCA to obtain orthogonal components capturing maximum variance, then uses those components as predictors in OLS regression. Standardization is required since PCA is scale-sensitive."},
+  {q:"A logistic regression model has β_income = 0.0008 for monthly income (in dollars). The odds ratio is e^0.0008 ≈ 1.0008. This means:", opts:["A) A $1 increase in income increases the probability of the event by 0.08%","B) A $1 increase in income multiplies the odds of the event by approximately 1.0008","C) Income has no practical effect on the outcome","D) The model is underfitting because the coefficient is near zero"], ans:"B", exp:"The odds ratio interpretation is multiplicative. A $1 increase multiplies odds by e^β ≈ 1.0008. Practical significance depends on the typical range of income — a $1000 increase would multiply odds by e^0.8 ≈ 2.2."},
+];
+
+// ─────────────────────────────────────────────────
+// SA DATA
+// ─────────────────────────────────────────────────
+const saData = [
+  {
+    q: "A bank wants to predict loan default. They have a feature 'days_past_due_at_review', which records the number of days past due at the time a loan review officer manually flags a case. Explain whether and why this feature might cause data leakage, and how you would investigate.",
+    a: "<strong>Answer:</strong> This feature is highly suspect because the review officer flags the case <em>after</em> already observing delinquency patterns — meaning the value may only be populated when default is likely, effectively encoding the outcome. To investigate: (1) check whether 'days_past_due_at_review' is non-null only for flagged/defaulted cases; (2) verify the timestamp at which this field was populated relative to the target event; (3) check if its correlation with default is implausibly high (a near-perfect predictor of a future event is a red flag). If the feature is only known after the model would need to make a prediction, it must be excluded. If it is genuinely known beforehand (e.g., it captures prior delinquency), it may be valid but needs careful documentation."
+  },
+  {
+    q: "Explain the bias-variance tradeoff in the context of decision tree depth. Under what conditions would you prefer a shallower tree over a deeper one, and vice versa?",
+    a: "<strong>Answer:</strong> A deeper tree has lower bias (it can represent complex, non-linear decision boundaries closely matching training data) but high variance (small changes in training data can drastically alter splits and structure). A shallower tree has higher bias (underfits, misses complex patterns) but lower variance (more stable across different samples). You would prefer a <strong>shallower tree</strong> when: the dataset is small (overfitting risk is high), interpretability is critical, or deployment stability matters. You would prefer a <strong>deeper tree</strong> (with pruning/stopping) when: the data has genuinely complex interactions, you have large datasets that can support deeper splits, or depth is managed via cost-complexity pruning evaluated on a validation set. The key is always to use held-out validation to find the optimal depth — not to assume shallow = safe."
+  },
+  {
+    q: "Compare Lasso and Ridge regularization on three dimensions: (1) sparsity, (2) behavior with correlated features, and (3) appropriate use cases.",
+    a: "<strong>Answer:</strong> <strong>(1) Sparsity:</strong> Lasso (L1) drives coefficients to exactly zero, producing sparse models with built-in variable selection. Ridge (L2) shrinks coefficients toward zero but never reaches exactly zero — all features remain in the model. <strong>(2) Correlated features:</strong> When features are highly correlated, Lasso arbitrarily picks one and discards the rest (unstable selection). Ridge distributes the coefficient mass among correlated features, producing more stable, grouped solutions. Elastic Net combines both, enabling grouping while still achieving sparsity. <strong>(3) Use cases:</strong> Lasso is preferred when you believe many features are truly irrelevant (sparse ground truth) and want an interpretable model. Ridge is preferred when most features contribute, especially with many correlated variables. Both require feature normalization prior to application to ensure the penalty treats all coefficients on equal footing."
+  },
+  {
+    q: "Explain why computing the imputation statistic (e.g., median) on combined training and test data is a form of data leakage, and describe how a production ML pipeline should handle imputation consistently.",
+    a: "<strong>Answer:</strong> Computing the median on combined train+test data leaks distributional information from the test set into training preprocessing — the model indirectly 'sees' test data before evaluation, inflating performance metrics. <br><br>In a correct pipeline: (1) Fit all imputation rules (medians, modes, model-based imputations) <em>exclusively on the training set</em>. (2) Store these rules as part of the pipeline artefact. (3) Apply the same fixed rules to validation, test, and production data. (4) If a missing value pattern is encountered in production that was never seen in training (e.g., a feature that was never missing becomes missing), fall back to the training-derived statistic and flag this as a monitoring event. Everything done over multiple instances — imputation included — becomes part of the deployed model pipeline."
+  },
+  {
+    q: "Describe three distinct advantages and two distinct disadvantages of using Weights of Evidence (WoE) encoding for a high-cardinality categorical feature in a credit scoring model.",
+    a: "<strong>Answer:</strong> <strong>Advantages:</strong> (1) Reduces a categorical with many levels to a single numeric feature, avoiding the dimensionality explosion of one-hot encoding. (2) Encodes a monotonic relationship with the target — the resulting numeric feature is directly interpretable as log-odds, ideal for logistic regression. (3) Information Value (IV) provides an automatic importance ranking to screen whether the original variable is worth including at all. <strong>Disadvantages:</strong> (1) WoE is computed using the target, so it must be applied <em>after</em> the train/test split to avoid leakage — it is a target-informed transformation. (2) Categories with very few instances produce unstable WoE estimates (high variance). Laplace smoothing helps but introduces a hyperparameter. Also, WoE is less interpretable than the raw category labels when explaining individual predictions to regulators."
+  },
+  {
+    q: "A colleague claims: 'Logistic regression always gives well-calibrated probabilities, so it is the best choice whenever probability estimates matter.' Evaluate this claim critically.",
+    a: "<strong>Answer:</strong> The claim is <em>partially correct but overstated</em>. Logistic regression is indeed well-calibrated under the model's assumptions — the sigmoid transformation ensures outputs lie in (0,1) and the model is fit by maximizing likelihood, which promotes calibration. However: (1) Calibration assumes the linear logit is a correct functional form. If the true boundary is non-linear and interactions are omitted, the model is misspecified and calibration degrades. (2) Class imbalance can distort calibration — a model trained on 1% positives will tend to underestimate positive probabilities unless corrected. (3) Other models (e.g., gradient boosted trees, neural nets) paired with Platt scaling or isotonic regression can achieve equally or better calibration. (4) Logistic regression's linear boundary may miss complex patterns, trading calibration accuracy for structural limitation. In regulated industries (credit, insurance), logistic regression's transparency and statistical framework are genuine advantages — but the claim that it is always best for probability estimation is not supported."
+  },
+  {
+    q: "In decision tree construction, entropy and information gain are used as the splitting criterion. Explain what entropy measures, why it is appropriate for classification, and what limitation it has that motivated the introduction of Gini impurity.",
+    a: "<strong>Answer:</strong> Entropy (from information theory, H(S) = −Σ p(x) log₂ p(x)) measures the expected information content (uncertainty) of a node. A pure node (all one class) has H = 0; a maximally mixed node has H = 1 (for binary case). Information Gain measures how much entropy is reduced by a split, guiding the algorithm toward splits that most increase class purity. <br><br>It is appropriate because it directly quantifies the uncertainty reduction achieved by the split, aligning with the goal of prediction. <br><br><strong>Limitation:</strong> Computing entropy requires a log operation at every node and for every candidate split threshold — slightly more expensive than Gini. Moreover, information gain is biased toward features with many distinct values (more splits = more chances for high IG). Gini (1 − Σ p(x)²) avoids the log operation (faster), and in practice produces very similar split selections to entropy. Neither is universally superior — they are nearly monotonically related for binary classification."
+  },
+  {
+    q: "A data scientist reports that their K-NN model achieves near-perfect accuracy on the training set but poor generalization to the test set. Explain why this happens and suggest two remedies.",
+    a: "<strong>Answer:</strong> With K=1, K-NN perfectly memorizes training data — each training point is its own nearest neighbor, yielding 100% training accuracy. For K &gt; 1, training accuracy is still very high because the true data point is among the K neighbors. On new data, however, the model must generalize purely from stored training instances, and with small K it is highly sensitive to noise in training data (high variance). <br><br><strong>Remedy 1 — Increase K:</strong> Larger K averages over more neighbors, smoothing the decision boundary and reducing sensitivity to individual noisy training points (reduces variance at the cost of some bias). Use cross-validation to select optimal K. <br><br><strong>Remedy 2 — Feature preprocessing:</strong> K-NN's generalization often degrades when many irrelevant or noisy features are present (curse of dimensionality — distances become uninformative in high dimensions). Apply feature selection or dimensionality reduction (PCA) to retain only meaningful signal dimensions before computing distances."
+  },
+  {
+    q: "Describe the concept of 'odds-based grouping' for a nominal variable. How does it differ from equal-width and equal-frequency binning, and when would you prefer it?",
+    a: "<strong>Answer:</strong> Odds-based grouping constructs a pivot table of the nominal variable against the target and computes the odds (positives/negatives) for each level. Levels with similar odds are then grouped together. A chi-square statistic can evaluate whether two proposed groups differ significantly. <br><br><strong>Difference from standard binning:</strong> Equal-width binning divides a continuous feature's value range into equally spaced intervals, ignoring the distribution or target. Equal-frequency (quantile) binning ensures each bin contains the same number of instances, also ignoring the target. <strong>Odds-based grouping explicitly uses target information</strong>, so the resulting bins are predictively meaningful — levels grouped together have similar risk profiles. <br><br><strong>When to prefer it:</strong> Use odds-based grouping when the goal is predictive accuracy and interpretability (credit scoring, risk modeling), and the categorical variable has too many levels for one-hot encoding. It must be applied after the train/test split to avoid leakage, and it works best when there are enough instances per level to estimate reliable odds."
+  },
+  {
+    q: "A company uses a logistic regression model trained in January for customer churn prediction. By September, model performance has degraded significantly. Discuss possible causes and a systematic monitoring strategy.",
+    a: "<strong>Answer:</strong> <strong>Possible causes — Concept drift and population shift:</strong> (1) <em>Feature drift:</em> The distribution of input features has shifted (e.g., a product launch changed usage patterns, affecting 'account activity' distributions). (2) <em>Concept drift:</em> The underlying relationship between features and churn has changed (e.g., a competitor's new offer changed the reasons customers churn). (3) <em>Target drift:</em> The base rate of churn has changed (e.g., seasonal effects or economic changes). (4) <em>Data pipeline changes:</em> How features are computed may have silently changed. <br><br><strong>Monitoring strategy:</strong> (1) Monitor PSI (Population Stability Index) on key input features to detect distribution shifts. (2) Track calibration and discrimination metrics (AUC, Brier score) over time on new labelled batches. (3) Set thresholds for when to trigger model review or retrain. (4) Log predictions and link them to eventual outcomes. (5) Compare actual churn rates to predicted rates — divergence indicates miscalibration. (6) Retrain periodically on recent data and maintain a versioned pipeline so imputation rules and encodings are updated consistently."
+  }
+];
+
+// ─────────────────────────────────────────────────
+// RENDER MCQ
+// ─────────────────────────────────────────────────
+let mcqState = {};
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-card-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Question ${idx+1} of ${mcqData.length}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.dataset.idx = idx;
+      btn.dataset.oi = oi;
+      btn.onclick = () => handleMCQ(idx, oi, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = `fb-${idx}`;
+    fb.style.display = 'none';
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+  updateScore();
+}
+
+function handleMCQ(idx, oi, btn, card, item) {
+  if (mcqState[idx] !== undefined) return; // already answered
+  mcqState[idx] = oi;
+
+  const opts = card.querySelectorAll('.option-btn');
+  opts.forEach(b => b.disabled = true);
+
+  const selectedLabel = item.opts[oi];
+  const correctLabel = item.ans;
+
+  // Determine which option index is correct
+  const correctIdx = item.opts.findIndex(o => {
+    if (item.opts.length === 2) {
+      // T/F — match "True"/"False"
+      return o === correctLabel;
+    } else {
+      // MCQ — match leading letter
+      return o.startsWith(correctLabel + ')');
+    }
+  });
+
+  // Mark selected
+  const isCorrect = item.opts.length === 2
+    ? selectedLabel === correctLabel
+    : selectedLabel.startsWith(correctLabel + ')');
+
+  opts[oi].className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect && correctIdx >= 0) {
+    opts[correctIdx].className = 'option-btn reveal-correct';
+  }
+
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+
+  updateScore();
+}
+
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const selectedLabel = item.opts[mcqState[idx]];
+    const isCorrect = item.opts.length === 2
+      ? selectedLabel === item.ans
+      : selectedLabel.startsWith(item.ans + ')');
+    if (isCorrect) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+
+function resetMCQ() {
+  mcqState = {};
+  renderMCQ();
+}
+
+// ─────────────────────────────────────────────────
+// RENDER SA
+// ─────────────────────────────────────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer ${idx+1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+    btn.onclick = () => {
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      btn.textContent = panel.style.display === 'none' ? 'Reveal Answer' : 'Hide Answer';
+    };
+    card.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    panel.style.display = 'none';
+    card.appendChild(panel);
+
+    container.appendChild(card);
+  });
+}
+
+function resetSA() {
+  renderSA();
+}
+
+// Init
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

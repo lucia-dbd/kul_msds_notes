@@ -1,0 +1,982 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1 – Modes of Statistical Inference | Review Notes</title>
+  <style>
+    :root {
+      --primary: #1a3a5c;
+      --accent: #2e7db8;
+      --accent2: #e8a020;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d0dce8;
+      --correct: #1e7e34;
+      --correct-bg: #d4edda;
+      --wrong: #a71d2a;
+      --wrong-bg: #f8d7da;
+      --neutral-bg: #eef4fb;
+      --text: #1c2a38;
+      --muted: #5a6a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.6rem; letter-spacing: 0.5px; }
+    header p { margin-top: 6px; color: #b8d0e8; font-size: 0.95rem; }
+    .toc-bar {
+      background: var(--accent);
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 10px 20px; justify-content: center;
+    }
+    .toc-bar a {
+      color: #fff; text-decoration: none; font-size: 0.82rem;
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px; border-radius: 20px;
+      transition: background 0.2s;
+    }
+    .toc-bar a:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(30,60,100,0.06);
+    }
+    .section-card h2 {
+      color: var(--primary);
+      font-size: 1.18rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section-card h3 {
+      color: var(--accent);
+      font-size: 1rem;
+      margin: 18px 0 8px;
+    }
+    .section-card p { margin-bottom: 10px; }
+    .key-box {
+      background: var(--neutral-bg);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .key-box strong { color: var(--primary); }
+    .warning-box {
+      background: #fff8e8;
+      border-left: 4px solid var(--accent2);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .formula-box {
+      background: #f0f6ff;
+      border: 1px solid #b0ccee;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.93rem;
+      overflow-x: auto;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag {
+      background: var(--neutral-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 2px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    table {
+      width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem;
+    }
+    th {
+      background: var(--primary); color: #fff;
+      padding: 8px 12px; text-align: left;
+    }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--neutral-bg); }
+    .q-section h2 {
+      color: var(--primary);
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--accent2);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+    .question-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px rgba(30,60,100,0.05);
+    }
+    .question-block .q-number {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+    .question-block .q-text {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .option-btn {
+      background: var(--neutral-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 14px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #dceeff; border-color: var(--accent);
+    }
+    .option-btn.correct {
+      background: var(--correct-bg); border-color: var(--correct);
+      color: var(--correct); font-weight: 600;
+    }
+    .option-btn.incorrect {
+      background: var(--wrong-bg); border-color: var(--wrong);
+      color: var(--wrong);
+    }
+    .option-btn:disabled { cursor: default; }
+    .reveal-btn {
+      background: var(--accent2);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .reveal-btn:hover { background: #c8870f; }
+    .answer-box {
+      display: none;
+      background: var(--correct-bg);
+      border: 1px solid var(--correct);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .answer-box.shown { display: block; }
+    .answer-box strong { color: var(--correct); }
+    .feedback {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+    .feedback.correct-fb {
+      display: block;
+      background: var(--correct-bg);
+      color: var(--correct);
+      border: 1px solid var(--correct);
+    }
+    .feedback.incorrect-fb {
+      display: block;
+      background: var(--wrong-bg);
+      color: var(--wrong);
+      border: 1px solid var(--wrong);
+    }
+    .score-bar {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .score-bar span { font-size: 0.95rem; color: var(--muted); }
+    .score-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .reset-btn {
+      background: var(--primary); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 8px 20px; font-size: 0.85rem;
+      cursor: pointer; font-weight: 600;
+    }
+    .reset-btn:hover { background: #0f2540; }
+    .short-q { margin-bottom: 22px; }
+    .short-q .q-text { font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    @media (max-width: 600px) {
+      .container { padding: 16px 10px 50px; }
+      .section-card { padding: 16px 14px; }
+      header h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📘 Chapter 1 — Modes of Statistical Inference</h1>
+  <p>Bayesian Biostatistics · Lesaffre &amp; Lawson · Exam Preparation Notes</p>
+</header>
+
+<nav class="toc-bar">
+  <a href="#freq">Frequentist</a>
+  <a href="#pvalue">P-Value</a>
+  <a href="#ci">Confidence Intervals</a>
+  <a href="#fishernp">Fisher vs NP</a>
+  <a href="#likelihood">Likelihood</a>
+  <a href="#bayes">Bayesian</a>
+  <a href="#mcq">MCQ &amp; T/F</a>
+  <a href="#shortq">Short Answer</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== REVIEW NOTES ===== -->
+
+  <div class="section-card" id="freq">
+    <h2>1.1 The Frequentist Approach</h2>
+    <p>The <strong>classical statistical approach</strong> encompasses methods providing inference through the <em>P-value</em>, significance level (α), power (1−β), and confidence intervals (CI). The randomized controlled clinical trial (RCT) is the paradigmatic study design built on this toolbox.</p>
+
+    <h3>Key Elements of Frequentist Inference</h3>
+    <div class="tag-list">
+      <span class="tag">P-value</span>
+      <span class="tag">Significance Level α</span>
+      <span class="tag">Power (1−β)</span>
+      <span class="tag">Type I Error</span>
+      <span class="tag">Type II Error</span>
+      <span class="tag">Confidence Interval</span>
+    </div>
+
+    <h3>Toenail RCT — Illustrative Example</h3>
+    <p>A double-blind multicenter RCT compared two oral treatments for toenail infection. Key numbers: n₁ = 131, n₂ = 133; observed mean nail lengths: 9.07 mm (A) vs 7.70 mm (B); Δ̂ = 1.38; t<sub>obs</sub> = 2.19; two-sided P = 0.030; α = 0.05 → statistically significant by Neyman–Pearson (NP).</p>
+
+    <div class="key-box">
+      <strong>Important distinction:</strong> The frequentist approach is <em>not</em> one unified theory — it is a combination of Fisher's inductive significance testing and Neyman–Pearson's deductive hypothesis testing.
+    </div>
+  </div>
+
+  <div class="section-card" id="pvalue">
+    <h2>1.1.2 The P-Value as a Measure of Evidence</h2>
+    <p>The P-value was developed by Fisher for well-planned agricultural experiments. It is widely used but frequently misunderstood.</p>
+
+    <h3>What the P-Value IS</h3>
+    <div class="key-box">
+      The P-value is the probability of observing a test statistic <em>as extreme or more extreme</em> than the one observed, <strong>assuming H₀ is true</strong>.
+    </div>
+
+    <h3>Critical Misinterpretations</h3>
+    <table>
+      <thead><tr><th>Common Misconception</th><th>Correct Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>P = probability H₀ is true</td><td>P only measures extremeness under H₀; p(H₀|data) requires Bayes theorem</td></tr>
+        <tr><td>P is based only on observed data</td><td>P includes hypothetical/unobserved data more extreme than observed</td></tr>
+        <tr><td>Small P ⟹ large effect size</td><td>P depends on sample size; a tiny P may reflect a trivial effect in a large study</td></tr>
+        <tr><td>P is an absolute measure of evidence</td><td>P does not account for prior information or study size</td></tr>
+      </tbody>
+    </table>
+
+    <h3>The P-Value Depends on Sample Space</h3>
+    <p>The P-value is computed using the <strong>long-run frequency definition</strong>. The sample space — the set of hypothetical experiments considered — affects its value.</p>
+    <div class="warning-box">
+      <strong>Example I.3:</strong> In a RCT with 4 planned interim analyses (Pocock's method), a final P = 0.02 is <em>not</em> significant (α* = 0.016 per analysis). But if no interim analyses were planned, the same P = 0.02 <em>is</em> significant. Identical observed data → different conclusions due to different sample spaces!
+    </div>
+
+    <h3>P-Value Does Not Incorporate Prior Evidence</h3>
+    <p>Example I.5 (Merseyside registry, P = 0.67) illustrates that a non-significant P-value in a very small study does <em>not</em> mean no relationship exists — it may simply reflect insufficient power. The past evidence from Kaldor et al. showing a strong association should logically inform interpretation.</p>
+  </div>
+
+  <div class="section-card" id="ci">
+    <h2>1.1.3 Confidence Intervals as Evidence</h2>
+    <p>The 95% CI is increasingly preferred over P-values. From the toenail RCT: 95% CI for Δ = <strong>[0.14, 2.62]</strong>.</p>
+
+    <div class="key-box">
+      <strong>Technical definition:</strong> In the long run, 95% of such intervals constructed from repeated samples will contain the true parameter. For any single interval, the parameter is either in it or not — there is no "95% probability" attached to a specific computed interval.
+    </div>
+
+    <div class="warning-box">
+      <strong>Bayesian flavor:</strong> When we tell non-statisticians "there is a 95% probability the true Δ lies in [0.14, 2.62]," we are using a Bayesian posterior credible interval interpretation — which is technically incorrect in the frequentist framework.
+    </div>
+  </div>
+
+  <div class="section-card" id="fishernp">
+    <h2>1.1.4 Fisher vs. Neyman–Pearson: Two Frequentist Paradigms</h2>
+    <table>
+      <thead><tr><th>Aspect</th><th>Fisher</th><th>Neyman–Pearson (NP)</th></tr></thead>
+      <tbody>
+        <tr><td>Reasoning</td><td>Inductive (data → hypothesis)</td><td>Deductive (general → particular)</td></tr>
+        <tr><td>Hypotheses</td><td>Null hypothesis H₀ only</td><td>H₀ and alternative Hₐ required</td></tr>
+        <tr><td>Output</td><td>P-value (surprise index)</td><td>Decision: reject or accept H₀</td></tr>
+        <tr><td>α</td><td>Threshold chosen post-hoc</td><td>Pre-specified Type I error rate</td></tr>
+        <tr><td>H₀ acceptance</td><td>Cannot accept H₀ (Popperian)</td><td>Can accept H₀</td></tr>
+        <tr><td>Error framework</td><td>No formal Type II error</td><td>Type I (α) and Type II (β) errors; power = 1−β</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box">
+      <strong>The hybrid danger:</strong> In practice, the P-value (Fisherian concept) is wrongly treated as a pre-specified Type I error rate (NP concept). Reporting P &lt; 0.01 as "significant at the 1% level" mixes the two incompatible frameworks.
+    </div>
+  </div>
+
+  <div class="section-card" id="likelihood">
+    <h2>1.2 Statistical Inference Based on the Likelihood Function</h2>
+    <p>The <strong>likelihood function</strong> L(θ | data) expresses the plausibility of parameter θ given observed data. It was introduced by Fisher (1922).</p>
+
+    <h3>The Binomial Likelihood</h3>
+    <div class="formula-box">
+      f_θ(s) = C(n,s) · θˢ · (1−θ)^(n−s)
+
+      As a function of θ (with s fixed): L(θ | s) = C(n,s) · θˢ · (1−θ)^(n−s)
+      
+      Log-likelihood: ℓ(θ | s) = c + [s·log(θ) + (n−s)·log(1−θ)]
+      MLE: θ̂ = s/n
+    </div>
+
+    <p>For s = 9, n = 12: <strong>MLE = θ̂ = 0.75</strong></p>
+
+    <h3>The Two Likelihood Principles (LP)</h3>
+    <div class="key-box">
+      <strong>LP1 (Sufficiency Principle):</strong> All evidence about θ from an experiment is contained in the likelihood function L(θ | data). Nothing outside the likelihood is relevant.
+    </div>
+    <div class="key-box">
+      <strong>LP2 (Relative/Proportionality Principle):</strong> Two likelihood functions for θ contain the same information about θ if they are proportional to each other.
+    </div>
+
+    <h3>Standardized Likelihood and Interval of Evidence</h3>
+    <p>The <strong>standardized likelihood</strong> is L(θ|s) / L(θ̂|s). For θ = 0.5 vs θ̂ = 0.75, the likelihood ratio = 0.21 — meaning θ = 0.5 has only ~1/5 the evidential support of the MLE. The <strong>interval of evidence</strong> contains all θ-values with standardized likelihood ≥ 0.5.</p>
+
+    <h3>Stopping Rules: Likelihood vs. Frequentist</h3>
+    <p>Example I.8 contrasts binomial vs. negative binomial (Pascal) stopping rules. Both yield 9 successes and 3 failures, but:</p>
+    <table>
+      <thead><tr><th></th><th>Binomial (fixed n=12)</th><th>Negative Binomial (wait for k=3 failures)</th></tr></thead>
+      <tbody>
+        <tr><td>Likelihood</td><td colspan="2">Proportional → same MLE, same interval of evidence (LP2)</td></tr>
+        <tr><td>Frequentist P-value (H₀: θ=0.5)</td><td>P = 0.0730</td><td>P = 0.0337</td></tr>
+      </tbody>
+    </table>
+    <div class="warning-box">
+      <strong>Key result:</strong> The stopping rule does NOT affect likelihood inference but DOES affect frequentist inference. This is a fundamental criticism of the frequentist approach.
+    </div>
+  </div>
+
+  <div class="section-card" id="bayes">
+    <h2>1.3 The Bayesian Approach: Basic Ideas</h2>
+    <h3>The Core Idea</h3>
+    <div class="key-box">
+      Bayesian inference combines <strong>prior knowledge</strong> (prior probability) with <strong>observed data</strong> (likelihood) to produce an updated <strong>posterior probability</strong>.
+      <br><br>
+      <em>Posterior ∝ Likelihood × Prior</em>
+    </div>
+
+    <h3>Bayes Theorem — Discrete Version</h3>
+    <div class="formula-box">
+      p(B | A) = [p(A | B) · p(B)] / p(A)
+
+      Expanded (Law of Total Probability):
+      p(B | A) = [p(A|B)·p(B)] / [p(A|B)·p(B) + p(A|Bᶜ)·p(Bᶜ)]
+    </div>
+
+    <h3>Diagnostic Test Application (Example I.10)</h3>
+    <p>With A = "positive test" and B = "diseased":</p>
+    <div class="formula-box">
+      pred+ = (Se · prev) / [Se · prev + (1−Sp) · (1−prev)]
+
+      Folin-Wu test: Se = 0.80, Sp = 0.90
+      At world prevalence (prev = 0.03): pred+ = 0.20
+      At hospital prevalence (prev = 0.10): pred+ = 0.47
+    </div>
+
+    <div class="key-box">
+      <strong>Important:</strong> Even with Se = 0.80 and Sp = 0.90, at low disease prevalence most positive test results are false positives. This is why prevalence matters enormously for predictive value.
+    </div>
+
+    <h3>Published Research Findings (Example I.11)</h3>
+    <div class="formula-box">
+      Positive predictive value of a research finding:
+      PPV = (1−β)R / [(1−β)R + α]
+
+      where R = prior odds of a true relationship = 1/(G−1)
+      (G = number of likely relationships examined, 1 truly positive)
+    </div>
+    <p>When G is large, R is very small, and even with α = 0.05, the probability of a reported positive finding being true can be very low. This highlights the replication crisis in medical research.</p>
+
+    <h3>Probability Interpretation Differences</h3>
+    <table>
+      <thead><tr><th>Aspect</th><th>Frequentist</th><th>Bayesian</th></tr></thead>
+      <tbody>
+        <tr><td>Probability definition</td><td>Long-run frequency of events</td><td>Degree of belief (subjective or objective)</td></tr>
+        <tr><td>Parameters</td><td>Fixed, unknown constants</td><td>Random variables with distributions</td></tr>
+        <tr><td>Prior information</td><td>Not formally incorporated</td><td>Formally incorporated via prior distribution</td></tr>
+        <tr><td>Output</td><td>P-value, CI (frequentist)</td><td>Posterior distribution, credible interval</td></tr>
+        <tr><td>H₀ probability</td><td>Not defined (H₀ is either true or not)</td><td>p(H₀ | data) computable via Bayes theorem</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== MCQ SECTION ===== -->
+
+  <div class="section-card q-section" id="mcq">
+    <h2>🎯 Multiple Choice &amp; True/False Questions (30 Questions)</h2>
+
+    <div class="score-bar">
+      <div>
+        <span>Score: </span><span class="score-val" id="scoreDisplay">0 / 30</span>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block" data-q="1">
+      <div class="q-number">Question 1 · Multiple Choice</div>
+      <div class="q-text">According to its correct definition, the P-value is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The probability that the null hypothesis H₀ is true given the data</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The probability of observing a test statistic as extreme or more extreme than observed, assuming H₀ is true</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The probability of the observed result occurring by chance in any experiment</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The posterior probability of the alternative hypothesis</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" data-q="2">
+      <div class="q-number">Question 2 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The P-value is calculated using only the observed data and does not involve any hypothetical or unobserved results.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" data-q="3">
+      <div class="q-number">Question 3 · Multiple Choice</div>
+      <div class="q-text">In the toenail RCT (Example I.1), the observed t-statistic was t_obs = 2.19 with a two-sided P-value of 0.030. Which conclusion is correct at α = 0.05?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) There is a 3% probability that the two treatments are equally effective</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) There is a 97% probability that treatment A is superior to B</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The result is statistically significant; we reject H₀ that the treatments are equally effective</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The clinical difference between treatments is certainly large enough to be meaningful</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" data-q="4">
+      <div class="q-number">Question 4 · Multiple Choice</div>
+      <div class="q-text">Which of the following statisticians introduced the null hypothesis, the P-value, and the level of significance?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Neyman and Pearson</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Fisher</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Bayes</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Bonferroni</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" data-q="5">
+      <div class="q-number">Question 5 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Neyman–Pearson framework, the researcher must specify both a null hypothesis AND an alternative hypothesis before conducting the test.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" data-q="6">
+      <div class="q-number">Question 6 · Multiple Choice</div>
+      <div class="q-text">With Pocock's group sequential method and 5 analyses (4 interim + 1 final), to achieve an overall significance level of 0.05, the nominal significance level at each analysis must be approximately:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.05</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) 0.025</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.016</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.01</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" data-q="7">
+      <div class="q-number">Question 7 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The chi-squared test and Fisher's exact test use the same sample space when analyzing a 2×2 contingency table.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" data-q="8">
+      <div class="q-number">Question 8 · Multiple Choice</div>
+      <div class="q-text">In the 95% confidence interval for Δ in the toenail RCT, [0.14, 2.62], which interpretation is technically correct in the frequentist framework?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) There is a 95% probability that the true Δ lies in [0.14, 2.62]</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) In the long run, 95% of such intervals constructed from repeated samples will contain the true parameter</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The observed Δ = 1.38 is the true difference with 95% confidence</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) There is a 5% probability that the true difference is zero</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" data-q="9">
+      <div class="q-number">Question 9 · Multiple Choice</div>
+      <div class="q-text">The maximum likelihood estimate (MLE) for the probability of success θ in a binomial experiment with s = 9 successes out of n = 12 trials is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.50</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) 0.70</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.75</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.90</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" data-q="10">
+      <div class="q-number">Question 10 · True / False</div>
+      <div class="q-text">TRUE or FALSE: According to Likelihood Principle 2, if two likelihood functions for θ are proportional to each other, they contain the same information about θ.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-block" data-q="11">
+      <div class="q-number">Question 11 · Multiple Choice</div>
+      <div class="q-text">In Example I.8, comparing two surgeons who both observe 9 successes and 3 failures (one using binomial stopping, one using negative binomial stopping), which statement is correct?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Both the likelihood and the frequentist P-value give the same result for both experiments</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Both methods give different results for both experiments</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The likelihood gives the same MLE and interval of evidence, but the frequentist P-values differ (0.0730 vs 0.0337)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The likelihood gives different results, but the frequentist P-values are the same</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-block" data-q="12">
+      <div class="q-number">Question 12 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The stopping rule used in an experiment affects likelihood-based inference about the parameter θ.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-block" data-q="13">
+      <div class="q-number">Question 13 · Multiple Choice</div>
+      <div class="q-text">The standardized likelihood for θ = 0.5 relative to the MLE θ̂ = 0.75 (for s = 9, n = 12) is approximately:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.05</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 0.21</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.50</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.75</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-block" data-q="14">
+      <div class="q-number">Question 14 · Multiple Choice</div>
+      <div class="q-text">The "interval of evidence" in the likelihood framework consists of:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) All θ values with P-value &gt; 0.05</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) The same as the 95% confidence interval</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) All θ values whose standardized likelihood is at or above a chosen fraction (e.g., ≥ 0.5) of the maximum</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) All θ values with log-likelihood above 0</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-block" data-q="15">
+      <div class="q-number">Question 15 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Bayesian approach requires that probability statements always have a long-run frequency interpretation.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-block" data-q="16">
+      <div class="q-number">Question 16 · Multiple Choice</div>
+      <div class="q-text">Bayes theorem is sometimes called the "Theorem on Inverse Probability" because it:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Reverses the direction of time in an experiment</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Allows calculation of p(B|A) from p(A|B), i.e., derives the "inverse" conditional probability</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Inverts the likelihood to give a prior</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Converts posterior probabilities into prior probabilities</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-block" data-q="17">
+      <div class="q-number">Question 17 · Multiple Choice</div>
+      <div class="q-text">Using the Folin-Wu test with Se = 0.80, Sp = 0.90, and a world prevalence of diabetes of 3%, the positive predictive value (pred+) is approximately:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.80</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) 0.47</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.20</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.90</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-block" data-q="18">
+      <div class="q-number">Question 18 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the frequentist interpretation, the 95% CI [0.14, 2.62] means there is a 95% probability that the true parameter Δ lies within this specific interval.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-block" data-q="19">
+      <div class="q-number">Question 19 · Multiple Choice</div>
+      <div class="q-text">In the Ioannidis (2005) formula for the positive predictive value of a published research finding, PPV = (1−β)R / [(1−β)R + α], which scenario gives the LOWEST PPV?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">A) High G (many possible relationships, few truly positive), low power (1−β), standard α = 0.05</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Low G, high power, small α</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) High G, high power, small α</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Low G, low power, small α</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-block" data-q="20">
+      <div class="q-number">Question 20 · True / False</div>
+      <div class="q-text">TRUE or FALSE: Fisher believed that when a significance test is non-significant, one should accept the null hypothesis H₀.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="question-block" data-q="21">
+      <div class="q-number">Question 21 · Multiple Choice</div>
+      <div class="q-text">The sensitivity of the Folin-Wu blood test from the Boston City Hospital data (56 true positives out of 70 diabetics) is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 49/510 ≈ 0.096</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 56/70 = 0.80</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 461/510 ≈ 0.904</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 56/105 ≈ 0.533</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="question-block" data-q="22">
+      <div class="q-number">Question 22 · True / False</div>
+      <div class="q-text">TRUE or FALSE: Likelihood Principle 1 states that ALL evidence from an experiment about θ is contained in the likelihood function — not in the sampling distribution or the P-value.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q23 -->
+    <div class="question-block" data-q="23">
+      <div class="q-number">Question 23 · Multiple Choice</div>
+      <div class="q-text">What does Bonferroni's rule prescribe when k tests are conducted simultaneously to maintain an overall Type I error rate of α?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Use α for each test as normal</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Use α/k as the significance level for each individual test</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Use k·α as the significance level for each individual test</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Use √α as the significance level for each individual test</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q24 -->
+    <div class="question-block" data-q="24">
+      <div class="q-number">Question 24 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Bayesian framework, parameters are treated as fixed (though unknown) constants, not as random variables.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q25 -->
+    <div class="question-block" data-q="25">
+      <div class="q-number">Question 25 · Multiple Choice</div>
+      <div class="q-text">Which of the following represents the correct form of Bayes theorem using the Law of Total Probability?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) p(B|A) = p(B)·p(A)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) p(B|A) = p(A|B)/p(B)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) p(B|A) = [p(A|B)·p(B)] / [p(A|B)·p(B) + p(A|Bᶜ)·p(Bᶜ)]</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) p(B|A) = p(A|B)·p(A)/p(B)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q26 -->
+    <div class="question-block" data-q="26">
+      <div class="q-number">Question 26 · True / False</div>
+      <div class="q-text">TRUE or FALSE: A small P-value necessarily implies a large or clinically important effect size.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="question-block" data-q="27">
+      <div class="q-number">Question 27 · Multiple Choice</div>
+      <div class="q-text">The negative binomial (Pascal) distribution gθ(s) is used when:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The total number of trials n is fixed in advance</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The experiment continues until a fixed number k of failures occurs</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The probability of success changes with each trial</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The outcomes are not independent</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="question-block" data-q="28">
+      <div class="q-number">Question 28 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The "sample space" in frequentist statistics refers to the set of all possible outcomes considered when computing the null distribution of a test statistic.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="question-block" data-q="29">
+      <div class="q-number">Question 29 · Multiple Choice</div>
+      <div class="q-text">The probability that the null hypothesis H₀ is true, formally written as p(H₀|data), is called the:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Type I error rate</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) P-value</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Posterior probability of the null hypothesis</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Power of the test</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q30 -->
+    <div class="question-block" data-q="30">
+      <div class="q-number">Question 30 · Multiple Choice</div>
+      <div class="q-text">In Example I.11, when should the power (1−β) be greater than 0.05/R to ensure the posterior probability of a true research finding is above 0.5?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) When the prior odds R are very high</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) When (1−β)R &gt; α, which requires power &gt; α/R = 0.05/R</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) When α &gt; β</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) When R = 1 (equal prior odds for true and false hypotheses)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+  </div><!-- end MCQ section -->
+
+  <!-- ===== SHORT ANSWER SECTION ===== -->
+
+  <div class="section-card q-section" id="shortq">
+    <h2>✍️ Short Answer Questions (5 Questions)</h2>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 1</div>
+      <div class="q-text">Explain, using the context of Example I.3 (RCT with interim analyses), why two studies can produce an identical final P-value of 0.02 yet lead to opposite conclusions about statistical significance. What fundamental property of the frequentist approach does this illustrate?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        In Example I.3, a RCT with 4 planned interim analyses using Pocock's group sequential method requires a nominal significance level of α* = 0.016 at each analysis to maintain an overall α = 0.05. If the study runs to completion and yields P = 0.02, this does <em>not</em> reach the required per-analysis threshold of 0.016, so the result is declared non-significant.<br><br>
+        However, if a different RCT with no planned interim analyses yields the same final P = 0.02, this result exceeds the standard α = 0.05 threshold and is declared statistically significant.<br><br>
+        The fundamental property illustrated is <strong>dependence on the sample space</strong>. In frequentist statistics, the P-value is computed as a long-run frequency over a defined sample space — the set of hypothetical experiments considered. When interim analyses are planned, the sample space expands to include all possible outcomes across multiple time points, which changes the null distribution and thus the threshold for significance. The P-value, and hence the conclusion, depends not only on the observed data but also on unobserved experiments that could have happened. This has been a major philosophical criticism of the frequentist approach.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 2</div>
+      <div class="q-text">State both likelihood principles (LP1 and LP2) and use Example I.8 (the two surgery experiments with binomial vs. negative binomial stopping rules) to demonstrate how LP2 shows that the stopping rule is irrelevant under the likelihood approach, yet violates the frequentist approach.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>LP1 (Sufficiency Principle):</strong> All evidence from an experiment about an unknown quantity θ is contained in the likelihood function L(θ|data). No other aspects of the experimental design affect the inferential content.<br><br>
+        <strong>LP2 (Relative Likelihood Principle):</strong> Two likelihood functions for θ contain the same information about θ if they are proportional to each other.<br><br>
+        <strong>Application to Example I.8:</strong><br>
+        Surgeon 1 (binomial): L₁(θ|9) = C(12,9)·θ⁹·(1−θ)³<br>
+        Surgeon 2 (negative binomial): L₂(θ|9) = C(11,9)·θ⁹·(1−θ)³<br><br>
+        These two likelihoods differ only in their binomial coefficients — they are proportional (constant × θ⁹·(1−θ)³). By LP2, they carry the same information about θ. Both yield MLE = θ̂ = 9/12 = 0.75 and identical intervals of evidence. The stopping rule is irrelevant.<br><br>
+        <strong>Frequentist violation:</strong> The same data give P = 0.0730 (binomial) vs P = 0.0337 (negative binomial) for H₀: θ = 0.5. The stopping rule changes the sample space, altering the null distribution and thus the P-value. This demonstrates that the conclusion of a frequentist test depends on experiments that never occurred.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 3</div>
+      <div class="q-text">Describe the difference between Fisher's significance testing approach and the Neyman–Pearson hypothesis testing approach. Why does Hubbard and Bayarri (2003) warn against conflating the P-value with the Type I error rate? Give a concrete example of how this conflation occurs in medical publications.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Fisher's approach:</strong> Inductive — moves from specific data to general conclusions. Only a null hypothesis H₀ is needed. The P-value is an <em>a posteriori</em> measure of surprise, a continuous index of evidence against H₀. Fisher believed H₀ could never be accepted, only failed to be rejected. The significance level α is a flexible post-hoc threshold, not a pre-committed error rate.<br><br>
+        <strong>Neyman–Pearson (NP) approach:</strong> Deductive — reasons from the general to the particular. Requires both H₀ and an alternative Hₐ. The outcome is a binary decision: reject or accept H₀. Type I error (α) and Type II error (β) are pre-specified before data collection. The power (1−β) is used to plan sample size. The goal is long-run inductive behavior — being wrong no more than α fraction of the time.<br><br>
+        <strong>The conflation:</strong> Hubbard and Bayarri warn that using the P-value as though it were a pre-specified Type I error rate is conceptually invalid. For example, if α = 0.05 is set in advance and the study yields P = 0.023, we may say H₀ is rejected at α = 0.05. However, we cannot say H₀ is rejected at the 0.025 level — because α was not chosen as 0.025; the P-value now takes on the spurious status of a pre-specified level.<br><br>
+        <strong>Medical example:</strong> When papers report asterisks (∗ for P &lt; 0.05, ∗∗ for P &lt; 0.01, ∗∗∗ for P &lt; 0.001), readers infer that a "∗∗" result implies significance at α = 0.01. But if α was originally chosen as 0.05, claiming 0.01-level significance based on an observed P = 0.008 retroactively treats the P-value as a pre-specified error rate — a Fisherian tool misused as a Neyman–Pearson decision threshold.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 4</div>
+      <div class="q-text">A GP's elderly patient population has a 10% prevalence of diabetes. Using the Folin-Wu blood test (Se = 0.80, Sp = 0.90): (a) Write out the relevant form of Bayes theorem using sensitivity, specificity, and prevalence. (b) Compute the positive predictive value for this population. (c) Interpret the result in plain language, explaining the Bayesian nature of the calculation.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>(a) Bayes theorem formula:</strong><br>
+        pred+ = (Se · prev) / [Se · prev + (1 − Sp) · (1 − prev)]<br><br>
+        <strong>(b) Calculation:</strong><br>
+        pred+ = (0.80 × 0.10) / [(0.80 × 0.10) + (0.10 × 0.90)]<br>
+        = 0.080 / (0.080 + 0.090)<br>
+        = 0.080 / 0.170<br>
+        ≈ <strong>0.47</strong><br><br>
+        <strong>(c) Interpretation:</strong><br>
+        If the test returns positive for this patient, there is approximately a 47% probability that they truly have diabetes. Despite the test having 80% sensitivity and 90% specificity, fewer than half of positive tests in this population actually indicate true disease. This occurs because even a 10% false-positive rate (1 − Sp = 0.10) applies to the large non-diabetic group (90% of population), generating many false positives that dilute the true positives.<br><br>
+        <strong>Bayesian nature:</strong> The GP started with a <em>prior probability</em> of 10% (prevalence = prior belief about the patient). The test result (data via Se and Sp) updated this belief to a <em>posterior probability</em> of 47%. The prior and the data are formally combined via Bayes theorem to produce an updated, actionable probability estimate — exactly the Bayesian prior-to-posterior updating mechanism.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 5</div>
+      <div class="q-text">Compare and contrast how a frequentist and a Bayesian statistician would approach the analysis of the Merseyside registry data (Example I.5, P = 0.67 from a very small study of 8 subjects) in light of the prior Kaldor et al. study showing a strong association between chemotherapy and leukemia. What are the philosophical and practical advantages of the Bayesian approach in this context?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Frequentist approach:</strong><br>
+        A classical analysis of the Merseyside registry data in isolation yields P = 0.67 (chi-squared with continuity correction). The frequentist interpretation would be: no evidence against H₀ (no relationship between chemotherapy and leukemia). The study's small size (only 8 subjects total: 6 controls, 2 cases) means it is severely underpowered and virtually unable to detect any relationship, even if a strong one exists. Yet under the frequentist paradigm, the Kaldor et al. evidence — which showed an odds ratio of ~8 with P ≈ 10⁻¹⁴ — is not formally incorporated into the analysis. Each study is treated in isolation. The result: "no evidence of harm" from an underpowered study that could not possibly detect harm.<br><br>
+        <strong>Bayesian approach:</strong><br>
+        A Bayesian statistician would encode the strong prior evidence from Kaldor et al. as an informative prior distribution on the odds ratio (or log-odds ratio), reflecting a high probability that the relationship is positive and large. The small Merseyside dataset would then be used to update this prior. Because the prior is strongly informative, a small sample provides little ability to overturn the prior — the posterior would still reflect a substantially elevated risk estimate. The prior knowledge is formally and transparently incorporated.<br><br>
+        <strong>Philosophical and practical advantages:</strong><br>
+        1. <em>Coherence:</em> Research is not conducted in isolation; the Bayesian approach formally reflects this by using all available evidence.<br>
+        2. <em>No fictive data:</em> Unlike P-values, the posterior depends only on observed data, not hypothetical unobserved results.<br>
+        3. <em>Meaningful probability statements:</em> The posterior provides a direct probability that the true effect exceeds a clinically important threshold — impossible with a frequentist P-value alone.<br>
+        4. <em>Small-sample robustness:</em> In small studies, the posterior is appropriately dominated by the prior, preventing misleading "no evidence of effect" conclusions caused solely by lack of statistical power.
+      </div>
+    </div>
+
+  </div><!-- end short answer section -->
+
+</div><!-- end container -->
+
+<script>
+  let scores = {};
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+
+  function checkAnswer(btn, isCorrect) {
+    const block = btn.closest('.question-block');
+    const qNum = block.getAttribute('data-q');
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const allBtns = block.querySelectorAll('.option-btn');
+    allBtns.forEach(b => { b.disabled = true; });
+
+    const feedback = block.querySelector('.feedback');
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'feedback correct-fb';
+      totalCorrect++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b => {
+        if (b.onclick.toString().includes('true')) {
+          b.classList.add('correct');
+        }
+      });
+      feedback.textContent = '✗ Incorrect. The highlighted option is correct.';
+      feedback.className = 'feedback incorrect-fb';
+    }
+
+    totalAnswered++;
+    updateScore();
+  }
+
+  function updateScore() {
+    document.getElementById('scoreDisplay').textContent = totalCorrect + ' / 30';
+  }
+
+  function toggleAnswer(btn) {
+    const answerBox = btn.nextElementSibling;
+    if (answerBox.classList.contains('shown')) {
+      answerBox.classList.remove('shown');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      answerBox.classList.add('shown');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  function resetAll() {
+    const blocks = document.querySelectorAll('.question-block');
+    blocks.forEach(block => {
+      delete block.dataset.answered;
+      const btns = block.querySelectorAll('.option-btn');
+      btns.forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect');
+      });
+      const feedback = block.querySelector('.feedback');
+      feedback.className = 'feedback';
+      feedback.textContent = '';
+    });
+    totalAnswered = 0;
+    totalCorrect = 0;
+    updateScore();
+  }
+</script>
+
+
+
+</body></html>

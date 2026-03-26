@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Supervised Learning Essentials III Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body { background-color:#f5f6fa; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; font-size:15px; line-height:1.75; color:#2c2c3a; max-width:960px; margin:0 auto; padding:24px 16px; }
+  .page-header { background:linear-gradient(135deg,#1a3a5c,#2e6da4); color:#fff; border-radius:14px; padding:28px 36px; margin-bottom:24px; box-shadow:0 4px 18px rgba(30,80,140,.18); }
+  .page-header h1 { font-size:1.8em; font-weight:700; letter-spacing:.3px; margin:0 0 6px; }
+  .page-header .subtitle { font-size:.92em; opacity:.82; font-weight:400; }
+  .nav-bar { background:#fff; border:1px solid #dde3ef; padding:10px 18px; margin-bottom:28px; display:flex; flex-wrap:wrap; gap:8px; box-shadow:0 1px 6px rgba(0,0,0,.06); }
+  .nav-bar a { background:#eef2fb; color:#2e6da4; padding:4px 14px; font-size:.85em; font-weight:600; text-decoration:none; transition:background .2s; border-radius:12px; }
+  .nav-bar a:hover { background:#2e6da4; color:#fff; }
+  .nav-bar a.nav-mcq { background:#fff3cd; color:#856404; }
+  .nav-bar a.nav-sa { background:#d1ecf1; color:#0c5460; }
+  .notes-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .notes-section h2 { color:#1a3a5c; font-size:1.25em; font-weight:700; border-bottom:2px solid #eef2fb; padding-bottom:8px; margin-top:0; }
+  .notes-section h3 { color:#2e6da4; font-size:1.05em; font-weight:700; margin-top:22px; margin-bottom:6px; }
+  .key-point { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; font-size:1.05em; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.93em; box-shadow:0 1px 6px rgba(0,0,0,.07); }
+  thead tr { background:#2e6da4; color:#fff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background:#f0f4fb; }
+  tbody tr:nth-child(odd) { background:#fff; }
+  tbody tr:hover { background:#dce8f8; }
+  th,td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  ul,ol { padding-left:1.4em; }
+  li { margin-bottom:4px; }
+  code { background:#eef2fb; padding:2px 6px; border-radius:4px; font-size:.9em; color:#1a3a5c; }
+  /* MCQ */
+  .mcq-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .mcq-section h2 { color:#92400e; font-size:1.2em; border-bottom:2px solid #fff3cd; padding-bottom:8px; margin-top:0; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:.95em; }
+  .mcq-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .reset-btn-mcq { background:#2e6da4; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; }
+  .reset-btn-mcq:hover { background:#1a3a5c; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1em; }
+  .option-btn { display:block; width:100%; background:#fff; border:1.5px solid #d0d8ea; border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left; cursor:pointer; font-size:.95em; color:#2c2c3a; transition:all .18s; }
+  .option-btn:hover:not(:disabled) { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:.85; }
+  .option-btn:disabled { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:.9em; font-weight:600; }
+  .feedback-bar.correct { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  /* SA */
+  .sa-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .sa-section h2 { color:#4a148c; font-size:1.2em; border-bottom:2px solid #e8d5ff; padding-bottom:8px; margin-top:0; }
+  .sa-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:.8em; font-weight:700; text-transform:uppercase; letter-spacing:.8px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin:8px 0 14px; font-size:1em; }
+  .reveal-btn { background:#6f42c1; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background .2s; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .reset-btn-sa { background:#6f42c1; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; }
+  .reset-btn-sa:hover { background:#5a32a3; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:14px 0; }
+  .method-card { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 16px; }
+  .method-card h4 { color:#1a3a5c; margin:0 0 8px; font-size:.95em; }
+  .method-card ul { margin:0; padding-left:1.2em; font-size:.9em; }
+  @media(max-width:600px){.two-col{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Supervised Learning Essentials III: Modern Techniques (Ensembles &amp; Deep Learning for Tabular Data) — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#motivation">Motivation</a>
+  <a href="#combination">Combination Rules</a>
+  <a href="#bagging">Bagging &amp; RF</a>
+  <a href="#boosting">Boosting</a>
+  <a href="#adaboost">AdaBoost</a>
+  <a href="#gbm">GBM / XGBoost</a>
+  <a href="#comparison">Bagging vs. Boosting</a>
+  <a href="#deep">Deep Learning for Tabular</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ========== NOTES ========== -->
+
+<div class="notes-section" id="motivation">
+  <h2>1. Ensemble Motivation &amp; The Bias-Variance Problem</h2>
+  <div class="key-point">An <strong>ensemble</strong> combines multiple models to achieve better performance or robustness than any individual model. The jelly-bean jar analogy: the average of many independent noisy estimates converges on the true value better than any single estimate.</div>
+  <p>Motivation for ensembles stems from two limitations of individual models:</p>
+  <ul>
+    <li><strong>Overfitting (high variance):</strong> a deeply-grown decision tree fits training data perfectly but generalises poorly. Pruning reduces variance but also caps the accuracy ceiling.</li>
+    <li><strong>Underfitting (high bias):</strong> simple models (shallow trees, stumps) are stable but systematically wrong in complex regions of feature space.</li>
+  </ul>
+  <div class="theorem-box">
+    <strong>Bias-Variance decomposition:</strong> Total expected error = Bias² + Variance + Irreducible Noise.<br>
+    Bias: systematic error due to wrong assumptions. Variance: sensitivity to training data fluctuations.<br>
+    <strong>Bagging targets variance. Boosting targets bias.</strong>
+  </div>
+  <p>Additional motivation: combining linear classifiers via smoothing — a weighted blend λ × (logistic regression) + (1−λ) × (complex model) inherits the global linear structure while preserving local non-linear adjustments.</p>
+</div>
+
+<div class="notes-section" id="combination">
+  <h2>2. Combination Rules &amp; Ensemble Architecture Types</h2>
+  <h3>Algebraic Combination</h3>
+  <p>Given two models with predicted probabilities, combine their scores using: <strong>minimum</strong>, <strong>maximum</strong>, or <strong>mean</strong> — then determine a new optimal cutoff on the combined score. Mean combination typically works well and produces stable probability estimates.</p>
+
+  <h3>Voting</h3>
+  <p><strong>Majority voting:</strong> each model casts a class vote; majority class wins. Less sensitive to probability calibration. <strong>Weighted voting:</strong> assign vote weights based on each model's estimated accuracy (e.g., Model 4 gets 5 votes if it is much better). Determining weights is itself a learning problem (meta-learning).</p>
+
+  <h3>Stacking (Wolpert, 1992)</h3>
+  <ul>
+    <li>Train Tier-1 classifiers on a bootstrap or jackknife subset of training data</li>
+    <li>Use Tier-1 predictions as input features for a Tier-2 meta-classifier (optionally combined with original features)</li>
+    <li>The meta-classifier learns to correct systematic errors of Tier-1 models</li>
+  </ul>
+  <div class="warning-box">⚠ Stacking and mixture-of-experts both sacrifice interpretability and add production complexity. Use when performance gains justify the overhead.</div>
+
+  <h3>Mixture of Experts (Jordan &amp; Jacobs, 1991)</h3>
+  <p>Multiple expert classifiers whose outputs are combined by a <strong>gating network</strong> trained via the Expectation-Maximization (EM) algorithm. The gating network learns which expert is most reliable for each region of feature space.</p>
+
+  <table>
+    <thead><tr><th>Method</th><th>How it combines</th><th>When to prefer</th></tr></thead>
+    <tbody>
+      <tr><td>Majority voting</td><td>Count class votes</td><td>Models with different strengths; no calibration needed</td></tr>
+      <tr><td>Mean probability</td><td>Average predicted probabilities</td><td>Well-calibrated models; most common in practice</td></tr>
+      <tr><td>Stacking</td><td>Meta-classifier on top of Tier-1 outputs</td><td>When Tier-1 models have complementary error patterns</td></tr>
+      <tr><td>Mixture of experts</td><td>Gating network weights each expert</td><td>Distinct subpopulations in data</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="bagging">
+  <h2>3. Bagging &amp; Random Forests</h2>
+  <h3>Bagging (Bootstrap AGGregating)</h3>
+  <div class="key-point">Bagging creates diversity by training each base model on a different <strong>bootstrap sample</strong> (sampled with replacement) from the training data. Models are trained independently (parallelisable) and combined by majority vote or averaged probability.</div>
+
+  <p><strong>Sources of diversity in bagging:</strong></p>
+  <ul>
+    <li>Bootstrap resampling (different data subsets)</li>
+    <li>Subset of training instances (row sampling without replacement)</li>
+    <li>Subset of features (column sampling)</li>
+    <li>Using <strong>unstable learners</strong> (decision trees) — small changes in training data → very different trees → maximum diversity benefit</li>
+  </ul>
+
+  <h3>Out-of-Bag (OOB) Validation</h3>
+  <p>Each bootstrap sample excludes ~37% of training instances. Those excluded instances can be used as a validation set for their respective tree. OOB error is a free, unbiased performance estimate — but does not replace a dedicated test set.</p>
+
+  <div class="formula-box">
+    Majority vote: \(\hat p_{ens}(y=1|x) = \dfrac{|\{c \in C : p_c(y=1|x) \geq 0.5\}|}{|C|}\)<br><br>
+    Averaged probability: \(\hat p_{ens}(y=1|x) = \dfrac{\sum_{c \in C} p_c(y=1|x)}{|C|}\)
+  </div>
+  <div class="key-point">Averaged probability and majority voting are nearly equivalent in practice — if the average probability exceeds 0.5, a majority of individual models almost always also vote positive.</div>
+
+  <h3>Random Forests</h3>
+  <p>Bagging of decision trees with one critical addition: at <strong>each split</strong> (not once per tree), only a random subset of M features is considered as split candidates. This breaks the correlation between trees — a single dominant feature cannot dominate every tree.</p>
+
+  <table>
+    <thead><tr><th>Hyperparameter</th><th>Guideline</th></tr></thead>
+    <tbody>
+      <tr><td>Number of trees</td><td>Use plenty — no risk of overfitting with more trees (validation performance plateaus)</td></tr>
+      <tr><td>Depth / pruning</td><td>Usually no pruning needed; apply some stopping for speed only</td></tr>
+      <tr><td>Bootstrap size</td><td>100% (sampling with replacement, not all instances appear); lower values if data is large</td></tr>
+      <tr><td>M (features per split)</td><td>Classification: \(\lfloor\sqrt{N}\rfloor\); Regression: \(\max(\lfloor N/3\rfloor, 1)\); or tune via CV</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">Random forests capture interaction effects "for free" because many trees × random features = many different split combinations explored. No feature scaling needed. No explicit pruning needed. The trade-off: 100 trees are hard to explain vs. 1 tree.</div>
+
+  <p><strong>Extra Randomized Trees (ExtraTrees):</strong> further randomizes split selection by also randomly drawing candidate split <em>thresholds</em> (not just candidate features), maximising variance reduction through diversity.</p>
+</div>
+
+<div class="notes-section" id="boosting">
+  <h2>4. Boosting — Core Concept</h2>
+  <div class="key-point">Boosting builds an ensemble <strong>sequentially</strong>. Each new model focuses on correcting the errors made by the ensemble so far. Models cooperate rather than acting independently. This primarily reduces <strong>bias</strong>.</div>
+
+  <table>
+    <thead><tr><th></th><th>Bagging</th><th>Boosting</th></tr></thead>
+    <tbody>
+      <tr><td>Training order</td><td>Parallel (independent)</td><td>Sequential (dependent)</td></tr>
+      <tr><td>Diversity source</td><td>Bootstrap resampling, feature subsets</td><td>Re-weighting of misclassified instances</td></tr>
+      <tr><td>Error target</td><td>Variance reduction</td><td>Bias reduction</td></tr>
+      <tr><td>Base learner type</td><td>Deep, complex (unstable) trees</td><td>Shallow, weak learners (stumps or small trees)</td></tr>
+      <tr><td>Overfitting risk</td><td>Low (by design)</td><td>Higher — "overboosting" is possible</td></tr>
+      <tr><td>Example algorithms</td><td>Random Forest, Extra Trees</td><td>AdaBoost, GBM, XGBoost, LightGBM, CatBoost</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="adaboost">
+  <h2>5. AdaBoost</h2>
+  <div class="key-point">AdaBoost (Adaptive Boosting) trains T weak learners sequentially. After each round, misclassified instances receive higher weight — forcing the next learner to focus on the hard cases. Each learner also receives a weight α_t reflecting its accuracy.</div>
+
+  <h3>Algorithm Steps</h3>
+  <ol>
+    <li>Initialise: uniform weights D₁(i) = 1/N for all i</li>
+    <li>For t = 1 to T: train classifier h_t on weighted data</li>
+    <li>Compute weighted error: \(\varepsilon_t = \sum_{i: y_i \neq h_t(x_i)} D_t(i)\)</li>
+    <li>If ε_t > 0.5: stop early (learner is worse than chance)</li>
+    <li>Compute learner weight: \(\alpha_t = \frac{1}{2}\ln\!\left(\frac{1-\varepsilon_t}{\varepsilon_t}\right)\)</li>
+    <li>Update instance weights: \(D_{t+1}(i) = D_t(i) \cdot e^{-\alpha_t h_t(x_i) y_i}\) then normalise</li>
+    <li>Final classifier: \(H(x) = \text{sign}\!\left(\sum_t \alpha_t h_t(x)\right)\)</li>
+  </ol>
+
+  <div class="key-point">Friedman et al. showed that AdaBoost is equivalent to <strong>additive logistic regression minimising an exponential loss function</strong>. This mathematical insight connects AdaBoost to a specific loss and motivated the generalisation to Gradient Boosting Machines.</div>
+
+  <div class="warning-box">⚠ If a weak learner's error ε_t &gt; 0.5, it is worse than random — AdaBoost stops. This is why the weak learner must be <em>weakly</em> better than chance, not worse.</div>
+</div>
+
+<div class="notes-section" id="gbm">
+  <h2>6. Gradient Boosting Machines (GBM) &amp; XGBoost</h2>
+  <h3>Gradient Boosting — Core Idea</h3>
+  <div class="key-point">Instead of re-weighting instances (AdaBoost), GBM trains each new learner on the <strong>residuals</strong> (errors) of the current ensemble. This is equivalent to functional gradient descent: fitting the negative gradient of the loss function.</div>
+
+  <div class="formula-box">
+    Ensemble update: \(F_{m+1}(x) = F_m(x) + h_m(x)\)<br><br>
+    where \(h_m(x)\) is trained to predict \(y - F_m(x)\) (the residuals)<br><br>
+    Connection: \(-\dfrac{\partial L_{MSE}}{\partial F} = \dfrac{2}{n}(y - F(x))\) — negative gradient = residuals for MSE
+  </div>
+
+  <p>GBM generalises beyond MSE to any differentiable loss function:</p>
+  <table>
+    <thead><tr><th>Loss function</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td>MSE: \(\frac{1}{n}\sum(y_i - \hat y_i)^2\)</td><td>Regression</td></tr>
+      <tr><td>LogLoss: \(-\frac{1}{n}\sum[y_i\log p_i + (1-y_i)\log(1-p_i)]\)</td><td>Binary classification</td></tr>
+      <tr><td>Multi-LogLoss: \(-\frac{1}{n}\sum_i\sum_j y_{ij}\log p_{ij}\)</td><td>Multiclass classification</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Extreme Gradient Boosting (XGBoost / LightGBM / CatBoost)</h3>
+  <p>XGBoost extends GBM with two key improvements:</p>
+  <ol>
+    <li><strong>Second-order gradients (Hessian):</strong> uses both the first and second partial derivatives of the loss, providing richer curvature information and faster convergence to the optimum</li>
+    <li><strong>L1/L2 regularisation on tree complexity:</strong> the objective function penalises the number of leaves and leaf weight magnitudes, directly preventing overfitting</li>
+  </ol>
+
+  <div class="two-col">
+    <div class="method-card">
+      <h4>XGBoost</h4>
+      <ul>
+        <li>Level-wise tree growth</li>
+        <li>Strong L1/L2 regularisation</li>
+        <li>Very stable and robust</li>
+        <li>Categorical: needs preprocessing</li>
+        <li>Good for mostly numerical tabular data</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h4>LightGBM</h4>
+      <ul>
+        <li>Leaf-wise tree growth (faster but riskier)</li>
+        <li>Histogram-based: very memory-efficient</li>
+        <li>Extremely fast on large datasets</li>
+        <li>Higher overfitting risk if untuned</li>
+        <li>Best when speed + large data matter</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h4>CatBoost</h4>
+      <ul>
+        <li>Symmetric (oblivious) trees</li>
+        <li>Native categorical feature handling</li>
+        <li>Ordered boosting (reduces target leakage)</li>
+        <li>Very strong defaults; minimal tuning</li>
+        <li>Excellent for small/medium data + many categoricals</li>
+      </ul>
+    </div>
+    <div class="method-card">
+      <h4>DART (Dropouts + Trees)</h4>
+      <ul>
+        <li>Applies neural net dropout to boosted trees</li>
+        <li>Prevents early trees from dominating</li>
+        <li>Addresses the problem that late-added trees become negligible</li>
+        <li>Reports better results in some situations</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>XGBoost Advanced Features</h3>
+  <p><strong>Feature interaction constraints:</strong> restrict which features are allowed to interact in splits (e.g., feature A may only interact with B, not C). Prevents spurious interactions from being learned. <strong>Monotonic constraints:</strong> enforce that the model's prediction must increase/decrease monotonically with a specific feature — critical for regulated settings (e.g., higher credit risk must yield higher predicted default probability).</p>
+
+  <div class="key-point">Level-wise vs. leaf-wise tree growth: XGBoost grows all nodes at a given depth level before going deeper (balanced trees). LightGBM grows the leaf with the highest loss reduction first (unbalanced but faster and often more accurate).</div>
+
+  <h3>CatBoost's Ordered Boosting</h3>
+  <p>Standard GBM calculates residuals using the same data points used to train the current model — causing prediction shift (target leakage within training). CatBoost uses a moving average of historical predictions in random permutations of training data, so each instance's residual is estimated only from models trained on instances that appeared before it in the permutation. This reduces bias in categorical encoding and gradient estimation.</p>
+
+  <div class="warning-box">⚠ Boosting can overfit — "overboosting" occurs when too many rounds are run without regularisation or early stopping. Monitor validation set performance over rounds and stop when it stops improving.</div>
+</div>
+
+<div class="notes-section" id="comparison">
+  <h2>7. Bagging vs. Boosting — Master Comparison</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>Bagging (e.g. Random Forest)</th><th>Boosting (e.g. XGBoost)</th></tr></thead>
+    <tbody>
+      <tr><td>Primary effect</td><td>Reduces variance</td><td>Reduces bias</td></tr>
+      <tr><td>Training</td><td>Parallel — trees independent</td><td>Sequential — each tree depends on previous</td></tr>
+      <tr><td>Base learner</td><td>Deep, complex, unstable trees</td><td>Shallow, weak learners (stumps preferred)</td></tr>
+      <tr><td>Data treatment</td><td>Bootstrap resampling</td><td>Instance re-weighting or residual fitting</td></tr>
+      <tr><td>Overfitting</td><td>Naturally resistant — adding trees plateaus test performance</td><td>Can overfit (overboosting) — needs regularisation, early stopping</td></tr>
+      <tr><td>Number of trees</td><td>More is always safe; performance plateaus</td><td>More can overfit; tune with CV/early stopping</td></tr>
+      <tr><td>Interpretability</td><td>Low (100 trees); use SHAP</td><td>Low (100 trees); use SHAP</td></tr>
+      <tr><td>Typical data profile</td><td>Noisy data, high variance problem</td><td>Clean data, need maximum performance</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Practical decision rule:</strong><br>
+    — Model has high variance (overfit single tree)? → Use <strong>bagging / Random Forest</strong><br>
+    — Model has high bias (underfit, too simple)? → Use <strong>boosting / GBM</strong><br>
+    — Maximum performance on structured tabular data (Kaggle-style)? → Start with <strong>XGBoost or LightGBM</strong><br>
+    — Many categorical features, minimal preprocessing wanted? → <strong>CatBoost</strong>
+  </div>
+</div>
+
+<div class="notes-section" id="deep">
+  <h2>8. Deep Learning for Tabular Data</h2>
+  <div class="key-point">Tabular data differs fundamentally from images and text: features are heterogeneous (mix of numeric and categorical), datasets are often small/medium (10k–100k rows), and there is no inherent spatial or sequential structure to exploit.</div>
+
+  <h3>Why GBMs Usually Win on Tabular Data</h3>
+  <ul>
+    <li>No strong spatial structure (unlike CNNs for images)</li>
+    <li>No natural sequential structure (unlike transformers for NLP)</li>
+    <li>Tree ensembles capture non-linear interactions easily with few samples</li>
+    <li>Gradient boosting consistently outperforms deep nets in honest benchmarks on tabular data</li>
+  </ul>
+
+  <h3>Standard Deep Learning Approaches for Tabular Data</h3>
+  <p><strong>MLPs (Multilayer Perceptrons):</strong> simple strong baseline. Numeric features: normalise. Categorical features: embeddings or one-hot encoding. Fast to set up (even in scikit-learn). But typically underperform GBMs.</p>
+  <p><strong>Tabular-specific architectures:</strong> attempt to model feature interactions explicitly by treating each feature as a "token" and using attention mechanisms.</p>
+  <table>
+    <thead><tr><th>Architecture</th><th>Key idea</th></tr></thead>
+    <tbody>
+      <tr><td>TabNet</td><td>Sequential attention with sparsity — selects a subset of features at each step. Interpretable attention masks.</td></tr>
+      <tr><td>FT-Transformer</td><td>Feature-wise attention: each feature is a token; transformer models cross-feature interactions.</td></tr>
+      <tr><td>SAINT</td><td>Row + column attention: attends both to features within an instance and across instances.</td></tr>
+      <tr><td>NODE / DeepGBM hybrids</td><td>Neural networks with tree-like decision function layers embedded in the architecture.</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ Despite architectural sophistication, tabular-specific deep learning methods rarely outperform well-tuned XGBoost/LightGBM in most practical benchmarks. The overhead (training time, tuning complexity, less interpretability) is substantial.</div>
+
+  <h3>TabPFN — Prior-Data Fitted Networks</h3>
+  <div class="key-point">TabPFN brings the "foundation model" idea to tabular data. Instead of training per dataset, it is trained once on millions of synthetic tabular tasks and applied directly to new datasets at inference time — no hyperparameter tuning required.</div>
+  <ul>
+    <li>Architecture: Transformer trained on synthetic tabular tasks</li>
+    <li>Learns Bayesian inference over tasks — approximates Bayesian model averaging</li>
+    <li>At inference: feed in your labelled training data as context; the model predicts directly</li>
+    <li>TabPFN v1: underperformed GBMs. TabPFN v2 / v2.5: often on par or better than GBMs for small/medium datasets</li>
+    <li>Limitation: &gt;10k rows requires special handling (subsampling or approximation)</li>
+  </ul>
+</div>
+
+<!-- ========== MCQ ========== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">&#8635; Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ========== SHORT ANSWER ========== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (10)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">&#8635; Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  // MOTIVATION & BIAS-VARIANCE
+  {q:"The primary motivation for building ensemble models is:",opts:["A) To reduce training time by parallelising computation","B) To combine multiple models to improve predictive performance and/or reduce overfitting relative to any individual model","C) To avoid the need for hyperparameter tuning","D) To make models more interpretable"],ans:"B",exp:"Ensembles are motivated by combining diverse models that each capture different patterns, and by variance/bias reduction mechanisms that individual models cannot achieve alone."},
+  {q:"TRUE or FALSE: Bagging primarily reduces bias, while boosting primarily reduces variance.",opts:["True","False"],ans:"False",exp:"It is the opposite: bagging reduces variance (by averaging diverse models trained on bootstrap samples), while boosting reduces bias (by sequentially correcting errors of weak learners)."},
+  {q:"The bias-variance tradeoff states that:",opts:["A) High-bias models are always better than high-variance models","B) Total expected error = Bias² + Variance + Irreducible noise, and reducing one typically increases the other","C) Ensembles eliminate both bias and variance simultaneously","D) Variance only affects the training error, not test error"],ans:"B",exp:"Bias reflects systematic error from wrong model assumptions; variance reflects sensitivity to training data fluctuations. Reducing one typically increases the other. Ensembles are strategies to address one or both."},
+  {q:"Which type of base learner benefits most from bagging?",opts:["A) Logistic regression (stable, low variance)","B) Linear regression with L2 regularization","C) Decision trees (unstable — small data changes produce very different trees)","D) K-nearest neighbors with large K"],ans:"C",exp:"Unstable learners (deep decision trees) produce very different models when trained on slightly different data. Averaging many such diverse models reduces variance significantly. Stable learners like logistic regression benefit less from bagging."},
+  // COMBINATION RULES
+  {q:"In majority voting, a 5-model ensemble predicts: [yes, yes, no, yes, no]. The final prediction is:",opts:["A) No","B) Yes","C) Undecided — tie","D) Abstain"],ans:"B",exp:"3 yes votes vs 2 no votes → majority is 'yes'. Majority voting requires more than half of models to agree on a class."},
+  {q:"The key difference between averaged probability combination and majority voting in scikit-learn's BaggingClassifier is:",opts:["A) They always produce identical results","B) Scikit-learn averages predicted probabilities rather than taking majority class vote, which tends to produce smoother probability estimates","C) Majority voting is always more accurate than averaged probability","D) Averaged probability requires calibration of individual classifiers first"],ans:"B",exp:"Scikit-learn's implementation averages class probabilities across ensemble members. The note from the slides confirms this, and it nearly always produces the same final class decision as majority voting, since if the average probability exceeds 0.5, a majority of models typically also voted positive."},
+  {q:"Stacking (Wolpert, 1992) uses a Tier-2 meta-classifier that:",opts:["A) Trains on the original features only","B) Trains on the predictions of Tier-1 classifiers (optionally combined with original features) to learn how to correct their errors","C) Applies majority voting across Tier-1 classifiers","D) Retrains Tier-1 classifiers iteratively based on Tier-2 feedback"],ans:"B",exp:"In stacking, Tier-1 classifiers are trained on subsets of training data; their predictions become input features for the Tier-2 meta-classifier, which learns to correct for regions where Tier-1 models made systematic errors."},
+  {q:"TRUE or FALSE: The mixture of experts model's gating network is typically trained using the EM (Expectation-Maximization) algorithm.",opts:["True","False"],ans:"True",exp:"The gating network in Jordan and Jacobs' mixture of experts framework is trained using EM, which iteratively optimizes the assignment of instances to experts and the weights of the gating network."},
+  // BAGGING
+  {q:"In bootstrap sampling (with replacement) from a dataset of N instances, the expected fraction of instances that are NOT included in a given bootstrap sample is approximately:",opts:["A) 50%","B) 37%","C) 63%","D) 25%"],ans:"B",exp:"The probability of any instance not being selected in any single draw is (1−1/N). For N draws, P(not selected) = (1−1/N)^N → 1/e ≈ 0.368 as N→∞. So approximately 37% of instances are excluded from each bootstrap sample."},
+  {q:"Out-of-bag (OOB) validation in bagging:",opts:["A) Is equivalent to leave-one-out cross-validation","B) Uses the ~37% of training instances not selected in each bootstrap sample to validate the model trained on that sample","C) Replaces the need for a dedicated test set entirely","D) Requires retraining each tree on the full dataset"],ans:"B",exp:"OOB validation exploits the fact that each bootstrap sample excludes ~37% of instances. These excluded instances serve as a free validation set for their respective model. It provides an unbiased performance estimate but does not replace a held-out test set."},
+  {q:"Random forests add an extra source of randomness to bagging by:",opts:["A) Using random learning rates for each tree","B) Randomly sampling a subset of M features to consider at each split point","C) Randomly permuting the target variable for some trees","D) Training on random subsets of the validation data"],ans:"B",exp:"Random forests sample M features at every split (not once per tree) to consider as split candidates. This breaks correlations between trees — even if one feature is very dominant, it can only appear in a fraction of splits across the forest."},
+  {q:"TRUE or FALSE: Adding more trees to a random forest will eventually cause it to overfit.",opts:["True","False"],ans:"False",exp:"Random forests do not overfit with more trees — validation performance plateaus as trees are added. Each new tree adds diversity without increasing overfitting because the averaging mechanism is robust to the addition of further independent models."},
+  {q:"The recommended heuristic for the number of features to consider at each split (M) in a random forest for classification is:",opts:["A) All features (same as standard bagging)","B) 1 feature","C) Floor of square root of N (total features)","D) Floor of N/2"],ans:"C",exp:"The heuristic M = ⌊√N⌋ for classification is widely used and often effective. For regression, ⌊N/3⌋ is the common heuristic. Alternatively, M can be tuned via cross-validation."},
+  {q:"Extra Randomized Trees (ExtraTrees) differ from standard random forests by:",opts:["A) Using a different loss function","B) Randomly sampling both candidate features AND candidate split thresholds at each split, rather than finding the optimal threshold","C) Training trees on non-overlapping data subsets","D) Using logistic regression as the base learner instead of decision trees"],ans:"B",exp:"ExtraTrees go further than random forests: instead of finding the best threshold from the observed data, they randomly select a threshold from the feature's range. This maximises variance between trees, potentially further reducing ensemble variance at the cost of higher individual tree bias."},
+  // BOOSTING
+  {q:"Boosting differs from bagging primarily in that:",opts:["A) Boosting trains base learners in parallel; bagging is sequential","B) Boosting trains base learners sequentially, with each new learner focused on correcting the errors of the ensemble so far","C) Boosting uses more complex base learners than bagging","D) Boosting relies on bootstrap sampling; bagging does not"],ans:"B",exp:"Boosting is sequential: each new model is trained to correct the mistakes of the previous ensemble. Bagging is parallel: models are trained independently on bootstrap samples. This sequential error-correction is what allows boosting to reduce bias."},
+  {q:"TRUE or FALSE: Boosting is suitable for combining high-variance, complex base learners such as deep decision trees.",opts:["True","False"],ans:"False",exp:"Boosting is designed for low-variance, high-bias base learners (weak learners like decision stumps or shallow trees). It builds up complexity sequentially. Using complex, deep trees as the base learner in boosting increases the risk of overboosting and overfitting."},
+  {q:"In AdaBoost, the weight α_t of a learner at round t is computed as α_t = 0.5 × ln((1−ε_t)/ε_t). What happens to α_t when ε_t = 0 (perfect learner)?",opts:["A) α_t = 0","B) α_t = 0.5","C) α_t → +∞","D) α_t = −∞"],ans:"C",exp:"When ε_t = 0, (1−0)/0 = ∞, so ln(∞) → +∞. A perfect learner receives infinite weight, dominating the ensemble. In practice, ε_t = 0 is handled as a special case; AdaBoost would stop at round 1 with this learner."},
+  {q:"In AdaBoost, if a learner's weighted error ε_t > 0.5:",opts:["A) The learner is given a negative weight to flip its predictions","B) AdaBoost stops adding this learner and may terminate","C) The learner's weight is set to zero and training continues","D) The instance weights are reset to uniform"],ans:"B",exp:"If ε_t > 0.5, the learner is worse than random guessing, and AdaBoost stops (T ← t−1 and returns the ensemble built so far). This is a guard against adding a counter-productive weak learner."},
+  {q:"AdaBoost was shown by Friedman et al. to minimise which loss function?",opts:["A) Mean Squared Error","B) Cross-entropy (log loss)","C) Exponential loss","D) Hinge loss"],ans:"C",exp:"Friedman et al. showed that AdaBoost can be interpreted as minimising an exponential loss function within an additive logistic regression framework. This mathematical connection generalises to GBM by changing the loss function."},
+  // GBM
+  {q:"Gradient Boosting Machines differ from AdaBoost in that:",opts:["A) GBM uses bootstrap sampling; AdaBoost does not","B) GBM fits each new learner to the negative gradient of the loss function (residuals for MSE), enabling any differentiable loss to be optimised","C) GBM uses majority voting; AdaBoost uses weighted voting","D) GBM parallelises training across all learners"],ans:"B",exp:"GBM's key generalisation over AdaBoost: instead of re-weighting instances, it trains each new learner to predict the negative gradient of the chosen loss function. For MSE this is the residual; for other losses it is the corresponding gradient. This enables arbitrary differentiable loss functions."},
+  {q:"For MSE loss in gradient boosting, the pseudo-residuals that the next tree is trained to predict are:",opts:["A) The absolute errors of the current ensemble","B) The squared errors of the current ensemble","C) y − F_m(x), the difference between true labels and current ensemble predictions","D) The entropy of predictions at each leaf"],ans:"C",exp:"For MSE: −∂L/∂F = (2/n)(y − F(x)) ∝ (y − F(x)). The pseudo-residuals are the actual residuals (differences between true labels and current predictions), making residual fitting a special case of gradient descent."},
+  {q:"XGBoost improves on standard GBM by using second-order gradients. This means:",opts:["A) It trains two GBM models and averages them","B) It uses both the first derivative (gradient) and the second derivative (Hessian) of the loss function to find better split points and leaf values","C) It applies two rounds of regularisation to each tree","D) It evaluates splits at twice the standard depth"],ans:"B",exp:"XGBoost uses a second-order Taylor expansion of the loss function, incorporating the Hessian (second derivative). This provides richer curvature information, enabling more precise leaf value computation and faster convergence to the loss minimum."},
+  {q:"TRUE or FALSE: XGBoost applies L1/L2 regularisation only to the feature weights, not to the tree structure itself.",opts:["True","False"],ans:"False",exp:"XGBoost's objective function penalises both the number of leaf nodes (tree complexity) and the magnitude of leaf weights (L2 regularisation on predictions). This directly controls model complexity during tree construction, not just feature weighting."},
+  {q:"LightGBM uses leaf-wise tree growth instead of level-wise. The main risk of this approach is:",opts:["A) Trees become too shallow","B) Only one feature can be used per tree","C) Leaf-wise growth can produce very unbalanced trees that overfit, especially on small datasets, if not properly regularised","D) Training cannot be parallelised"],ans:"C",exp:"Leaf-wise growth always expands the leaf with the greatest loss reduction, potentially growing very deep unbalanced branches. This is efficient but can overfit more easily than level-wise growth on small datasets. LightGBM includes max_depth and min_data_in_leaf to mitigate this."},
+  {q:"CatBoost's ordered boosting is designed to address:",opts:["A) The curse of dimensionality with many features","B) Target leakage within training caused by using the same instance to compute gradients and update the model","C) The inability of standard GBMs to handle categorical features","D) The computational cost of level-wise tree growth"],ans:"B",exp:"In standard GBM, residuals are computed using model predictions that were themselves trained on the same data points — a subtle form of target leakage that causes prediction shift. Ordered boosting uses a historical moving average so each instance's residual is only estimated from models trained on earlier instances in a random permutation."},
+  {q:"Which XGBoost feature allows a user to enforce that the model's predicted risk score increases with the 'loan amount' feature?",opts:["A) L2 regularisation on leaf weights","B) Feature interaction constraints","C) Monotonic relationship constraints","D) DART dropout"],ans:"C",exp:"Monotonic constraints in XGBoost allow users to specify that the model's prediction must be monotonically increasing or decreasing with a specific feature, enforcing domain knowledge (e.g., higher loan amount → higher credit risk)."},
+  {q:"Feature interaction constraints in XGBoost are primarily used to:",opts:["A) Speed up training by reducing the number of feature combinations","B) Restrict which pairs of features are allowed to co-occur along a tree path, preventing spurious interaction effects","C) Enforce regularisation on high-cardinality categorical features","D) Enable GPU-accelerated training"],ans:"B",exp:"Feature interaction constraints restrict which variables can interact in tree paths. Variables that appear together in a parent-child node path are considered interacting. Constraints prevent noise-driven spurious interactions from entering the model."},
+  {q:"DART (Dropout + Multiple Additive Regression Trees) addresses which specific limitation of standard gradient boosting?",opts:["A) Gradient boosting cannot handle categorical features natively","B) Trees added early in boosting become too dominant; later trees contribute negligibly","C) Gradient boosting cannot optimise the log-loss function","D) Standard GBM does not support regularisation"],ans:"B",exp:"In standard XGBoost with small learning rates, early trees are large and impactful while late trees make tiny adjustments. DART applies dropout (randomly dropping trees during training) to prevent early trees from dominating, giving later trees more influence."},
+  // COMPARISON BAGGING VS BOOSTING
+  {q:"A random forest model shows training accuracy = 100% and test accuracy = 92%, which remains stable as more trees are added. This behaviour is:",opts:["A) A sign of overfitting that worsens with more trees","B) Expected — random forests always achieve 100% training accuracy, and test performance plateaus without worsening","C) A sign that the model needs pruning","D) Caused by bootstrap sampling bias"],ans:"B",exp:"Random forests grow unpruned trees that fit each bootstrap sample perfectly (100% training accuracy on each tree's sample). The test accuracy plateaus because adding more diverse trees averages away variance without adding overfitting. This is the by-design behaviour of bagging."},
+  {q:"TRUE or FALSE: Boosting can be parallelised across base learners in the same way as bagging.",opts:["True","False"],ans:"False",exp:"Boosting is inherently sequential — each new learner depends on the residuals/errors of the previous ensemble, which requires the previous model to be trained first. The trees themselves can be parallelised internally (within-tree parallelism), but the boosting rounds themselves cannot."},
+  {q:"Which scenario best justifies choosing boosting over random forests?",opts:["A) The data is very noisy and you need robustness to outliers","B) You need a model that is parallelisable and trains quickly","C) The baseline single-tree model severely underfits (high bias) and you need to incrementally add complexity","D) The dataset is small and you want to avoid overfitting at all costs"],ans:"C",exp:"Boosting reduces bias by sequentially adding models that correct ensemble errors. It is ideal when the base learner (a shallow stump) is too simple to capture the patterns alone. For noisy data with overfitting concerns, bagging (random forests) is more appropriate."},
+  {q:"'Overboosting' refers to:",opts:["A) Using too many features in each tree split","B) Training too many boosting rounds, causing the model to fit noise and overfit to the training set","C) Applying too aggressive a learning rate in gradient descent","D) Combining too many different types of models in one ensemble"],ans:"B",exp:"Overboosting occurs when gradient boosting runs too many rounds. Each round reduces training loss further, but eventually the model starts fitting noise in the training set. Validation set monitoring and early stopping are the standard remedies."},
+  {q:"The best practical choice for structured tabular data with mostly numerical features and a large dataset where speed is critical is:",opts:["A) CatBoost","B) Logistic regression with LASSO","C) LightGBM","D) TabNet"],ans:"C",exp:"LightGBM's histogram-based leaf-wise growth is specifically optimised for large datasets where speed is critical. For primarily numerical features on large data, LightGBM typically outperforms XGBoost in training speed while maintaining comparable accuracy."},
+  {q:"TRUE or FALSE: CatBoost requires the user to manually one-hot encode or target-encode categorical features before training.",opts:["True","False"],ans:"False",exp:"CatBoost natively handles categorical features using its ordered target statistics and ordered boosting framework. The user can pass raw categorical columns; CatBoost encodes them internally using its leakage-resistant ordered encoding scheme."},
+  // DEEP LEARNING FOR TABULAR
+  {q:"Why do convolutional neural networks (CNNs) not naturally excel at tabular data problems?",opts:["A) CNNs cannot handle more than 3 input features","B) CNNs exploit spatial locality and translation invariance — properties that do not exist in heterogeneous tabular feature sets","C) CNNs require GPU training, which is unavailable for tabular tasks","D) CNNs cannot perform binary classification"],ans:"B",exp:"CNNs are designed for spatially structured data (images) where adjacent pixels share semantic relationships. Tabular data has no natural spatial ordering — 'feature 1' next to 'feature 2' carries no spatial meaning, and features are heterogeneous (age, income, churn_flag mixed together)."},
+  {q:"TRUE or FALSE: In most honest benchmarks, tabular-specific deep learning architectures (TabNet, FT-Transformer) consistently outperform well-tuned gradient boosting models.",opts:["True","False"],ans:"False",exp:"The slides explicitly state and the broader research literature confirms that gradient boosting (XGBoost, LightGBM) consistently matches or outperforms tabular-specific deep learning architectures in most benchmarks. The overhead of deep learning is rarely justified for pure tabular prediction tasks."},
+  {q:"TabNet's key architectural innovation for tabular data is:",opts:["A) Using second-order derivatives of the loss for faster training","B) Sequential attention that selects a sparse subset of features at each step, providing both performance and interpretability","C) Treating each row as a sequence and applying recurrent cells","D) Training a separate neural network for each feature and averaging predictions"],ans:"B",exp:"TabNet uses sequential feature selection via attention mechanisms. At each step, the network selects a subset of the most informative features for that step, enabling sparsity (few features used per step) and producing attention masks that can be visualised as explanations."},
+  {q:"FT-Transformer handles tabular data by:",opts:["A) Converting each row into an image and applying a CNN","B) Treating each feature as a 'token' and using transformer self-attention to model interactions between features","C) Building a separate decision tree for each feature and combining with an MLP","D) Embedding rows in a shared latent space using contrastive learning"],ans:"B",exp:"FT-Transformer (Feature Tokenizer + Transformer) maps each tabular feature to an embedding vector (token) and applies transformer self-attention layers to model pairwise feature interactions. This is the tabular analog of how NLP transformers model word interactions."},
+  {q:"TabPFN (Tabular Prior-Data Fitted Network) differs from traditional tabular ML methods by:",opts:["A) Training a separate XGBoost model for each feature","B) Being trained once on millions of synthetic tabular tasks and applied directly to new datasets at inference without any per-dataset training or hyperparameter tuning","C) Using reinforcement learning to select optimal features for each dataset","D) Requiring a large labelled dataset of at least 1 million rows"],ans:"B",exp:"TabPFN is a 'foundation model' for tabular data. Trained once on synthetic tasks, it learns to perform Bayesian model averaging over many possible tabular models. At inference, you simply feed your dataset as context — no training or tuning needed."},
+  {q:"TRUE or FALSE: TabPFN v2 and v2.5 often perform on par with or better than gradient boosting models on small to medium tabular datasets.",opts:["True","False"],ans:"True",exp:"While TabPFN v1 underperformed, v2 and v2.5 (as referenced in the slides) have been shown to be competitive with or better than GBMs on small/medium datasets (< ~10k rows), especially when hyperparameter tuning time is limited."},
+  {q:"The primary limitation of TabPFN in its current form is:",opts:["A) It cannot handle categorical features","B) It requires GPU hardware","C) Handling datasets larger than ~10k rows is non-trivial and requires special strategies","D) It is not available as open source"],ans:"C",exp:"TabPFN's context-based inference mechanism scales poorly with dataset size because the full training set must be passed as context at inference time. Handling >10k rows requires subsampling or approximation strategies."},
+  // MIXED / APPLIED
+  {q:"A practitioner wants to build a model on a 500k-row dataset with 150 features, mostly numerical, where training time is a bottleneck. Which approach is most appropriate?",opts:["A) Logistic regression with polynomial features","B) Random forest with 1000 trees","C) LightGBM with histogram-based training","D) TabPFN v2"],ans:"C",exp:"LightGBM's histogram-based leaf-wise growth is specifically optimised for large datasets with numerical features. It is significantly faster than XGBoost on large data. TabPFN is limited to ~10k rows. Random forests at 1000 trees on 500k rows would be very slow."},
+  {q:"TRUE or FALSE: A random forest with 500 trees is more likely to overfit than one with 50 trees, all else being equal.",opts:["True","False"],ans:"False",exp:"Random forests do not overfit with more trees — adding trees only helps (or at worst plateaus). The variance of the ensemble decreases as trees are added. Overfitting is controlled by individual tree depth, not by the number of trees."},
+  {q:"Which ensemble approach should you use if you want the ensemble to be natively parallelisable across multiple cores during training?",opts:["A) AdaBoost","B) Gradient Boosting Machines","C) Random Forest (bagging)","D) Stacking"],ans:"C",exp:"Bagging trains each tree independently on a bootstrap sample — all trees can be trained in parallel. Boosting is sequential by nature. Stacking requires Tier-1 models to be trained before Tier-2 can begin."},
+  {q:"When combining a logistic regression and a complex tree model via smoothing (λ × LR + (1-λ) × tree), the main benefit is:",opts:["A) The smooth model always outperforms both individual models","B) The complex model's non-linear boundary is blended with the linear model's global structure, improving robustness in sparse data regions","C) The ensemble becomes interpretable through the logistic regression coefficients alone","D) Smoothing eliminates the need for cross-validation"],ans:"B",exp:"Smoothing combines the logistic regression's stable global linear boundary (good generalisation in sparse regions) with the tree's local non-linear adjustments. The blending parameter λ controls how much each model contributes, offering a robust ensemble."},
+  {q:"A data scientist notices that their gradient boosting model achieves near-perfect training AUC = 0.999 but test AUC = 0.71. The most likely cause and remedy is:",opts:["A) Too few boosting rounds — add more trees","B) Overboosting / overfitting — reduce the number of rounds, increase the learning rate penalty, and add L1/L2 regularisation or use early stopping","C) The model needs more features","D) The base learners are too shallow — use deeper trees"],ans:"B",exp:"This large train-test gap is the classic signature of overboosting. The model has memorised training patterns including noise. Remedies: fewer boosting rounds (early stopping on validation set), higher regularisation (L1/L2 in XGBoost), lower learning rate, and/or shallower base trees."},
+  {q:"TRUE or FALSE: The smoothing ensemble λ × logistic_regression + (1-λ) × decision_tree requires both models to be well-calibrated probability estimators for the blending to be valid.",opts:["True","False"],ans:"True",exp:"For linear combination of predicted probabilities to produce a meaningful probability estimate, both models should produce calibrated outputs in [0,1]. Blending raw decision tree probabilities (which may be poorly calibrated) with logistic regression probabilities requires care."},
+  {q:"In the context of ensemble methods, why are 'unstable' classifiers like deep decision trees preferred as base learners for bagging?",opts:["A) They train faster than stable classifiers","B) Their high sensitivity to data perturbations means each bootstrap sample produces a very different tree, maximising diversity and variance reduction in the ensemble","C) They produce better-calibrated probabilities than stable classifiers","D) Unstable classifiers are easier to combine via majority voting"],ans:"B",exp:"The variance-reduction benefit of bagging is proportional to the diversity of individual models. An unstable classifier (a deep tree) responds drastically to different bootstrap samples, producing highly diverse models whose errors are largely uncorrelated, leading to large variance reduction in the ensemble."},
+  {q:"XGBoost vs. LightGBM: which grows trees level-wise and which grows trees leaf-wise?",opts:["A) Both grow level-wise","B) XGBoost level-wise; LightGBM leaf-wise","C) XGBoost leaf-wise; LightGBM level-wise","D) Both grow leaf-wise"],ans:"B",exp:"XGBoost: level-wise growth — all nodes at a given depth level are expanded before going deeper. LightGBM: leaf-wise growth — always expands the single leaf with the greatest loss reduction. Leaf-wise is faster but riskier for overfitting on small data."},
+  {q:"TRUE or FALSE: SAINT (Self-Attention and Intersample Attention Transformer) can model interactions both within a single instance (across features) and across different instances (across rows).",opts:["True","False"],ans:"True",exp:"SAINT introduces intersample attention in addition to standard feature-wise attention. This allows the model to use information from other training instances when making predictions — a form of non-parametric reasoning similar in spirit to K-NN but learned through attention."},
+  {q:"The key advantage of out-of-bag (OOB) evaluation in random forests compared to k-fold cross-validation is:",opts:["A) OOB evaluation is always more accurate than cross-validation","B) OOB evaluation is computed for free during training without requiring additional training passes","C) OOB evaluation uses more data for validation than k-fold","D) OOB evaluation corrects for class imbalance automatically"],ans:"B",exp:"OOB validation uses the ~37% of training instances excluded from each bootstrap sample. This is computed as a byproduct of training — no additional CV folds or retraining runs are needed. It is efficient but gives a single-point performance estimate without the stability of k-fold CV."},
+  {q:"Which of the following best describes the 'cooperation' characteristic of boosting versus the 'diversity' characteristic of bagging?",opts:["A) Boosting models are trained on the same data; bagging models are trained on different data","B) Boosting models explicitly correct each other's errors sequentially; bagging models are trained independently and correct for each other's errors only through averaging","C) Bagging models are more accurate individually; boosting models are weaker individually","D) Cooperation means boosting models share parameters; diversity means bagging models do not"],ans:"B",exp:"In boosting, each new model directly targets the errors of the current ensemble — active cooperation. In bagging, models are trained in isolation and errors are corrected only through the statistical averaging of independent predictions — passive diversity-based error reduction."},
+  {q:"For a tabular dataset with 20 categorical features, many of which have high cardinality, and 5,000 training rows, the recommended starting point is:",opts:["A) LightGBM — it handles large datasets fastest","B) CatBoost — native categorical handling and strong defaults for small/medium data","C) XGBoost with one-hot encoding of all categoricals","D) TabNet — attention-based feature selection handles categoricals"],ans:"B",exp:"CatBoost is specifically designed for small/medium datasets with many categorical features. Its ordered target encoding natively handles high-cardinality categoricals without manual preprocessing, and its defaults are robust for small datasets."},
+];
+
+const saData = [
+  {
+    q:"Explain why bagging reduces variance but not bias, using the mathematical intuition of averaging. Give a concrete example illustrating when you would choose bagging over boosting.",
+    a:"<strong>Answer — Mathematical intuition:</strong> Consider B models trained on independent bootstrap samples, each with prediction variance σ². The predictions are correlated with correlation ρ. The variance of the average is: ρσ² + (1−ρ)σ²/B. As B → ∞, the variance approaches ρσ². The key insight: averaging reduces the (1−ρ)σ²/B component (uncorrelated variance) toward zero, but the correlated component ρσ² persists. Bootstrap sampling and random feature subsets reduce ρ, maximising the variance reduction. Bias is unchanged because each individual model is unbiased on expectation relative to its training data — averaging unbiased models gives an unbiased ensemble.<br><br><strong>Example:</strong> A single deep decision tree achieves 98% training accuracy and 71% test accuracy — classic high-variance, low-bias overfitting. A random forest of 500 such trees achieves 74% test accuracy (stable) because individual trees' errors are uncorrelated and cancel in the average. You would choose random forest over boosting here because the problem is variance (overfitting), not bias (underfitting). Boosting shallow stumps on this problem would produce a model with insufficient capacity."
+  },
+  {
+    q:"Walk through the AdaBoost algorithm for two rounds with a concrete numerical example. Explain what happens to instance weights after a misclassification and why this steers the next learner toward hard cases.",
+    a:"<strong>Answer:</strong> Suppose N=4 instances with initial uniform weights D₁ = [0.25, 0.25, 0.25, 0.25]. <br><br><strong>Round 1:</strong> Learner h₁ classifies instance 3 incorrectly. Weighted error ε₁ = 0.25. Learner weight: α₁ = 0.5 × ln((1−0.25)/0.25) = 0.5 × ln(3) ≈ 0.549. Instance weight update: correctly classified instances receive w × e^(−α₁) ≈ w × 0.578 (down-weighted); the misclassified instance receives w × e^(+α₁) ≈ w × 1.732 (up-weighted). After normalisation, instance 3 has roughly 3× the weight of others. <br><br><strong>Round 2:</strong> Learner h₂ is trained on this reweighted dataset. It now sees instance 3 as a high-priority case and is more likely to classify it correctly. The new learner's weight α₂ depends on h₂'s weighted error. The final ensemble: H(x) = sign(α₁·h₁(x) + α₂·h₂(x)). <br><br><strong>Why this steers toward hard cases:</strong> Increasing the weight of misclassified instances effectively forces the next learner to pay more attention to them during training — errors in weighted subsets cost more in the loss function. The learner cannot simply ignore a region: if it does, the high weights there will dominate its error ε_t, giving it a low α_t (less influence in the final ensemble)."
+  },
+  {
+    q:"Explain the connection between gradient boosting and gradient descent. Why does fitting a learner to residuals correspond to functional gradient descent for MSE loss?",
+    a:"<strong>Answer:</strong> Gradient descent in parameter space: update parameters θ in the direction −∂L/∂θ. Functional gradient descent: instead of parameters, we update the function F itself in the direction of the negative gradient of L with respect to F. <br><br><strong>MSE connection:</strong> L_MSE = (1/n)Σ(y_i − F(x_i))². The negative gradient w.r.t. F is: −∂L/∂F = (2/n)(y_i − F(x_i)) ∝ y_i − F(x_i). This is exactly the residual. So training h_m to predict the residuals y_i − F_m(x_i) is equivalent to taking a gradient descent step in function space along the steepest descent direction of MSE. <br><br><strong>Why GBM generalises AdaBoost:</strong> AdaBoost re-weights instances, which can be shown to be equivalent to gradient descent on the exponential loss. GBM replaces the exponential loss with any differentiable loss (log-loss for classification, MAE for robust regression, custom business losses). The gradient of the chosen loss becomes the target pseudo-residuals for the next tree. This is the insight that made GBM so versatile — you choose the loss function; the algorithm handles the rest."
+  },
+  {
+    q:"Compare XGBoost, LightGBM, and CatBoost across five dimensions. For each of the following datasets, identify which you would start with and explain why: (a) 1M rows, 50 numeric features; (b) 8,000 rows, 30 features of which 20 are categorical; (c) a competition dataset where maximum AUC is the only goal.",
+    a:"<strong>Five-dimension comparison:</strong><br>(1) <em>Tree growth:</em> XGBoost=level-wise (balanced), LightGBM=leaf-wise (fast), CatBoost=symmetric/oblivious (consistent).<br>(2) <em>Speed:</em> LightGBM fastest, XGBoost fast, CatBoost moderate.<br>(3) <em>Categorical handling:</em> XGBoost=none (manual), LightGBM=limited, CatBoost=native ordered encoding.<br>(4) <em>Overfitting risk:</em> LightGBM highest if untuned, CatBoost lowest (strong defaults), XGBoost medium with L1/L2.<br>(5) <em>Small data:</em> CatBoost excellent, XGBoost good, LightGBM good but needs more tuning.<br><br><strong>(a) 1M rows, 50 numeric features → LightGBM.</strong> Its histogram-based algorithm and leaf-wise growth are specifically optimised for large datasets. Training speed is the constraint and features are all numeric so CatBoost's categorical advantage does not apply.<br><br><strong>(b) 8,000 rows, 20 categorical features → CatBoost.</strong> Small dataset + many categoricals is CatBoost's sweet spot. Ordered boosting prevents target leakage in categorical encoding, and its defaults generalise well on small data without extensive tuning. Manual preprocessing would be required for XGBoost.<br><br><strong>(c) Competition, maximise AUC → XGBoost as primary, LightGBM for speed, then ensemble all three.</strong> In competition settings: start with XGBoost (robust, stable regularisation), add LightGBM (different tree growth = different errors = valuable diversity), add CatBoost if categoricals present. Ensembling all three often adds 0.5–2 AUC points over any single model."
+  },
+  {
+    q:"A data scientist trains a random forest and a gradient boosting model on the same dataset. The random forest achieves training AUC=1.0 and test AUC=0.84. The gradient boosting achieves training AUC=0.98 and test AUC=0.88. Analyse this result with respect to bias-variance theory. What additional experiments would you run?",
+    a:"<strong>Analysis:</strong> <em>Random forest:</em> training AUC=1.0 (each tree perfectly fits its bootstrap sample, expected for unpruned trees), test AUC=0.84 (stable, showing good generalisation). The train-test gap of 0.16 reflects the irreducible variance of individual trees, which is reduced but not eliminated by the ensemble. <em>Gradient boosting:</em> training AUC=0.98 (slightly below 1.0 — GBM with regularisation or small learning rate does not fully memorise training data), test AUC=0.88 (better than RF). The smaller train-test gap (0.10) and higher test AUC suggests GBM has better bias-variance balance here — it has higher capacity captured through sequential error correction while regularisation controls overfitting.<br><br><strong>Bias-variance interpretation:</strong> Random forest primarily reduces variance (averaging diverse trees) but may retain some bias from individual tree limitations. GBM reduces bias through sequential correction and its stronger test performance suggests the problem has structural complexity that benefits from bias reduction more than variance reduction.<br><br><strong>Additional experiments:</strong> (1) Learning curves (test AUC vs. number of trees for both) — does RF plateau while GBM continues to improve? (2) Tune GBM's learning rate, max_depth, and regularisation via CV to find if test AUC can improve further. (3) Check for overboosting — monitor test AUC at each boosting round. (4) Try an ensemble of RF + GBM predictions. (5) Compute feature importances for both to check consistency."
+  },
+  {
+    q:"Explain why deep learning has not replaced gradient boosting for tabular data, and describe the specific conditions under which a deep learning approach (e.g. TabPFN or FT-Transformer) might be preferred.",
+    a:"<strong>Why GBMs still win:</strong> (1) <em>No structural inductive bias:</em> CNNs exploit spatial locality; transformers exploit sequential dependencies. Tabular data has no inherent spatial or sequential structure — GBMs' axis-aligned splits directly match how tabular feature interactions work. (2) <em>Sample efficiency:</em> deep networks require large amounts of data to learn useful representations from scratch. Tabular datasets are often 10k–100k rows, where tree ensembles generalise much better. (3) <em>Heterogeneous features:</em> tabular data mixes numeric and categorical features of very different scales and semantics. GBMs handle this naturally; deep nets require careful preprocessing and architecture choices. (4) <em>Practical benchmarks:</em> honest comparisons (Makridakis et al. for time-series, various tabular benchmarks) consistently show gradient boosting winning or tying with deep approaches. (5) <em>Tuning cost:</em> GBMs with sensible defaults often outperform deep nets that require extensive architecture and hyperparameter search.<br><br><strong>When deep learning may be preferred:</strong> (1) <em>TabPFN</em> when you have very little time for tuning, small datasets (&lt;10k rows), and need a strong immediate baseline without fitting. (2) <em>FT-Transformer / SAINT</em> when you have very large datasets (&gt;500k rows) and can afford the training cost — transformers may scale better than trees at extreme data sizes. (3) When the task requires joint learning across modalities (combining tabular with text or image features). (4) When online learning or streaming updates are needed (neural nets update incrementally; GBMs do not). (5) When pre-trained embeddings from a foundation model can be fine-tuned on the tabular task."
+  },
+  {
+    q:"Describe how CatBoost's ordered boosting prevents the target leakage problem that affects standard gradient boosting when encoding categorical features.",
+    a:"<strong>The problem:</strong> In standard gradient boosting, target statistics for categorical encoding (e.g., mean target per category) are computed using all training instances — including the instance currently being evaluated. This means the encoding 'knows' the target of the instance being predicted, creating a subtle form of target leakage within training that inflates gradient estimates and leads to overfit categorical encodings. The same problem applies when computing residuals: using the full-dataset model to compute residuals for the same instances that trained the model causes prediction shift (the residuals are systematically underestimated because the model has already seen and partially memorised those instances).<br><br><strong>CatBoost's solution — Ordered boosting:</strong> CatBoost randomly permutes all training instances multiple times. For a given instance at position k in a permutation, CatBoost computes: (1) its target encoding statistics using only instances that appeared before it (positions 1 to k−1) in that permutation; (2) its gradient/residual using a model trained only on instances before it in the permutation. This ensures that no information from instance k's own target ever enters its gradient computation or its feature encoding. The random permutations provide multiple such orderings, reducing variance in the estimates. The result: categorical encodings and gradient estimates are unbiased, and the model generalises better, especially on small datasets where target leakage would otherwise cause severe overfitting in categorical feature handling."
+  },
+  {
+    q:"What are feature interaction constraints and monotonic constraints in XGBoost? Give a concrete business example where each would be critically important and explain how they improve model trustworthiness.",
+    a:"<strong>Feature interaction constraints:</strong> Specify which pairs of features are allowed to co-occur along a path in any decision tree. If features A and B are not allowed to interact, no tree may have both A and B on the same root-to-leaf path. This prevents the model from learning spurious interactions that happen to reduce training loss but do not reflect genuine relationships. <br><br><em>Business example:</em> In a credit default model, 'customer ZIP code' and 'loan officer ID' should not interact — allowing this interaction would let the model learn that a specific loan officer approves risky applications in a specific area, which is noise or bias rather than a real credit risk signal. Constraining them prevents this spurious learning.<br><br><strong>Monotonic constraints:</strong> Force the model's predicted output to be monotonically increasing or decreasing with a specified feature. Implemented by constraining tree splits to only go in one direction for that feature.<br><br><em>Business example:</em> In credit scoring, regulators require that 'higher income → lower default probability'. Without a monotonic constraint, a gradient boosted model might predict that customers earning €80,000 are higher risk than those earning €70,000 in some region due to noise in training data — a result that cannot be explained to regulators or customers. Enforcing monotonicity on income ensures the model is directionally consistent with domain knowledge, making it auditable and legally defensible.<br><br><strong>How they improve trustworthiness:</strong> Both constraints encode domain knowledge directly into the model structure, preventing it from overfitting to noise in ways that produce nonsensical predictions. They reduce the explanation burden: a compliant officer can easily verify that 'income effect is always negative on default risk', regardless of the model's internal complexity."
+  },
+  {
+    q:"Explain the 'wisdom of crowds' justification for ensemble methods. Under what mathematical conditions does averaging diverse models guarantee improvement over any single model, and what breaks this guarantee?",
+    a:"<strong>Wisdom of crowds:</strong> Just as averaging many independent estimates of a quantity (e.g., jelly beans in a jar) converges to the true value better than any individual estimate, averaging model predictions can outperform any single model if individual errors are diverse and uncorrelated.<br><br><strong>Mathematical conditions for guaranteed improvement:</strong> Let model i have squared error E[ε_i²] = σ² and pair-wise error correlation ρ. The ensemble's expected squared error is: ρσ² + (1−ρ)σ²/B. This is always ≤ σ² (single model error) as long as ρ &lt; 1. So the guarantee holds as long as: (1) individual models have non-trivial correlation ρ &lt; 1 (they make different errors), and (2) individual models are better than random (σ² &lt; max possible error).<br><br><strong>What breaks the guarantee:</strong> (1) <em>Perfect correlation (ρ = 1):</em> if all models make the same errors (e.g., they are all trained on the same data with the same algorithm), the ensemble is no better than a single model. This is why diversity (bootstrap sampling, feature randomness) is critical. (2) <em>All models are worse than the mean prediction:</em> if base learners are anti-correlated with the truth in the same direction, averaging amplifies the error. (3) <em>Combining poorly calibrated models with different scales</em> of output: blending probabilities from models with very different ranges without calibration can degrade performance. (4) <em>Data leakage between train and validation:</em> if the ensemble is evaluated on data that informed its training, the apparent improvement is illusory."
+  },
+  {
+    q:"A regulated bank wants to use a gradient boosting model for credit scoring but the compliance team requires: (1) model decisions are monotonically consistent with key risk drivers, (2) certain features cannot interact, and (3) the model can be explained to regulators. How would you configure and justify the use of XGBoost in this setting?",
+    a:"<strong>Configuration and justification:</strong><br><br><strong>(1) Monotonic constraints:</strong> Identify all features where domain knowledge dictates a directional effect: income ↑ → default probability ↓; debt-to-income ratio ↑ → default ↑; number of prior defaults ↑ → default ↑. Set monotone_constraints in XGBoost (e.g., +1 for positive, −1 for negative, 0 for unconstrained). This ensures regulatory consistency — a compliance officer can verify that no customer with higher income ever receives a higher risk score, all else equal. Justification: monotonic constraints reduce the model's effective hypothesis space to only models consistent with domain knowledge, also reducing overfitting. <br><br><strong>(2) Feature interaction constraints:</strong> Define interaction_constraints to prevent sensitive demographic features (age, gender, ZIP code as proxy for race) from interacting with core financial risk drivers. For example, age may be allowed to interact with employment length (both time-based) but not with account product type. This is both a fairness intervention and a spurious-correlation prevention mechanism. Justification: regulators require that protected characteristics do not influence credit decisions either directly or through interactions. <br><br><strong>(3) Explainability to regulators:</strong> Apply SHAP (TreeSHAP, which is exact and fast for XGBoost) to produce: (a) global feature importance bar chart for the full portfolio; (b) instance-level waterfall plots for individual credit decisions (required for adverse action notices in many jurisdictions: 'why was this customer declined?'); (c) SHAP dependence plots to demonstrate that the monotonic constraint is working — the SHAP values for income must be monotonically decreasing as a function of income. Also validate calibration so that scores are interpretable as probabilities. Supplement with a simple logistic scorecard trained on XGBoost predictions (Platt scaling or isotonic regression) if an exact points-based score table is required by the regulator."
+  }
+];
+
+// ─── RENDER MCQ ───
+let mcqState = {};
+function renderMCQ() {
+  const c = document.getElementById('mcq-container');
+  c.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.innerHTML = `<div class="question-label">Question ${idx+1} of ${mcqData.length}</div><div class="question-stem">${item.q}</div>`;
+    item.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => handleMCQ(idx, opt, btn, card, item);
+      card.appendChild(btn);
+    });
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar'; fb.id = `fb-${idx}`; fb.style.display = 'none';
+    card.appendChild(fb);
+    c.appendChild(card);
+  });
+  updateScore();
+}
+function handleMCQ(idx, optText, btn, card, item) {
+  if (mcqState[idx] !== undefined) return;
+  mcqState[idx] = optText;
+  card.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  const isTF = item.opts.length === 2;
+  const isCorrect = isTF ? optText === item.ans : optText.startsWith(item.ans + ')');
+  const correctOpt = item.opts.find(o => isTF ? o === item.ans : o.startsWith(item.ans + ')'));
+  btn.className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect) card.querySelectorAll('.option-btn').forEach(b => { if (b.textContent === correctOpt) b.className = 'option-btn reveal-correct'; });
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+  updateScore();
+}
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const isTF = item.opts.length === 2;
+    const ok = isTF ? mcqState[idx] === item.ans : mcqState[idx].startsWith(item.ans + ')');
+    if (ok) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+function resetMCQ() { mcqState = {}; renderMCQ(); }
+
+// ─── RENDER SA ───
+function renderSA() {
+  const c = document.getElementById('sa-container');
+  c.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    btn.onclick = () => {
+      const show = panel.style.display === 'none';
+      panel.style.display = show ? 'block' : 'none';
+      btn.textContent = show ? 'Hide Answer' : 'Reveal Answer';
+    };
+    card.innerHTML = `<div class="question-label">Short Answer ${idx+1}</div><div class="question-stem">${item.q}</div>`;
+    card.appendChild(btn);
+    card.appendChild(panel);
+    c.appendChild(card);
+  });
+}
+function resetSA() { renderSA(); }
+
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

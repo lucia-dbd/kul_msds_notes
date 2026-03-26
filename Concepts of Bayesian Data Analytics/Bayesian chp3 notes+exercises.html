@@ -1,0 +1,1176 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 — Introduction to Bayesian Inference</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async=""></script>
+<style>
+:root{
+  --primary:#1a3a5c;--accent:#2878b8;--accent2:#c0580a;
+  --bg:#f3f6fb;--card:#fff;--border:#cdd8e8;
+  --ok:#1e7e34;--ok-bg:#d4edda;--err:#a71d2a;--err-bg:#f8d7da;
+  --nb:#eef4fc;--text:#1c2a38;--muted:#5a6a7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.72;font-size:15px;}
+header{background:var(--primary);color:#fff;padding:26px 20px 18px;text-align:center;}
+header h1{font-size:1.55rem;letter-spacing:.3px;}
+header p{margin-top:5px;color:#aac8e4;font-size:.9rem;}
+.toc{background:var(--accent);display:flex;flex-wrap:wrap;gap:5px;padding:9px 18px;justify-content:center;}
+.toc a{color:#fff;text-decoration:none;font-size:.78rem;background:rgba(255,255,255,.15);
+  padding:4px 11px;border-radius:20px;transition:background .2s;}
+.toc a:hover{background:rgba(255,255,255,.32);}
+.wrap{max-width:940px;margin:0 auto;padding:26px 14px 70px;}
+
+/* ── NOTES ─────────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:20px 24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(30,60,100,.06);}
+.card h2{color:var(--primary);font-size:1.12rem;border-bottom:2px solid var(--accent);
+  padding-bottom:7px;margin-bottom:13px;}
+.card h3{color:var(--accent);font-size:.96rem;margin:15px 0 7px;}
+.card p{margin-bottom:9px;}
+.card ul{padding-left:20px;margin-bottom:9px;}
+.card li{margin-bottom:5px;}
+.nb{background:var(--nb);border-left:4px solid var(--accent);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.nb strong{color:var(--primary);}
+.warn{background:#fff8e8;border-left:4px solid var(--accent2);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.fbox{background:#f0f6ff;border:1px solid #aaccee;border-radius:6px;
+  padding:11px 15px;margin:11px 0;font-size:.9rem;overflow-x:auto;}
+.fbox p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin:11px 0;font-size:.86rem;}
+th{background:var(--primary);color:#fff;padding:8px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:var(--nb);}
+.tag{display:inline-block;background:var(--accent2);color:#fff;border-radius:3px;
+  padding:1px 8px;font-size:.72rem;font-weight:700;margin-right:5px;vertical-align:middle;}
+
+/* ── MCQ ───────────────────────────────────────────────── */
+.score-bar{background:var(--card);border:2px solid var(--accent);border-radius:10px;
+  padding:13px 20px;margin-bottom:20px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:9px;}
+.score-bar span{font-size:.9rem;color:var(--muted);}
+#score-display{font-size:1.5rem;font-weight:700;color:var(--accent);}
+.reset-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;
+  padding:7px 18px;font-size:.83rem;cursor:pointer;font-weight:600;}
+.reset-btn:hover{background:#0f2540;}
+.qblock{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;box-shadow:0 1px 4px rgba(30,60,100,.05);}
+.qnum{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:5px;}
+.qtext{font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.opt{background:var(--nb);border:1px solid var(--border);border-radius:6px;
+  padding:7px 12px;text-align:left;cursor:pointer;font-size:.87rem;color:var(--text);
+  transition:background .15s,border-color .15s;}
+.opt:hover:not(:disabled){background:#dceeff;border-color:var(--accent);}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600;}
+.opt.bad{background:var(--err-bg);border-color:var(--err);color:var(--err);}
+.opt:disabled{cursor:default;}
+.fb{display:none;margin-top:7px;padding:7px 12px;border-radius:5px;font-size:.86rem;}
+.fb.ok-fb{display:block;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.fb.bad-fb{display:block;background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+/* ── SHORT ANSWER ──────────────────────────────────────── */
+.saq{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;}
+.saq .qtext{margin-bottom:10px;}
+.reveal-btn{background:var(--accent2);color:#fff;border:none;border-radius:6px;
+  padding:7px 15px;font-size:.83rem;font-weight:700;cursor:pointer;transition:background .2s;}
+.reveal-btn:hover{background:#9e460a;}
+.ans-box{display:none;background:var(--ok-bg);border:1px solid var(--ok);border-radius:6px;
+  padding:12px 15px;margin-top:10px;font-size:.87rem;line-height:1.65;}
+.ans-box.shown{display:block;}
+.ans-box strong{color:var(--ok);}
+.aform{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:8px 12px;
+  margin:7px 0;font-size:.86rem;overflow-x:auto;}
+
+/* section title stripe */
+.sec-title{background:var(--primary);color:#fff;border-radius:8px;padding:10px 18px;
+  margin:28px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:.3px;}
+
+@media(max-width:600px){
+  .wrap{padding:12px 8px 50px;}
+  .card{padding:13px 11px;}
+  header h1{font-size:1.1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📗 Chapter 3 — Introduction to Bayesian Inference</h1>
+  <p>Bayesian Biostatistics · Lesaffre &amp; Lawson · Study Notes + 45 MCQ + 8 Short-Answer Questions</p>
+</header>
+
+<nav class="toc">
+  <a href="#s32">3.2 Posterior Probs</a>
+  <a href="#s33">3.3 Summary Measures</a>
+  <a href="#s332">3.3.2 Intervals</a>
+  <a href="#s34">3.4 Predictive Dist.</a>
+  <a href="#s35">3.5 Exchangeability</a>
+  <a href="#s36">3.6 Normal Approx.</a>
+  <a href="#s37">3.7 Numerical Methods</a>
+  <a href="#s38">3.8 Hypothesis Testing</a>
+  <a href="#mcq">45 MCQ</a>
+  <a href="#saq">8 Short Answer</a>
+</nav>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════
+     STUDY NOTES
+════════════════════════════════════════════ -->
+<div class="sec-title">📖 Study Notes</div>
+
+<!-- 3.2 -->
+<div class="card" id="s32">
+  <h2>3.2 Summarizing the Posterior by Probabilities</h2>
+  <p>The simplest characterization of a posterior \(p(\theta \mid \boldsymbol{y})\) is to compute probabilities of the form \(P(a &lt; \theta &lt; b \mid \boldsymbol{y})\) for chosen \(a\) and \(b\).</p>
+  <div class="nb">
+    <strong>Stroke Study (Example III.1):</strong> Posterior is \(\text{Beta}(19, 133)\). We can compute, e.g., \(P(\theta &gt; 0.20 \mid \boldsymbol{y}) = 0.0062\) and \(P(\theta &lt; 0.088 \mid \boldsymbol{y}) = 0.072\). This shows the incidence is very unlikely to exceed the interim rate of 0.20.
+  </div>
+  <p>While useful, posterior probabilities alone are not sufficient — we also need point and interval estimates, analogous to frequentist analyses.</p>
+</div>
+
+<!-- 3.3.1 -->
+<div class="card" id="s33">
+  <h2>3.3.1 Location and Variability of the Posterior</h2>
+  <h3>Three Measures of Location</h3>
+  <table>
+    <thead>
+      <tr><th>Measure</th><th>Formula</th><th>Loss Function Minimized</th><th>Transformation Equivariant?</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Posterior Mode</strong> \(\hat{\theta}_M\)</td>
+        <td>\(\arg\max_\theta\, p(\theta \mid \boldsymbol{y})\)</td>
+        <td>0–1 loss (1 if wrong, 0 if correct)</td>
+        <td>❌ No: \(\hat{\psi}_M \neq h(\hat{\theta}_M)\)</td>
+      </tr>
+      <tr>
+        <td><strong>Posterior Mean</strong> \(\bar{\theta}\)</td>
+        <td>\(\displaystyle\int \theta\, p(\theta \mid \boldsymbol{y})\, d\theta\)</td>
+        <td>Quadratic (squared) loss \((\theta - \hat{\theta})^2\)</td>
+        <td>❌ No: \(\bar{\psi} \neq h(\bar{\theta})\)</td>
+      </tr>
+      <tr>
+        <td><strong>Posterior Median</strong> \(\bar{\theta}_M\)</td>
+        <td>\(\displaystyle 0.5 = \int_{-\infty}^{\bar{\theta}_M} p(\theta \mid \boldsymbol{y})\, d\theta\)</td>
+        <td>Absolute loss \(a|\theta - \hat{\theta}|\), \(a &gt; 0\)</td>
+        <td>✅ Yes: \(\bar{\psi}_M = h(\bar{\theta}_M)\)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Key symmetry result:</strong> For a <em>unimodal symmetric</em> posterior, Mode = Mean = Median.
+  </div>
+
+  <h3>Posterior Variance (Measure of Variability)</h3>
+  <div class="fbox">
+    <p>\[\bar{\sigma}^2 = \int (\theta - \bar{\theta})^2\, p(\theta \mid \boldsymbol{y})\, d\theta\]</p>
+    <p>Requires <strong>three integrals</strong> to evaluate; \(\bar{\sigma} = \sqrt{\bar{\sigma}^2}\) is the posterior standard deviation.</p>
+  </div>
+
+  <h3>Beta(α, β) Posterior — Summary Formulas</h3>
+  <table>
+    <thead><tr><th>Measure</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>Mode</td><td>\((\alpha - 1)/(\alpha + \beta - 2)\)</td></tr>
+      <tr><td>Mean</td><td>\(\alpha / (\alpha + \beta)\)</td></tr>
+      <tr><td>Variance</td><td>\(\alpha\beta\,/\,\bigl[(\alpha+\beta)^2(\alpha+\beta+1)\bigr]\)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Stroke Study (Example III.2):</strong> Beta(19, 133): Mode = 18/150 = 0.12, Mean = 19/152 = 0.125, Median ≈ 0.122, SD ≈ 0.0267.
+  </div>
+
+  <div class="warn">
+    <strong>Computation note:</strong> Posterior mode only needs maximization (no full normalizing constant); posterior mean needs 2 integrals; posterior variance needs 3 integrals.
+  </div>
+</div>
+
+<!-- 3.3.2 -->
+<div class="card" id="s332">
+  <h2>3.3.2 Posterior Interval Estimation (Credible Intervals)</h2>
+  <p>A <strong>100(1 − α)% credible interval</strong> \([a, b]\) satisfies \(P(a \le \theta \le b \mid \boldsymbol{y}) = 1 - \alpha\). Two important types exist.</p>
+
+  <h3>Equal Tail Credible Interval</h3>
+  <div class="fbox">
+    <p>\[P(\theta \le a \mid \boldsymbol{y}) = \alpha/2 \quad \text{and} \quad P(\theta \ge b \mid \boldsymbol{y}) = \alpha/2\]</p>
+  </div>
+  <ul>
+    <li>Constructed using the posterior <strong>CDF</strong> only (quantile function).</li>
+    <li>✅ <strong>Invariant</strong> under monotone transformations: if \([a,b]\) is an equal tail CI for \(\theta\), then \([h(a), h(b)]\) is an equal tail CI for \(\psi = h(\theta)\).</li>
+    <li>Some values inside may have lower density than values outside — a limitation.</li>
+  </ul>
+
+  <h3>Highest Posterior Density (HPD) Interval</h3>
+  <div class="fbox">
+    <p>For all \(\theta_1 \in [a,b]\) and \(\theta_2 \notin [a,b]\): \(p(\theta_1 \mid \boldsymbol{y}) \ge p(\theta_2 \mid \boldsymbol{y})\)</p>
+  </div>
+  <ul>
+    <li>Contains the most plausible parameter values — constructed by a horizontal line intersecting the posterior density.</li>
+    <li>✅ <strong>Shortest</strong> interval with \(P(a \le \theta \le b \mid \boldsymbol{y}) = 1 - \alpha\).</li>
+    <li>Requires the posterior <strong>density</strong> (PDF), not just the CDF.</li>
+    <li>❌ <strong>Not</strong> invariant under monotone transformations (e.g., the HPD for \(\theta\) does not map to the HPD for \(\log \theta\)).</li>
+  </ul>
+
+  <div class="nb">
+    <strong>Coincidence:</strong> For a unimodal <em>symmetric</em> posterior, the equal tail CI and the HPD interval are identical.
+  </div>
+
+  <h3>Bayesian vs. Frequentist Interpretation</h3>
+  <p>A 95% <em>credible interval</em> contains the 95% most plausible parameter values <em>a posteriori</em>. A 95% frequentist CI either contains or does not contain the true value for any given dataset — the 95% refers to long-run coverage, not a probability about the current data.</p>
+</div>
+
+<!-- 3.4 -->
+<div class="card" id="s34">
+  <h2>3.4 Predictive Distributions</h2>
+  <p>Given observed data \(\boldsymbol{y}\) and a future observation \(\tilde{y}\), the <strong>posterior predictive distribution (PPD)</strong> integrates out parameter uncertainty:</p>
+  <div class="fbox">
+    <p>\[p(\tilde{y} \mid \boldsymbol{y}) = \int p(\tilde{y} \mid \theta)\, p(\theta \mid \boldsymbol{y})\, d\theta\]</p>
+    <p>This relies on <strong>hierarchical independence</strong>: \(p(\tilde{y} \mid \theta, \boldsymbol{y}) = p(\tilde{y} \mid \theta)\) — given the true \(\theta\), past data cannot inform the future observation.</p>
+  </div>
+  <p>The <strong>prior predictive distribution</strong> is \(p(\tilde{y}) = \int p(\tilde{y} \mid \theta)\, p(\theta)\, d\theta\) — this is also the <em>denominator of Bayes' theorem</em> (marginal/integrated likelihood).</p>
+
+  <h3>Three Classic Cases</h3>
+  <table>
+    <thead>
+      <tr><th>Likelihood + Prior</th><th>Posterior</th><th>PPD</th><th>Named Distribution</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Normal \(+\) Normal prior</td>
+        <td>Normal \(N(\bar{\mu}, \bar{\sigma}^2)\)</td>
+        <td>\(\tilde{y} \mid \boldsymbol{y} \sim N(\bar{\mu},\; \sigma^2 + \bar{\sigma}^2)\)</td>
+        <td>Normal (PPD is wider than posterior)</td>
+      </tr>
+      <tr>
+        <td>Binomial \(+\) Beta(\(\alpha, \beta\))</td>
+        <td>Beta(\(\bar\alpha, \bar\beta\))</td>
+        <td>\(p(\tilde{y} \mid \boldsymbol{y}) = \binom{m}{\tilde{y}} \dfrac{B(\tilde{y}+\bar\alpha,\; m - \tilde{y} + \bar\beta)}{B(\bar\alpha,\bar\beta)}\)</td>
+        <td><strong>Beta-Binomial</strong> BB(\(m, \bar\alpha, \bar\beta\))</td>
+      </tr>
+      <tr>
+        <td>Poisson \(+\) Gamma(\(\alpha, \beta\))</td>
+        <td>Gamma(\(\bar\alpha, \bar\beta\))</td>
+        <td>\(p(\tilde{y} \mid \boldsymbol{y}) = \dfrac{\Gamma(\bar\alpha + \tilde{y})}{\Gamma(\bar\alpha)\,\tilde{y}!} \left(\dfrac{\bar\beta}{\bar\beta+1}\right)^{\bar\alpha} \left(\dfrac{1}{\bar\beta+1}\right)^{\tilde{y}}\)</td>
+        <td><strong>Negative Binomial</strong> NB(\(\bar\alpha, \bar\beta\)) (also: Pólya distribution)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <strong>Key point:</strong> The Bayesian PPD automatically accounts for parameter uncertainty, resulting in <em>more variability</em> than the frequentist plug-in predictive distribution \(p(\tilde{y} \mid \hat{\theta})\).
+  </div>
+</div>
+
+<!-- 3.5 -->
+<div class="card" id="s35">
+  <h2>3.5 Exchangeability</h2>
+  <p>The classical assumption of <strong>conditional independence</strong> given \(\theta\) leads — when \(\theta\) is given a prior — to a weaker unconditional concept:</p>
+
+  <div class="fbox">
+    <p><strong>Definition:</strong> \(y_1, \ldots, y_n\) are <em>exchangeable</em> if their joint distribution is invariant to any permutation \(\pi\):</p>
+    <p>\[p(y_1, \ldots, y_n) = p(y_{\pi(1)}, \ldots, y_{\pi(n)})\]</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Property</th><th>Independence → Exchangeability?</th><th>Exchangeability → Independence?</th></tr></thead>
+    <tbody>
+      <tr><td>General relation</td><td>✅ Yes (if identical marginals)</td><td>❌ No, in general</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>de Finetti's Representation Theorem (Theorem 3.5.1):</strong> If \(y_1, y_2, \ldots\) is an <em>infinitely exchangeable</em> sequence of binary random variables, then there exists a CDF \(Q\) such that:
+    \[p(y_1, \ldots, y_n) = \int_0^1 \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i}\, dQ(\theta)\]
+    This is equivalent to assuming the \(y_i\) are conditionally i.i.d. Bernoulli(\(\theta\)) with \(\theta\) drawn from prior \(Q\). Hence <em>exchangeability naturally leads to a Bayesian model</em>.
+  </div>
+
+  <p><strong>Partial/conditional exchangeability:</strong> Subjects may be exchangeable within subgroups (e.g., within age–gender strata) but not across groups.</p>
+</div>
+
+<!-- 3.6 -->
+<div class="card" id="s36">
+  <h2>3.6 Normal Approximation to the Posterior (Bayesian CLT)</h2>
+  <p>When a non-conjugate prior is used, or when computation is complex, a normal approximation to the posterior is valid for <em>large sample sizes</em>.</p>
+
+  <div class="fbox">
+    <p><strong>Theorem 3.6.1 (Bayesian CLT):</strong> Under suitable regularity conditions, as \(n \to \infty\):</p>
+    <p>\[p(\theta \mid \boldsymbol{y}) \xrightarrow{\;d\;} N\!\left(\hat{\theta},\; \sigma^2_{\hat{\theta}}\right)\]</p>
+    <p>where \(\hat\theta\) is the MLE and \(\;\sigma^2_{\hat\theta} = \displaystyle -\!\left(\frac{d^2 \log L(\theta \mid \boldsymbol{y})}{d\theta^2}\bigg|_{\theta = \hat\theta}\right)^{-1}\) (inverse observed Fisher information).</p>
+  </div>
+
+  <ul>
+    <li>Laplace proved this for inverse probability in 1785 — <em>before</em> the classical CLT.</li>
+    <li>For large \(n\): the likelihood dominates the prior, so the posterior is essentially determined by the data regardless of the prior chosen.</li>
+    <li>Analytical posteriors can only always be derived with a <strong>conjugate prior</strong>; otherwise, numerical methods are required.</li>
+  </ul>
+
+  <div class="warn">
+    <strong>Practical importance:</strong> The Bayesian CLT enables Bayesian inference via a normal approximation when conjugate analysis is not possible, especially useful in complex models.
+  </div>
+</div>
+
+<!-- 3.7 -->
+<div class="card" id="s37">
+  <h2>3.7 Numerical Techniques to Determine the Posterior</h2>
+  <h3>3.7.1 Numerical Integration</h3>
+  <p>The general integral \(\int_a^b f(\theta)\, d\theta \approx \sum_{m=1}^{M+1} w_m f(\theta^*_m)\) can be approximated by several methods:</p>
+  <ul>
+    <li><strong>Rectangle (midpoint) rule:</strong> \(w_m = \delta\) (equal spacing)</li>
+    <li><strong>Trapezoidal rule:</strong> Piecewise linear approximation</li>
+    <li><strong>Simpson's rule:</strong> Piecewise quadratic — more accurate</li>
+    <li><strong>Gaussian quadrature:</strong> Uses Hermite polynomial roots as grid points; exactly reproduces polynomials of degree \(\le 2M-1\)</li>
+    <li><strong>Laplace approximation:</strong> For one quadrature point — approximates \(\int e^{h(\theta)}\, d\theta \approx (2\pi)^{d/2} |A|^{1/2} e^{h(\hat\theta_M)}\), where \(A\) is minus the inverse Hessian at the mode.</li>
+  </ul>
+
+  <h3>3.7.2 Sampling from the Posterior</h3>
+  <p>In Monte Carlo integration, if \(\{\theta^1, \ldots, \theta^K\}\) are sampled from \(p(\theta \mid \boldsymbol{y})\), then:</p>
+  <div class="fbox">
+    <p>\[\int t(\theta)\, p(\theta \mid \boldsymbol{y})\, d\theta \approx \bar{t}_K = \frac{1}{K}\sum_{k=1}^K t(\theta^k)\]</p>
+    <p><strong>Monte Carlo error:</strong> \(s_t / \sqrt{K}\), where \(s_t\) is the SD of the sampled \(t(\theta^k)\) values.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Algorithm</th><th>Idea</th><th>Requirement</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ICDF method</strong></td><td>Sample \(u \sim U(0,1)\); set \(x = F^{-1}(u)\)</td><td>Invertible CDF</td></tr>
+      <tr><td><strong>Accept–Reject (AR)</strong></td><td>Sample \(\tilde\theta\) from proposal \(q(\theta)\); accept if \(u \le p(\tilde\theta \mid \boldsymbol{y})\,/\,[A\,q(\tilde\theta)]\)</td><td>Envelope: \(p(\theta \mid \boldsymbol{y}) &lt; A\,q(\theta)\) for all \(\theta\). Efficiency = 1/A.</td></tr>
+      <tr><td><strong>ARS (Adaptive Rejection Sampling)</strong></td><td>Builds a piecewise-linear envelope adaptively on the log-posterior</td><td>Log-posterior must be concave and differentiable</td></tr>
+      <tr><td><strong>ARMS</strong></td><td>ARS combined with Metropolis step</td><td>Non-log-concave posteriors (used in SAS Bayesian procedures)</td></tr>
+      <tr><td><strong>Importance Sampling</strong></td><td>Sample from \(q(\theta)\); weight by \(w(\theta^k) = p(\theta^k \mid \boldsymbol{y})\,/\,q(\theta^k)\)</td><td>Tails of \(q\) must be heavier than those of \(p(\theta \mid \boldsymbol{y})\)</td></tr>
+      <tr><td><strong>SIR (Sampling/Importance Resampling)</strong></td><td>Two-stage: draw large \(J\) sample from \(q\), then resample \(K \ll J\) with importance weights</td><td>Produces an actual sample from the posterior</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Advantage of sampling:</strong> With little extra effort, summary measures for <em>transformed parameters</em> (e.g., \(\log\theta\), \(\theta/(1-\theta)\)) can be obtained immediately from the same sample — avoiding complex analytical derivations.
+  </div>
+</div>
+
+<!-- 3.8 -->
+<div class="card" id="s38">
+  <h2>3.8 Bayesian Hypothesis Testing</h2>
+
+  <h3>3.8.1 Credible Intervals and the Contour Probability</h3>
+  <p>For \(H_0 : \theta = \theta_0\): reject if \(\theta_0\) lies outside the 95% credible interval.</p>
+  <p>More formally, the <strong>contour probability</strong> \(p_B\) is defined as:</p>
+  <div class="fbox">
+    <p>\[P\!\bigl(p(\theta \mid \boldsymbol{y}) &gt; p(\theta_0 \mid \boldsymbol{y})\bigr) \equiv 1 - p_B\]</p>
+    <p>\(p_B\) = complement of the AUC of the <em>smallest HPD interval containing \(\theta_0\)</em>. Small \(p_B\) means \(H_0\) is <strong>not</strong> well-supported a posteriori.</p>
+  </div>
+  <p>The contour probability is the Bayesian analogue of the two-sided frequentist P-value (first suggested by Box &amp; Tiao, 1973).</p>
+
+  <h3>3.8.2 The Bayes Factor</h3>
+  <div class="fbox">
+    <p>\[\text{BF}(\boldsymbol{y}) = \frac{p(\boldsymbol{y} \mid H_0)}{p(\boldsymbol{y} \mid H_a)}\]</p>
+    <p>Transforms prior odds to posterior odds: \(\dfrac{p(H_0 \mid \boldsymbol{y})}{p(H_a \mid \boldsymbol{y})} = \text{BF}(\boldsymbol{y}) \times \dfrac{p(H_0)}{p(H_a)}\)</p>
+  </div>
+
+  <table>
+    <thead><tr><th>BF(y) value</th><th>Jeffreys' classification (evidence for H₀)</th></tr></thead>
+    <tbody>
+      <tr><td>BF(y) &gt; 100</td><td>Decisive</td></tr>
+      <tr><td>32 &lt; BF(y) ≤ 100</td><td>Very strong</td></tr>
+      <tr><td>10 &lt; BF(y) ≤ 32</td><td>Strong</td></tr>
+      <tr><td>3.2 &lt; BF(y) ≤ 10</td><td>Substantial</td></tr>
+      <tr><td>1 &lt; BF(y) ≤ 3.2</td><td>Not worth more than a bare mention</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.8.3 Bayesian vs. Frequentist Hypothesis Testing</h3>
+  <p><strong>P-value vs. posterior probability:</strong> The P-value does not equal the probability that \(H_0\) is true (the "P-value fallacy"). The Bayesian posterior probability \(p(H_0 \mid \boldsymbol{y})\) does provide this.</p>
+
+  <div class="fbox">
+    <p><strong>Minimum Bayes factor (Gaussian case):</strong> \(\text{BF}_{\min}(\boldsymbol{y}) = \exp(-0.5\, z^2)\)</p>
+    <p>When P-value = 0.05 (z = 1.96): \(\text{BF}_{\min} = 0.15\), corresponding to minimum posterior probability 0.204 for \(H_0\) under equal prior probabilities. P-values <strong>exaggerate evidence against \(H_0\)</strong> in a simple hypothesis test.</p>
+  </div>
+
+  <div class="warn">
+    <strong>Jeffreys–Lindley–Bartlett Paradox:</strong> For a sharp null hypothesis (e.g., \(H_0: \theta = \theta_0\) vs. \(H_a: \theta \ne \theta_0\)) with a diffuse alternative prior, it is possible for a small P-value to coexist with a Bayes factor that favors \(H_0\) — especially at large sample sizes. This occurs because the Bayesian test compares <em>averaged</em> likelihoods (not maximized), and averaging over an unrealistically broad alternative weakens the evidence for \(H_a\).
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     45 MCQ
+════════════════════════════════════════════ -->
+<div class="sec-title" id="mcq">✏️ 45 Multiple Choice Questions</div>
+
+<div class="score-bar">
+  <div>
+    <span>Score: </span><span id="score-display">0 / 0</span>
+    <span style="margin-left:14px;font-size:.82rem;">(out of 45 questions)</span>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+</div>
+
+<!-- Q1 -->
+<div class="qblock" id="q1">
+  <div class="qnum">Question 1 of 45 — Posterior Mode</div>
+  <div class="qtext">The posterior mode \(\hat\theta_M\) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">A. &nbsp;\(\displaystyle\int \theta\, p(\theta \mid \boldsymbol{y})\, d\theta\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q1',this)">B. &nbsp;\(\arg\max_\theta\; p(\theta \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">C. &nbsp;The value where the posterior CDF equals 0.5</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">D. &nbsp;The value minimizing the posterior variance</button>
+  </div>
+  <div class="fb" id="q1-fb"></div>
+</div>
+
+<!-- Q2 -->
+<div class="qblock" id="q2">
+  <div class="qnum">Question 2 of 45 — Posterior Mode and Flat Prior</div>
+  <div class="qtext">For a flat prior \(p(\theta) \propto c\), the posterior mode is equal to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">A. The posterior mean \(\bar\theta\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q2',this)">B. The maximum likelihood estimator (MLE) of \(\theta\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">C. The posterior median</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">D. Zero</button>
+  </div>
+  <div class="fb" id="q2-fb"></div>
+</div>
+
+<!-- Q3 -->
+<div class="qblock" id="q3">
+  <div class="qnum">Question 3 of 45 — Loss Functions</div>
+  <div class="qtext">The posterior mean \(\bar\theta\) is the Bayes estimator that minimizes which loss function?</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q3',this)">A. Quadratic (squared) loss: \(L(\theta, \hat\theta) = (\theta - \hat\theta)^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">B. Absolute loss: \(a|\theta - \hat\theta|\), \(a &gt; 0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">C. 0–1 loss (1 if incorrect, 0 if correct)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">D. Logarithmic (entropy) loss</button>
+  </div>
+  <div class="fb" id="q3-fb"></div>
+</div>
+
+<!-- Q4 -->
+<div class="qblock" id="q4">
+  <div class="qnum">Question 4 of 45 — Posterior Median</div>
+  <div class="qtext">The posterior median minimizes which loss function?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">A. Quadratic loss \((\theta - \hat\theta)^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">B. 0–1 loss</button>
+    <button class="opt" data-correct="true" onclick="answer('q4',this)">C. Absolute loss \(a|\theta - \hat\theta|\), with \(a &gt; 0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">D. Posterior variance</button>
+  </div>
+  <div class="fb" id="q4-fb"></div>
+</div>
+
+<!-- Q5 -->
+<div class="qblock" id="q5">
+  <div class="qnum">Question 5 of 45 — Transformation Invariance</div>
+  <div class="qtext">Which posterior location measure is equivariant under monotone transformations \(h\), i.e., the measure of \(\psi = h(\theta)\) equals \(h\) applied to the measure of \(\theta\)?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">A. Posterior mode</button>
+    <button class="opt" data-correct="true" onclick="answer('q5',this)">B. Posterior median</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">C. Posterior mean</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">D. All three are transformation invariant</button>
+  </div>
+  <div class="fb" id="q5-fb"></div>
+</div>
+
+<!-- Q6 -->
+<div class="qblock" id="q6">
+  <div class="qnum">Question 6 of 45 — Symmetric Posterior</div>
+  <div class="qtext">For a unimodal, symmetric posterior distribution, which of the following is true?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">A. Mode &gt; Mean &gt; Median</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">B. Only the mode and mean coincide; the median differs</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">C. Only the mean and median coincide; the mode differs</button>
+    <button class="opt" data-correct="true" onclick="answer('q6',this)">D. Mode = Mean = Median</button>
+  </div>
+  <div class="fb" id="q6-fb"></div>
+</div>
+
+<!-- Q7 -->
+<div class="qblock" id="q7">
+  <div class="qnum">Question 7 of 45 — Beta Posterior Mode</div>
+  <div class="qtext">The posterior mode of a \(\text{Beta}(19, 133)\) distribution equals:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">A. \(19/152 = 0.125\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q7',this)">B. \(18/150 = 0.12\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">C. \(0.122\) (posterior median)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">D. \(0.0267\) (posterior SD)</button>
+  </div>
+  <div class="fb" id="q7-fb"></div>
+</div>
+
+<!-- Q8 -->
+<div class="qblock" id="q8">
+  <div class="qnum">Question 8 of 45 — Beta Posterior Mean</div>
+  <div class="qtext">The posterior mean of a \(\text{Beta}(\alpha, \beta)\) distribution is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q8',this)">A. \(\alpha / (\alpha + \beta)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">B. \((\alpha - 1) / (\alpha + \beta - 2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">C. \(\alpha\beta / [(\alpha+\beta)^2(\alpha+\beta+1)]\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">D. \(\alpha / \beta\)</button>
+  </div>
+  <div class="fb" id="q8-fb"></div>
+</div>
+
+<!-- Q9 -->
+<div class="qblock" id="q9">
+  <div class="qnum">Question 9 of 45 — Posterior Variance Computation</div>
+  <div class="qtext">How many integrals need to be evaluated to compute the posterior standard deviation?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">A. One</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">B. Two</button>
+    <button class="opt" data-correct="true" onclick="answer('q9',this)">C. Three</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">D. Four</button>
+  </div>
+  <div class="fb" id="q9-fb"></div>
+</div>
+
+<!-- Q10 -->
+<div class="qblock" id="q10">
+  <div class="qnum">Question 10 of 45 — Equal Tail CI</div>
+  <div class="qtext">A 95% equal tail credible interval \([a, b]\) satisfies:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q10',this)">A. \(P(\theta \le a \mid \boldsymbol{y}) = P(\theta \ge b \mid \boldsymbol{y}) = 0.025\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">B. All \(\theta_1 \in [a,b]\) have higher density than all \(\theta_2 \notin [a,b]\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">C. It is the shortest interval with 95% posterior coverage</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">D. \(P(\theta \le a \mid \boldsymbol{y}) = 0.05\) and \(P(\theta \ge b \mid \boldsymbol{y}) = 0\)</button>
+  </div>
+  <div class="fb" id="q10-fb"></div>
+</div>
+
+<!-- Q11 -->
+<div class="qblock" id="q11">
+  <div class="qnum">Question 11 of 45 — HPD Interval Definition</div>
+  <div class="qtext">The 100(1 − α)% HPD interval \([a, b]\) is characterized by:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">A. Equal probability mass in each tail</button>
+    <button class="opt" data-correct="true" onclick="answer('q11',this)">B. Every \(\theta\) inside \([a,b]\) has higher posterior density than every \(\theta\) outside \([a,b]\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">C. It is symmetric around the posterior mean</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">D. The posterior mode lies exactly at the midpoint</button>
+  </div>
+  <div class="fb" id="q11-fb"></div>
+</div>
+
+<!-- Q12 -->
+<div class="qblock" id="q12">
+  <div class="qnum">Question 12 of 45 — HPD Interval Length</div>
+  <div class="qtext">Among all 100(1 − α)% credible intervals, the HPD interval is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q12',this)">A. The shortest such interval</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">B. The widest such interval</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">C. The same length as the equal tail CI for all distributions</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">D. Only defined for symmetric distributions</button>
+  </div>
+  <div class="fb" id="q12-fb"></div>
+</div>
+
+<!-- Q13 -->
+<div class="qblock" id="q13">
+  <div class="qnum">Question 13 of 45 — Transformation Invariance of CIs</div>
+  <div class="qtext">If \([a, b]\) is a 95% credible interval for \(\theta\), and \(h\) is a monotone transformation, then \([h(a), h(b)]\) is automatically a 95% credible interval for \(\psi = h(\theta)\) in the case of:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">A. The HPD interval only</button>
+    <button class="opt" data-correct="true" onclick="answer('q13',this)">B. The equal tail CI only</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">C. Both the HPD and equal tail CI</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">D. Neither</button>
+  </div>
+  <div class="fb" id="q13-fb"></div>
+</div>
+
+<!-- Q14 -->
+<div class="qblock" id="q14">
+  <div class="qnum">Question 14 of 45 — CDF vs. PDF Requirement</div>
+  <div class="qtext">Which credible interval can be constructed using only the posterior CDF (and not the posterior density)?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">A. The HPD interval</button>
+    <button class="opt" data-correct="true" onclick="answer('q14',this)">B. The equal tail CI</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">C. Both require only the CDF</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">D. Both require the posterior density</button>
+  </div>
+  <div class="fb" id="q14-fb"></div>
+</div>
+
+<!-- Q15 -->
+<div class="qblock" id="q15">
+  <div class="qnum">Question 15 of 45 — Posterior Predictive Distribution</div>
+  <div class="qtext">The posterior predictive distribution (PPD) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">A. \(p(\tilde y \mid \boldsymbol{y}) = p(\tilde y \mid \hat\theta)\) where \(\hat\theta\) is the MLE</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">B. \(p(\tilde y \mid \boldsymbol{y}) = \int p(\tilde y \mid \theta)\, p(\theta)\, d\theta\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q15',this)">C. \(p(\tilde y \mid \boldsymbol{y}) = \int p(\tilde y \mid \theta)\, p(\theta \mid \boldsymbol{y})\, d\theta\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">D. \(p(\tilde y \mid \boldsymbol{y}) = p(\boldsymbol{y} \mid \theta)\, p(\theta)\,/\,p(\boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q15-fb"></div>
+</div>
+
+<!-- Q16 -->
+<div class="qblock" id="q16">
+  <div class="qnum">Question 16 of 45 — Hierarchical Independence</div>
+  <div class="qtext">Hierarchical independence, used in deriving the PPD, states that:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">A. \(p(\tilde y \mid \theta, \boldsymbol{y}) = p(\boldsymbol{y} \mid \theta)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q16',this)">B. \(p(\tilde y \mid \theta, \boldsymbol{y}) = p(\tilde y \mid \theta)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">C. \(p(\tilde y \mid \boldsymbol{y}) = p(\tilde y \mid \theta)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">D. Future and past data are unconditionally independent</button>
+  </div>
+  <div class="fb" id="q16-fb"></div>
+</div>
+
+<!-- Q17 -->
+<div class="qblock" id="q17">
+  <div class="qnum">Question 17 of 45 — Gaussian PPD</div>
+  <div class="qtext">For a normal likelihood with known \(\sigma^2\) and a normal prior, the posterior predictive distribution (PPD) for a future observation \(\tilde y\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q17',this)">A. \(N(\bar\mu,\; \sigma^2 + \bar\sigma^2)\) where \(\bar\mu, \bar\sigma^2\) are the posterior mean and variance</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">B. \(N(\mu_0,\; \sigma_0^2 + \sigma^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">C. \(N(\bar y,\; \sigma^2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">D. A t-distribution centred at the posterior mean</button>
+  </div>
+  <div class="fb" id="q17-fb"></div>
+</div>
+
+<!-- Q18 -->
+<div class="qblock" id="q18">
+  <div class="qnum">Question 18 of 45 — Binomial–Beta PPD</div>
+  <div class="qtext">In the binomial–beta model with posterior \(\text{Beta}(\bar\alpha, \bar\beta)\), the PPD for the number of future successes in \(m\) trials follows a:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">A. Negative binomial distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q18',this)">B. Beta-binomial distribution \(\text{BB}(m, \bar\alpha, \bar\beta)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">C. Poisson distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">D. Normal distribution (for large \(m\))</button>
+  </div>
+  <div class="fb" id="q18-fb"></div>
+</div>
+
+<!-- Q19 -->
+<div class="qblock" id="q19">
+  <div class="qnum">Question 19 of 45 — Poisson–Gamma PPD</div>
+  <div class="qtext">In the Poisson–gamma model with posterior \(\text{Gamma}(\bar\alpha, \bar\beta)\), the PPD for a single future count follows a:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">A. Poisson distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">B. Beta-binomial distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q19',this)">C. Negative binomial distribution \(\text{NB}(\bar\alpha, \bar\beta)\) (Pólya distribution)</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">D. Gamma distribution</button>
+  </div>
+  <div class="fb" id="q19-fb"></div>
+</div>
+
+<!-- Q20 -->
+<div class="qblock" id="q20">
+  <div class="qnum">Question 20 of 45 — Prior Predictive Distribution</div>
+  <div class="qtext">The prior predictive distribution \(p(\tilde y) = \int p(\tilde y \mid \theta)\, p(\theta)\, d\theta\) is also known as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q20',this)">A. The marginal (integrated) likelihood — the denominator of Bayes' theorem</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">B. The posterior predictive distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">C. The likelihood function \(L(\theta \mid \tilde y)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">D. The prior distribution of \(\theta\)</button>
+  </div>
+  <div class="fb" id="q20-fb"></div>
+</div>
+
+<!-- Q21 -->
+<div class="qblock" id="q21">
+  <div class="qnum">Question 21 of 45 — PPD Variability</div>
+  <div class="qtext">Compared to the frequentist plug-in predictive distribution \(p(\tilde y \mid \hat\theta)\), the Bayesian PPD generally exhibits:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">A. Less variability, since it uses more information</button>
+    <button class="opt" data-correct="true" onclick="answer('q21',this)">B. More variability, because it accounts for parameter uncertainty</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">C. Identical variability</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">D. More variability only when the prior is informative</button>
+  </div>
+  <div class="fb" id="q21-fb"></div>
+</div>
+
+<!-- Q22 -->
+<div class="qblock" id="q22">
+  <div class="qnum">Question 22 of 45 — Exchangeability Definition</div>
+  <div class="qtext">Random variables \(y_1, \ldots, y_n\) are <em>exchangeable</em> if:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">A. They are mutually independent</button>
+    <button class="opt" data-correct="true" onclick="answer('q22',this)">B. Their joint distribution is invariant to any permutation of the indices</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">C. They are identically distributed with the same variance</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">D. They are pairwise uncorrelated</button>
+  </div>
+  <div class="fb" id="q22-fb"></div>
+</div>
+
+<!-- Q23 -->
+<div class="qblock" id="q23">
+  <div class="qnum">Question 23 of 45 — Exchangeability vs. Independence</div>
+  <div class="qtext">Which of the following correctly describes the relationship between independence and exchangeability?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">A. Exchangeability always implies independence</button>
+    <button class="opt" data-correct="true" onclick="answer('q23',this)">B. Independence (with identical marginals) implies exchangeability, but not vice versa</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">C. They are equivalent concepts</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">D. Neither implies the other</button>
+  </div>
+  <div class="fb" id="q23-fb"></div>
+</div>
+
+<!-- Q24 -->
+<div class="qblock" id="q24">
+  <div class="qnum">Question 24 of 45 — de Finetti's Theorem</div>
+  <div class="qtext">de Finetti's Representation Theorem states that an infinitely exchangeable sequence of binary random variables is equivalent to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">A. A sequence of i.i.d. Uniform(0,1) random variables</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">B. A stationary Markov chain</button>
+    <button class="opt" data-correct="true" onclick="answer('q24',this)">C. Conditionally i.i.d. Bernoulli(\(\theta\)) random variables, where \(\theta\) has a prior distribution \(Q\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">D. A sequence of standard normal random variables</button>
+  </div>
+  <div class="fb" id="q24-fb"></div>
+</div>
+
+<!-- Q25 -->
+<div class="qblock" id="q25">
+  <div class="qnum">Question 25 of 45 — Bayesian CLT</div>
+  <div class="qtext">According to Theorem 3.6.1 (Bayesian CLT), the posterior \(p(\theta \mid \boldsymbol{y})\) converges as \(n \to \infty\) to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q25',this)">A. \(N\!\left(\hat\theta,\; \sigma^2_{\hat\theta}\right)\) where \(\hat\theta\) is the MLE</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">B. \(N\!\left(\mu_0,\; \sigma_0^2\right)\) where \(\mu_0, \sigma_0^2\) are the prior mean and variance</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">C. \(N\!\left(\bar\theta,\; 1/n\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">D. The prior distribution \(p(\theta)\)</button>
+  </div>
+  <div class="fb" id="q25-fb"></div>
+</div>
+
+<!-- Q26 -->
+<div class="qblock" id="q26">
+  <div class="qnum">Question 26 of 45 — Bayesian CLT Variance</div>
+  <div class="qtext">In the Bayesian CLT, the asymptotic posterior variance \(\sigma^2_{\hat\theta}\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">A. The prior variance \(\sigma_0^2\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q26',this)">B. \(-\!\left(\dfrac{d^2 \log L(\theta \mid \boldsymbol{y})}{d\theta^2}\bigg|_{\theta=\hat\theta}\right)^{-1}\) — the inverse observed Fisher information</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">C. \(1/n\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">D. The posterior variance at the mode</button>
+  </div>
+  <div class="fb" id="q26-fb"></div>
+</div>
+
+<!-- Q27 -->
+<div class="qblock" id="q27">
+  <div class="qnum">Question 27 of 45 — Large-Sample Prior Influence</div>
+  <div class="qtext">For very large sample sizes, the posterior distribution is effectively determined by:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q27',this)">A. The likelihood function; the prior becomes negligible</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">B. The prior distribution; data become irrelevant</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">C. An equal combination of prior and likelihood</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">D. The posterior mode alone</button>
+  </div>
+  <div class="fb" id="q27-fb"></div>
+</div>
+
+<!-- Q28 -->
+<div class="qblock" id="q28">
+  <div class="qnum">Question 28 of 45 — Conjugate Priors</div>
+  <div class="qtext">Analytical (closed-form) derivation of the posterior distribution is guaranteed only when using:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">A. A uniform (flat) prior</button>
+    <button class="opt" data-correct="true" onclick="answer('q28',this)">B. A conjugate prior</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">C. A normally distributed prior</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">D. Any proper prior with a large sample size</button>
+  </div>
+  <div class="fb" id="q28-fb"></div>
+</div>
+
+<!-- Q29 -->
+<div class="qblock" id="q29">
+  <div class="qnum">Question 29 of 45 — ICDF Method</div>
+  <div class="qtext">The inverse CDF (ICDF) sampling method is based on which result?</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q29',this)">A. If \(x\) has continuous CDF \(F\), then \(F(x) \sim U(0,1)\), so \(x = F^{-1}(u)\) with \(u \sim U(0,1)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">B. The central limit theorem for sample means</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">C. The accept–reject criterion</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">D. The Laplace approximation to the posterior</button>
+  </div>
+  <div class="fb" id="q29-fb"></div>
+</div>
+
+<!-- Q30 -->
+<div class="qblock" id="q30">
+  <div class="qnum">Question 30 of 45 — Accept–Reject Algorithm</div>
+  <div class="qtext">In the accept–reject algorithm, a proposed draw \(\tilde\theta\) from \(q(\theta)\) is accepted if (with \(u \sim U(0,1)\)):</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">A. \(u &gt; p(\tilde\theta \mid \boldsymbol{y})\,/\,[A\,q(\tilde\theta)]\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q30',this)">B. \(u \le p(\tilde\theta \mid \boldsymbol{y})\,/\,[A\,q(\tilde\theta)]\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">C. \(\tilde\theta\) exceeds the posterior mode</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">D. \(A\,q(\tilde\theta) &gt; p(\tilde\theta \mid \boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q30-fb"></div>
+</div>
+
+<!-- Q31 -->
+<div class="qblock" id="q31">
+  <div class="qnum">Question 31 of 45 — AR Algorithm Efficiency</div>
+  <div class="qtext">The efficiency of the accept–reject algorithm is measured by the acceptance probability, which equals:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">A. The envelope constant \(A\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">B. The sample size \(K\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q31',this)">C. \(1/A\) — the closer \(A\) is to 1, the more efficient</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">D. The variance of the sampled values</button>
+  </div>
+  <div class="fb" id="q31-fb"></div>
+</div>
+
+<!-- Q32 -->
+<div class="qblock" id="q32">
+  <div class="qnum">Question 32 of 45 — ARS Algorithm</div>
+  <div class="qtext">The Adaptive Rejection Sampling (ARS) algorithm (tangent method) requires:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q32',this)">A. The log-posterior to be concave and differentiable on its support</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">B. The posterior to be symmetric and unimodal</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">C. A normally distributed proposal distribution</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">D. The posterior to be available in closed form</button>
+  </div>
+  <div class="fb" id="q32-fb"></div>
+</div>
+
+<!-- Q33 -->
+<div class="qblock" id="q33">
+  <div class="qnum">Question 33 of 45 — Monte Carlo Error</div>
+  <div class="qtext">The Monte Carlo error, which quantifies the precision with which the true posterior summary measure is estimated from \(K\) samples, equals:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">A. \(s_t / K\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q33',this)">B. \(s_t / \sqrt{K}\) where \(s_t\) is the SD of the sampled \(t(\theta^k)\) values</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">C. \(1.96 / \sqrt{K}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">D. \(s_t^2 / K\)</button>
+  </div>
+  <div class="fb" id="q33-fb"></div>
+</div>
+
+<!-- Q34 -->
+<div class="qblock" id="q34">
+  <div class="qnum">Question 34 of 45 — Importance Sampling</div>
+  <div class="qtext">In importance sampling, the importance weight for the \(k\)-th sample drawn from proposal \(q(\theta)\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q34',this)">A. \(w(\theta^k) = p(\theta^k \mid \boldsymbol{y})\,/\,q(\theta^k)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">B. \(w(\theta^k) = q(\theta^k)\,/\,p(\theta^k \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">C. \(w(\theta^k) = p(\boldsymbol{y} \mid \theta^k)\,p(\theta^k)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">D. \(w(\theta^k) = 1/K\) for all \(k\)</button>
+  </div>
+  <div class="fb" id="q34-fb"></div>
+</div>
+
+<!-- Q35 -->
+<div class="qblock" id="q35">
+  <div class="qnum">Question 35 of 45 — SIR Algorithm</div>
+  <div class="qtext">The SIR (Sampling/Importance Resampling) algorithm produces:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">A. A weighted summary of draws from the proposal distribution \(q(\theta)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q35',this)">B. An approximate direct sample from the posterior distribution \(p(\theta \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">C. A sample from the prior distribution \(p(\theta)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">D. Only point estimates (mode, mean), not a sample</button>
+  </div>
+  <div class="fb" id="q35-fb"></div>
+</div>
+
+<!-- Q36 -->
+<div class="qblock" id="q36">
+  <div class="qnum">Question 36 of 45 — Importance Sampling Tail Requirement</div>
+  <div class="qtext">For the normalized importance sampling estimator to avoid wild fluctuations, the tails of the proposal distribution \(q(\theta)\) must be:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">A. Lighter than those of \(p(\theta \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q36',this)">B. Heavier than those of \(p(\theta \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">C. Identical to those of \(p(\theta \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">D. Normally distributed regardless of \(p(\theta \mid \boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q36-fb"></div>
+</div>
+
+<!-- Q37 -->
+<div class="qblock" id="q37">
+  <div class="qnum">Question 37 of 45 — Contour Probability</div>
+  <div class="qtext">The contour probability \(p_B\) for testing \(H_0 : \theta = \theta_0\) is defined by \(P(p(\theta \mid \boldsymbol{y}) &gt; p(\theta_0 \mid \boldsymbol{y})) = 1 - p_B\). A <strong>small</strong> value of \(p_B\) implies:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q37',this)">A. \(H_0 : \theta = \theta_0\) is <strong>not</strong> well-supported a posteriori</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">B. \(H_0\) is strongly supported a posteriori</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">C. The prior is too informative</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">D. \(\theta_0\) lies near the posterior mode</button>
+  </div>
+  <div class="fb" id="q37-fb"></div>
+</div>
+
+<!-- Q38 -->
+<div class="qblock" id="q38">
+  <div class="qnum">Question 38 of 45 — Contour Probability Analogy</div>
+  <div class="qtext">The contour probability \(p_B\) (suggested by Box &amp; Tiao, 1973) is viewed as the Bayesian analogue of:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">A. The one-sided frequentist P-value</button>
+    <button class="opt" data-correct="true" onclick="answer('q38',this)">B. The two-sided frequentist P-value</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">C. The likelihood ratio test statistic</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">D. The posterior probability of \(H_0\)</button>
+  </div>
+  <div class="fb" id="q38-fb"></div>
+</div>
+
+<!-- Q39 -->
+<div class="qblock" id="q39">
+  <div class="qnum">Question 39 of 45 — Bayes Factor Definition</div>
+  <div class="qtext">The Bayes factor \(\text{BF}(\boldsymbol{y})\) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q39',this)">A. \(\displaystyle\frac{p(\boldsymbol{y} \mid H_0)}{p(\boldsymbol{y} \mid H_a)}\) — ratio of averaged likelihoods</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">B. \(\displaystyle\frac{\max_\theta L(\theta \mid \boldsymbol{y}, H_0)}{\max_\theta L(\theta \mid \boldsymbol{y}, H_a)}\) — ratio of maximized likelihoods</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">C. \(p(H_0 \mid \boldsymbol{y})\,/\,p(H_a \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">D. The posterior probability that \(H_0\) is true</button>
+  </div>
+  <div class="fb" id="q39-fb"></div>
+</div>
+
+<!-- Q40 -->
+<div class="qblock" id="q40">
+  <div class="qnum">Question 40 of 45 — Bayes Factor Interpretation</div>
+  <div class="qtext">A Bayes factor \(\text{BF}(\boldsymbol{y}) &gt; 1\) means:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q40',this)">A. The posterior odds for \(H_0\) is <em>greater</em> than the prior odds for \(H_0\) — the data favor \(H_0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">B. The data favor the alternative hypothesis \(H_a\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">C. The posterior probability of \(H_0\) equals the prior probability</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">D. \(H_0\) has posterior probability greater than 0.5</button>
+  </div>
+  <div class="fb" id="q40-fb"></div>
+</div>
+
+<!-- Q41 -->
+<div class="qblock" id="q41">
+  <div class="qnum">Question 41 of 45 — Jeffreys' Classification</div>
+  <div class="qtext">According to Jeffreys' classification, a Bayes factor \(\text{BF}(\boldsymbol{y}) &gt; 100\) (favouring \(H_0\)) is considered:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q41',this)">A. Substantial</button>
+    <button class="opt" data-correct="false" onclick="answer('q41',this)">B. Strong</button>
+    <button class="opt" data-correct="false" onclick="answer('q41',this)">C. Very strong</button>
+    <button class="opt" data-correct="true" onclick="answer('q41',this)">D. Decisive</button>
+  </div>
+  <div class="fb" id="q41-fb"></div>
+</div>
+
+<!-- Q42 -->
+<div class="qblock" id="q42">
+  <div class="qnum">Question 42 of 45 — Cross-Over Study Bayes Factor</div>
+  <div class="qtext">In the cross-over study (Scenario 3): \(H_0 : \theta = 0.5\) vs. \(H_a : \theta \ne 0.5\) with \(y = 21\) out of 30, the computed \(\text{BF}(21) \approx 0.41\) is classified by Jeffreys as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q42',this)">A. Decisive evidence against \(H_0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q42',this)">B. Strong evidence against \(H_0\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q42',this)">C. Not worth more than a bare mention</button>
+    <button class="opt" data-correct="false" onclick="answer('q42',this)">D. Substantial evidence in favor of \(H_0\)</button>
+  </div>
+  <div class="fb" id="q42-fb"></div>
+</div>
+
+<!-- Q43 -->
+<div class="qblock" id="q43">
+  <div class="qnum">Question 43 of 45 — Minimum Bayes Factor</div>
+  <div class="qtext">In the Gaussian case with test statistic \(z\), the <em>minimum</em> Bayes factor (over all alternative hypotheses) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q43',this)">A. \(\exp(+0.5\,z^2)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q43',this)">B. \(\exp(-0.5\,z^2)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q43',this)">C. \(1 - \Phi(z)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q43',this)">D. \(1/z^2\)</button>
+  </div>
+  <div class="fb" id="q43-fb"></div>
+</div>
+
+<!-- Q44 -->
+<div class="qblock" id="q44">
+  <div class="qnum">Question 44 of 45 — P-values and Bayesian Evidence</div>
+  <div class="qtext">In a simple (sharp) null hypothesis test (\(H_0 : \theta = \theta_0\) vs. \(H_a : \theta \ne \theta_0\)), the widely accepted Bayesian viewpoint is that P-values:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q44',this)">A. Exaggerate the evidence against \(H_0\) compared to the Bayes factor</button>
+    <button class="opt" data-correct="false" onclick="answer('q44',this)">B. Underestimate the evidence against \(H_0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q44',this)">C. Are approximately equal to the posterior probability \(p(H_0 \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q44',this)">D. Are always larger than the minimum posterior probability</button>
+  </div>
+  <div class="fb" id="q44-fb"></div>
+</div>
+
+<!-- Q45 -->
+<div class="qblock" id="q45">
+  <div class="qnum">Question 45 of 45 — Lindley's Paradox</div>
+  <div class="qtext">In the Lindley paradox illustration (Example III.16), for a fixed observed test statistic \(z_\text{obs} = 1.96\) (two-sided P-value = 0.05), what happens to the posterior probability \(p(H_0 \mid \bar y)\) as sample size increases from 5 to 1000?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q45',this)">A. Decreases from 0.33 toward zero</button>
+    <button class="opt" data-correct="false" onclick="answer('q45',this)">B. Remains approximately 0.05 (tracking the P-value)</button>
+    <button class="opt" data-correct="true" onclick="answer('q45',this)">C. Increases from 0.33 to 0.82 — demonstrating that P-values exaggerate evidence against \(H_0\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q45',this)">D. Stays fixed at 0.5 (equal prior probabilities)</button>
+  </div>
+  <div class="fb" id="q45-fb"></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     8 SHORT ANSWER
+════════════════════════════════════════════ -->
+<div class="sec-title" id="saq">📝 8 Short Answer Questions</div>
+
+<!-- SA1 -->
+<div class="saq">
+  <div class="qnum">Short Answer 1 of 8 — Posterior Mode Properties</div>
+  <div class="qtext">State the three key properties of the posterior mode \(\hat\theta_M\). Why does it equal the MLE when the prior is flat?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa1')">Reveal Answer</button>
+  <div class="ans-box" id="sa1">
+    <strong>Answer:</strong><br>
+    The three properties of the posterior mode are:
+    <ol style="padding-left:18px;margin-top:6px;">
+      <li><strong>Computationally simple:</strong> Computing \(\hat\theta_M\) only requires maximizing \(L(\theta \mid \boldsymbol{y})\,p(\theta)\) — no full normalization of the posterior is needed.</li>
+      <li><strong>Equals MLE for flat priors:</strong> When \(p(\theta) \propto c\), then \(p(\theta \mid \boldsymbol{y}) \propto L(\theta \mid \boldsymbol{y})\), so maximizing the posterior is identical to maximizing the likelihood. Hence \(\hat\theta_M = \hat\theta_\text{MLE}\).</li>
+      <li><strong>Not transformation invariant:</strong> For a monotone transformation \(h\), the posterior mode of \(\psi = h(\theta)\) is generally <em>not</em> equal to \(h(\hat\theta_M)\), i.e., \(\hat\psi_M \ne h(\hat\theta_M)\).</li>
+    </ol>
+    <div class="aform">\[\hat\theta_M = \arg\max_\theta\; p(\theta \mid \boldsymbol{y}) = \arg\max_\theta\; L(\theta \mid \boldsymbol{y})\,p(\theta)\]</div>
+  </div>
+</div>
+
+<!-- SA2 -->
+<div class="saq">
+  <div class="qnum">Short Answer 2 of 8 — Equal Tail CI vs. HPD Interval</div>
+  <div class="qtext">Explain the difference between the equal tail credible interval and the HPD interval. State two advantages of each, and describe when they coincide.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa2')">Reveal Answer</button>
+  <div class="ans-box" id="sa2">
+    <strong>Answer:</strong><br>
+    <p><strong>Equal tail CI</strong> \([a, b]\): satisfies \(F(a) = \alpha/2\) and \(1 - F(b) = \alpha/2\). Advantages: (1) requires only the posterior CDF (quantile function), easy to compute; (2) invariant under monotone transformations — if \([a,b]\) is the equal tail CI for \(\theta\), then \([h(a), h(b)]\) is the equal tail CI for \(\psi = h(\theta)\). Disadvantage: some values inside the interval can have lower density than some values outside.</p>
+    <p><strong>HPD interval</strong> \([a, b]\): every point inside has higher posterior density than every point outside. Advantages: (1) it is the <em>shortest</em> interval with \(P(a \le \theta \le b \mid \boldsymbol{y}) = 1 - \alpha\); (2) contains only the most plausible (highest density) values. Disadvantage: requires the posterior PDF and numerical optimization; not invariant under non-linear monotone transformations.</p>
+    <p><strong>They coincide</strong> when the posterior is <em>unimodal and symmetric</em> (e.g., a normal posterior), because equal tails automatically yield the highest density region.</p>
+  </div>
+</div>
+
+<!-- SA3 -->
+<div class="saq">
+  <div class="qnum">Short Answer 3 of 8 — Deriving the Binomial–Beta PPD</div>
+  <div class="qtext">Derive the posterior predictive distribution for a future binomial count \(\tilde y\) in \(m\) trials, given a \(\text{Beta}(\bar\alpha, \bar\beta)\) posterior for \(\theta\). Name the resulting distribution.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa3')">Reveal Answer</button>
+  <div class="ans-box" id="sa3">
+    <strong>Answer:</strong><br>
+    <p>Starting from the PPD formula \(p(\tilde y \mid \boldsymbol{y}) = \int_0^1 p(\tilde y \mid \theta)\,p(\theta \mid \boldsymbol{y})\,d\theta\), substitute the Binomial likelihood for \(\tilde y\) and the Beta posterior:</p>
+    <div class="aform">p(ỹ | y) = ∫₀¹ C(m, ỹ) θ^ỹ (1−θ)^(m−ỹ) · [θ^(ᾱ−1)(1−θ)^(β̄−1) / B(ᾱ,β̄)] dθ
+
+= C(m,ỹ) / B(ᾱ,β̄) · ∫₀¹ θ^(ỹ+ᾱ−1)(1−θ)^(m−ỹ+β̄−1) dθ
+
+= C(m,ỹ) · B(ỹ+ᾱ, m−ỹ+β̄) / B(ᾱ, β̄)</div>
+    <p>This defines the <strong>Beta-Binomial distribution</strong> \(\text{BB}(m, \bar\alpha, \bar\beta)\), first derived by Laplace. It exhibits more variability than the binomial \(\text{Bin}(m, \hat\theta)\) from the frequentist approach, because it accounts for uncertainty in \(\theta\).</p>
+  </div>
+</div>
+
+<!-- SA4 -->
+<div class="saq">
+  <div class="qnum">Short Answer 4 of 8 — de Finetti's Representation Theorem</div>
+  <div class="qtext">State de Finetti's Representation Theorem and explain its significance for justifying the Bayesian approach.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa4')">Reveal Answer</button>
+  <div class="ans-box" id="sa4">
+    <strong>Answer:</strong><br>
+    <p><strong>Theorem (de Finetti, 1937):</strong> Let \(y_1, y_2, \ldots\) be an infinitely exchangeable sequence of binary random variables. Then there exists a cumulative distribution function \(Q\) such that:</p>
+    <div class="aform">\[p(y_1, \ldots, y_n) = \int_0^1 \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i}\, dQ(\theta)\]</div>
+    <p>where \(Q(\theta) = \lim_{n\to\infty} F(s_n/n \le \theta)\), with \(s_n = y_1 + \cdots + y_n\).</p>
+    <p><strong>Significance:</strong> The theorem shows that <em>exchangeability</em> — a natural, weaker assumption than independence — is mathematically equivalent to a Bayesian hierarchical model: the observations are conditionally i.i.d. Bernoulli(\(\theta\)) given \(\theta\), and \(\theta\) has prior distribution \(Q\). Therefore, assuming that subjects in an experiment are "similar" (exchangeable) <em>immediately</em> leads to a Bayesian model combining a likelihood with a prior distribution, providing a philosophical justification for the Bayesian paradigm.</p>
+  </div>
+</div>
+
+<!-- SA5 -->
+<div class="saq">
+  <div class="qnum">Short Answer 5 of 8 — Accept–Reject Algorithm</div>
+  <div class="qtext">Describe the accept–reject (AR) sampling algorithm. What is required for it to be valid, and how is its efficiency measured?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa5')">Reveal Answer</button>
+  <div class="ans-box" id="sa5">
+    <strong>Answer:</strong><br>
+    <p>The AR algorithm generates samples from a target distribution \(p(\theta \mid \boldsymbol{y})\) using a proposal distribution \(q(\theta)\).</p>
+    <p><strong>Requirements:</strong> There must exist a finite constant \(A &lt; \infty\) such that \(p(\theta \mid \boldsymbol{y}) &lt; A\,q(\theta)\) for all \(\theta\) (the "envelope condition"). Also, the support of \(p(\theta \mid \boldsymbol{y})\) must be contained within the support of \(q(\theta)\).</p>
+    <p><strong>Algorithm:</strong></p>
+    <ol style="padding-left:18px;margin:6px 0;">
+      <li>Sample \(\tilde\theta \sim q(\theta)\) and independently \(u \sim U(0,1)\).</li>
+      <li>Accept \(\tilde\theta\) if \(u \le p(\tilde\theta \mid \boldsymbol{y})\,/\,[A\,q(\tilde\theta)]\); otherwise reject.</li>
+      <li>Repeat until \(K\) accepted values are obtained.</li>
+    </ol>
+    <p>It can be shown that accepted values form a valid sample from \(p(\theta \mid \boldsymbol{y})\), and this holds even when only \(p(\theta)\,L(\theta \mid \boldsymbol{y})\) (the unnormalized posterior) is available.</p>
+    <p><strong>Efficiency:</strong> The probability that \(\tilde\theta\) is accepted equals \(1/A\). The closer \(A\) is to 1, the more efficient the algorithm. Choosing \(q(\theta)\) as close as possible to \(p(\theta \mid \boldsymbol{y})\) minimizes \(A\) and maximizes efficiency.</p>
+  </div>
+</div>
+
+<!-- SA6 -->
+<div class="saq">
+  <div class="qnum">Short Answer 6 of 8 — The Bayes Factor</div>
+  <div class="qtext">Define the Bayes factor. State Jeffreys' classification. How does the Bayes factor relate prior odds to posterior odds? What role does the prior play in the composite alternative hypothesis case?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa6')">Reveal Answer</button>
+  <div class="ans-box" id="sa6">
+    <strong>Answer:</strong><br>
+    <p>The <strong>Bayes factor</strong> \(\text{BF}(\boldsymbol{y})\) is the ratio of the <em>averaged</em> (marginal) likelihoods under \(H_0\) and \(H_a\):</p>
+    <div class="aform">\[\text{BF}(\boldsymbol{y}) = \frac{p(\boldsymbol{y} \mid H_0)}{p(\boldsymbol{y} \mid H_a)} = \frac{\int p(\boldsymbol{y} \mid \theta)\,p(\theta \mid H_0)\,d\theta}{\int p(\boldsymbol{y} \mid \theta)\,p(\theta \mid H_a)\,d\theta}\]</div>
+    <p>It transforms prior odds into posterior odds: posterior odds = BF(y) × prior odds. When \(\text{BF}(\boldsymbol{y}) &gt; 1\), the data increase the odds for \(H_0\); when \(&lt; 1\), they favor \(H_a\).</p>
+    <p><strong>Jeffreys' classification:</strong> BF &gt; 100 = decisive; 32–100 = very strong; 10–32 = strong; 3.2–10 = substantial; 1–3.2 = not worth more than a bare mention.</p>
+    <p><strong>Role of the prior under composite \(H_a\):</strong> When \(H_a\) is composite (e.g., \(\theta \ne \theta_0\)), the averaged likelihood under \(H_a\) depends on the chosen prior \(p(\theta \mid H_a)\). Different prior choices yield different Bayes factors — reflecting that the prior specification is part of defining the hypothesis. This contrasts with the frequentist likelihood ratio test, which uses maximized (not averaged) likelihoods.</p>
+  </div>
+</div>
+
+<!-- SA7 -->
+<div class="saq">
+  <div class="qnum">Short Answer 7 of 8 — Jeffreys–Lindley–Bartlett Paradox</div>
+  <div class="qtext">Explain the Jeffreys–Lindley–Bartlett paradox. What causes it, and what does it imply about the comparison between P-values and the Bayes factor for sharp null hypotheses?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa7')">Reveal Answer</button>
+  <div class="ans-box" id="sa7">
+    <strong>Answer:</strong><br>
+    <p>The <strong>Jeffreys–Lindley–Bartlett paradox</strong> describes a situation where a small P-value rejects \(H_0\) in a frequentist analysis, yet the Bayes factor favors \(H_0\).</p>
+    <p><strong>Cause:</strong> The paradox arises from the different ways frequentist and Bayesian tests compare hypotheses. The frequentist likelihood ratio test compares <em>maximized</em> likelihoods under \(H_0\) and \(H_a\). The Bayes factor, by contrast, compares <em>averaged</em> likelihoods. When the alternative prior \(p(\theta \mid H_a)\) is very diffuse (spread over a large, unrealistic range of \(\theta\) values), the average likelihood under \(H_a\) is diluted, weakening evidence for \(H_a\) and potentially making BF favour \(H_0\).</p>
+    <p><strong>Example (Lindley):</strong> For \(y_i \sim N(\theta, \sigma^2)\) testing \(H_0: \theta = \theta_0\) with prior \(p(\theta) = N(\theta_0, \sigma^2)\), the posterior probability of \(H_0\) increases from 0.33 to 0.82 as \(n\) grows from 5 to 1000 (holding \(z_\text{obs} = 1.96\), P-value = 0.05). This demonstrates that in a simple hypothesis test, <strong>P-values exaggerate evidence against \(H_0\)</strong> relative to the Bayesian posterior probability. For P = 0.05, the minimum Bayes factor is \(\text{BF}_{\min} = e^{-0.5 z^2} = 0.15\), and the minimum posterior probability of \(H_0\) (under equal priors) is 0.204 — much less extreme than what 0.05 suggests.</p>
+  </div>
+</div>
+
+<!-- SA8 -->
+<div class="saq">
+  <div class="qnum">Short Answer 8 of 8 — Exchangeability in Practice</div>
+  <div class="qtext">Define exchangeability and explain how it differs from independence. Give a concrete example of a sequence of random variables that is exchangeable but not independent. Why is the concept of exchangeability particularly important in clinical trial settings?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa8')">Reveal Answer</button>
+  <div class="ans-box" id="sa8">
+    <strong>Answer:</strong><br>
+    <p><strong>Exchangeability:</strong> Random variables \(y_1, \ldots, y_n\) are exchangeable if their joint distribution is invariant to any permutation of indices: \(p(y_1,\ldots,y_n) = p(y_{\pi(1)},\ldots,y_{\pi(n)})\) for any permutation \(\pi\).</p>
+    <p><strong>Difference from independence:</strong> Independence (with identical marginals) implies exchangeability — but the converse is false. The product and the integral in \(p(y_1,\ldots,y_n) = \int \prod_{i=1}^n p(y_i \mid \theta)\,p(\theta)\,d\theta\) cannot be exchanged, so variables that are conditionally independent given \(\theta\) are marginally <em>dependent</em> (and exchangeable). Independence is a stronger condition.</p>
+    <p><strong>Concrete example:</strong> Sampling <em>without replacement</em> from an urn with 10 red and 5 white marbles: \(R_1, \ldots, R_{15}\) are exchangeable (\(P(R_i) = 10/15\) for all \(i\)) but not independent, because once a marble is drawn, the composition of the urn changes. With replacement, they are both exchangeable and independent.</p>
+    <p><strong>Clinical trial importance:</strong> In a sequential clinical trial, patients enrolled over time may be considered exchangeable if there is no systematic trend in recruitment (e.g., no change in patient profile over time). Exchangeability licenses the use of a prior distribution \(Q\) (via de Finetti) and thus the full Bayesian framework. However, differences in patient characteristics (age, gender, disease severity) can make patients non-exchangeable, necessitating conditioning on covariates — leading to the concept of <em>conditional exchangeability</em>.</p>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+let score = 0, answered = 0;
+
+function answer(qId, btn) {
+  const block = document.getElementById(qId);
+  const buttons = block.querySelectorAll('.opt');
+  if (buttons[0].disabled) return;
+  const isCorrect = btn.dataset.correct === 'true';
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('ok');
+  });
+  const fb = document.getElementById(qId + '-fb');
+  if (isCorrect) {
+    score++;
+    fb.textContent = '✓ Correct!';
+    fb.className = 'fb ok-fb';
+  } else {
+    btn.classList.add('bad');
+    fb.textContent = '✗ Incorrect. The correct option is highlighted above.';
+    fb.className = 'fb bad-fb';
+  }
+  answered++;
+  document.getElementById('score-display').textContent = score + ' / ' + answered;
+}
+
+function resetAll() {
+  score = 0; answered = 0;
+  document.getElementById('score-display').textContent = '0 / 0';
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('ok', 'bad');
+  });
+  document.querySelectorAll('.fb').forEach(f => {
+    f.className = 'fb';
+    f.textContent = '';
+  });
+}
+
+function toggleAns(id) {
+  const box = document.getElementById(id);
+  box.classList.toggle('shown');
+  const btn = box.previousElementSibling;
+  btn.textContent = box.classList.contains('shown') ? 'Hide Answer' : 'Reveal Answer';
+}
+</script>
+
+
+</body></html>

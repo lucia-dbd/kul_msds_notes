@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Supervised Learning Essentials II Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body { background-color:#f5f6fa; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; font-size:15px; line-height:1.75; color:#2c2c3a; max-width:960px; margin:0 auto; padding:24px 16px; }
+  .page-header { background:linear-gradient(135deg,#1a3a5c,#2e6da4); color:#fff; border-radius:14px; padding:28px 36px; margin-bottom:24px; box-shadow:0 4px 18px rgba(30,80,140,.18); }
+  .page-header h1 { font-size:1.8em; font-weight:700; letter-spacing:.3px; margin:0 0 6px; }
+  .page-header .subtitle { font-size:.92em; opacity:.82; font-weight:400; }
+  .nav-bar { background:#fff; border:1px solid #dde3ef; padding:10px 18px; margin-bottom:28px; display:flex; flex-wrap:wrap; gap:8px; box-shadow:0 1px 6px rgba(0,0,0,.06); }
+  .nav-bar a { background:#eef2fb; color:#2e6da4; padding:4px 14px; font-size:.85em; font-weight:600; text-decoration:none; transition:background .2s; border-radius:12px; }
+  .nav-bar a:hover { background:#2e6da4; color:#fff; }
+  .nav-bar a.nav-mcq { background:#fff3cd; color:#856404; }
+  .nav-bar a.nav-sa { background:#d1ecf1; color:#0c5460; }
+  .notes-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .notes-section h2 { color:#1a3a5c; font-size:1.25em; font-weight:700; border-bottom:2px solid #eef2fb; padding-bottom:8px; margin-top:0; }
+  .notes-section h3 { color:#2e6da4; font-size:1.05em; font-weight:700; margin-top:22px; margin-bottom:6px; }
+  .key-point { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; font-size:1.05em; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:.93em; box-shadow:0 1px 6px rgba(0,0,0,.07); }
+  thead tr { background:#2e6da4; color:#fff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background:#f0f4fb; }
+  tbody tr:nth-child(odd) { background:#fff; }
+  tbody tr:hover { background:#dce8f8; }
+  th,td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  ul,ol { padding-left:1.4em; }
+  li { margin-bottom:4px; }
+  code { background:#eef2fb; padding:2px 6px; border-radius:4px; font-size:.9em; color:#1a3a5c; }
+  .cm-grid { display:grid; grid-template-columns:auto 1fr 1fr; gap:4px; max-width:480px; margin:16px auto; font-size:.9em; }
+  .cm-cell { padding:10px 14px; text-align:center; border-radius:6px; font-weight:600; }
+  .cm-header { background:#2e6da4; color:#fff; }
+  .cm-tp,.cm-tn { background:#d4edda; color:#155724; }
+  .cm-fp,.cm-fn { background:#f8d7da; color:#721c24; }
+  .cm-label { background:#eef2fb; color:#1a3a5c; }
+  /* MCQ */
+  .mcq-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .mcq-section h2 { color:#92400e; font-size:1.2em; border-bottom:2px solid #fff3cd; padding-bottom:8px; margin-top:0; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:.95em; }
+  .mcq-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .reset-btn-mcq { background:#2e6da4; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; }
+  .reset-btn-mcq:hover { background:#1a3a5c; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1em; }
+  .option-btn { display:block; width:100%; background:#fff; border:1.5px solid #d0d8ea; border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left; cursor:pointer; font-size:.95em; color:#2c2c3a; transition:all .18s; }
+  .option-btn:hover:not(:disabled) { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:.85; }
+  .option-btn:disabled { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:.9em; font-weight:600; }
+  .feedback-bar.correct { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  /* SA */
+  .sa-section { background:#fff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,.07); }
+  .sa-section h2 { color:#4a148c; font-size:1.2em; border-bottom:2px solid #e8d5ff; padding-bottom:8px; margin-top:0; }
+  .sa-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:.8em; font-weight:700; text-transform:uppercase; letter-spacing:.8px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin:8px 0 14px; font-size:1em; }
+  .reveal-btn { background:#6f42c1; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background .2s; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .reset-btn-sa { background:#6f42c1; color:#fff; border:none; border-radius:20px; padding:7px 22px; font-size:.88em; font-weight:600; cursor:pointer; }
+  .reset-btn-sa:hover { background:#5a32a3; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Supervised Learning Essentials II: Evaluation &amp; Interpretability — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#generalization">Generalization</a>
+  <a href="#clf-perf">Classification Metrics</a>
+  <a href="#costs">Cost-Sensitive</a>
+  <a href="#sampling">Sampling</a>
+  <a href="#roc">ROC &amp; AUC</a>
+  <a href="#lift">Lift &amp; CAP</a>
+  <a href="#reg-perf">Regression Metrics</a>
+  <a href="#cv">Cross-Validation</a>
+  <a href="#multiclass">Multiclass</a>
+  <a href="#interpretability">Interpretability</a>
+  <a href="#shap">Shapley / SHAP</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ========== NOTES ========== -->
+
+<div class="notes-section" id="generalization">
+  <h2>1. Generalization &amp; Evaluation Philosophy</h2>
+  <div class="key-point"><strong>Core principle:</strong> Training performance is trivially perfect for sufficiently complex models (fully-grown tree, K-NN k=1, a database). What matters is performance on <em>unseen</em> data. The goal is to make the test set as <strong>challenging</strong> as possible — not to maximize the test score by repeated reuse.</div>
+  <h3>Data Split Protocol</h3>
+  <ul>
+    <li><strong>Train set</strong> — fit all model parameters and preprocessing rules</li>
+    <li><strong>Validation set / CV folds</strong> — hyperparameter tuning and model selection</li>
+    <li><strong>Test set (hold-out)</strong> — evaluated exactly once, at the very end</li>
+    <li>The split must happen <em>before</em> any preprocessing or featurization step</li>
+  </ul>
+  <div class="warning-box">⚠ <strong>Out-of-time validation</strong> is more realistic for temporal data. Even repeated small parameter adjustments on the same validation set constitute hidden overtraining. If scores are suspiciously good, check for target leakage.</div>
+  <p><strong>Stratified split:</strong> preserves the same class proportions in both train and test — critical under imbalance.</p>
+</div>
+
+<div class="notes-section" id="clf-perf">
+  <h2>2. Classification Performance Metrics</h2>
+  <h3>Confusion Matrix</h3>
+  <div class="cm-grid">
+    <div class="cm-cell cm-label"></div>
+    <div class="cm-cell cm-header">Predicted Negative</div>
+    <div class="cm-cell cm-header">Predicted Positive</div>
+    <div class="cm-cell cm-label">Actual Negative</div>
+    <div class="cm-cell cm-tn">TN ✓</div>
+    <div class="cm-cell cm-fp">FP ✗</div>
+    <div class="cm-cell cm-label">Actual Positive</div>
+    <div class="cm-cell cm-fn">FN ✗</div>
+    <div class="cm-cell cm-tp">TP ✓</div>
+  </div>
+  <div class="key-point">All confusion-matrix-derived metrics depend on the chosen <strong>classification threshold</strong>. Shifting the threshold changes TP, FP, TN, FN — and therefore every metric derived from them.</div>
+
+  <h3>Core Formulae</h3>
+  <div class="formula-box">
+    \(\text{Accuracy} = \dfrac{TP+TN}{TP+TN+FP+FN}\)<br><br>
+    \(\text{Recall (Sensitivity)} = \dfrac{TP}{TP+FN}\) &nbsp;—&nbsp; "How many positives did we catch?"<br><br>
+    \(\text{Precision} = \dfrac{TP}{TP+FP}\) &nbsp;—&nbsp; "How many predicted positives are correct?"<br><br>
+    \(\text{Specificity} = \dfrac{TN}{TN+FP}\) &nbsp;&nbsp;&nbsp;
+    \(\text{Balanced Accuracy} = \dfrac{\text{Recall}+\text{Specificity}}{2}\)<br><br>
+    \(F_1 = 2\cdot\dfrac{\text{Precision}\times\text{Recall}}{\text{Precision}+\text{Recall}}\)
+  </div>
+
+  <table>
+    <thead><tr><th>Metric</th><th>Best when…</th><th>Pitfall</th></tr></thead>
+    <tbody>
+      <tr><td>Accuracy</td><td>Balanced classes, equal error costs</td><td>Misleading under imbalance — 99% accuracy from majority-class prediction</td></tr>
+      <tr><td>Recall</td><td>Missing a positive is very costly (disease, fraud)</td><td>Maximized trivially by predicting everything positive</td></tr>
+      <tr><td>Precision</td><td>False alarms are costly (spam filter, automation)</td><td>Maximized trivially by being very conservative</td></tr>
+      <tr><td>F1</td><td>Imbalanced classes, both error types matter</td><td>Harmonic mean — very sensitive to the weaker of the two</td></tr>
+      <tr><td>AUC-ROC</td><td>Threshold-independent comparison, balanced data</td><td>Optimistic under heavy imbalance</td></tr>
+      <tr><td>AUC-PR</td><td>Heavily imbalanced datasets</td><td>More sensitive to positive class performance</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">⚠ Never rely on accuracy alone under class imbalance. A model predicting only the majority class achieves 99% accuracy when positives are 1% of data — yet catches zero true positives.</div>
+</div>
+
+<div class="notes-section" id="costs">
+  <h2>3. Cost-Sensitive Classification</h2>
+  <p>Different errors carry different business costs. A cost matrix makes these explicit:</p>
+  <table>
+    <thead><tr><th></th><th>Actual Negative</th><th>Actual Positive</th></tr></thead>
+    <tbody>
+      <tr><td>Predicted Negative</td><td>C(0,0) = 0</td><td>C(0,1) = cost of False Negative</td></tr>
+      <tr><td>Predicted Positive</td><td>C(1,0) = cost of False Positive</td><td>C(1,1) = 0</td></tr>
+    </tbody>
+  </table>
+  <h3>Expected Loss &amp; Cost-Sensitive Threshold (TCS)</h3>
+  <div class="formula-box">
+    \(\ell(x,1) = p(0|x)\cdot C(1,0)\) &nbsp;&nbsp;&nbsp; \(\ell(x,0) = p(1|x)\cdot C(0,1)\)<br><br>
+    Classify as positive when \(\ell(x,1) &lt; \ell(x,0)\)<br><br>
+    \(T_{CS} = \dfrac{C(1,0)-C(0,0)}{C(1,0)-C(0,0)+C(0,1)-C(1,1)}\)
+  </div>
+  <div class="key-point">With symmetric unit costs (C(1,0)=C(0,1)=1, C(0,0)=C(1,1)=0): T<sub>CS</sub> = 0.5. High FN cost → T<sub>CS</sub> is pushed down, making the classifier more aggressive at flagging positives.</div>
+  <div class="example-box"><strong>Example:</strong> C(0,1)=5, C(1,0)=1 → T<sub>CS</sub> = 1/6 ≈ 0.167. A model scoring p(1|x)=0.22 exceeds the threshold and should be classified as positive.</div>
+  <div class="theorem-box"><strong>Key insight:</strong> Oversampling/undersampling to a 1:1 class ratio is mathematically equivalent to using a cost matrix built from the inverse class distribution. They bias the classifier identically.</div>
+</div>
+
+<div class="notes-section" id="sampling">
+  <h2>4. Sampling for Class Imbalance</h2>
+  <table>
+    <thead><tr><th>Method</th><th>Idea</th><th>Pros</th><th>Cons</th></tr></thead>
+    <tbody>
+      <tr><td>Oversampling (upsampling)</td><td>Duplicate minority class instances</td><td>No data loss</td><td>Can overfit to duplicates</td></tr>
+      <tr><td>Undersampling (downsampling)</td><td>Remove majority class instances</td><td>Faster training</td><td>Discards useful data</td></tr>
+      <tr><td>SMOTE</td><td>Synthesize new minority instances by interpolating between K nearest neighbors</td><td>Creates diverse synthetic data</td><td>Can create unrealistic instances; not magic</td></tr>
+      <tr><td>Combined</td><td>SMOTE minority + undersample majority</td><td>Flexible control</td><td>Two hyperparameters</td></tr>
+    </tbody>
+  </table>
+  <h3>SMOTE Algorithm</h3>
+  <ol>
+    <li>For each minority instance, find its K nearest minority-class neighbors</li>
+    <li>Pick one neighbor randomly; generate a synthetic point interpolated along the line segment</li>
+    <li>Repeat until target balance is achieved</li>
+  </ol>
+  <div class="warning-box">⚠ <strong>Critical rules:</strong> (1) Sampling applies only to the <em>training set</em> — the test set must remain untouched. (2) SMOTE does not invent hidden or future patterns. (3) For tree-based ensembles and deep learning, cost-sensitive loss modification is often better. (4) Accuracy on a resampled training set will appear lower than "always-majority-class" — this is correct and expected.</div>
+</div>
+
+<div class="notes-section" id="roc">
+  <h2>5. ROC Curve, AUC, and Separation Metrics</h2>
+  <div class="key-point">The ROC curve plots <strong>Sensitivity (TPR)</strong> vs. <strong>1 − Specificity (FPR)</strong> across all possible thresholds. A perfect classifier occupies the top-left corner. AUC = area under this curve.</div>
+  <table>
+    <thead><tr><th>AUC</th><th>Interpretation</th></tr></thead>
+    <tbody>
+      <tr><td>1.0</td><td>Perfect discrimination</td></tr>
+      <tr><td>0.9–1.0</td><td>Excellent</td></tr>
+      <tr><td>0.7–0.9</td><td>Good</td></tr>
+      <tr><td>0.5</td><td>Random — no better than chance</td></tr>
+      <tr><td>&lt;0.5</td><td>Worse than random (usually a sign of error)</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Probabilistic interpretation (Hanley &amp; McNeil, 1983):</strong> AUC = P(score of random positive &gt; score of random negative). It is <strong>threshold-independent</strong>.</p>
+
+  <h3>ROC vs. Precision-Recall Curve</h3>
+  <table>
+    <thead><tr><th></th><th>ROC Curve</th><th>PR Curve</th></tr></thead>
+    <tbody>
+      <tr><td>Y-axis</td><td>Recall (TPR)</td><td>Precision</td></tr>
+      <tr><td>X-axis</td><td>FPR = FP/(FP+TN)</td><td>Recall</td></tr>
+      <tr><td>Accounts for TN?</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Best for</td><td>Balanced classes</td><td>Heavily imbalanced classes</td></tr>
+      <tr><td>Why PR under imbalance?</td><td>Many TN make FPR small even with many FP → ROC looks optimistic</td><td>Precision directly penalizes FP regardless of TN count</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Other Separation Metrics</h3>
+  <div class="formula-box">
+    \(KS = \max_s |P(s|y=1) - P(s|y=0)|\) &nbsp;&nbsp; (max distance between class score CDFs)<br><br>
+    \(M = \dfrac{|\mu_p - \mu_n|}{\sigma}\) &nbsp;&nbsp; (Mahalanobis distance, accounts for spread)<br><br>
+    \(D = \dfrac{(\mu_p-\mu_n)^2}{\frac{1}{2}(\sigma_p^2+\sigma_n^2)}\) &nbsp;&nbsp; (Divergence measure)<br><br>
+    \(AR = 2 \times AUC - 1\) &nbsp;&nbsp; (Accuracy Ratio from CAP curve)
+  </div>
+  <p><strong>H-index (Hand, 2009):</strong> addresses AUC's theoretical incoherence — AUC implicitly uses different misclassification cost distributions for different classifiers, making comparisons potentially misleading when ROC curves cross.</p>
+</div>
+
+<div class="notes-section" id="lift">
+  <h2>6. Lift, CAP, and Ranked-List Metrics</h2>
+  <div class="key-point"><strong>Lift at n%</strong> = (fraction of positives in top n% by model) ÷ (fraction of positives in top n% by random). Lift = 1 means the model does no better than random selection.</div>
+  <p><strong>CAP (Cumulative Accuracy Profile)</strong> / Lorenz / Power curve: sort by predicted score descending; plot cumulative % of positives captured vs. % of population contacted.</p>
+  <p><strong>Precision/Recall at N:</strong> evaluate only among the top-N ranked predictions. Critical in settings where a fixed-size shortlist is delivered (fraud alerts to investigators, top-K recommendations).</p>
+  <div class="example-box"><strong>Example:</strong> If 5% of the population are positives and your model in the top 10% captures 40% of all positives, lift = (40%/10%) ÷ (5%/100%) = 4 ÷ 5 = ... actually: lift = (40% positives in top 10%) / (5% base rate × 10% population) = 40/5 = 8. The model is 8× more efficient than random at the top decile.</div>
+</div>
+
+<div class="notes-section" id="reg-perf">
+  <h2>7. Regression Performance Metrics</h2>
+  <div class="formula-box">
+    \(r^2 = 1 - \dfrac{SSE}{S_{yy}}\) &nbsp; where \(S_{yy}=\sum(y_i-\bar y)^2\), \(SSE=\sum(y_i-\hat y_i)^2\)<br><br>
+    \(r^2_a = 1-(1-r^2)\dfrac{n-1}{n-k}\) &nbsp; (adjusted, penalizes extra features)<br><br>
+    \(MSE=\dfrac{\sum(y_i-\hat y_i)^2}{n}\) &nbsp;&nbsp;
+    \(MAD=\dfrac{\sum|y_i-\hat y_i|}{n}\) &nbsp;&nbsp;
+    \(RMSE=\sqrt{MSE}\)
+  </div>
+  <table>
+    <thead><tr><th>Metric</th><th>Property</th></tr></thead>
+    <tbody>
+      <tr><td>r²</td><td>Proportion of variance explained. Always ↑ when adding any feature — use adjusted r² instead</td></tr>
+      <tr><td>Adjusted r²</td><td>Only increases if new feature improves fit beyond chance. Most implementations report this as "r²"</td></tr>
+      <tr><td>AIC / BIC</td><td>Balance fit vs. complexity; lower is better; BIC penalizes parameters more heavily</td></tr>
+      <tr><td>MSE</td><td>Squares residuals — heavily penalizes large errors; sensitive to outliers</td></tr>
+      <tr><td>MAD</td><td>Absolute residuals — more robust to outliers</td></tr>
+      <tr><td>RMSE</td><td>Same unit as y; equals residual std dev for an unbiased model</td></tr>
+    </tbody>
+  </table>
+  <p><strong>REC (Regression Error Characteristic) curve:</strong> X-axis = error tolerance ε; Y-axis = % of predictions with error ≤ ε. Regression analogue of the ROC curve.</p>
+  <div class="warning-box">⚠ Always inspect residual plots, check coefficient signs, and examine extreme mispredictions — not just aggregate metrics. A model trained on data from 1900–2000 should not be used to extrapolate beyond 2000 without caution.</div>
+</div>
+
+<div class="notes-section" id="cv">
+  <h2>8. Cross-Validation &amp; Hyperparameter Tuning</h2>
+  <div class="key-point"><strong>Cross-validation is for tuning; the test set is for final evaluation.</strong> Using the test set during tuning — even once — permanently contaminates it.</div>
+  <h3>k-Fold Cross-Validation Protocol</h3>
+  <ol>
+    <li>Split training data into k equal folds</li>
+    <li>Train on k−1 folds; evaluate on the remaining fold</li>
+    <li>Rotate the held-out fold k times</li>
+    <li>Average performance across all k folds → stable estimate for hyperparameter comparison</li>
+  </ol>
+  <p>CV produces a <strong>pessimistically biased</strong> estimate because each fold uses less training data than the full set. Leave-one-out CV is approximately unbiased but expensive.</p>
+  <h3>Key Rules</h3>
+  <ul>
+    <li>Preprocessing (imputation, WoE encoding, scaling) must be fitted <em>inside each CV fold</em> — never pre-computed on all data before CV begins</li>
+    <li>Too many hyperparameter combinations on the same CV scheme leads to data dredging</li>
+    <li>After tuning: retrain with optimal params on the full training set; evaluate once on the held-out test set</li>
+    <li>Nested CV: outer loop = generalization estimate; inner loop = hyperparameter tuning</li>
+  </ul>
+</div>
+
+<div class="notes-section" id="multiclass">
+  <h2>9. Multiclass &amp; Multilabel Classification</h2>
+  <h3>Multiclass Strategies</h3>
+  <table>
+    <thead><tr><th>Strategy</th><th>How it works</th><th>Classifiers needed</th></tr></thead>
+    <tbody>
+      <tr><td>One-vs-All (OvR)</td><td>Each class against all others; assign highest posterior probability</td><td>K</td></tr>
+      <tr><td>One-vs-One (OvO)</td><td>Every pair of classes; majority vote across all pairwise outcomes</td><td>K(K−1)/2</td></tr>
+    </tbody>
+  </table>
+  <p>ROC requires one curve per class (OvR decomposition); then macro- or weighted-average across curves.</p>
+  <h3>Multilabel Strategies</h3>
+  <ul>
+    <li><strong>Binary relevance:</strong> one independent binary classifier per label — simple but ignores label correlations</li>
+    <li><strong>Classifier chaining:</strong> predictions of earlier classifiers become features of later ones — captures label dependencies</li>
+    <li><strong>Label powerset:</strong> each unique label combination is a class — exponential explosion of classes</li>
+  </ul>
+  <p>Evaluation metrics: Hamming loss, Jaccard index, instance-level and label-level precision/recall adapted for multiple labels.</p>
+</div>
+
+<div class="notes-section" id="interpretability">
+  <h2>10. Interpretability Techniques</h2>
+  <div class="key-point"><strong>White-box models</strong> (logistic regression, decision trees, rule sets) are interpretable by design. <strong>Black-box models</strong> (ensembles, deep learning) require post-hoc techniques. Two dimensions: <strong>scope</strong> (global vs. local/instance) and <strong>specificity</strong> (model-specific vs. model-agnostic).</div>
+
+  <h3>Feature Importance</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Agnostic?</th><th>Key property</th><th>Key limitation</th></tr></thead>
+    <tbody>
+      <tr><td>MDI (Mean Decrease Impurity)</td><td>No (trees)</td><td>Fast, built-in for forests</td><td>Biased toward high-cardinality features; inflated when overfitting</td></tr>
+      <tr><td>Permutation importance</td><td>Yes</td><td>No retraining; valid on test set</td><td>Correlated features share importance; breaks interaction effects</td></tr>
+      <tr><td>LOFO (Drop-feature)</td><td>Yes</td><td>Most precise</td><td>Requires retraining per feature — very slow</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ Correlated features share permutation importance. Permuting one correlated feature while keeping the other intact underestimates true importance. Permute groups of correlated features together for accurate joint importance.</div>
+  <div class="key-point">Use <strong>test set</strong> importance to understand generalization drivers. Use <strong>train set</strong> importance to understand how the model actually used each feature during training.</div>
+
+  <h3>Partial Dependence Plots (PDP)</h3>
+  <p>Shows the <em>average marginal effect</em> of a feature on the model's output, averaging over the distribution of all other features. Two approaches: (1) impute others with median/mode; (2) average predictions across real instances from training data.</p>
+  <div class="warning-box">⚠ PDPs use a ceteris paribus assumption. A flat PDP does not mean a feature is unimportant — it may be active in interactions that cancel out in the average. If the raw data binning shows an effect but the PDP is flat, interaction effects are present.</div>
+
+  <h3>ICE (Individual Conditional Expectation) Plots</h3>
+  <p>Extension of PDP: one prediction trajectory per instance instead of just the average. When ICE lines diverge or cross while the PDP is flat, this reveals heterogeneous interaction effects. Centering the lines at a reference feature value makes deviations from the average effect visible.</p>
+
+  <h3>LIME</h3>
+  <p>Local, instance-level, model-agnostic explanation. Perturb the instance → get black-box predictions → fit a simple weighted local model (Lasso or shallow tree) on the perturbed data → use local coefficients as explanation. Works for tabular data, text (remove words), and images (blank superpixels).</p>
+  <div class="warning-box">⚠ LIME is unstable: results depend on the kernel bandwidth, distance measure, and Lasso regularization. This instability is why SHAP has largely replaced it in production settings.</div>
+</div>
+
+<div class="notes-section" id="shap">
+  <h2>11. Shapley Values &amp; SHAP</h2>
+  <div class="key-point">Shapley values from cooperative game theory fairly attribute team outcomes to individual players based on their average marginal contribution across all possible team formations. In ML: features are players, predictions are payouts.</div>
+  <div class="formula-box">
+    \(\phi_j = \sum_{S \subseteq \{x_1,\ldots,x_p\}\setminus\{x_j\}} \dfrac{|S|!\,(p-|S|-1)!}{p!}\bigl[v(S\cup\{x_j\})-v(S)\bigr]\)
+  </div>
+  <p><strong>Efficiency axiom:</strong> \(\sum_j \phi_j = \hat{f}(x) - \mathbb{E}[\hat{f}(X)]\) — Shapley values partition the deviation from the baseline prediction exactly.</p>
+
+  <h3>Monte Carlo Approximation</h3>
+  <div class="formula-box">
+    \(\hat\phi_j \approx \dfrac{1}{M}\sum_{m=1}^M\bigl[\hat f(x^m_{+j}) - \hat f(x^m_{-j})\bigr]\)
+  </div>
+  <p>For each of M permutations: draw a random reference instance z; construct two instances — one with x's value for feature j, one with z's value; the other features are randomly mixed from x and z. Difference in predictions = j's marginal contribution for that permutation.</p>
+
+  <div class="example-box">
+    <strong>Example:</strong> baseline = 0.10. Age=65 → +0.40; sex=F → −0.30; bp=180 → +0.10; bmi=40 → +0.10. Final prediction = 0.10 + 0.40 − 0.30 + 0.10 + 0.10 = <strong>0.40</strong>.
+  </div>
+
+  <h3>SHAP Visualizations</h3>
+  <table>
+    <thead><tr><th>Plot</th><th>Scope</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td>Waterfall / Force plot</td><td>Instance</td><td>Each feature's push from baseline to final prediction for one instance</td></tr>
+      <tr><td>Beeswarm / Summary plot</td><td>Global</td><td>All instances: SHAP value distributions per feature — direction, magnitude, and feature value</td></tr>
+      <tr><td>Dependence plot</td><td>Feature-level</td><td>SHAP values vs. feature value across instances; color by second feature reveals interactions</td></tr>
+      <tr><td>Mean |SHAP| bar chart</td><td>Global</td><td>Feature importance ranking by average absolute SHAP value</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">SHAP is the most widely used instance-level explanation method in industry. It unifies global importance, partial dependence, and instance-level explanations in one theoretically grounded framework.</div>
+  <div class="warning-box">⚠ SHAP values reflect model attribution, not causal effects. Correlated features share SHAP values. Do not interpret SHAP as "removing this feature would change the prediction by φ_j" — Shapley values are defined as average marginal contributions, not as interventional effects.</div>
+
+  <h3>Production Monitoring</h3>
+  <p>Track over time: feature distribution drift (PSI), prediction score distribution shift, outcome-based metrics on newly labelled batches, and calibration drift. Set automated thresholds to trigger retraining. ML models are high-maintenance systems — monitoring is not optional.</p>
+</div>
+
+<!-- ========== MCQ ========== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">&#8635; Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ========== SHORT ANSWER ========== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (10)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">&#8635; Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  {q:"TRUE or FALSE: The primary goal of a machine learning evaluation is to achieve the highest possible score on the test set.",opts:["True","False"],ans:"False",exp:"The goal is to demonstrate generalization by making the test set as challenging as possible. Optimizing specifically for the test set by reusing it repeatedly constitutes hidden overtraining."},
+  {q:"Why is measuring performance on the training set alone a poor indicator of model quality?",opts:["A) It is computationally expensive","B) A sufficiently complex model can memorize training data and score near-perfectly without learning generalizable patterns","C) Training data is always too small","D) Training performance is always lower than test performance"],ans:"B",exp:"Trivial models like K-NN (k=1) or a fully-grown decision tree score 100% on training data by memorization. This reveals nothing about generalization."},
+  {q:"Out-of-time validation is preferred over random splitting for temporal data because:",opts:["A) It is faster to compute","B) A deployed model always predicts future data — out-of-time splits mimic this temporal gap","C) Random splits always produce higher AUC","D) Out-of-time splits are always larger"],ans:"B",exp:"Time always moves forward. Random splits may leak future data patterns into training. Out-of-time validation enforces the realistic production scenario: train on the past, evaluate on the future."},
+  {q:"Stratified splitting ensures:",opts:["A) Equal numbers of instances in train and test","B) The same class proportions in both train and test sets","C) All features are normalized before splitting","D) Temporal ordering is preserved"],ans:"B",exp:"Stratification preserves the class distribution in both sets. Without it, a small test set could by chance contain very few positive examples, making evaluation unreliable under imbalance."},
+  {q:"A fraud detection model has recall = 0.95 and precision = 0.20. Which statement is correct?",opts:["A) 95% of flagged transactions are true fraud","B) The model catches 95% of actual frauds but generates many false alarms","C) 20% of actual frauds are caught","D) The model has F1 = 0.575"],ans:"B",exp:"Recall = TP/(TP+FN) = 0.95: 95% of actual frauds are caught. Precision = TP/(TP+FP) = 0.20: only 20% of flagged cases are real fraud (many false positives). F1 is harmonic, not arithmetic, mean."},
+  {q:"TRUE or FALSE: Balanced accuracy equals standard accuracy when the class distribution is exactly 50/50.",opts:["True","False"],ans:"True",exp:"Balanced accuracy = (recall + specificity)/2. When classes are balanced, recall and specificity converge to the same value as overall accuracy."},
+  {q:"A model on a 99% negative, 1% positive dataset achieves 99.5% accuracy. The most appropriate next step is:",opts:["A) Deploy immediately","B) Examine the confusion matrix — the model likely predicts only the majority class","C) Increase training data","D) Apply L2 regularization"],ans:"B",exp:"On a 99% negative dataset, predicting 'negative' always achieves 99% accuracy. 99.5% accuracy is nearly achievable this way. The confusion matrix will likely show near-zero TP."},
+  {q:"Precision measures:",opts:["A) Fraction of actual positives that were correctly identified","B) Fraction of predicted positives that are actually positive","C) Fraction of true negatives among all negatives","D) Overall percentage of correct predictions"],ans:"B",exp:"Precision = TP/(TP+FP). Of everything the model predicted as positive, what fraction truly was? High precision means few false positives among predictions."},
+  {q:"Why is F1 computed as the harmonic mean rather than the arithmetic mean of precision and recall?",opts:["A) Harmonic mean is faster to compute","B) Harmonic mean penalizes extreme imbalances between precision and recall more than arithmetic mean does","C) Arithmetic mean of precision and recall equals accuracy","D) F1 must equal AUC"],ans:"B",exp:"Harmonic mean is always ≤ arithmetic mean and approaches the smaller value when the two inputs are very unequal. A model with recall=1 and precision=0.01 gets F1 ≈ 0.02 but arithmetic mean = 0.505."},
+  {q:"With cost matrix C(0,1)=9 and C(1,0)=1, the cost-sensitive threshold T_CS is:",opts:["A) 0.50","B) 0.10","C) 0.90","D) 0.45"],ans:"B",exp:"T_CS = C(1,0)/(C(1,0)+C(0,1)) = 1/(1+9) = 0.10. Classify as positive whenever predicted probability > 0.10 — very aggressive because missing a positive is 9× worse than a false alarm."},
+  {q:"TRUE or FALSE: Applying inverse class distribution costs is mathematically equivalent to oversampling the minority class to a 1:1 ratio.",opts:["True","False"],ans:"True",exp:"The slides prove this equivalence: sampling to 1:1 shifts the effective threshold to 0.5 under the resampled distribution, which is equivalent to setting misclassification costs inversely proportional to class frequencies."},
+  {q:"With C(0,1)=5 and C(1,0)=1, a model predicts p(positive|x)=0.22. Should this instance be classified as positive?",opts:["A) No — 0.22 < 0.50","B) Yes — T_CS = 1/6 ≈ 0.167, and 0.22 > 0.167","C) No — expected loss for positive exceeds that for negative","D) Cannot determine without the base rate"],ans:"B",exp:"T_CS = 1/(1+5) = 0.167. Since 0.22 > 0.167, classify as positive. Verified: l(x,1) = 0.78×1 = 0.78 < l(x,0) = 0.22×5 = 1.10."},
+  {q:"Which of the following constitutes a correct sampling protocol for class imbalance?",opts:["A) Oversample both training and test sets to 1:1","B) Undersample only the training set; leave the test set at the natural class ratio","C) Apply SMOTE after the model is trained","D) Oversample all available data before splitting into train and test"],ans:"B",exp:"The test set must always reflect the true population distribution — never resample it. Only the training set should be modified. Resampling before splitting leaks imbalance information and gives an unrealistic test evaluation."},
+  {q:"SMOTE generates synthetic instances by:",opts:["A) Duplicating existing minority class instances","B) Interpolating between a minority instance and one of its K nearest minority neighbors","C) Sampling from a fitted Gaussian distribution","D) Flipping labels of borderline majority instances"],ans:"B",exp:"SMOTE: find K nearest minority-class neighbors for each minority instance, pick one, and create a new point on the line segment connecting the original to the neighbor."},
+  {q:"The AUC of an ROC curve equals 0.5. This means:",opts:["A) The model misclassifies half of all instances","B) The model has 50% recall","C) The model ranks a random positive above a random negative with probability 0.5 — no better than chance","D) The model achieves 50% precision"],ans:"C",exp:"AUC = P(score of random positive > score of random negative). AUC=0.5 means scores carry no discriminative information — the ROC curve lies on the diagonal."},
+  {q:"TRUE or FALSE: AUC-ROC is a threshold-dependent metric.",opts:["True","False"],ans:"False",exp:"AUC summarizes the ROC curve across all possible thresholds — it is explicitly threshold-independent. Individual metrics like precision, recall, and F1 are threshold-dependent."},
+  {q:"Under heavy class imbalance, why is the PR curve more informative than the ROC curve?",opts:["A) The PR curve is always larger in area","B) The ROC FPR denominator includes the many true negatives, making FPR small even with many false positives — PR curve is not affected by TN count","C) PR curves do not require a threshold","D) ROC curves cannot be computed for imbalanced data"],ans:"B",exp:"FPR = FP/(FP+TN). With many TN, even large FP yields a small FPR, making ROC look optimistic. Precision = TP/(TP+FP) is unaffected by TN and directly reflects the quality of positive predictions."},
+  {q:"The ROC curve plots:",opts:["A) Precision vs. Recall","B) Sensitivity (TPR) vs. 1-Specificity (FPR) at each possible threshold","C) Cumulative positives captured vs. population contacted","D) Predicted probability vs. actual outcome"],ans:"B",exp:"ROC: Y-axis = TPR (Recall = Sensitivity), X-axis = FPR (1 − Specificity). Each point on the curve corresponds to a specific classification threshold."},
+  {q:"The KS statistic measures:",opts:["A) The area under the ROC curve","B) The maximum separation between the cumulative score distributions of positive and negative classes","C) The Euclidean distance between class centroids","D) The variance ratio between predicted and actual values"],ans:"B",exp:"KS = max_s |P(s|y=1) − P(s|y=0)|. It captures the maximum separation between the CDFs of scores for the two classes."},
+  {q:"TRUE or FALSE: The h-index (Hand, 2009) was proposed because AUC uses consistent misclassification cost distributions across all classifiers.",opts:["True","False"],ans:"False",exp:"The critique is the opposite: AUC uses DIFFERENT misclassification cost distributions for different classifiers, making it theoretically incoherent. The h-index addresses this with a consistent cost framework."},
+  {q:"A model has lift = 8 at the top 5% of ranked predictions. This means:",opts:["A) The model is 8% better than random overall","B) The top 5% of model predictions contains 8 times more positives than a random selection of 5% of the population","C) 8% of the top 5% predictions are correct","D) The model achieves AUC = 0.8"],ans:"B",exp:"Lift at n% = (% positives in top n% by model) / (% positives in top n% by random = base rate). Lift=8 means the model is 8× more efficient at finding positives in that top slice."},
+  {q:"AR = 2×AUC − 1. If AUC = 0.85, then AR equals:",opts:["A) 0.70","B) 0.85","C) 1.70","D) 0.425"],ans:"A",exp:"AR = 2×0.85 − 1 = 0.70. AR ranges from 0 (random) to 1 (perfect), mirroring AUC's range of 0.5 to 1.0."},
+  {q:"Precision at N is especially relevant in:",opts:["A) Predicting a single continuous value","B) Recommender systems or fraud investigation where only the top-K ranked predictions are acted upon","C) Binary classification with balanced classes","D) Regression with non-normal residuals"],ans:"B",exp:"When you deliver a fixed-size shortlist (top-100 fraud alerts, top-10 recommendations), the precision among those top-N predictions directly measures the business value of the model's output."},
+  {q:"TRUE or FALSE: Adding any new feature to a linear regression model will never decrease R².",opts:["True","False"],ans:"True",exp:"R² is defined as 1 − SSE/S_yy. Adding any feature (even noise) can only reduce SSE or leave it unchanged, so R² can only increase or stay the same. Adjusted R² corrects for this by penalizing additional parameters."},
+  {q:"Adjusted R² differs from standard R² in that:",opts:["A) It is always larger than R²","B) It penalizes for adding predictors that do not improve fit beyond chance","C) It is bounded between 0 and 1","D) It does not require a test set"],ans:"B",exp:"Adjusted R² = 1−(1−R²)(n−1)/(n−k). Adding a useless feature increases k, which tightens the penalty term (n−1)/(n−k) and decreases adjusted R². Standard R² can only increase with more features."},
+  {q:"MAD (Mean Absolute Deviation) is preferred over MSE when:",opts:["A) Residuals are normally distributed","B) Large outliers in the data would disproportionately inflate MSE","C) The model is a decision tree","D) The target variable is binary"],ans:"B",exp:"MSE squares residuals, so a single large error can dominate the metric. MAD takes absolute values, making it much more robust to occasional large prediction errors."},
+  {q:"AIC balances which two competing objectives?",opts:["A) Precision and recall","B) Goodness of fit and model complexity (number of parameters)","C) Training speed and accuracy","D) Bias and variance independently"],ans:"B",exp:"AIC rewards better fit (lower SSE) and penalizes complexity (more parameters k). The model with the lowest AIC is preferred. BIC uses a stricter complexity penalty."},
+  {q:"In k-fold cross-validation, the overall performance estimate is:",opts:["A) The maximum across all folds","B) The minimum across all folds","C) The average across all folds","D) The performance on the last fold only"],ans:"C",exp:"Performance is averaged across all k folds to obtain a stable estimate with lower variance than a single train/validation split."},
+  {q:"TRUE or FALSE: Preprocessing steps like mean imputation should be fitted on the entire dataset before cross-validation begins.",opts:["True","False"],ans:"False",exp:"Fitting preprocessing on all data before CV leaks test-fold statistics into training. Each fold's preprocessing must be fitted on that fold's training portion and applied to its validation fold."},
+  {q:"Leave-one-out cross-validation (LOOCV) is approximately unbiased because:",opts:["A) It uses equal-size folds","B) The training set in each LOOCV fold differs from the full dataset by just one instance","C) It averages over more random splits","D) It is always faster"],ans:"B",exp:"LOOCV trains on n−1 instances. The pessimistic bias of k-fold CV (due to smaller training sets) is nearly eliminated because the training set is almost as large as the full dataset."},
+  {q:"Nested cross-validation is designed to:",opts:["A) Speed up hyperparameter search","B) Separately estimate generalization performance (outer loop) and tune hyperparameters (inner loop) to prevent tuning from inflating test estimates","C) Replace the need for a held-out test set","D) Allow all data to be used for both training and testing simultaneously"],ans:"B",exp:"Without nesting, tuning and evaluation on the same CV scheme causes optimistic bias. The outer loop provides an uncontaminated generalization estimate while the inner loop tunes parameters."},
+  {q:"Cross-validation produces pessimistically biased performance estimates primarily because:",opts:["A) It evaluates on a different time period","B) Each training fold uses fewer instances than the full training set, producing slightly weaker models than when trained on all data","C) Cross-validation randomly shuffles labels","D) Performance varies too much across folds"],ans:"B",exp:"Models generally improve with more training data. Each CV fold uses (k−1)/k of the training set, so models are slightly weaker than the final model trained on all data, leading to pessimistic estimates."},
+  {q:"One-vs-One multiclass classification for K=5 classes requires how many binary classifiers?",opts:["A) 5","B) 4","C) 10","D) 25"],ans:"C",exp:"OvO: K(K−1)/2 = 5×4/2 = 10 classifiers. Each pair of classes gets its own binary classifier; final prediction by majority vote."},
+  {q:"TRUE or FALSE: Binary relevance for multilabel classification trains one binary classifier per label, independently of other labels.",opts:["True","False"],ans:"True",exp:"Binary relevance trains K independent binary classifiers (one per label). It ignores correlations between labels — its main limitation. Classifier chaining addresses this by using earlier predictions as features for later classifiers."},
+  {q:"The label powerset approach for multilabel classification:",opts:["A) Trains one classifier per label","B) Treats each unique combination of labels as a distinct class in a multiclass problem","C) Applies one-vs-all to each label","D) Uses regression for each label"],ans:"B",exp:"Label powerset treats every distinct label combination as a unique class. For 3 binary labels, this creates up to 2³=8 possible classes. Simple but leads to class explosion with many labels."},
+  {q:"Permutation feature importance is computed by:",opts:["A) Retraining the model without each feature and measuring performance drop","B) Randomly shuffling one feature's values and measuring the resulting performance drop on the already-trained model","C) Ranking features by coefficient magnitude","D) Counting how often each feature appears in tree splits"],ans:"B",exp:"Permutation importance: shuffle one feature's values (breaking its relationship with the target), predict with the trained model, measure drop vs. baseline. No retraining needed. Model-agnostic."},
+  {q:"TRUE or FALSE: MDI (Mean Decrease in Impurity) is biased toward high-cardinality continuous features.",opts:["True","False"],ans:"True",exp:"High-cardinality features offer more possible split points, giving more opportunities to reduce impurity regardless of true predictive value. MDI tends to rank them as highly important even when overfitting."},
+  {q:"A Partial Dependence Plot (PDP) for feature X shows a flat line. The correct interpretation is:",opts:["A) Feature X has no effect on predictions under any circumstances","B) On average, X has no marginal effect after averaging over other features — but X may still participate in interaction effects","C) Feature X was not used by the model","D) The model is underfitting"],ans:"B",exp:"PDPs average over all other features. A flat PDP means the average effect of X is zero, but X may still be active in interactions: its effect may be strong for some values of other features, canceling out in the mean."},
+  {q:"ICE plots extend PDPs by:",opts:["A) Averaging predictions across instances","B) Plotting one prediction trajectory per instance instead of just the average, revealing heterogeneous effects","C) Using permutation-based perturbations","D) Applying only to linear models"],ans:"B",exp:"While PDPs show the average effect, ICE plots show each instance's individual trajectory as the feature varies. Diverging or crossing ICE lines signal interaction effects invisible in the averaged PDP."},
+  {q:"LIME builds a local explanatory model by:",opts:["A) Applying SHAP to K nearest neighbors","B) Perturbing the instance, collecting black-box predictions on the perturbed data, then fitting a simple weighted local model","C) Retraining the black-box model on a feature subset","D) Computing partial derivatives of the model output w.r.t. each feature"],ans:"B",exp:"LIME: perturb instance → get black-box scores → weight by proximity to original → fit Lasso or small tree on this weighted synthetic dataset → local model coefficients are the explanation."},
+  {q:"A key reason LIME has been largely replaced by SHAP in production is:",opts:["A) LIME cannot handle tabular data","B) LIME requires retraining the black-box model","C) LIME results are sensitive to neighborhood definition and local model regularization, causing instability","D) LIME only works for positive predictions"],ans:"C",exp:"LIME's kernel bandwidth, distance metric, and Lasso regularization can significantly change the explanation for the same instance. SHAP has stronger theoretical guarantees and is generally more stable."},
+  {q:"Shapley values satisfy the efficiency axiom, which means:",opts:["A) They can be computed in linear time","B) The sum of all feature Shapley values equals the model's prediction minus the baseline prediction","C) Each feature's Shapley value is between 0 and 1","D) Shapley values are always positive"],ans:"B",exp:"Efficiency: Σφ_j = f(x) − E[f(X)]. All feature contributions sum exactly to the deviation of the prediction from the average, with no credit lost or invented."},
+  {q:"TRUE or FALSE: Shapley values indicate the causal effect of a feature on the outcome.",opts:["True","False"],ans:"False",exp:"Shapley values reflect model attribution — how much each feature value contributed to the model's prediction. They do not establish causation. Correlated features share Shapley values in ways that do not reflect true causal relationships."},
+  {q:"The main computational challenge of exact Shapley values is:",opts:["A) They require gradient computation","B) The number of feature subsets grows exponentially (2^p), making exact computation intractable for large p","C) They cannot be computed for models with more than 10 features","D) They require a separate validation set"],ans:"B",exp:"Exact Shapley values sum over all 2^p subsets. For p=20 features, ~1 million subsets; for p=100, effectively intractable. Monte Carlo sampling approximates Shapley values; TreeSHAP exploits tree structure for exact fast computation."},
+  {q:"A SHAP dependence plot for 'age' shows high SHAP values for age>60, colored red (indicating high 'income'). This suggests:",opts:["A) Age and income are negatively correlated","B) There is an interaction — the positive effect of high age is amplified when income is also high","C) Income is more important than age","D) The model is overfitting on older customers"],ans:"B",exp:"SHAP dependence plots reveal interactions by coloring SHAP values by a second feature. Red clusters (high income) aligned with high SHAP for age>60 indicate the two features interact positively in driving model predictions."},
+  {q:"Which interpretability method unifies global feature importance, marginal feature effects, AND instance-level explanations in one theoretically consistent framework?",opts:["A) Permutation importance","B) LIME","C) Partial Dependence Plots","D) SHAP (Shapley values)"],ans:"D",exp:"SHAP provides: mean |SHAP| for global importance, dependence plots for marginal effects (like PDP), and waterfall/force plots for instance explanations. All derived from the same Shapley computation under consistent axioms."},
+  {q:"The 'efficiency' axiom of Shapley values states that all feature contributions sum exactly to:",opts:["A) The predicted probability","B) The prediction minus the average baseline prediction","C) The entropy of the prediction distribution","D) The model's AUC on the test set"],ans:"B",exp:"Efficiency: Σφ_j = f(x) − E[f(X)]. The Shapley values partition the deviation from the baseline (mean prediction) exactly — no credit is wasted or double-counted."},
+  {q:"Which of the following is a concrete, data-driven trigger for model retraining in production?",opts:["A) The model has been deployed for exactly 6 months","B) A new, more accurate algorithm has been published","C) PSI (Population Stability Index) on a key feature exceeds the warning threshold, indicating distribution shift","D) The AUC on training data has slightly decreased"],ans:"C",exp:"PSI measures the shift in feature distributions between training-time and scoring-time data. A high PSI signals that the input population has changed, potentially invalidating learned patterns — a concrete retraining trigger."},
+  {q:"TRUE or FALSE: When very little data is available, cross-validation can serve as the evaluation framework with no caveats, provided the model architecture is carefully chosen.",opts:["True","False"],ans:"False",exp:"Using CV as your only evaluation under limited data is a pragmatic compromise, not a guarantee. The number of models and hyperparameter combinations tested must be strictly limited to prevent data dredging. Results carry higher uncertainty than with a dedicated test set."},
+  {q:"'If scores are too good to be true, they most likely are' refers to which specific failure mode?",opts:["A) Overfitting due to too many features","B) Target variable leakage — a post-outcome variable has been included in the feature set","C) The test set being too easy","D) The model having too few parameters"],ans:"B",exp:"Near-perfect AUC or accuracy almost always indicates target leakage: a feature that is derived from or only available after the outcome was accidentally included, giving the model unfair predictive information."},
+];
+
+const saData = [
+  {
+    q:"A credit model achieves AUC=0.75, but the business only wants to contact the top 5% highest-risk customers. Explain why AUC alone is insufficient and describe what metrics you would use instead.",
+    a:"<strong>Answer:</strong> AUC is a global, threshold-independent metric summarizing discrimination across the entire ROC curve — it does not reflect performance specifically at the top 5% of the score distribution. A model with high global AUC may still rank the true positives poorly in the very top decile, where the business cares most. <br><br><strong>Better metrics:</strong> (1) <strong>Lift at the top 5%</strong> — how many times more positives does the model capture in the top 5% vs. random? A lift of 10 means 10× efficiency over random selection. (2) <strong>Precision at N</strong> — among the top 5% flagged, what fraction are true defaults? This maps directly to the business cost of acting on the shortlist. (3) <strong>Recall at N</strong> — what fraction of all positives are captured in the top 5%? Reveals coverage. A CAP or cumulative lift curve provides the full picture across all deciles. These metrics directly reflect the business use case in a way AUC does not."
+  },
+  {
+    q:"Describe the complete evaluation protocol for a classification model on a heavily imbalanced dataset (1% positive rate). Cover: data splitting, preprocessing, sampling, metric selection, and key pitfalls.",
+    a:"<strong>Answer:</strong> <strong>Splitting:</strong> Stratified train/test split to preserve the 1% rate in both sets. Set aside the test set before any preprocessing. Use out-of-time split if data is temporal. <br><br><strong>Preprocessing:</strong> Fit all imputation, encoding, and scaling rules on the training set only; apply identically to the test set. <br><br><strong>Sampling:</strong> Apply oversampling (SMOTE) or cost-sensitive weighting only to the training set. The test set must remain at the true 1% base rate for an unbiased evaluation. Experimentation with the amount of oversampling is needed. <br><br><strong>Metric selection:</strong> Avoid accuracy (meaningless at 1% positive rate). Report: AUC-PR (preferred over AUC-ROC under heavy imbalance), recall, precision, F1, and lift at the threshold or top-N relevant to the business. Use a cost matrix when FN/FP costs are known. <br><br><strong>Key pitfalls:</strong> (1) Resampling the test set. (2) Applying target-aware encodings (WoE) before the train/test split. (3) Reporting only accuracy. (4) Not using stratified CV folds. (5) Assuming SMOTE will solve everything — it helps but does not create genuinely new positive patterns."
+  },
+  {
+    q:"Derive the cost-sensitive classification threshold T_CS from first principles and provide a worked example with C(0,1)=8 and C(1,0)=2. Interpret the result in a business context.",
+    a:"<strong>Answer:</strong> <strong>Derivation:</strong> We classify an instance as positive if the expected loss of predicting positive is less than the expected loss of predicting negative. With C(0,0)=C(1,1)=0: l(x,1) = p(0|x)·C(1,0) and l(x,0) = p(1|x)·C(0,1). Setting l(x,1) = l(x,0) and solving for p(1|x) gives: T_CS = C(1,0)/(C(1,0)+C(0,1)). <br><br><strong>Worked example:</strong> C(0,1)=8 (cost of missing a positive/FN), C(1,0)=2 (cost of false alarm/FP). T_CS = 2/(2+8) = 0.20. Any instance with predicted probability ≥ 0.20 should be classified as positive. <br><br><strong>Business interpretation (e.g. disease screening):</strong> Missing a disease is 4× worse than a false alarm. Setting the threshold at 0.20 means we flag patients even when there is only a 20% probability of disease — accepting more false positives to ensure we catch true cases. The threshold makes the cost trade-off explicit and auditable, replacing an arbitrary 0.5 default."
+  },
+  {
+    q:"Compare and contrast ROC AUC and PR AUC as evaluation metrics. Provide a concrete numerical example illustrating when they give different signals for the same model.",
+    a:"<strong>Answer:</strong> <strong>ROC AUC</strong> plots TPR vs. FPR across all thresholds. FPR = FP/(FP+TN), so it uses true negatives in its denominator. AUC = P(random positive is ranked above random negative). It is the preferred metric when classes are roughly balanced and both types of errors matter equally. <br><br><strong>PR AUC</strong> plots precision vs. recall. Precision = TP/(TP+FP) — unaffected by TN. It directly measures how many of the model's positive predictions are correct. It is preferred under heavy imbalance because many TN inflate specificity and make the ROC look optimistic even when precision is very poor. <br><br><strong>Numerical example:</strong> Suppose 1,000 instances: 10 positives, 990 negatives. A model flags 100 as positive: TP=9, FP=91, FN=1, TN=899. ROC: TPR=0.9, FPR=91/990=0.092. This single point looks good on a ROC curve (high TPR, low FPR). Precision=9/100=0.09 (only 9% of flagged cases are true positives). The PR curve would immediately show the very poor precision, giving a much more honest picture of the model's usefulness for a shortlist."
+  },
+  {
+    q:"Explain the purpose of nested cross-validation. Describe a scenario where using standard k-fold cross-validation for both tuning and reporting performance would lead to misleading results.",
+    a:"<strong>Answer:</strong> <strong>Purpose:</strong> Nested CV uses two loops: an outer loop to estimate generalization performance and an inner loop to tune hyperparameters. This separation ensures the outer performance estimate is not contaminated by the tuning process. <br><br><strong>Misleading scenario:</strong> Suppose a data scientist tries 200 hyperparameter combinations on 10-fold CV, reports the best CV performance = AUC 0.91, and calls this 'the performance of the model'. Problem: with 200 combinations × 10 folds = 2000 experiments on the same data, the reported AUC reflects the best of many random outcomes — a form of data dredging. The true generalization performance is lower, but there is no clean estimate of how much lower because the test signal was exhausted by tuning. <br><br>With nested CV: the inner loop (e.g., 5-fold CV) tunes hyperparameters for each outer fold; the outer loop (e.g., 10-fold) evaluates the fully tuned model on held-out data. The outer-loop results are not seen during tuning, giving an honest generalization estimate. The reported performance is for the hyperparameter-selected model class, not for a single lucky combination."
+  },
+  {
+    q:"Explain the difference between MDI (Mean Decrease in Impurity) and permutation feature importance. Give a concrete example where they would rank the same set of features differently and explain why.",
+    a:"<strong>Answer:</strong> <strong>MDI</strong> is computed during tree training: each time a feature is used in a split, the impurity reduction is attributed to it, summed across all trees. It is fast and built-in for tree models. <strong>Permutation importance</strong> shuffles one feature's values post-training and measures the drop in test-set performance. It is model-agnostic and reflects generalization. <br><br><strong>Concrete example:</strong> Suppose a dataset has feature A = customer ID (10,000 unique values) and feature B = income bucket (3 levels). MDI may rank A highly because its many distinct values offer many split points that happen to reduce training impurity — even though a random permutation of IDs would not hurt test performance at all (the model overfits to IDs). Permutation importance on the test set would correctly rank B much higher than A, because shuffling income meaningfully degrades test AUC, while shuffling customer IDs does not. <br><br>This is MDI's known bias toward high-cardinality features, and why permutation importance on the test set is the preferred method for understanding what drives generalization."
+  },
+  {
+    q:"Describe how SHAP values are computed (Monte Carlo approximation) and explain how the beeswarm plot and SHAP dependence plot answer different interpretability questions.",
+    a:"<strong>Answer:</strong> <strong>Monte Carlo SHAP computation:</strong> For feature j and instance x, repeat M times: (1) draw a random reference instance z from the training data; (2) randomly choose a subset of features S from {all features except j}; (3) construct x⁺ (uses x's value for j, mix of x and z for others) and x⁻ (uses z's value for j, same mix); (4) compute the model's prediction difference f̂(x⁺) − f̂(x⁻). Average these differences over M permutations to get φ̂_j(x). This estimates the average marginal contribution of feature j to the prediction, averaged over all possible feature orderings (coalitions). <br><br><strong>Beeswarm plot (summary plot):</strong> Shows all instances for all features simultaneously. Each dot is one instance: its horizontal position = SHAP value (contribution to prediction), its color = feature value (e.g., red=high, blue=low). Answers: Which features matter most globally? For each important feature, do high feature values push predictions up or down? Are the effects consistent across instances or heterogeneous? <br><br><strong>SHAP dependence plot:</strong> For one selected feature, plots SHAP value (y) vs. feature value (x) across all instances. A second feature colors the dots to reveal interactions. Answers: How does this specific feature's contribution change across its range? Does the effect depend on another feature (interaction)?"
+  },
+  {
+    q:"A team deploys a churn prediction model in January. By July, business stakeholders report the model seems 'off' — more customers are churning than the model predicted, and the model's recall on recent data has dropped significantly. Describe a systematic diagnosis and remediation process.",
+    a:"<strong>Answer:</strong> <strong>Step 1 — Diagnose the type of drift:</strong> (a) <em>Feature drift</em>: check PSI for all input features. Compare July feature distributions to January training distributions. A high PSI (>0.2) on key features confirms the input population has changed. (b) <em>Concept drift</em>: even if features are stable, the relationship between features and churn may have changed (e.g., a competitor launched a product). Compare SHAP values or feature importance at deployment time vs. current time. (c) <em>Data pipeline issue</em>: verify that feature computation logic has not silently changed since January. <br><br><strong>Step 2 — Quantify performance degradation:</strong> Collect newly labelled churn outcomes for July data. Compute AUC, recall, and calibration on this batch. Compare to January baseline metrics. If calibration has drifted significantly (predicted 0.7 probability now corresponds to actual 0.4), the model's probability estimates are unreliable for cost-sensitive decisions. <br><br><strong>Step 3 — Remediation options:</strong> (a) <em>Threshold recalibration</em>: if calibration drift is the only issue, re-estimate the threshold using recent labelled data without full retraining. (b) <em>Incremental retraining</em>: retrain the model on recent data (last 6 months), preserving the pipeline but updating weights to current patterns. (c) <em>Full rebuild</em>: if feature drift is severe and old patterns are no longer valid, rebuild with updated features and a fresh training window. <br><br><strong>Step 4 — Prevent recurrence:</strong> Set up automated monitoring of PSI, calibration plots, and discrimination metrics on monthly labelled batches, with alerting thresholds that trigger the above process automatically."
+  },
+  {
+    q:"Explain what it means for a classifier to be 'well-calibrated' and why decision trees pruned with cost-complexity pruning may not be. Describe one method to recalibrate a miscalibrated model.",
+    a:"<strong>Answer:</strong> A classifier is <strong>well-calibrated</strong> if its predicted probability p(y=1|x)=0.8 truly corresponds to an 80% empirical positive rate among all instances assigned that score. In other words, the score is a faithful probability estimate, not just a ranking. Calibration can be visualized with a reliability diagram (calibration curve): predicted probabilities on the x-axis, observed positive rates on the y-axis. A perfectly calibrated model's curve is the diagonal. <br><br><strong>Why decision trees may not be well-calibrated:</strong> A pruned decision tree assigns the fraction of positive instances in each leaf as the predicted probability. With small leaves (few instances), these fractions are noisy estimates. More fundamentally, tree probabilities tend to be pushed toward 0 and 1 (pure or near-pure leaves), making probabilities overconfident. This is a structural property of trees. <br><br><strong>Recalibration method — Platt scaling:</strong> Train a logistic regression model with the tree's raw scores as the only input feature, using a held-out calibration set. The logistic regression learns a monotonic mapping from tree scores to calibrated probabilities. Alternatively, <em>isotonic regression</em> fits a non-parametric monotone transformation, which is more flexible but requires more calibration data."
+  },
+  {
+    q:"A stakeholder asks: 'Our model has AUC=0.92 and our competitor claims AUC=0.88 — so our model is definitely better, right?' Critically evaluate this claim with reference to the theoretical limitations of AUC and practical evaluation concerns.",
+    a:"<strong>Answer:</strong> <strong>Not necessarily — here are the key concerns:</strong> <br><br><strong>(1) Different evaluation conditions:</strong> Were both AUCs measured on the same test set, with the same class distribution, using the same out-of-time or random split? An AUC of 0.92 on an easy random split from a stable dataset may be worse in production than 0.88 measured on a challenging out-of-time test set. <br><br><strong>(2) AUC's theoretical incoherence (Hand, 2009):</strong> AUC implicitly uses different misclassification cost distributions for different classifiers. When comparing two classifiers, each is being evaluated under a different cost regime — making the comparison potentially misleading, especially when ROC curves cross. The h-index provides a theoretically consistent alternative. <br><br><strong>(3) ROC curves may cross:</strong> A model with higher AUC might actually be inferior in the specific operating region (threshold) used in production. If your business only operates at high precision (top 5%), the higher AUC at low-precision operating points is irrelevant. <br><br><strong>(4) Class imbalance:</strong> Under heavy imbalance, AUC-ROC is optimistic. Compare AUC-PR, lift, and calibration — the competitor's model might outperform on the metrics that actually matter for the business case. <br><br><strong>(5) Leakage / evaluation hygiene:</strong> The 0.92 should be scrutinized — was the test set used multiple times during development? Was any target-aware preprocessing applied before splitting? A suspicious AUC should trigger an audit before the claim is accepted."
+  }
+];
+
+// ─── RENDER MCQ ───
+let mcqState = {};
+function renderMCQ() {
+  const c = document.getElementById('mcq-container');
+  c.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.innerHTML = `<div class="question-label">Question ${idx+1} of ${mcqData.length}</div><div class="question-stem">${item.q}</div>`;
+    item.opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.onclick = () => handleMCQ(idx, opt, btn, card, item);
+      card.appendChild(btn);
+    });
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar'; fb.id = `fb-${idx}`; fb.style.display = 'none';
+    card.appendChild(fb);
+    c.appendChild(card);
+  });
+  updateScore();
+}
+function handleMCQ(idx, optText, btn, card, item) {
+  if (mcqState[idx] !== undefined) return;
+  mcqState[idx] = optText;
+  card.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  const isTF = item.opts.length === 2;
+  const isCorrect = isTF ? optText === item.ans : optText.startsWith(item.ans + ')');
+  const correctOpt = item.opts.find(o => isTF ? o === item.ans : o.startsWith(item.ans + ')'));
+  btn.className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect) {
+    card.querySelectorAll('.option-btn').forEach(b => { if (b.textContent === correctOpt) b.className = 'option-btn reveal-correct'; });
+  }
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+  updateScore();
+}
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const isTF = item.opts.length === 2;
+    const ok = isTF ? mcqState[idx] === item.ans : mcqState[idx].startsWith(item.ans + ')');
+    if (ok) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+function resetMCQ() { mcqState = {}; renderMCQ(); }
+
+// ─── RENDER SA ───
+function renderSA() {
+  const c = document.getElementById('sa-container');
+  c.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    btn.onclick = () => {
+      const show = panel.style.display === 'none';
+      panel.style.display = show ? 'block' : 'none';
+      btn.textContent = show ? 'Hide Answer' : 'Reveal Answer';
+    };
+    card.innerHTML = `<div class="question-label">Short Answer ${idx+1}</div><div class="question-stem">${item.q}</div>`;
+    card.appendChild(btn);
+    card.appendChild(panel);
+    c.appendChild(card);
+  });
+}
+function resetSA() { renderSA(); }
+
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>
