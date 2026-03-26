@@ -1,0 +1,691 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cure Models — Study Notes &amp; 30 MCQs</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath:[['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']] },
+  options: { skipHtmlTags:['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async=""></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.75;background:#f5f6fa;color:#2c2c3a;padding:20px;}
+.page-header{background:linear-gradient(135deg,#1a3a5c,#2e6da4);border-radius:14px;padding:28px 36px;margin-bottom:22px;color:#fff;}
+.page-header h1{font-size:1.75em;font-weight:700;margin-bottom:4px;}
+.page-header p{font-size:0.93em;opacity:0.85;}
+.nav-bar{background:#fff;border-radius:10px;padding:10px 16px;margin-bottom:22px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.07);position:sticky;top:0;z-index:100;}
+.nav-link{display:inline-block;padding:5px 15px;border-radius:20px;background:#eef2fb;color:#2e6da4;text-decoration:none;font-size:0.87em;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.nav-link:hover,.nav-link.active{background:#2e6da4;color:#fff;}
+.score-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.score-label{background:#2e6da4;color:#fff;padding:5px 16px;border-radius:20px;font-size:0.88em;font-weight:700;}
+.btn-pill{padding:5px 16px;border-radius:20px;border:none;cursor:pointer;font-size:0.87em;font-weight:600;transition:all 0.2s;}
+.btn-reveal{background:#f59e0b;color:#fff;}
+.btn-reveal:hover{background:#d97706;}
+.btn-reset{background:#6b7280;color:#fff;}
+.btn-reset:hover{background:#4b5563;}
+.notes-section,.mcq-section,.sa-section{background:#fff;padding:28px 36px;margin-bottom:28px;box-shadow:0 2px 10px rgba(0,0,0,0.07);}
+.section-title{font-size:1.25em;font-weight:700;color:#1a3a5c;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid #e2e8f4;}
+.sub-heading{font-size:1.03em;font-weight:700;color:#2e6da4;margin:22px 0 8px 0;}
+.key-point{background:#eef6ff;border-left:4px solid #2e6da4;padding:12px 18px;margin:14px 0;}
+.example-box{background:#f0f7ee;border-left:4px solid #4caf50;padding:12px 18px;margin:14px 0;}
+.theorem-box{background:#f3f0ff;border-left:4px solid #7c4dff;padding:14px 20px;margin:16px 0;}
+.warning-box{background:#fff8e1;border-left:4px solid #ffc107;padding:12px 18px;margin:14px 0;}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:0.92em;box-shadow:0 1px 6px rgba(0,0,0,0.07);}
+thead tr{background:#2e6da4;color:#fff;font-weight:600;text-align:left;}
+tbody tr:nth-child(even){background:#f0f4fb;}
+tbody tr:nth-child(odd){background:#fff;}
+tbody tr:hover{background:#dce8f8;}
+th,td{padding:10px 14px;border-bottom:1px solid #e2e8f4;}
+pre{background:#1e1e2e;color:#cdd6f4;padding:14px 18px;font-size:0.87em;overflow-x:auto;margin:12px 0;font-family:'Courier New',monospace;line-height:1.6;}
+code{font-family:'Courier New',monospace;background:#eef2fb;padding:1px 5px;font-size:0.9em;}
+.mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:800px){.mcq-grid{grid-template-columns:1fr;}}
+.mcq-card{background:#f9fafb;border:1px solid #e5e9f2;padding:18px 20px;}
+.mcq-question{font-weight:600;color:#1a3a5c;margin-bottom:10px;font-size:0.95em;}
+.mcq-num{display:inline-block;background:#2e6da4;color:#fff;font-size:0.75em;font-weight:700;padding:2px 9px;border-radius:20px;margin-right:7px;}
+.option-btn{display:block;width:100%;background:#fff;border:1.5px solid #d0d8ea;padding:8px 14px;margin:4px 0;text-align:left;cursor:pointer;font-size:0.91em;color:#2c2c3a;transition:all 0.18s;}
+.option-btn:hover{background:#eef2fb;border-color:#2e6da4;}
+.option-btn.selected{background:#dce8f8;border-color:#2e6da4;color:#1a3a5c;font-weight:600;}
+.option-btn.correct{background:#d4edda;border-color:#28a745;color:#155724;font-weight:700;}
+.option-btn.incorrect{background:#f8d7da;border-color:#dc3545;color:#721c24;font-weight:600;}
+.option-btn.reveal-correct{background:#d4edda;border-color:#28a745;color:#155724;font-weight:700;opacity:0.85;}
+.option-btn:disabled{cursor:default;}
+.feedback-bar{padding:6px 12px;margin-top:8px;font-size:0.86em;font-weight:600;}
+.feedback-bar.correct{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.feedback-bar.incorrect{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+.sa-card{background:#faf9ff;border:1px solid #e2dcf5;padding:20px 24px;margin-bottom:20px;}
+.sa-question{font-weight:600;color:#1a3a5c;margin-bottom:12px;}
+.answer-panel{background:#f3f0ff;border:1px solid #d4c8f5;padding:18px 22px;margin-top:12px;font-size:0.94em;line-height:1.8;display:none;}
+.btn-rev-ans{background:#6f42c1;color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:0.86em;font-weight:600;transition:background 0.2s;}
+.btn-rev-ans:hover{background:#5a2fa0;}
+@media(max-width:640px){.notes-section,.mcq-section,.sa-section{padding:16px 14px;}.page-header{padding:18px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Cure Models</h1>
+  <p>Survival Analysis &nbsp;·&nbsp; Nonparametric &amp; Semiparametric Methods &nbsp;·&nbsp; 30-Question MCQ Bank</p>
+</div>
+
+<div class="nav-bar">
+  <span class="nav-link active" data-target="notes">📖 Study Notes</span>
+  <span class="nav-link" data-target="mcq">❓ 30 MCQs</span>
+  <span class="nav-link" data-target="sa">✏️ Short Answer</span>
+</div>
+
+<!-- ═══════════════  STUDY NOTES  ═══════════════ -->
+<div class="notes-section" id="notes">
+  <div class="section-title">📖 Study Notes — Cure Models</div>
+
+  <!-- 1. Introduction -->
+  <div class="sub-heading">1. Classical Survival Models vs. Cure Models</div>
+  <p>In <strong>classical survival analysis</strong>, all individuals are assumed to eventually experience the event of interest, so the survival function is <em>proper</em>:</p>
+  $$\lim_{t \to \infty} S(t) = 0, \qquad \text{where } S(t) = P(T &gt; t)$$
+  <p>This assumption is realistic for events such as all-cause mortality, machine failure, or retirement — events that will occur with probability 1.</p>
+
+  <div class="warning-box">
+    <strong>When does the classical assumption fail?</strong> In many settings, a fraction of the population will <em>never</em> experience the event of interest — for example: cancer recurrence (some patients are permanently cured), loan default (some borrowers never default), re-arrest (some released prisoners never re-offend), and time to a second child (some parents have only one child).
+  </div>
+
+  <!-- 2. Cure Model Structure -->
+  <div class="sub-heading">2. The Two-Population Structure</div>
+  <p>A cure model partitions the population into two latent groups:</p>
+  <ul style="margin-left:20px;margin-top:8px;">
+    <li><strong>Cured (immune) individuals</strong> — will never experience the event; their time-to-event \(T\) is set to \(\infty\).</li>
+    <li><strong>Susceptible individuals</strong> — will eventually experience the event.</li>
+  </ul>
+
+  <div class="theorem-box">
+    <strong>Improper Survival Function.</strong> Because a positive fraction of the population never experiences the event, the population survival function satisfies:
+    $$\lim_{t \to \infty} S(t) &gt; 0$$
+    This is called an <em>improper</em> (or <em>defective</em>) survival function. The <strong>cure rate</strong> is defined as:
+    $$1 - p = \lim_{t \to \infty} S(t)$$
+    where \(p = P(B = 1)\) is the probability of being susceptible, and \(B = I(T &lt; \infty)\) is the latent cure indicator.
+  </div>
+
+  <p style="margin-top:12px;">On a Kaplan–Meier plot, the cure fraction appears as a <strong>plateau</strong> at the right tail of the estimated survival curve — the height of this plateau estimates \(1 - p\).</p>
+
+  <!-- 3. Censoring in Cure Models -->
+  <div class="sub-heading">3. Censoring in Cure Models</div>
+  <p>We assume <strong>random right censoring</strong>. Instead of observing \(T\) directly, we observe:</p>
+  $$Y = \min(T, C), \qquad \Delta = I(T \leq C)$$
+  <p>where \(C\) is the (independent) censoring time. Note the key asymmetry:</p>
+  <div class="key-point">
+    <strong>When \(\Delta = 1\)</strong>: the event was observed → the individual is <em>definitely susceptible</em>.<br>
+    <strong>When \(\Delta = 0\)</strong>: the observation is censored → the individual could be <em>either cured or susceptible</em> (status unknown).
+  </div>
+  <p style="margin-top:10px;">The cure indicator \(B = I(T &lt; \infty)\) is therefore <strong>latent</strong> — it is never directly observed. This is the fundamental challenge of cure model estimation.</p>
+
+  <!-- 4. Identifiability -->
+  <div class="sub-heading">4. Nonparametric Identification and Estimation</div>
+  <p>Let \(S_u(t) = P(T &gt; t \mid B = 1)\) be the proper survival function of the susceptibles, and \(F_u = 1 - S_u\). The mixture decomposition of the population survival function is:</p>
+  $$S(t) = (1 - p) + p \, S_u(t)$$
+
+  <div class="theorem-box">
+    <strong>Identifiability Condition (Maller &amp; Zhou 1992).</strong> Let \(\tau_F\) denote the right endpoint of the support of any distribution \(F\), and let \(G\) be the censoring distribution. If
+    $$\tau_{F_u} \leq \tau_G,$$
+    then the cure model is <em>nonparametrically identified</em>. This condition is called <strong>sufficient follow-up</strong>: the follow-up period must be long enough to cover the full support of the susceptibles' failure time distribution. It is crucial for consistent inference.
+  </div>
+
+  <div class="sub-heading">4a. Nonparametric Estimator of \(1 - p\)</div>
+  <p>When \(\tau_{F_u} \leq \tau_G\), the cure rate can be estimated by the tail value of the Kaplan–Meier estimator \(\hat{S}\) evaluated at the largest observation \(Y_n\):</p>
+  $$1 - \hat{p} = \hat{S}(Y_n)$$
+  <p>This exploits the fact that \(1 - p = \lim_{t \to \infty} S(t)\).</p>
+
+  <div class="theorem-box">
+    <strong>Consistency (Maller &amp; Zhou 1992).</strong> Assume \(0 &lt; p &lt; 1\) and \(S\) is continuous at \(\tau_G\) if \(\tau_G &lt; \infty\). Then:
+    $$\hat{S}(Y_n) \xrightarrow{P} 1 - p \quad \iff \quad \tau_{F_u} \leq \tau_G$$
+  </div>
+
+  <div class="theorem-box">
+    <strong>Asymptotic Normality (Maller &amp; Zhou 1992).</strong> Assume \(0 &lt; p &lt; 1\) and \(\tau_G = \infty\). If \(\int_0^\infty \frac{dF(s)}{1 - G(s^-)} &lt; \infty\), then:
+    $$n^{1/2}\bigl\{\hat{S}(Y_n) - (1-p)\bigr\} \xrightarrow{d} N(0, \sigma^2)$$
+    where
+    $$\sigma^2 = (1-p)^2 \int_0^\infty \frac{dF(s)}{\{1-F(s)\}\{1-F(s^-)\}\{1-G(s^-)\}}$$
+    Estimating \(\sigma^2\) by replacing \(p, F, G\) with their Kaplan–Meier counterparts yields the confidence interval:
+    $$1 - \hat{p} \;\pm\; z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{n}}$$
+  </div>
+
+  <!-- 5. Breast Cancer Example -->
+  <div class="sub-heading">5. Example: Breast Cancer Data (SEER 1988–2016)</div>
+  <div class="example-box">
+    <p><strong>Data:</strong> Subsample of \(n = 2000\) patients with Grade II breast cancer. Covariate: cancer stage (I–IV).</p>
+    <p><strong>Nonparametric cure fraction estimates by stage</strong> (KM tail values):</p>
+    <table>
+      <thead><tr><th>Stage I</th><th>Stage II</th><th>Stage III</th><th>Stage IV</th></tr></thead>
+      <tbody><tr><td>0.863</td><td>0.639</td><td>0.395</td><td>0.215</td></tr></tbody>
+    </table>
+    <p><strong>Caution:</strong> These are consistent only if \(\tau_{F_u} \leq \tau_G\) for each stage. The KM plot suggests sufficient follow-up for Stage IV but possibly not for Stages I–III.</p>
+  </div>
+
+  <!-- 6. Mixture Cure Regression Models -->
+  <div class="sub-heading">6. Mixture Cure Regression Models</div>
+  <p>With covariates, the general mixture cure model is:</p>
+  $$S(t \mid x, z) = p(z)\,S_u(t \mid x) + 1 - p(z)$$
+  <p>The model has two distinct components:</p>
+  <ul style="margin-left:20px;margin-top:8px;">
+    <li><strong>Incidence</strong>: \(p(z) = P(B = 1 \mid Z = z)\) — models the <em>long-term</em> probability of being susceptible, capturing a treatment's curative effect. Most often a logistic regression model:
+    $$p(z) = \frac{\exp(\alpha_0 + \alpha^T z)}{1 + \exp(\alpha_0 + \alpha^T z)}$$</li>
+    <li><strong>Latency</strong>: \(S_u(t \mid x) = P(T &gt; t \mid X = x, B = 1)\) — models the <em>short-term</em> survival of the susceptibles. Choices include parametric models, Cox PH, or AFT models.</li>
+  </ul>
+  <div class="key-point">
+    The mixture cure model was originally proposed by Boag (1949), Berkson &amp; Gage (1952), and Farewell (1982). Covariates \(X\) and \(Z\) may be equal, partially overlapping, or completely different. Importantly, there is <strong>no proportional hazards assumption at the population level</strong> — PH holds only within the susceptible subgroup.
+  </div>
+
+  <!-- 7. Logistic/Cox PH -->
+  <div class="sub-heading">7. Logistic / Cox PH Mixture Cure Model</div>
+  <p>The latency takes a Cox PH form:</p>
+  $$S_u(t \mid x) = S_{u,0}(t)^{\exp(\beta^T x)}$$
+  <p>where \(S_{u,0}(t) = P(T &gt; t \mid B = 1, X = 0)\) is left unspecified. The key difficulty is that the PH assumption does <em>not</em> hold at the population level, so the baseline hazard \(h_{u,0}(\cdot)\) cannot be isolated in the likelihood — the partial likelihood trick from standard Cox PH is <strong>not applicable</strong>.</p>
+
+  <div class="theorem-box">
+    <strong>EM Algorithm (Peng &amp; Dear 2000; Sy &amp; Taylor 2000).</strong> Since \(B_i = I(T_i &lt; \infty)\) is latent, one augments the data with \(B_i\) and uses the EM algorithm. The complete-data likelihood factorises as:
+    $$L_c(\alpha, \beta, S_{u,0}) = L_1(\alpha) \times L_2(\beta, S_{u,0})$$
+    where \(L_1\) depends only on \(\alpha\) (incidence) and \(L_2\) depends only on \(\beta, S_{u,0}\) (latency), enabling <em>separate estimation</em> of the two parts.
+  </div>
+
+  <div class="key-point">
+    <strong>E-step:</strong> Replace the unobserved \(B_i\) by its conditional expectation given the current parameter estimates \(\theta^{(m-1)} = (\alpha, \beta, S_{u,0})^{(m-1)}\) and the observed data \(V_i = (Y_i, \Delta_i, X_i, Z_i)\).<br><br>
+    <strong>M-step:</strong> Maximise the expected complete-data log-likelihood. The incidence part reduces to a standard weighted logistic regression; the latency part is solved via partial or marginal likelihood approaches.
+  </div>
+
+  <div class="example-box">
+    <p><strong>Breast Cancer Example — Logistic/Cox PH Results (smcure package):</strong></p>
+    <table>
+      <thead><tr><th>Component</th><th>Variable</th><th>Estimate</th><th>SE</th><th>Z-value</th><th>P-value</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="4">Incidence (\(\alpha\))</td><td>Intercept</td><td>−1.466</td><td>0.132</td><td>−11.088</td><td>&lt;0.001</td></tr>
+        <tr><td>X1 (Stage 2 vs 1)</td><td>0.547</td><td>0.220</td><td>2.487</td><td>0.013</td></tr>
+        <tr><td>X2 (Stage 3 vs 1)</td><td>1.835</td><td>0.254</td><td>7.226</td><td>&lt;0.001</td></tr>
+        <tr><td>X3 (Stage 4 vs 1)</td><td>2.777</td><td>0.430</td><td>6.451</td><td>&lt;0.001</td></tr>
+        <tr><td rowspan="3">Latency (\(\beta\))</td><td>X1</td><td>0.459</td><td>0.267</td><td>1.717</td><td>0.086</td></tr>
+        <tr><td>X2</td><td>1.037</td><td>0.277</td><td>3.747</td><td>0.0001</td></tr>
+        <tr><td>X3</td><td>2.469</td><td>0.266</td><td>9.274</td><td>&lt;0.001</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Interpretation:</strong></p>
+    <ul style="margin-left:20px;">
+      <li><em>Incidence</em>: OR for Stage 4 vs Stage 1 to be susceptible = \(\exp(2.777) \approx 16.07\). Cancer stage has a significant long-term effect.</li>
+      <li><em>Latency</em>: Hazard for susceptible Stage 4 patients is \(\exp(2.469) \approx 11.81\) times that of susceptible Stage 1 patients.</li>
+    </ul>
+    <p>Predicted cure probabilities: Stage I ≈ 81.2%, Stage II ≈ 71.5%, Stage III ≈ 40.9%, Stage IV ≈ 21.2%.</p>
+  </div>
+
+  <!-- 8. Logistic/AFT -->
+  <div class="sub-heading">8. Logistic / AFT Mixture Cure Model</div>
+  <p>The latency is modelled via a <em>semiparametric</em> accelerated failure time (AFT) model (in contrast to the fully parametric AFT of Chapter 5):</p>
+  $$S_u(t \mid x) = S_0\bigl(t\,\exp(-\beta^T x)\bigr)$$
+  <p>where \(S_0\) is an unknown baseline survival function. Equivalently:</p>
+  $$\log T^* = \beta_0 + \beta^T X + \epsilon$$
+  <p>where \(\epsilon\) is independent of \(X\) with unknown distribution, and \(T = BT^* + (1-B)\infty\). The EM algorithm (Zhang &amp; Peng 2007) is used; the R package <code>smcure</code> provides implementation.</p>
+
+  <div class="key-point">
+    <strong>Cox vs. AFT for Latency:</strong> Under the Cox model, the support of \(T\) does <em>not</em> depend on \(X\). Under AFT, the support is scaled by \(\exp(\beta^T X)\), which is more realistic in settings where patients with worse prognosis die faster (e.g., aggressive vs. slowly-growing tumours).
+  </div>
+
+  <!-- 9. Promotion Time -->
+  <div class="sub-heading">9. Promotion Time Cure Regression Models</div>
+  <p>An alternative to the mixture cure model is the <strong>promotion time</strong> (or bounded cumulative hazard / PH cure) model:</p>
+  $$S(t \mid x) = \exp\bigl\{-\theta(x)\,F(t)\bigr\}$$
+  <p>where \(\theta(x) = \exp(\beta_0 + \beta^T x) &gt; 0\) and \(F(\cdot)\) is an unknown distribution function. Key properties:</p>
+  <ul style="margin-left:20px;margin-top:8px;">
+    <li>The model has a <strong>proportional hazards structure</strong> at the population level.</li>
+    <li>The <strong>cure rate</strong> is \(P(B = 0 \mid X = x) = \exp\{-\theta(x)\}\).</li>
+    <li>The cumulative hazard \(H(t) = \theta F(t)\) is <em>bounded</em>, justifying the name "bounded cumulative hazard model."</li>
+  </ul>
+
+  <div class="theorem-box">
+    <strong>Biological Motivation (Yakovlev et al. 1996; Tsodikov 1998).</strong> After cancer treatment, let \(N \sim \text{Poisson}(\theta(X))\) be the number of residual carcinogenic cells. Each cell \(k\) produces a detectable tumour at time \(W_k\) (i.i.d. with distribution \(F\), independent of \(N\)). Then:
+    $$T = \min(W_1, \ldots, W_N), \quad N = 0 \Rightarrow \text{cured}$$
+    $$S(t \mid X) = \exp[-\theta(X)F(t)]$$
+    Increasing \(\theta(x)\) means more residual cells → lower cure probability and shorter survival for susceptibles.
+  </div>
+
+  <div class="key-point">
+    <strong>Link to Cox PH Model (Portier et al. 2017).</strong> The promotion time model is a special Cox PH model with a bounded cumulative baseline hazard \(H(t) = \exp(\beta_0)F(t)\). It can be shown that \(\hat{\beta}_{PT} = \hat{\beta}_{PH}\) and \(\exp(\hat{\beta}_{0,PT})\hat{F}_{PT}(t) = \hat{H}_{PH}(t)\), so estimation can be performed using standard Cox software with a zero-tail constraint.
+  </div>
+
+  <!-- 10. Other Models -->
+  <div class="sub-heading">10. Extensions and Other Cure Models</div>
+  <p>Beyond the standard mixture and promotion time models, the literature includes flexible extensions such as probit or complementary log-log link functions for incidence; single-index incidence models \(p(z) = g(\alpha^T z)\) with unspecified \(g\) (Amico et al. 2019); nonparametric latency combined with logistic incidence (Patilea &amp; Van Keilegom 2020); and fully nonparametric mixture cure models (Xu &amp; Peng 2014; López-Cheda et al. 2017). In economics, cure models are called "split population models"; in engineering, "limited-failure population life models."</p>
+
+</div><!-- end notes-section -->
+
+<!-- ═══════════  MCQ  ═══════════ -->
+<div class="mcq-section" id="mcq">
+  <div class="section-title">❓ Multiple Choice Questions (30)</div>
+  <div class="score-bar">
+    <span class="score-label">Score: <span id="score-display">0 / 30</span></span>
+    <button class="btn-pill btn-reveal" onclick="revealAll()">Reveal All</button>
+    <button class="btn-pill btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+
+  <div class="mcq-grid">
+
+  <div class="mcq-card" id="q1">
+    <div class="mcq-question"><span class="mcq-num">Q1</span>In <em>classical</em> survival analysis, what is assumed about \(S(t)\) as \(t\to\infty\)?</div>
+    <button class="option-btn" onclick="answer(1,0,false)">A) \(\lim_{t\to\infty}S(t)&gt;0\)</button>
+    <button class="option-btn" onclick="answer(1,1,true)">B) \(\lim_{t\to\infty}S(t)=0\)</button>
+    <button class="option-btn" onclick="answer(1,2,false)">C) \(\lim_{t\to\infty}S(t)=1\)</button>
+    <button class="option-btn" onclick="answer(1,3,false)">D) \(\lim_{t\to\infty}S(t)=p\)</button>
+    <div class="feedback-bar" id="fb1"></div>
+  </div>
+
+  <div class="mcq-card" id="q2">
+    <div class="mcq-question"><span class="mcq-num">Q2</span>In a cure model, the cure rate \(1-p\) equals:</div>
+    <button class="option-btn" onclick="answer(2,0,false)">A) \(p=P(B=1)\)</button>
+    <button class="option-btn" onclick="answer(2,1,false)">B) \(\lim_{t\to\infty}S_u(t)\)</button>
+    <button class="option-btn" onclick="answer(2,2,true)">C) \(\lim_{t\to\infty}S(t)\)</button>
+    <button class="option-btn" onclick="answer(2,3,false)">D) \(1-\hat S(Y_1)\)</button>
+    <div class="feedback-bar" id="fb2"></div>
+  </div>
+
+  <div class="mcq-card" id="q3">
+    <div class="mcq-question"><span class="mcq-num">Q3</span>When the event indicator \(\Delta_i=1\), what can be concluded about individual \(i\)?</div>
+    <button class="option-btn" onclick="answer(3,0,true)">A) The individual is <em>definitely susceptible</em></button>
+    <button class="option-btn" onclick="answer(3,1,false)">B) The individual is cured</button>
+    <button class="option-btn" onclick="answer(3,2,false)">C) The censoring time \(C\) exceeded all failure times in the sample</button>
+    <button class="option-btn" onclick="answer(3,3,false)">D) The cure status \(B_i\) is still unknown</button>
+    <div class="feedback-bar" id="fb3"></div>
+  </div>
+
+  <div class="mcq-card" id="q4">
+    <div class="mcq-question"><span class="mcq-num">Q4</span>The formal nonparametric identifiability condition for a cure model is:</div>
+    <button class="option-btn" onclick="answer(4,0,false)">A) \(\tau_G=0\)</button>
+    <button class="option-btn" onclick="answer(4,1,false)">B) \(\tau_{F_u}\geq\tau_G\)</button>
+    <button class="option-btn" onclick="answer(4,2,true)">C) \(\tau_{F_u}\leq\tau_G\)</button>
+    <button class="option-btn" onclick="answer(4,3,false)">D) \(p&lt;0.5\)</button>
+    <div class="feedback-bar" id="fb4"></div>
+  </div>
+
+  <div class="mcq-card" id="q5">
+    <div class="mcq-question"><span class="mcq-num">Q5</span>The consistent nonparametric estimator of the cure fraction \(1-p\) is:</div>
+    <button class="option-btn" onclick="answer(5,0,true)">A) \(\hat S(Y_n)\) — the Kaplan–Meier estimator at the largest observation \(Y_n\)</button>
+    <button class="option-btn" onclick="answer(5,1,false)">B) \(1-\hat F(Y_1)\)</button>
+    <button class="option-btn" onclick="answer(5,2,false)">C) \(\hat G(Y_n)\), where \(\hat G\) is the censoring distribution estimator</button>
+    <button class="option-btn" onclick="answer(5,3,false)">D) \(\frac{1}{n}\sum_{i=1}^n(1-\Delta_i)\)</button>
+    <div class="feedback-bar" id="fb5"></div>
+  </div>
+
+  <div class="mcq-card" id="q6">
+    <div class="mcq-question"><span class="mcq-num">Q6</span>Under the asymptotic normality theorem (\(\tau_G=\infty\)), the standardised statistic \(n^{1/2}\{\hat S(Y_n)-(1-p)\}\) converges to:</div>
+    <button class="option-btn" onclick="answer(6,0,false)">A) Exponential with mean \(\sigma\)</button>
+    <button class="option-btn" onclick="answer(6,1,false)">B) Chi-squared with 1 degree of freedom</button>
+    <button class="option-btn" onclick="answer(6,2,false)">C) Uniform on \([-\sigma,\sigma]\)</button>
+    <button class="option-btn" onclick="answer(6,3,true)">D) \(N(0,\sigma^2)\) with an explicit variance \(\sigma^2\)</button>
+    <div class="feedback-bar" id="fb6"></div>
+  </div>
+
+  <div class="mcq-card" id="q7">
+    <div class="mcq-question"><span class="mcq-num">Q7</span>Why is "sufficient follow-up" (\(\tau_{F_u}\leq\tau_G\)) critical for cure model inference?</div>
+    <button class="option-btn" onclick="answer(7,0,false)">A) It ensures the EM algorithm converges in finite iterations</button>
+    <button class="option-btn" onclick="answer(7,1,true)">B) Without it, \(\hat S(Y_n)\) is inconsistent and the cure fraction is systematically overestimated</button>
+    <button class="option-btn" onclick="answer(7,2,false)">C) It guarantees the logistic incidence model is identified</button>
+    <button class="option-btn" onclick="answer(7,3,false)">D) It ensures proportional hazards at the population level</button>
+    <div class="feedback-bar" id="fb7"></div>
+  </div>
+
+  <div class="mcq-card" id="q8">
+    <div class="mcq-question"><span class="mcq-num">Q8</span>The general mixture cure regression model specifies \(S(t\mid x,z)\) as:</div>
+    <button class="option-btn" onclick="answer(8,0,false)">A) \(\exp\{-\theta(x)F(t)\}\)</button>
+    <button class="option-btn" onclick="answer(8,1,false)">B) \(S_{u,0}(t)^{\exp(\beta^Tx)}\)</button>
+    <button class="option-btn" onclick="answer(8,2,true)">C) \(p(z)\,S_u(t\mid x)+1-p(z)\)</button>
+    <button class="option-btn" onclick="answer(8,3,false)">D) \(p(z)\,h_u(t\mid x)+(1-p(z))\,h_0(t)\)</button>
+    <div class="feedback-bar" id="fb8"></div>
+  </div>
+
+  <div class="mcq-card" id="q9">
+    <div class="mcq-question"><span class="mcq-num">Q9</span>In the mixture cure model, the <em>incidence</em> component models:</div>
+    <button class="option-btn" onclick="answer(9,0,true)">A) \(p(z)=P(B=1\mid Z=z)\), the probability of being susceptible</button>
+    <button class="option-btn" onclick="answer(9,1,false)">B) The conditional survival \(S_u(t\mid x)\) of the susceptibles</button>
+    <button class="option-btn" onclick="answer(9,2,false)">C) The baseline hazard \(h_{u,0}(t)\)</button>
+    <button class="option-btn" onclick="answer(9,3,false)">D) The censoring distribution \(G(t)\)</button>
+    <div class="feedback-bar" id="fb9"></div>
+  </div>
+
+  <div class="mcq-card" id="q10">
+    <div class="mcq-question"><span class="mcq-num">Q10</span>The most commonly used model for the <em>incidence</em> is:</div>
+    <button class="option-btn" onclick="answer(10,0,false)">A) A Weibull regression model</button>
+    <button class="option-btn" onclick="answer(10,1,false)">B) A Cox proportional hazards model</button>
+    <button class="option-btn" onclick="answer(10,2,false)">C) A Kaplan–Meier estimator</button>
+    <button class="option-btn" onclick="answer(10,3,true)">D) A logistic regression model: \(p(z)=\exp(\alpha_0+\alpha^Tz)/[1+\exp(\alpha_0+\alpha^Tz)]\)</button>
+    <div class="feedback-bar" id="fb10"></div>
+  </div>
+
+  <div class="mcq-card" id="q11">
+    <div class="mcq-question"><span class="mcq-num">Q11</span>Which formula correctly represents the logistic incidence model \(p(z)\)?</div>
+    <button class="option-btn" onclick="answer(11,0,false)">A) \(p(z)=\exp(\alpha_0+\alpha^Tz)\)</button>
+    <button class="option-btn" onclick="answer(11,1,true)">B) \(p(z)=\dfrac{\exp(\alpha_0+\alpha^Tz)}{1+\exp(\alpha_0+\alpha^Tz)}\)</button>
+    <button class="option-btn" onclick="answer(11,2,false)">C) \(p(z)=1-\exp\{-\exp(\alpha_0+\alpha^Tz)\}\)</button>
+    <button class="option-btn" onclick="answer(11,3,false)">D) \(p(z)=\Phi(\alpha_0+\alpha^Tz)\)</button>
+    <div class="feedback-bar" id="fb11"></div>
+  </div>
+
+  <div class="mcq-card" id="q12">
+    <div class="mcq-question"><span class="mcq-num">Q12</span>Why can the standard partial likelihood for Cox PH <strong>not</strong> be directly applied to the logistic/Cox PH mixture cure model?</div>
+    <button class="option-btn" onclick="answer(12,0,false)">A) The Cox PH assumption is violated even within the susceptible subgroup</button>
+    <button class="option-btn" onclick="answer(12,1,false)">B) The model requires a Bayesian estimation framework</button>
+    <button class="option-btn" onclick="answer(12,2,true)">C) The baseline hazard \(h_{u,0}(\cdot)\) cannot be isolated because PH does not hold at the population level</button>
+    <button class="option-btn" onclick="answer(12,3,false)">D) The incidence and latency parts must share identical covariates</button>
+    <div class="feedback-bar" id="fb12"></div>
+  </div>
+
+  <div class="mcq-card" id="q13">
+    <div class="mcq-question"><span class="mcq-num">Q13</span>In the EM algorithm for the mixture cure model, which variable is treated as <em>latent</em>?</div>
+    <button class="option-btn" onclick="answer(13,0,false)">A) The censoring time \(C_i\)</button>
+    <button class="option-btn" onclick="answer(13,1,true)">B) The cure/susceptibility indicator \(B_i=I(T_i&lt;\infty)\)</button>
+    <button class="option-btn" onclick="answer(13,2,false)">C) The covariate vector \(X_i\)</button>
+    <button class="option-btn" onclick="answer(13,3,false)">D) The baseline survival function \(S_{u,0}(t)\)</button>
+    <div class="feedback-bar" id="fb13"></div>
+  </div>
+
+  <div class="mcq-card" id="q14">
+    <div class="mcq-question"><span class="mcq-num">Q14</span>In the <em>E-step</em> of the EM algorithm for the cure model, we:</div>
+    <button class="option-btn" onclick="answer(14,0,true)">A) Compute \(E(B_i\mid V_i,\theta^{(m-1)})\) and replace \(B_i\) in the complete-data likelihood</button>
+    <button class="option-btn" onclick="answer(14,1,false)">B) Maximise the observed likelihood with respect to \(\alpha\)</button>
+    <button class="option-btn" onclick="answer(14,2,false)">C) Apply the Breslow estimator to update \(S_{u,0}\)</button>
+    <button class="option-btn" onclick="answer(14,3,false)">D) Run Newton–Raphson on the full observed likelihood</button>
+    <div class="feedback-bar" id="fb14"></div>
+  </div>
+
+  <div class="mcq-card" id="q15">
+    <div class="mcq-question"><span class="mcq-num">Q15</span>The complete-data likelihood \(L_c\) for the logistic/Cox PH cure model factorises as:</div>
+    <button class="option-btn" onclick="answer(15,0,false)">A) \(L_c=L_1(\beta,S_{u,0})\times L_2(\alpha,\beta)\)</button>
+    <button class="option-btn" onclick="answer(15,1,false)">B) \(L_c=L_1(\alpha,\beta)\times L_2(S_{u,0})\)</button>
+    <button class="option-btn" onclick="answer(15,2,false)">C) \(L_c\) does not factorise — all parameters are entangled</button>
+    <button class="option-btn" onclick="answer(15,3,true)">D) \(L_c=L_1(\alpha)\times L_2(\beta,S_{u,0})\), enabling separate estimation of incidence and latency</button>
+    <div class="feedback-bar" id="fb15"></div>
+  </div>
+
+  <div class="mcq-card" id="q16">
+    <div class="mcq-question"><span class="mcq-num">Q16</span>The semiparametric <em>AFT</em> latency model specifies:</div>
+    <button class="option-btn" onclick="answer(16,0,true)">A) \(S_u(t\mid x)=S_0(t\cdot\exp(-\beta^Tx))\) with \(S_0\) unknown</button>
+    <button class="option-btn" onclick="answer(16,1,false)">B) \(S_u(t\mid x)=S_0(t)^{\exp(\beta^Tx)}\)</button>
+    <button class="option-btn" onclick="answer(16,2,false)">C) \(S_u(t\mid x)=\exp(-\lambda\exp(\beta^Tx)t^\rho)\)</button>
+    <button class="option-btn" onclick="answer(16,3,false)">D) \(S_u(t\mid x)=\exp\{-\theta(x)F(t)\}\)</button>
+    <div class="feedback-bar" id="fb16"></div>
+  </div>
+
+  <div class="mcq-card" id="q17">
+    <div class="mcq-question"><span class="mcq-num">Q17</span>A key difference between the AFT and Cox PH latency models in a cure setting is that under AFT:</div>
+    <button class="option-btn" onclick="answer(17,0,false)">A) The support of \(T\) does not depend on \(X\)</button>
+    <button class="option-btn" onclick="answer(17,1,false)">B) PH holds at the population level</button>
+    <button class="option-btn" onclick="answer(17,2,true)">C) The support of \(T\) depends on \(\exp(\beta^TX)\), which can be more realistic for fast vs. slow-growing tumours</button>
+    <button class="option-btn" onclick="answer(17,3,false)">D) The baseline \(S_0\) must be parametrically specified</button>
+    <div class="feedback-bar" id="fb17"></div>
+  </div>
+
+  <div class="mcq-card" id="q18">
+    <div class="mcq-question"><span class="mcq-num">Q18</span>In the promotion time cure model \(S(t\mid x)=\exp\{-\theta(x)F(t)\}\), the cure rate \(P(B=0\mid X=x)\) equals:</div>
+    <button class="option-btn" onclick="answer(18,0,false)">A) \(1-\exp\{-\theta(x)\}\)</button>
+    <button class="option-btn" onclick="answer(18,1,true)">B) \(\exp\{-\theta(x)\}\)</button>
+    <button class="option-btn" onclick="answer(18,2,false)">C) \(1/(1+\theta(x))\)</button>
+    <button class="option-btn" onclick="answer(18,3,false)">D) \(\theta(x)/(1+\theta(x))\)</button>
+    <div class="feedback-bar" id="fb18"></div>
+  </div>
+
+  <div class="mcq-card" id="q19">
+    <div class="mcq-question"><span class="mcq-num">Q19</span>The promotion time cure model is also known as:</div>
+    <button class="option-btn" onclick="answer(19,0,false)">A) The split population model</button>
+    <button class="option-btn" onclick="answer(19,1,false)">B) The limited-failure population life model</button>
+    <button class="option-btn" onclick="answer(19,2,false)">C) The accelerated failure time cure model</button>
+    <button class="option-btn" onclick="answer(19,3,true)">D) The bounded cumulative hazard model or PH cure model</button>
+    <div class="feedback-bar" id="fb19"></div>
+  </div>
+
+  <div class="mcq-card" id="q20">
+    <div class="mcq-question"><span class="mcq-num">Q20</span>In the biological motivation for the promotion time model, an individual with \(N=0\) residual carcinogenic cells is:</div>
+    <button class="option-btn" onclick="answer(20,0,true)">A) Cured — no cell can produce a detectable tumour</button>
+    <button class="option-btn" onclick="answer(20,1,false)">B) A high-risk susceptible patient with fast progression</button>
+    <button class="option-btn" onclick="answer(20,2,false)">C) Censored at time 0</button>
+    <button class="option-btn" onclick="answer(20,3,false)">D) Susceptible with a very long latency period</button>
+    <div class="feedback-bar" id="fb20"></div>
+  </div>
+
+  <div class="mcq-card" id="q21">
+    <div class="mcq-question"><span class="mcq-num">Q21</span>In the promotion time model, increasing \(\theta(x)=\exp(\beta_0+\beta^Tx)\) implies:</div>
+    <button class="option-btn" onclick="answer(21,0,false)">A) A higher cure probability</button>
+    <button class="option-btn" onclick="answer(21,1,false)">B) Longer survival times for susceptible patients</button>
+    <button class="option-btn" onclick="answer(21,2,true)">C) A lower cure probability and worse survival for uncured patients</button>
+    <button class="option-btn" onclick="answer(21,3,false)">D) No change in cure probability; only the baseline hazard is affected</button>
+    <div class="feedback-bar" id="fb21"></div>
+  </div>
+
+  <div class="mcq-card" id="q22">
+    <div class="mcq-question"><span class="mcq-num">Q22</span>Which cure model has a proportional hazards structure at the <strong>population</strong> level?</div>
+    <button class="option-btn" onclick="answer(22,0,false)">A) Logistic / Cox PH mixture cure model</button>
+    <button class="option-btn" onclick="answer(22,1,true)">B) Promotion time (bounded cumulative hazard) cure model</button>
+    <button class="option-btn" onclick="answer(22,2,false)">C) Logistic / AFT mixture cure model</button>
+    <button class="option-btn" onclick="answer(22,3,false)">D) Nonparametric mixture cure model</button>
+    <div class="feedback-bar" id="fb22"></div>
+  </div>
+
+  <div class="mcq-card" id="q23">
+    <div class="mcq-question"><span class="mcq-num">Q23</span>According to Portier et al. (2017), the relationship between \(\hat\beta_{PT}\) and \(\hat\beta_{PH}\) is:</div>
+    <button class="option-btn" onclick="answer(23,0,true)">A) \(\hat\beta_{PT}=\hat\beta_{PH}\)</button>
+    <button class="option-btn" onclick="answer(23,1,false)">B) \(\hat\beta_{PT}=-\hat\beta_{PH}\)</button>
+    <button class="option-btn" onclick="answer(23,2,false)">C) \(\hat\beta_{PT}=2\,\hat\beta_{PH}\)</button>
+    <button class="option-btn" onclick="answer(23,3,false)">D) They are asymptotically unrelated in general</button>
+    <div class="feedback-bar" id="fb23"></div>
+  </div>
+
+  <div class="mcq-card" id="q24">
+    <div class="mcq-question"><span class="mcq-num">Q24</span>In <code>smcure</code>, the <code>formula</code> argument (e.g., <code>Surv(Y,Delta)~X1+X2</code>) specifies:</div>
+    <button class="option-btn" onclick="answer(24,0,false)">A) The logistic incidence model</button>
+    <button class="option-btn" onclick="answer(24,1,false)">B) The censoring model</button>
+    <button class="option-btn" onclick="answer(24,2,false)">C) The baseline hazard model</button>
+    <button class="option-btn" onclick="answer(24,3,true)">D) The latency part — the survival model for susceptibles</button>
+    <div class="feedback-bar" id="fb24"></div>
+  </div>
+
+  <div class="mcq-card" id="q25">
+    <div class="mcq-question"><span class="mcq-num">Q25</span>In the breast cancer example (logistic/Cox PH cure model), the predicted cure probability for <strong>Stage 4</strong> was approximately:</div>
+    <button class="option-btn" onclick="answer(25,0,false)">A) 86.3%</button>
+    <button class="option-btn" onclick="answer(25,1,false)">B) 71.5%</button>
+    <button class="option-btn" onclick="answer(25,2,true)">C) 21.2%</button>
+    <button class="option-btn" onclick="answer(25,3,false)">D) 40.9%</button>
+    <div class="feedback-bar" id="fb25"></div>
+  </div>
+
+  <div class="mcq-card" id="q26">
+    <div class="mcq-question"><span class="mcq-num">Q26</span>The incidence estimate \(\hat\alpha_3=2.777\) (Stage 4 vs Stage 1). The odds ratio for being susceptible is approximately:</div>
+    <button class="option-btn" onclick="answer(26,0,false)">A) \(2.777\)</button>
+    <button class="option-btn" onclick="answer(26,1,true)">B) \(\exp(2.777)\approx 16.07\)</button>
+    <button class="option-btn" onclick="answer(26,2,false)">C) \(\exp(-2.777)\approx 0.062\)</button>
+    <button class="option-btn" onclick="answer(26,3,false)">D) \(2.777^2\approx 7.71\)</button>
+    <div class="feedback-bar" id="fb26"></div>
+  </div>
+
+  <div class="mcq-card" id="q27">
+    <div class="mcq-question"><span class="mcq-num">Q27</span>In the logistic/AFT cure model, \(\hat\beta_3=-3.191\) (Stage 4). How does the median survival of susceptible Stage 4 patients compare to Stage 1?</div>
+    <button class="option-btn" onclick="answer(27,0,false)">A) \(\exp(3.191)\approx 24.3\) times <em>longer</em></button>
+    <button class="option-btn" onclick="answer(27,1,false)">B) \(3.191\) times shorter</button>
+    <button class="option-btn" onclick="answer(27,2,true)">C) \(\exp(3.191)\approx 24.3\) times <em>shorter</em> (Stage 4 median \(=\) Stage 1 median \(\times\exp(-3.191)\))</button>
+    <button class="option-btn" onclick="answer(27,3,false)">D) Unchanged — AFT coefficients affect only the hazard, not the median</button>
+    <div class="feedback-bar" id="fb27"></div>
+  </div>
+
+  <div class="mcq-card" id="q28">
+    <div class="mcq-question"><span class="mcq-num">Q28</span>In economics, cure models are alternatively called:</div>
+    <button class="option-btn" onclick="answer(28,0,true)">A) Split population models</button>
+    <button class="option-btn" onclick="answer(28,1,false)">B) Limited-failure population life models</button>
+    <button class="option-btn" onclick="answer(28,2,false)">C) Defective distribution models</button>
+    <button class="option-btn" onclick="answer(28,3,false)">D) Bounded cumulative hazard models</button>
+    <div class="feedback-bar" id="fb28"></div>
+  </div>
+
+  <div class="mcq-card" id="q29">
+    <div class="mcq-question"><span class="mcq-num">Q29</span>In the personal loan data example (\(n=7521\)), approximately what percentage of loans resulted in default?</div>
+    <button class="option-btn" onclick="answer(29,0,false)">A) 1%</button>
+    <button class="option-btn" onclick="answer(29,1,false)">B) 10%</button>
+    <button class="option-btn" onclick="answer(29,2,true)">C) 5% (376 defaults out of 7521)</button>
+    <button class="option-btn" onclick="answer(29,3,false)">D) 25%</button>
+    <div class="feedback-bar" id="fb29"></div>
+  </div>
+
+  <div class="mcq-card" id="q30">
+    <div class="mcq-question"><span class="mcq-num">Q30</span>When an observation is censored (\(\Delta_i=0\)), the cure status \(B_i\) is:</div>
+    <button class="option-btn" onclick="answer(30,0,false)">A) \(B_i=0\) — definitely cured</button>
+    <button class="option-btn" onclick="answer(30,1,false)">B) \(B_i=1\) — definitely susceptible</button>
+    <button class="option-btn" onclick="answer(30,2,false)">C) Directly estimated by the Kaplan–Meier curve without a cure model</button>
+    <button class="option-btn" onclick="answer(30,3,true)">D) Unknown — could be either cured or susceptible but not yet observed to fail</button>
+    <div class="feedback-bar" id="fb30"></div>
+  </div>
+
+  </div>
+</div>
+
+<!-- ═══════════  SHORT ANSWER  ═══════════ -->
+<div class="sa-section" id="sa">
+  <div class="section-title">✏️ Short Answer Questions</div>
+
+  <div class="sa-card">
+    <div class="sa-question">SA1. Explain what it means for the survival function to be <em>improper</em>. Contrast it with the classical case and state the mathematical definition of the cure rate.</div>
+    <button class="btn-rev-ans" onclick="toggleAns('ans1',this)">Show Answer</button>
+    <div class="answer-panel" id="ans1">
+      <p>In <strong>classical survival analysis</strong>, \(S(t)\) is a proper distribution: \(\lim_{t\to\infty}S(t)=0\), meaning every individual eventually experiences the event with probability 1.</p>
+      <p>In a <strong>cure model</strong>, a fraction \(1-p&gt;0\) never experiences the event (\(T=\infty\)), so:
+      $$\lim_{t\to\infty}S(t)=P(T=\infty)=1-p&gt;0$$
+      The survival function is called <em>improper</em> (or defective). The <strong>cure rate</strong> is \(1-p=\lim_{t\to\infty}S(t)\), visually identifiable as the plateau in the KM plot.</p>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="sa-question">SA2. State and explain the formal nonparametric identifiability condition. What happens if it is violated?</div>
+    <button class="btn-rev-ans" onclick="toggleAns('ans2',this)">Show Answer</button>
+    <div class="answer-panel" id="ans2">
+      <p>The condition \(\tau_{F_u}\leq\tau_G\) — <strong>sufficient follow-up</strong> — requires that the censoring distribution's support extends at least as far as the susceptibles' failure time support. When it holds, \(\hat S(Y_n)\xrightarrow{P}1-p\). If violated, censored susceptibles are indistinguishable from cured individuals, causing the KM tail to systematically overestimate the cure fraction.</p>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="sa-question">SA3. Outline the EM algorithm for the logistic/Cox PH mixture cure model, clearly describing the E-step and M-step.</div>
+    <button class="btn-rev-ans" onclick="toggleAns('ans3',this)">Show Answer</button>
+    <div class="answer-panel" id="ans3">
+      <p>The EM algorithm is needed because \(B_i\) is <strong>latent</strong>. The complete-data likelihood factorises as \(L_c=L_1(\alpha)\times L_2(\beta,S_{u,0})\), but \(B_i\) is unobserved.</p>
+      <p><strong>E-step</strong>: For \(\Delta_i=1\): \(w_i=1\). For \(\Delta_i=0\):
+      $$w_i^{(m)}=\frac{p^{(m-1)}(Z_i)\,S_u^{(m-1)}(Y_i\mid X_i)}{1-p^{(m-1)}(Z_i)+p^{(m-1)}(Z_i)\,S_u^{(m-1)}(Y_i\mid X_i)}$$</p>
+      <p><strong>M-step</strong>: Update \(\alpha\) via weighted logistic regression (weights \(w_i\)); update \(\beta,S_{u,0}\) via weighted partial likelihood. Iterate until convergence. Variances by bootstrap.</p>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="sa-question">SA4. Compare the mixture cure model and the promotion time cure model across structure, population-level PH, covariate interpretation, and link to standard models.</div>
+    <button class="btn-rev-ans" onclick="toggleAns('ans4',this)">Show Answer</button>
+    <div class="answer-panel" id="ans4">
+      <table>
+        <thead><tr><th>Feature</th><th>Mixture Cure</th><th>Promotion Time</th></tr></thead>
+        <tbody>
+          <tr><td>Formula</td><td>\(p(z)S_u(t\mid x)+1-p(z)\)</td><td>\(\exp\{-\theta(x)F(t)\}\)</td></tr>
+          <tr><td>Cure rate</td><td>\(1-p(z)\) via logistic incidence</td><td>\(\exp\{-\theta(x)\}\)</td></tr>
+          <tr><td>Population-level PH</td><td>No</td><td>Yes</td></tr>
+          <tr><td>Covariate interpretation</td><td>Separate effects on incidence vs. latency</td><td>Single parameter affects both simultaneously</td></tr>
+          <tr><td>Link to standard models</td><td>Reduces to Cox/AFT when \(p\equiv1\)</td><td>\(\hat\beta_{PT}=\hat\beta_{PH}\) (Portier 2017)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="sa-question">SA5. Interpret \(\hat\alpha_3=2.777\) and \(\hat\beta_3=2.469\) from the logistic/Cox PH cure model. Explain the distinction between long-term and short-term effects.</div>
+    <button class="btn-rev-ans" onclick="toggleAns('ans5',this)">Show Answer</button>
+    <div class="answer-panel" id="ans5">
+      <p><strong>Incidence (\(\hat\alpha_3=2.777\)) — long-term effect:</strong> The odds ratio for being susceptible in Stage 4 vs Stage 1 is \(\exp(2.777)\approx16.07\). Stage 4 patients have approximately 16 times the odds of eventually experiencing the event, meaning their cure probability drops from ~81% to ~21%.</p>
+      <p><strong>Latency (\(\hat\beta_3=2.469\)) — short-term effect:</strong> Among susceptible (uncured) patients only, Stage 4 patients face a hazard \(\exp(2.469)\approx11.81\) times that of susceptible Stage 1 patients.</p>
+      <p><strong>Key distinction:</strong> The mixture cure model separates <em>whether</em> someone will ever experience the event (incidence) from <em>how quickly</em> susceptible individuals progress (latency). A standard Cox PH model conflates these two effects into a single hazard ratio.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+var answered={};
+var score=0;
+var total=30;
+
+function answer(qNum,optIdx,isCorrect){
+  if(answered[qNum])return;
+  answered[qNum]=true;
+  if(isCorrect)score++;
+  var card=document.getElementById('q'+qNum);
+  var btns=card.querySelectorAll('.option-btn');
+  var fb=document.getElementById('fb'+qNum);
+  btns.forEach(function(b,i){
+    b.disabled=true;
+    if(i===optIdx){b.classList.add(isCorrect?'correct':'incorrect');}
+  });
+  if(!isCorrect){
+    btns.forEach(function(b){
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(',true)')){
+        b.classList.add('reveal-correct');
+      }
+    });
+  }
+  fb.textContent=isCorrect?'✓ Correct!':'✗ Incorrect. See the highlighted answer above.';
+  fb.className='feedback-bar '+(isCorrect?'correct':'incorrect');
+  document.getElementById('score-display').textContent=score+' / '+total;
+}
+
+function revealAll(){
+  for(var q=1;q<=total;q++){
+    if(answered[q])continue;
+    var card=document.getElementById('q'+q);
+    var btns=card.querySelectorAll('.option-btn');
+    var fb=document.getElementById('fb'+q);
+    btns.forEach(function(b){
+      b.disabled=true;
+      if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(',true)')){
+        b.classList.add('reveal-correct');
+      }
+    });
+    fb.textContent='Answer revealed.';
+    fb.className='feedback-bar incorrect';
+    answered[q]=true;
+  }
+  document.getElementById('score-display').textContent=score+' / '+total;
+}
+
+function resetAll(){
+  answered={};score=0;
+  document.getElementById('score-display').textContent='0 / '+total;
+  for(var q=1;q<=total;q++){
+    var card=document.getElementById('q'+q);
+    var btns=card.querySelectorAll('.option-btn');
+    var fb=document.getElementById('fb'+q);
+    btns.forEach(function(b){b.disabled=false;b.className='option-btn';});
+    fb.textContent='';fb.className='feedback-bar';
+  }
+}
+
+function toggleAns(id,btn){
+  var panel=document.getElementById(id);
+  if(panel.style.display==='block'){
+    panel.style.display='none';btn.textContent='Show Answer';
+  }else{
+    panel.style.display='block';btn.textContent='Hide Answer';
+    if(window.MathJax)MathJax.typesetPromise([panel]);
+  }
+}
+
+// ── 修复跳转：用 window.scrollTo + getBoundingClientRect ──
+document.querySelectorAll('.nav-link').forEach(function(link){
+  link.addEventListener('click', function(){
+    // 更新 active 状态
+    document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
+    link.classList.add('active');
+    // 跳转到目标 section
+    var targetId = link.getAttribute('data-target');
+    var target = document.getElementById(targetId);
+    if(target){
+      var top = target.getBoundingClientRect().top + window.pageYOffset - 8;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+
+</body></html>

@@ -1,0 +1,817 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 — Dependent Censoring | Survival Analysis</title>
+<script>
+MathJax = {
+    tex: {
+        inlineMath: [['\\(','\\)']],
+        displayMath: [['$$','$$'],['\\[','\\]']],
+        packages: {'[+]': ['ams']}
+    },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async=""></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.68;color:#1a1a2e;background:#f5f7fa}
+header{background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);color:#fff;padding:2.5rem 2rem 2rem;text-align:center}
+header .badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:.3rem 1rem;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.9rem}
+header h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;margin-bottom:.4rem}
+header p{font-size:1rem;opacity:.8}
+nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #e8eaf0;display:flex;flex-wrap:wrap;padding:0 1rem}
+nav a{display:inline-block;padding:.75rem 1rem;font-size:.82rem;font-weight:600;color:#5a6275;text-decoration:none;border-bottom:3px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap}
+nav a:hover{color:#0f3460;border-bottom-color:#0f3460}
+nav a.active{color:#0f3460;border-bottom-color:#e94560}
+.container{max-width:1000px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.section-title{font-size:1.55rem;font-weight:700;color:#0f3460;margin:2.5rem 0 1rem;padding-bottom:.4rem;border-bottom:2px solid #e8eaf0}
+.subsection-title{font-size:1.15rem;font-weight:700;color:#16213e;margin:1.6rem 0 .6rem}
+.callout{border-radius:8px;padding:1rem 1.25rem;margin:1.1rem 0;border-left:4px solid}
+.callout-blue{background:#eef4ff;border-color:#3b82f6}
+.callout-green{background:#f0fdf4;border-color:#22c55e}
+.callout-amber{background:#fffbeb;border-color:#f59e0b}
+.callout-red{background:#fef2f2;border-color:#ef4444}
+.callout-purple{background:#faf5ff;border-color:#a855f7}
+.callout strong{display:block;margin-bottom:.3rem;font-size:.88rem;text-transform:uppercase;letter-spacing:.05em}
+.callout-blue strong{color:#1d4ed8}
+.callout-green strong{color:#15803d}
+.callout-amber strong{color:#b45309}
+.callout-red strong{color:#b91c1c}
+.callout-purple strong{color:#7e22ce}
+.tbl-wrap{overflow-x:auto;margin:1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{background:#0f3460;color:#fff;padding:.6rem .9rem;text-align:left;font-weight:600}
+td{padding:.55rem .9rem;border-bottom:1px solid #e8eaf0}
+tr:nth-child(even) td{background:#f8f9fc}
+tr:hover td{background:#eef4ff}
+pre{background:#1e2030;color:#a9b7c6;border-radius:8px;padding:1.1rem 1.3rem;overflow-x:auto;font-size:.83rem;line-height:1.55;margin:.8rem 0}
+code{font-family:'Cascadia Code','Fira Code',Consolas,monospace}
+p code,li code{background:#f0f4ff;color:#0f3460;border-radius:4px;padding:.1em .4em;font-size:.88em}
+.theorem{background:#f8f9ff;border:1.5px solid #818cf8;border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+.theorem .label{font-weight:700;color:#4f46e5;font-size:.95rem;margin-bottom:.4rem}
+.mcq-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;margin-bottom:1.5rem}
+.score-badge{background:#0f3460;color:#fff;border-radius:20px;padding:.45rem 1.2rem;font-weight:700;font-size:.95rem;min-width:120px;text-align:center}
+.btn-reset{background:#e94560;color:#fff;border:none;border-radius:20px;padding:.45rem 1.4rem;font-weight:600;font-size:.9rem;cursor:pointer;transition:background .2s,transform .1s}
+.btn-reset:hover{background:#c73652;transform:scale(1.03)}
+.mcq-card{background:#fff;border-radius:10px;padding:1.3rem 1.5rem;margin-bottom:1.3rem;border:1.5px solid #e8eaf0;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.mcq-card .q-label{font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem}
+.mcq-card .q-text{font-weight:600;color:#1a1a2e;margin-bottom:.9rem;font-size:.97rem}
+.options{display:flex;flex-direction:column;gap:.5rem}
+.opt-btn{display:flex;align-items:flex-start;gap:.7rem;background:#f8f9fc;border:1.5px solid #e0e4ef;border-radius:7px;padding:.6rem .9rem;cursor:pointer;font-size:.9rem;text-align:left;color:#1a1a2e;transition:background .15s,border-color .15s}
+.opt-btn:hover:not(:disabled){background:#eef4ff;border-color:#3b82f6}
+.opt-btn .opt-key{font-weight:700;color:#0f3460;min-width:1.5rem;flex-shrink:0}
+.opt-btn.correct{background:#f0fdf4;border-color:#22c55e;color:#15803d}
+.opt-btn.incorrect{background:#fef2f2;border-color:#ef4444;color:#b91c1c}
+.opt-btn.revealed{background:#f0fdf4;border-color:#22c55e;color:#15803d}
+.opt-btn:disabled{cursor:default}
+.feedback{margin-top:.7rem;padding:.7rem .9rem;background:#f9fafb;border-radius:6px;font-size:.87rem;color:#374151;display:none;border-left:3px solid #9ca3af}
+.feedback.show{display:block}
+p{margin-bottom:.8rem}
+ul,ol{margin:.5rem 0 .8rem 1.5rem}
+li{margin-bottom:.3rem}
+hr{border:none;border-top:1px solid #e8eaf0;margin:2rem 0}
+@media(max-width:600px){nav a{font-size:.75rem;padding:.65rem .7rem}header{padding:1.5rem 1rem 1.2rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">📊 Chapter 7 — Dependent Censoring</div>
+  <h1>Survival Analysis</h1>
+  <p>Statistical Methods &nbsp;·&nbsp; Exam Preparation Notes</p>
+</header>
+
+<nav id="main-nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#intro">Introduction</a>
+  <a href="#copulas">Copulas</a>
+  <a href="#no-covariates">No Covariates</a>
+  <a href="#with-covariates">With Covariates</a>
+  <a href="#mcq">MCQ ×30</a>
+</nav>
+
+<div class="container">
+
+<!-- ─────────────────────────────────────────────────── OVERVIEW -->
+<section id="overview">
+<h2 class="section-title">Overview &amp; Key Concepts</h2>
+
+<p>Dependent censoring arises when the survival time \(T\) and the censoring time \(C\) are <strong>not independent</strong>. Because we only observe \(Y = \min(T,C)\) and \(\Delta = I(T \le C)\), the joint distribution of \((T,C)\) is <em>not identifiable</em> without additional structural assumptions. Applying standard methods (KM, Cox) under dependent censoring produces <strong>biased estimates</strong>.</p>
+
+<div class="callout callout-blue">
+  <strong>Core Observable</strong>
+  We see either \(T\) or \(C\) — never both — so the dependence between them cannot be recovered from data alone. A structural model (parametric or semiparametric) is required to identify the event-time distribution.
+</div>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Topic</th><th>Key Reference / Tool</th></tr></thead>
+  <tbody>
+    <tr><td>Non-identifiability result</td><td>Tsiatis (1975); Crowder (1991)</td></tr>
+    <tr><td>Copula-graphic estimator (no covariates, known copula)</td><td>Zheng &amp; Klein (1995); Rivest &amp; Wells (2001)</td></tr>
+    <tr><td>Fully parametric, unknown copula parameter \(\theta\)</td><td>Czado &amp; Van Keilegom (2023)</td></tr>
+    <tr><td>Transformation model with covariates</td><td>Deresa &amp; Van Keilegom (2020)</td></tr>
+    <tr><td>Semiparametric copula model (Cox + parametric \(C\))</td><td>Deresa &amp; Van Keilegom (2024)</td></tr>
+  </tbody>
+</table>
+</div>
+</section>
+
+<!-- ─────────────────────────────────────────────────── INTRODUCTION -->
+<section id="intro">
+<h2 class="section-title">Introduction to Dependent Censoring</h2>
+
+<h3 class="subsection-title">When Is \(T \perp\!\!\!\perp C\) Plausible?</h3>
+<ul>
+  <li><strong>Administrative censoring:</strong> individuals alive at the pre-specified end date are censored — determined by the study calendar, unrelated to individual health.</li>
+  <li><strong>Unrelated loss to follow-up:</strong> patients who move away or die in unrelated accidents.</li>
+</ul>
+
+<h3 class="subsection-title">When Is \(T \perp\!\!\!\perp C\) Doubtful?</h3>
+<ul>
+  <li><strong>Medical trials (deteriorating):</strong> patients withdraw because their condition is worsening → <em>positive</em> association (\(T\) short, \(C\) short).</li>
+  <li><strong>Medical trials (improved):</strong> patients withdraw because they feel better and stop treatment → <em>negative</em> association.</li>
+  <li><strong>Unemployment studies:</strong> unmotivated individuals drop out quickly and also take longer to find work → \(C\) depends on \(T\).</li>
+  <li><strong>Transplant studies:</strong> organ allocation is based on disease severity, so waiting time \(C\) depends on survival prognosis \(T\).</li>
+  <li><strong>Health economics (medical costs):</strong> if \(U = RT\) and each individual has a random cost-accumulation rate \(R\), then \(U\) is censored by \(RC\), creating dependence through the shared \(R\).</li>
+</ul>
+
+<div class="callout callout-amber">
+  <strong>Critical Principle</strong>
+  \(T \perp\!\!\!\perp C\) <strong>cannot be tested nonparametrically</strong> from \((Y_i, \Delta_i)\) alone. It must be motivated by the study context. Standard methods applied under dependent censoring produce biased and potentially misleading results.
+</div>
+
+<h3 class="subsection-title">Effect of Dependence on the Kaplan–Meier Estimator</h3>
+<p>Consider \((\log T, \log C) \sim N_2\!\left(\begin{pmatrix}0\\0\end{pmatrix}, \begin{pmatrix}1 &amp; \rho\\ \rho &amp; 1\end{pmatrix}\right)\). Simulations show a clear pattern:</p>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Correlation \(\rho\)</th><th>KM estimator bias</th></tr></thead>
+  <tbody>
+    <tr><td>\(\rho = 0\)</td><td>Unbiased — KM tracks the true \(S(t)\)</td></tr>
+    <tr><td>\(\rho &gt; 0\) (e.g. 0.3, 0.6, 0.9)</td><td>KM lies <em>above</em> true \(S(t)\) — overestimates survival; bias increases with \(\rho\)</td></tr>
+    <tr><td>\(\rho &lt; 0\) (e.g. −0.3, −0.6, −0.9)</td><td>KM lies <em>below</em> true \(S(t)\) — underestimates survival; bias increases with \(|\rho|\)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">Liver Transplant Example</h3>
+<p>281 patients registered for a liver transplant; 75 died while waiting (\(\Delta=1\)), the rest received a transplant (\(\Delta=0\)). Since organs are allocated based on medical severity, patients closer to death receive a transplant sooner — creating positive dependence between \(T\) (time to death) and \(C\) (time to transplant). Covariates: Age (\(X_1\)), Gender (\(X_2\)), BMI (\(X_3\)), UKELD score (\(X_4\)).</p>
+
+<p>A naive log-normal AFT fit in R (ignoring dependent censoring):</p>
+<pre><code>fit = survreg(Surv(Y, Delta) ~ X, dist = "lognormal")
+#              Value    Std. Error    z         p
+# (Intercept)  24.40    2.04       11.99   &lt;2e-16
+# Age (X1)     -0.08    0.02       -4.41   1.1e-05
+# UKELD (X4)   -0.22    0.02       -8.99   &lt;2e-16</code></pre>
+<p>These coefficients are <strong>biased</strong> because dependent censoring is ignored.</p>
+</section>
+
+<!-- ─────────────────────────────────────────────────── COPULAS -->
+<section id="copulas">
+<h2 class="section-title">Copulas</h2>
+
+<h3 class="subsection-title">Definition and Sklar's Theorem</h3>
+<p>A <strong>copula</strong> is a bivariate distribution function on \([0,1]^2\) with uniform margins. It captures the dependence structure separately from the marginals.</p>
+
+<div class="theorem">
+  <div class="label">Sklar's Theorem</div>
+  If \(X \sim F\), \(Y \sim G\) are continuous, there exists a <strong>unique</strong> copula \(\mathcal{C}\) such that
+  \[ P(X \le x,\; Y \le y) = \mathcal{C}(F(x),\, G(y)). \]
+  If \(X \perp\!\!\!\perp Y\), then \(\mathcal{C}(u,v) = uv\) — the <strong>independence copula</strong>.
+</div>
+
+<h3 class="subsection-title">Archimedean Copulas</h3>
+<p>A copula is Archimedean if \(\mathcal{C}(u,v) = \psi^{[-1]}(\psi(u)+\psi(v))\), where \(\psi:[0,1]\to[0,\infty]\) is the <strong>generator</strong> — continuous, strictly decreasing, convex, \(\psi(1)=0\) — and \(\psi^{[-1]}\) is its pseudo-inverse.</p>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Family</th><th>Generator \(\psi(u)\)</th><th>Copula formula</th><th>Kendall's \(\tau\)</th></tr></thead>
+  <tbody>
+    <tr><td>Independence</td><td>\(-\log u\)</td><td>\(uv\)</td><td>0</td></tr>
+    <tr><td>Clayton (\(\alpha &gt; 0\))</td><td>\(u^{-\alpha}-1\)</td><td>\([u^{-\alpha}+v^{-\alpha}-1]^{-1/\alpha}\)</td><td>\(\alpha/(\alpha+2)\)</td></tr>
+    <tr><td>Gumbel (\(\alpha \ge 1\))</td><td>\((-\log u)^\alpha\)</td><td>\(\exp\{-((-\log u)^\alpha+(-\log v)^\alpha)^{1/\alpha}\}\)</td><td>\(1-1/\alpha\)</td></tr>
+    <tr><td>Frank (\(\alpha \ne 0\))</td><td>\(-\log\!\frac{e^{-\alpha u}-1}{e^{-\alpha}-1}\)</td><td>closed form</td><td>via integral</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3 class="subsection-title">Gaussian (Elliptical) Copula</h3>
+<p>
+\[ \mathcal{C}_\rho(u,v) = \Phi_R\!\left(\Phi^{-1}(u),\;\Phi^{-1}(v)\right), \]
+where \(\Phi_R\) is the bivariate normal CDF with correlation matrix \(R\) and \(\Phi^{-1}\) is the standard normal quantile function. The parameter \(\rho \in [-1,1]\) controls the strength and direction of dependence.
+</p>
+
+<h3 class="subsection-title">Kendall's Tau</h3>
+<p>The association parameter \(\xi\) of a copula family can be linked to Kendall's tau:
+\[ \tau = 4\int_0^1\!\!\int_0^1 \mathcal{C}_\xi(u,v)\,d\mathcal{C}_\xi(u,v) - 1. \]
+This relationship is one-to-one for Archimedean and Gaussian copulas, allowing a simple summary of dependence strength.
+</p>
+
+<h3 class="subsection-title">H-Functions (Conditional CDFs)</h3>
+<p>The <strong>h-functions</strong> are partial derivatives of the copula and represent conditional CDFs:
+\[ h_{T|C}(u\mid v) = \frac{\partial}{\partial v}\mathcal{C}(u,v), \qquad h_{C|T}(v\mid u) = \frac{\partial}{\partial u}\mathcal{C}(u,v). \]
+These appear directly in the likelihood under dependent censoring.
+</p>
+</section>
+
+<!-- ─────────────────────────────────────────────────── NO COVARIATES -->
+<section id="no-covariates">
+<h2 class="section-title">Models Without Covariates</h2>
+
+<h3 class="subsection-title">Non-identifiability</h3>
+<p>Cox (1959) and Tsiatis (1975): for any observed \((Y,\Delta)\) process, infinitely many joint distributions \((T,C)\) are compatible with it. Crowder (1991): even if the marginal laws are known, the joint distribution is not identifiable. This necessitates structural assumptions.</p>
+
+<h3 class="subsection-title">Approach 1 — Zheng &amp; Klein (1995): Known Copula</h3>
+<p>Model the joint survival via a <strong>fully specified</strong> copula (known family and parameter value):
+\[ P(T&gt;t,\;C&gt;c) = \mathcal{C}(S_T(t),\,S_C(c)). \]
+Extends the KM estimator to dependent censoring. The copula must be fully pre-specified.
+</p>
+
+<h3 class="subsection-title">Approach 2 — Rivest &amp; Wells (2001): Copula-Graphic Estimator</h3>
+<p>For Archimedean copulas with \(\psi(0)=\infty\):
+\[ P(T&gt;t,\;C&gt;c) = \psi^{-1}\!\left(\psi(S_T(t))+\psi(S_C(c))\right). \]
+The copula-graphic estimator has an explicit formula:
+\[ \hat{S}_T(t) = \psi^{-1}\!\left[-\sum_{Y_i\le t,\,\Delta_i=1}\!\left\{\psi\!\left(\hat\pi(Y_i)\right)-\psi\!\left(\hat\pi(Y_i)-\tfrac{1}{n}\right)\right\}\right], \]
+where \(\hat\pi(t) = n^{-1}\sum_{i=1}^n I(Y_i \ge t)\).
+</p>
+
+<div class="callout callout-green">
+  <strong>Special Case: KM as Copula-Graphic</strong>
+  Setting \(\psi(u)=-\log u\) (independence copula) makes the copula-graphic estimator reduce exactly to the <strong>Kaplan–Meier estimator</strong>. KM is a special case under independence.
+</div>
+
+<pre><code>library(compound.Cox); library(copula)
+tau = tau(claytonCopula(2))       # tau = alpha/(alpha+2) = 2/4 = 0.50
+fit.cg = CG.Clayton(Y, Delta, alpha = 2)   # copula-graphic estimator
+
+# Compare different tau values
+alpha = c(0, 1, 2, 4)            # tau = 0, 1/3, 1/2, 2/3
+for (k in 1:4) {
+  fit.cg = CG.Clayton(Y, Delta, alpha = alpha[k], S.plot = FALSE)
+}</code></pre>
+
+<div class="callout callout-red">
+  <strong>Sensitivity Warning</strong>
+  The copula-graphic estimator is highly sensitive to the choice of \(\tau\). Different values of \(\tau\) yield substantially different estimated survival functions. This motivates methods that estimate \(\tau\) from the data rather than fix it in advance.
+</div>
+
+<h3 class="subsection-title">Approach 3 — Czado &amp; Van Keilegom (2023): Unknown Copula Parameter</h3>
+<p>Both marginals and copula are parametric, but the copula parameter \(\theta\) is <em>unknown</em>:
+\[ F_{T,C}(t,c) = \mathcal{C}_\theta(F_{T,\theta_T}(t),\;F_{C,\theta_C}(c)). \]
+The full parameter vector \(\alpha = (\theta, \theta_T, \theta_C)^\top\) is estimated by MLE.
+</p>
+
+<div class="theorem">
+  <div class="label">Identifiability Theorem (Czado &amp; VK, 2023)</div>
+  The model is identifiable if conditions (C1) and (C2) hold:
+  <ul style="margin-top:.5rem">
+    <li><strong>(C1) Marginal tail condition:</strong> \(\lim_{t\to a} f_{T,\theta_{T1}}(t)/f_{T,\theta_{T2}}(t) = 1 \iff \theta_{T1}=\theta_{T2}\) for \(a\in\{0,\infty\}\), and similarly for \(C\). Satisfied for <strong>log-normal, log-Student-\(t\), Weibull, log-logistic</strong>.</li>
+    <li><strong>(C2) H-function tail condition:</strong> \(\lim_{t\to 0\text{ or }\infty} h_{T|C,\theta}(u_t\mid v_t)=0\) for all parameters. Satisfied for <strong>Frank</strong> (always), <strong>Gumbel</strong> (mild tail conditions on margins), <strong>Gaussian</strong> (mild conditions).</li>
+  </ul>
+</div>
+
+<h3 class="subsection-title">Log-Likelihood</h3>
+<p>For i.i.d. data \(\{(Y_i,\Delta_i)\}\):
+\begin{align}
+\ell(\alpha;\mathcal{D}) &amp;= \sum_{\Delta_i=1}\log\!\left(f_{T,\theta_T}(Y_i)\bigl\{1-h_{C|T,\theta}(F_{C,\theta_C}(Y_i)\mid F_{T,\theta_T}(Y_i))\bigr\}\right) \\
+&amp;\quad + \sum_{\Delta_i=0}\log\!\left(f_{C,\theta_C}(Y_i)\bigl\{1-h_{T|C,\theta}(F_{T,\theta_T}(Y_i)\mid F_{C,\theta_C}(Y_i))\bigr\}\right).
+\end{align}
+</p>
+
+<div class="callout callout-purple">
+  <strong>Simulation Summary (Frank copula, log-normal margins)</strong>
+  For \(n=200\) and \(n=500\), the MLE shows near-zero bias for all parameters including Kendall's \(\tau\). Larger \(\tau\) is estimated more precisely (smaller SD/RMSE). Asymptotic SEs from the Hessian closely match empirical SDs. Estimators are approximately normal.
+</div>
+</section>
+
+<!-- ─────────────────────────────────────────────────── WITH COVARIATES -->
+<section id="with-covariates">
+<h2 class="section-title">Models With Covariates</h2>
+
+<h3 class="subsection-title">Approach 1 — Copula-Graphic with Covariates</h3>
+<p>Extensions allowing covariates differ in how they model the marginals, while keeping the copula fully known. Examples include: fully nonparametric (Braekers &amp; Veraverbeke 2005), Cox model (Huang &amp; Zhang 2008; Emura &amp; Chen 2016), transformation model (Chen 2010), nonparametric location-scale (Sujica &amp; VK 2015, 2017).</p>
+
+<pre><code># R: Clayton copula (alpha=2, tau=0.5), UKELD covariate
+U.st = (UKELD - mean(UKELD)) / sd(UKELD)
+cg.cov = dependCox.reg(Y, Delta, U.st, alpha = 2, var = TRUE, censor.reg = TRUE)
+
+# $surv.reg (event time regression)
+#   beta      SE       Z         P
+#   8.5e-01  1.08e-01  7.89e+00  3.00e-15
+
+# $censor.reg (censoring time regression)
+#   beta      SE       Z         P
+#   4.21e-01  7.11e-02  5.92e+00  3.25e-09
+
+# Compare: naive Cox ignoring dependence
+coxph(Surv(Y, Delta) ~ U.st)
+#  UKELD coef = 1.10  (overestimated because dependence ignored)</code></pre>
+
+<h3 class="subsection-title">Approach 2 — Transformation Model (Deresa &amp; VK, 2020)</h3>
+<p>Both \(T\) and \(C\) are modelled jointly through a parametric transformation:
+\[ \begin{cases} \Lambda_\theta(\log T) = \beta_0 + \beta^\top X + \epsilon_T \\ \Lambda_\theta(\log C) = \eta_0 + \eta^\top W + \epsilon_C \end{cases} \]
+with \(\binom{\epsilon_T}{\epsilon_C} \sim N_2\!\!\left(\mathbf{0},\;\Sigma = \begin{pmatrix}\sigma_T^2 &amp; \rho\sigma_T\sigma_C \\ \rho\sigma_T\sigma_C &amp; \sigma_C^2\end{pmatrix}\right)\) independent of \((X,W)\). The parameter \(\rho = \text{Corr}(\Lambda_\theta(\log T), \Lambda_\theta(\log C)\mid X,W) \in [-1,1]\) directly quantifies the residual dependence.
+</p>
+
+<h3 class="subsection-title">Yeo–Johnson Transformation</h3>
+<p>
+\[ \Lambda_\theta(t) = \begin{cases} \{(t+1)^\theta-1\}/\theta &amp; t \ge 0,\;\theta\ne 0 \\ \log(t+1) &amp; t \ge 0,\;\theta=0 \\ -\{(-t+1)^{2-\theta}-1\}/(2-\theta) &amp; t&lt;0,\;\theta\ne 2 \\ -\log(-t+1) &amp; t&lt;0,\;\theta=2 \end{cases} \]
+</p>
+<ul>
+  <li>\(\theta = 1\): \(\Lambda_1(\log T) = \log T\) — log-normal marginal.</li>
+  <li>\(1 &lt; \theta \le 2\): convex, lies above \(\log T\).</li>
+  <li>\(0 \le \theta &lt; 1\): concave, lies below \(\log T\).</li>
+</ul>
+<p>Generalises Box–Cox to the full real line: Yeo-Johnson maps \(\mathbb{R}\to\mathbb{R}\) for \(\theta \in [0,2]\), while Box-Cox maps only \(\mathbb{R}^+\).</p>
+
+<h3 class="subsection-title">Results: Liver Transplant (Transformation Model)</h3>
+
+<div class="tbl-wrap">
+<table>
+  <thead><tr><th>Parameter</th><th>Estimate</th><th>SE</th><th>p-value</th><th>Interpretation</th></tr></thead>
+  <tbody>
+    <tr><td>Age</td><td>−0.165</td><td>0.097</td><td>0.088</td><td>Borderline: older → shorter survival</td></tr>
+    <tr><td>Gender</td><td>0.920</td><td>0.898</td><td>0.306</td><td>Not significant</td></tr>
+    <tr><td>BMI</td><td>−0.086</td><td>0.065</td><td>0.185</td><td>Not significant</td></tr>
+    <tr><td>UKELD</td><td>−0.614</td><td>0.218</td><td>0.005</td><td>Significant: higher UKELD → shorter survival</td></tr>
+    <tr><td>\(\hat\rho\)</td><td>0.741</td><td>0.245</td><td>0.003</td><td>Strong positive dependence \(T\)–\(C\)</td></tr>
+    <tr><td>\(\hat\theta\)</td><td>1.774</td><td>0.197</td><td>&lt;0.001</td><td>Departure from log-normal (\(\theta \ne 1\))</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Key findings: UKELD significantly associated with shorter survival. \(\hat\rho = 0.741\) confirms strong positive dependence — sicker patients (short \(T\)) receive transplants sooner (short \(C\)). Results differ substantially from naive AFT (e.g. UKELD: −0.22 vs. −0.614).</p>
+
+<p>For a female patient aged 50, UKELD = 57, BMI = 25: <strong>1-year survival ≈ 37%</strong>, median survival ≈ 269 days.</p>
+
+<h3 class="subsection-title">Approach 3 — Semiparametric Copula Model (Deresa &amp; VK, 2024)</h3>
+<p>\(T|X\) follows a <strong>Cox PH model</strong>:
+\[ F_{T|X}(t|x) = 1-\exp\!\{-H_0(t)e^{x^\top\beta}\}, \]
+\(C|W\) follows a <strong>parametric regression model</strong>, and an independent administrative censoring time \(A\) is also possible, so we observe \(Y=\min(T,C,A)\), \(\Delta_1=I(Y=T)\), \(\Delta_2=I(Y=C)\). The copula \(\mathcal{C}_\gamma\) links \(T\) and \(C\) (independently of covariates).
+</p>
+
+<div class="theorem">
+  <div class="label">Identifiability (C1)–(C5)</div>
+  Under conditions including: full-rank covariance of \(X\) and \(W\); at least one unique continuous variable in each; tail conditions on marginals and copula — the model is identifiable for <strong>Frank, Gumbel, and Gaussian</strong> copulas paired with log-normal, Weibull, etc., marginals.
+</div>
+
+<h3 class="subsection-title">Estimation — Pseudo-Likelihood Approach</h3>
+<p>Direct maximisation is difficult because \(H_0\) is unknown. Instead:</p>
+<ol>
+  <li>For fixed \(\theta = (\gamma,\beta,\eta)\), compute the <strong>Breslow estimator</strong> \(\hat{H}_0(\cdot,\theta)\).</li>
+  <li>Plug into the score equation: \(U_n(\theta,\hat{H}_0(\cdot,\theta)) = 0\).</li>
+  <li>Solve for \(\hat\theta\).</li>
+</ol>
+
+<div class="callout callout-green">
+  <strong>Connection to Cox Partial Likelihood</strong>
+  Under the independence copula \(\mathcal{C}(u,v)=uv\), \(\hat{H}_0\) reduces to the Breslow estimator and \(\hat\theta\) reduces exactly to the Cox partial likelihood estimator. The new method is a genuine extension of Cox to dependent censoring.
+</div>
+
+<p>Simulations (Frank copula, \(n=500\), \(\tau=0.8\)): the Frank copula model has near-zero bias (e.g. \(\hat\beta_2\): bias = −0.013); the naive independence copula (Cox) has Bias = 0.327 for \(\beta_2\) — a 32% overestimation of the covariate effect. Estimators are approximately normal (confirmed by QQ plots).</p>
+</section>
+
+<!-- ─────────────────────────────────────────────────── MCQ -->
+<section id="mcq">
+<h2 class="section-title">🎯 Multiple Choice &amp; True/False Questions</h2>
+
+<div class="mcq-header">
+  <div class="score-badge">Score: <span id="score">0</span> / <span id="total">30</span></div>
+  <button class="btn-reset" onclick="resetAll()">↺ Reset All</button>
+</div>
+
+<!-- Q1 -->
+<div class="mcq-card" id="q1">
+  <div class="q-label">Question 1 · Identifiability</div>
+  <div class="q-text">From the observed data \((Y_i, \Delta_i)_{i=1}^n\) with \(Y=\min(T,C)\) and \(\Delta=I(T\le C)\), the joint distribution of \((T,C)\) is:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q1',false)"><span class="opt-key">A)</span> Always uniquely identifiable — the minimum and indicator together determine the joint law.</button>
+    <button class="opt-btn" onclick="ans(this,'q1',false)"><span class="opt-key">B)</span> Identifiable if and only if both marginals are known.</button>
+    <button class="opt-btn" onclick="ans(this,'q1',true)"><span class="opt-key">C)</span> Not identifiable nonparametrically — infinitely many joint distributions of \((T,C)\) can produce the same \((Y,\Delta)\) process.</button>
+    <button class="opt-btn" onclick="ans(this,'q1',false)"><span class="opt-key">D)</span> Identifiable as long as the censoring percentage is below 50%.</button>
+  </div>
+  <div class="feedback" id="fb-q1">Tsiatis (1975) proved non-identifiability: for any observed \((Y,\Delta)\) process, infinitely many joint distributions \((T,C)\) are compatible. Crowder (1991) strengthened this: even knowing the marginals does not determine the joint. Structural modelling assumptions are essential.</div>
+</div>
+
+<!-- Q2 -->
+<div class="mcq-card" id="q2">
+  <div class="q-label">Question 2 · Independence Assumption</div>
+  <div class="q-text">In which scenario is the independence assumption \(T \perp\!\!\!\perp C\) <strong>most questionable</strong>?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q2',false)"><span class="opt-key">A)</span> All patients still alive are censored on the pre-set study end date.</button>
+    <button class="opt-btn" onclick="ans(this,'q2',false)"><span class="opt-key">B)</span> Some patients move to a different country and are lost to follow-up for unrelated reasons.</button>
+    <button class="opt-btn" onclick="ans(this,'q2',true)"><span class="opt-key">C)</span> A liver transplant study where organs are allocated based on disease severity, so sicker patients receive a transplant sooner.</button>
+    <button class="opt-btn" onclick="ans(this,'q2',false)"><span class="opt-key">D)</span> Patients die in traffic accidents unrelated to the disease under study.</button>
+  </div>
+  <div class="feedback" id="fb-q2">In the liver transplant study, the allocation mechanism directly links \(C\) (time to transplant) to \(T\) (time to death while waiting) — sicker patients (short \(T\)) are prioritised for transplant (short \(C\)), creating positive dependence. Options A, B, and D all describe censoring that is unrelated to the event process.</div>
+</div>
+
+<!-- Q3 -->
+<div class="mcq-card" id="q3">
+  <div class="q-label">Question 3 · Direction of KM Bias</div>
+  <div class="q-text">Suppose \((\log T, \log C)\) follow a bivariate normal distribution with correlation \(\rho = -0.7\). If the Kaplan–Meier estimator is applied assuming \(T \perp\!\!\!\perp C\), it will:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q3',false)"><span class="opt-key">A)</span> Lie above the true survival function — overestimating survival probability.</button>
+    <button class="opt-btn" onclick="ans(this,'q3',true)"><span class="opt-key">B)</span> Lie below the true survival function — underestimating survival probability.</button>
+    <button class="opt-btn" onclick="ans(this,'q3',false)"><span class="opt-key">C)</span> Be unbiased — negative correlation does not affect the KM estimator.</button>
+    <button class="opt-btn" onclick="ans(this,'q3',false)"><span class="opt-key">D)</span> Overestimate survival early and underestimate late, producing crossing curves.</button>
+  </div>
+  <div class="feedback" id="fb-q3">Negative \(\rho\): shorter \(T\) (early events) tends to pair with longer \(C\), so individuals with short \(T\) are not censored early and their events are fully observed, causing the KM to drop too fast and underestimate survival. The rule: positive \(\rho\) → KM too high; negative \(\rho\) → KM too low.</div>
+</div>
+
+<!-- Q4 -->
+<div class="mcq-card" id="q4">
+  <div class="q-label">Question 4 · Health Economics — True/False</div>
+  <div class="q-text"><strong>True or False:</strong> In the health economics setting where medical cost is \(U = RT\) with individual-specific accumulation rate \(R\), and \(T\) is censored by \(C\), the observed cost is censored by \(RC\). Since \(RT\) and \(RC\) share the common factor \(R\), they are dependent — illustrating dependent censoring even when \(T \perp\!\!\!\perp C\).</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q4',true)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q4',false)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q4">True. Even if \(T \perp\!\!\!\perp C\), the transformation \(U = RT\) creates dependence between the cost \(U = RT\) and its censoring value \(RC\) through the shared individual factor \(R\). This is a canonical example of induced dependent censoring in health economics.</div>
+</div>
+
+<!-- Q5 -->
+<div class="mcq-card" id="q5">
+  <div class="q-label">Question 5 · Sklar's Theorem</div>
+  <div class="q-text">Sklar's Theorem guarantees that for continuous \(X \sim F\) and \(Y \sim G\), there is a unique copula \(\mathcal{C}\) satisfying:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q5',false)"><span class="opt-key">A)</span> \(P(X \le x, Y \le y) = F(x) + G(y) - \mathcal{C}(F(x), G(y))\)</button>
+    <button class="opt-btn" onclick="ans(this,'q5',true)"><span class="opt-key">B)</span> \(P(X \le x, Y \le y) = \mathcal{C}(F(x), G(y))\)</button>
+    <button class="opt-btn" onclick="ans(this,'q5',false)"><span class="opt-key">C)</span> \(P(X \le x, Y \le y) = \mathcal{C}(f(x), g(y))\) where \(f, g\) are densities</button>
+    <button class="opt-btn" onclick="ans(this,'q5',false)"><span class="opt-key">D)</span> \(P(X &gt; x, Y &gt; y) = 1 - \mathcal{C}(F(x), G(y))\)</button>
+  </div>
+  <div class="feedback" id="fb-q5">The copula maps the marginal CDFs \(F(x)\) and \(G(y)\) to the joint CDF. Note: option D would be the survival copula formula and is not the standard Sklar statement.</div>
+</div>
+
+<!-- Q6 -->
+<div class="mcq-card" id="q6">
+  <div class="q-label">Question 6 · Kendall's Tau — Calculation</div>
+  <div class="q-text">For the Clayton copula, \(\tau = \alpha/(\alpha+2)\). What value of \(\alpha\) corresponds to \(\tau = 1/3\)?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q6',true)"><span class="opt-key">A)</span> \(\alpha = 1\)</button>
+    <button class="opt-btn" onclick="ans(this,'q6',false)"><span class="opt-key">B)</span> \(\alpha = 2\)</button>
+    <button class="opt-btn" onclick="ans(this,'q6',false)"><span class="opt-key">C)</span> \(\alpha = 1/3\)</button>
+    <button class="opt-btn" onclick="ans(this,'q6',false)"><span class="opt-key">D)</span> \(\alpha = 3\)</button>
+  </div>
+  <div class="feedback" id="fb-q6">Solving \(1/3 = \alpha/(\alpha+2)\): \(\alpha+2 = 3\alpha\), so \(2 = 2\alpha\), \(\alpha = 1\). Check: \(\tau = 1/(1+2) = 1/3\). ✓</div>
+</div>
+
+<!-- Q7 -->
+<div class="mcq-card" id="q7">
+  <div class="q-label">Question 7 · Copula-Graphic Estimator — R Code</div>
+  <div class="q-text">Consider:
+  <pre style="font-size:.82rem;margin:.5rem 0">tau_val = tau(claytonCopula(2))   # tau = alpha/(alpha+2)</pre>
+  What is the value of <code>tau_val</code>?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q7',false)"><span class="opt-key">A)</span> 0.25</button>
+    <button class="opt-btn" onclick="ans(this,'q7',false)"><span class="opt-key">B)</span> 0.40</button>
+    <button class="opt-btn" onclick="ans(this,'q7',true)"><span class="opt-key">C)</span> 0.50</button>
+    <button class="opt-btn" onclick="ans(this,'q7',false)"><span class="opt-key">D)</span> 0.67</button>
+  </div>
+  <div class="feedback" id="fb-q7">\(\tau = 2/(2+2) = 2/4 = 0.50\). The comment in the slides code explicitly states <code>#tau=alpha/(alpha+2)</code>.</div>
+</div>
+
+<!-- Q8 -->
+<div class="mcq-card" id="q8">
+  <div class="q-label">Question 8 · KM as Special Case</div>
+  <div class="q-text">The Kaplan–Meier estimator is a special case of the copula-graphic estimator (Rivest &amp; Wells, 2001). Which generator \(\psi\) yields the KM estimator?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q8',true)"><span class="opt-key">A)</span> \(\psi(u) = -\log u\) (independence copula generator)</button>
+    <button class="opt-btn" onclick="ans(this,'q8',false)"><span class="opt-key">B)</span> \(\psi(u) = u^{-\alpha} - 1\) (Clayton generator)</button>
+    <button class="opt-btn" onclick="ans(this,'q8',false)"><span class="opt-key">C)</span> \(\psi(u) = (-\log u)^\alpha\) (Gumbel generator)</button>
+    <button class="opt-btn" onclick="ans(this,'q8',false)"><span class="opt-key">D)</span> \(\psi(u) = (1-u)^{\alpha}\) (Joe-type generator)</button>
+  </div>
+  <div class="feedback" id="fb-q8">With \(\psi(u)=-\log u\), \(\psi^{-1}(t)=e^{-t}\), the copula is the independence copula, and the copula-graphic formula telescopes to the KM product-limit estimator. This is the mathematical foundation for why KM is valid under independence.</div>
+</div>
+
+<!-- Q9 -->
+<div class="mcq-card" id="q9">
+  <div class="q-label">Question 9 · Sensitivity of Copula-Graphic — True/False</div>
+  <div class="q-text"><strong>True or False:</strong> For the liver transplant data, the copula-graphic estimator with Clayton copula gives approximately the same estimated survival function for \(\tau = 0\) (KM), \(\tau = 1/3\), \(\tau = 1/2\), and \(\tau = 2/3\), showing little sensitivity to the choice of dependence parameter.</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q9',false)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q9',true)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q9">False. The slides show that different values of \(\tau\) give substantially different survival curves. Larger \(\tau\) shifts the estimated survival function downward significantly. This high sensitivity motivates the approach of Czado &amp; VK (2023) which estimates \(\tau\) from the data.</div>
+</div>
+
+<!-- Q10 -->
+<div class="mcq-card" id="q10">
+  <div class="q-label">Question 10 · Czado &amp; VK (2023) — Condition (C1)</div>
+  <div class="q-text">Condition (C1) for identifiability requires that the tail ratio of densities identifies the parameter. For which families of parametric densities is (C1) verified in the paper?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q10',false)"><span class="opt-key">A)</span> Exponential and gamma only.</button>
+    <button class="opt-btn" onclick="ans(this,'q10',true)"><span class="opt-key">B)</span> Log-normal, log-Student-\(t\), Weibull, and log-logistic.</button>
+    <button class="opt-btn" onclick="ans(this,'q10',false)"><span class="opt-key">C)</span> Any symmetric unimodal distribution.</button>
+    <button class="opt-btn" onclick="ans(this,'q10',false)"><span class="opt-key">D)</span> Only distributions with bounded support.</button>
+  </div>
+  <div class="feedback" id="fb-q10">The theorem in the slides explicitly states: "Condition (C1) is satisfied for the families of log-normal, log-Student-\(t\), Weibull, and log-logistic densities." These cover the vast majority of parametric survival models used in practice.</div>
+</div>
+
+<!-- Q11 -->
+<div class="mcq-card" id="q11">
+  <div class="q-label">Question 11 · Condition (C2) — Frank Copula</div>
+  <div class="q-text">Condition (C2) is satisfied for the Frank copula:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q11',false)"><span class="opt-key">A)</span> Only when the marginal distributions are Weibull.</button>
+    <button class="opt-btn" onclick="ans(this,'q11',false)"><span class="opt-key">B)</span> Only when Kendall's \(\tau &lt; 0.5\).</button>
+    <button class="opt-btn" onclick="ans(this,'q11',true)"><span class="opt-key">C)</span> Always, regardless of the choice of marginal distributions.</button>
+    <button class="opt-btn" onclick="ans(this,'q11',false)"><span class="opt-key">D)</span> Only when both marginals are log-normal.</button>
+  </div>
+  <div class="feedback" id="fb-q11">The Frank copula unconditionally satisfies (C2). For the Gumbel and Gaussian copulas, (C2) holds under mild additional conditions on the marginal tails. For the Clayton copula, a different approach is needed entirely.</div>
+</div>
+
+<!-- Q12 -->
+<div class="mcq-card" id="q12">
+  <div class="q-label">Question 12 · Likelihood Contribution — Event Observation</div>
+  <div class="q-text">In the Czado &amp; VK (2023) log-likelihood, the contribution of an <strong>uncensored</strong> observation (\(\Delta_i = 1\)) is proportional to:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q12',true)"><span class="opt-key">A)</span> \(f_{T,\theta_T}(Y_i) \cdot \bigl\{1 - h_{C|T,\theta}(F_{C,\theta_C}(Y_i) \mid F_{T,\theta_T}(Y_i))\bigr\}\)</button>
+    <button class="opt-btn" onclick="ans(this,'q12',false)"><span class="opt-key">B)</span> Only the marginal density \(f_{T,\theta_T}(Y_i)\), since independence implies no adjustment.</button>
+    <button class="opt-btn" onclick="ans(this,'q12',false)"><span class="opt-key">C)</span> The joint density \(f_{T,C,\theta}(Y_i, Y_i)\) evaluated on the diagonal.</button>
+    <button class="opt-btn" onclick="ans(this,'q12',false)"><span class="opt-key">D)</span> \(S_{T,\theta_T}(Y_i) \cdot S_{C,\theta_C}(Y_i)\).</button>
+  </div>
+  <div class="feedback" id="fb-q12">For an event (\(\Delta=1\)): the density of \(T\) at \(Y_i\) times the probability that \(C &gt; Y_i\) given \(T = Y_i\). Under dependent censoring, this conditional probability uses the copula h-function: \(P(C &gt; Y_i \mid T = Y_i) = 1 - h_{C|T}(F_C(Y_i)\mid F_T(Y_i))\). Option A is correct.</div>
+</div>
+
+<!-- Q13 -->
+<div class="mcq-card" id="q13">
+  <div class="q-label">Question 13 · Transformation Model — Rho</div>
+  <div class="q-text">In the Deresa &amp; VK (2020) transformation model, \(\rho\) is:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q13',false)"><span class="opt-key">A)</span> The Spearman rank correlation between observed times \(Y_i\).</button>
+    <button class="opt-btn" onclick="ans(this,'q13',true)"><span class="opt-key">B)</span> The correlation \(\text{Corr}(\epsilon_T, \epsilon_C) = \text{Corr}(\Lambda_\theta(\log T), \Lambda_\theta(\log C)\mid X, W)\), measuring residual dependence between \(T\) and \(C\) after adjusting for covariates.</button>
+    <button class="opt-btn" onclick="ans(this,'q13',false)"><span class="opt-key">C)</span> Kendall's tau between \(T\) and \(C\) marginals.</button>
+    <button class="opt-btn" onclick="ans(this,'q13',false)"><span class="opt-key">D)</span> The between-patient variability in the transformation parameter \(\theta\).</button>
+  </div>
+  <div class="feedback" id="fb-q13">The bivariate normal error structure means \(\rho = \text{Corr}(\epsilon_T, \epsilon_C)\). Since \(\epsilon_T = \Lambda_\theta(\log T) - \beta^\top X\) and \(\epsilon_C = \Lambda_\theta(\log C) - \eta^\top W\), \(\rho\) captures the dependence between the transformed survival and censoring times, after removing the covariate effects.</div>
+</div>
+
+<!-- Q14 -->
+<div class="mcq-card" id="q14">
+  <div class="q-label">Question 14 · Yeo–Johnson at theta = 1</div>
+  <div class="q-text">When \(\theta = 1\) in the Yeo–Johnson transformation, the model \(\Lambda_\theta(\log T) = \beta^\top X + \epsilon_T\) with \(\epsilon_T \sim N(0, \sigma_T^2)\) corresponds to which distribution for \(T\)?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q14',false)"><span class="opt-key">A)</span> Weibull distribution.</button>
+    <button class="opt-btn" onclick="ans(this,'q14',true)"><span class="opt-key">B)</span> Log-normal distribution, since \(\Lambda_1(\log T) = \log T\) gives \(\log T \sim N(\beta^\top X, \sigma_T^2)\).</button>
+    <button class="opt-btn" onclick="ans(this,'q14',false)"><span class="opt-key">C)</span> Log-logistic distribution.</button>
+    <button class="opt-btn" onclick="ans(this,'q14',false)"><span class="opt-key">D)</span> Exponential distribution.</button>
+  </div>
+  <div class="feedback" id="fb-q14">At \(\theta=1\): \(\Lambda_1(t) = \{(t+1)^1 - 1\}/1 = t\) for \(t \ge 0\). So \(\Lambda_1(\log T) = \log T\). If \(\log T = \beta^\top X + \epsilon_T\) with \(\epsilon_T \sim N(0,\sigma_T^2)\), then \(T\) is log-normally distributed — the standard log-normal AFT model.</div>
+</div>
+
+<!-- Q15 -->
+<div class="mcq-card" id="q15">
+  <div class="q-label">Question 15 · R Output — UKELD Coefficient</div>
+  <div class="q-text">The transformation model gives UKELD estimate = −0.614, SE = 0.218, p = 0.005. The naive AFT model gives UKELD estimate = −0.22. Which statement is most accurate?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q15',false)"><span class="opt-key">A)</span> Both models agree closely; the difference is negligible.</button>
+    <button class="opt-btn" onclick="ans(this,'q15',false)"><span class="opt-key">B)</span> The naive AFT overestimates the UKELD effect (|−0.614| &gt; |−0.22|).</button>
+    <button class="opt-btn" onclick="ans(this,'q15',true)"><span class="opt-key">C)</span> The naive AFT underestimates the magnitude of the UKELD effect. After accounting for the strong positive dependence (\(\hat\rho = 0.74\)), the estimated effect nearly triples in magnitude.</button>
+    <button class="opt-btn" onclick="ans(this,'q15',false)"><span class="opt-key">D)</span> UKELD is not significant in either model.</button>
+  </div>
+  <div class="feedback" id="fb-q15">The transformation model gives −0.614 vs. −0.22 for the naive AFT. The naive AFT underestimates the true UKELD effect because it confounds the event process with the dependent censoring. After correcting for the positive dependence (sicker patients censored earlier), the effect of UKELD on survival is much larger. UKELD is significant in both models (p = 0.005 vs. p &lt; 2e-16).</div>
+</div>
+
+<!-- Q16 -->
+<div class="mcq-card" id="q16">
+  <div class="q-label">Question 16 · Liver Transplant — Rho Interpretation</div>
+  <div class="q-text">The estimated \(\hat\rho = 0.741\) (p = 0.003) in the liver transplant transformation model. This means:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q16',false)"><span class="opt-key">A)</span> \(T\) and \(C\) are essentially independent, as \(\rho &lt; 1\).</button>
+    <button class="opt-btn" onclick="ans(this,'q16',false)"><span class="opt-key">B)</span> Patients with shorter survival time tend to wait <em>longer</em> for a transplant (negative dependence).</button>
+    <button class="opt-btn" onclick="ans(this,'q16',true)"><span class="opt-key">C)</span> Strong positive dependence: patients with shorter survival prognosis (given covariates) tend to receive a transplant sooner — consistent with organ allocation based on medical urgency.</button>
+    <button class="opt-btn" onclick="ans(this,'q16',false)"><span class="opt-key">D)</span> The model is near the boundary of identifiability since \(\hat\rho\) is close to 1.</button>
+  </div>
+  <div class="feedback" id="fb-q16">Positive \(\rho\): given covariates, shorter expected survival \(T\) co-occurs with shorter censoring time \(C\) (transplant sooner for sicker patients). This is precisely the allocation mechanism described: organs go to patients with the highest urgency. The result is statistically and clinically significant.</div>
+</div>
+
+<!-- Q17 -->
+<div class="mcq-card" id="q17">
+  <div class="q-label">Question 17 · Naive vs. Correct Model — True/False</div>
+  <div class="q-text"><strong>True or False:</strong> The results from the naive log-normal AFT model (ignoring dependent censoring) and the transformation model of Deresa &amp; VK (2020) are qualitatively similar for the liver transplant data, with coefficients differing by at most 10%.</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q17',false)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q17',true)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q17">False. The slides explicitly state "The results are quite different from those under the AFT model." UKELD: −0.22 (naive) vs. −0.614 (transformation model) — a factor of ~3. Age: −0.08 (naive) vs. −0.165 (transformation). With \(\hat\rho = 0.74\), ignoring dependence induces substantial bias.</div>
+</div>
+
+<!-- Q18 -->
+<div class="mcq-card" id="q18">
+  <div class="q-label">Question 18 · Testing Independence — True/False</div>
+  <div class="q-text"><strong>True or False:</strong> The hypothesis \(H_0: T \perp\!\!\!\perp C\) can be tested from the censored survival data \((Y_i, \Delta_i)\) using a standard nonparametric test, without any model assumptions.</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q18',false)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q18',true)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q18">False. Since we never observe both \(T\) and \(C\) for the same subject, we cannot form an empirical joint distribution to test independence. The assumption must be motivated by the study design. This is an intrinsic identification problem, not a sample size issue.</div>
+</div>
+
+<!-- Q19 -->
+<div class="mcq-card" id="q19">
+  <div class="q-label">Question 19 · Semiparametric Model — Breslow Estimator</div>
+  <div class="q-text">In Deresa &amp; VK (2024), the unknown baseline cumulative hazard \(H_0\) in the Cox submodel is estimated by:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q19',false)"><span class="opt-key">A)</span> Assuming a Weibull baseline and estimating the shape and scale jointly.</button>
+    <button class="opt-btn" onclick="ans(this,'q19',true)"><span class="opt-key">B)</span> Using the Breslow estimator \(\hat{H}_0(\cdot, \theta)\) at each fixed \(\theta\), plugged into a pseudo-likelihood score equation.</button>
+    <button class="opt-btn" onclick="ans(this,'q19',false)"><span class="opt-key">C)</span> Integrating out \(H_0\) nonparametrically using kernel smoothing.</button>
+    <button class="opt-btn" onclick="ans(this,'q19',false)"><span class="opt-key">D)</span> Fitting the Nelson–Åalen estimator independently of \(\theta\).</button>
+  </div>
+  <div class="feedback" id="fb-q19">The pseudo-likelihood approach: at fixed \(\theta\), plug in the Breslow estimator \(\hat{H}_0(\cdot,\theta)\), then solve the resulting score equation \(U_n(\theta, \hat{H}_0(\cdot,\theta))=0\). This extends the Cox partial likelihood and reduces to it exactly under independence.</div>
+</div>
+
+<!-- Q20 -->
+<div class="mcq-card" id="q20">
+  <div class="q-label">Question 20 · Semiparametric — Independence Copula Limit</div>
+  <div class="q-text">What does the Deresa &amp; VK (2024) estimator reduce to under the independence copula \(\mathcal{C}(u,v) = uv\)?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q20',false)"><span class="opt-key">A)</span> Kaplan–Meier estimator of \(S_T\).</button>
+    <button class="opt-btn" onclick="ans(this,'q20',true)"><span class="opt-key">B)</span> Cox partial likelihood estimator of \(\beta\), with the Breslow estimator for \(H_0\).</button>
+    <button class="opt-btn" onclick="ans(this,'q20',false)"><span class="opt-key">C)</span> Log-rank test statistic for comparing two groups.</button>
+    <button class="opt-btn" onclick="ans(this,'q20',false)"><span class="opt-key">D)</span> Nelson–Åalen estimator without any regression component.</button>
+  </div>
+  <div class="feedback" id="fb-q20">Under independence (\(\mathcal{C}(u,v)=uv\)), \(\hat{H}_0\) is the Breslow estimator and \(\hat\theta\) is the Cox partial likelihood estimator. The new method is a genuine extension of the Cox model to the dependent censoring setting, nesting it as a special case.</div>
+</div>
+
+<!-- Q21 -->
+<div class="mcq-card" id="q21">
+  <div class="q-label">Question 21 · R Output — Simulation Bias Comparison</div>
+  <div class="q-text">In the Deresa &amp; VK (2024) simulation with Frank copula, \(\tau = 0.8\), \(n = 500\): the Frank copula model gives Bias = −0.013 for \(\beta_2 = 1\), while the independence copula (naive Cox) gives Bias = 0.327. This means the naive Cox:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q21',false)"><span class="opt-key">A)</span> Underestimates \(\beta_2\) by about one third.</button>
+    <button class="opt-btn" onclick="ans(this,'q21',true)"><span class="opt-key">B)</span> Overestimates \(\beta_2\) by about 33% of the true value — a substantial bias that does not vanish with larger samples.</button>
+    <button class="opt-btn" onclick="ans(this,'q21',false)"><span class="opt-key">C)</span> Has negligible bias since 0.327 is small relative to 1.</button>
+    <button class="opt-btn" onclick="ans(this,'q21',false)"><span class="opt-key">D)</span> Shows a numerical instability, not a real bias.</button>
+  </div>
+  <div class="feedback" id="fb-q21">True \(\beta_2 = 1\); naive Cox estimates ≈ 1.327 on average — a 33% overestimation. This bias is systematic (it increases with \(\tau\)) and is not reduced by larger \(n\): it is an asymptotic bias caused by model misspecification, not a finite-sample phenomenon.</div>
+</div>
+
+<!-- Q22 -->
+<div class="mcq-card" id="q22">
+  <div class="q-label">Question 22 · Simulation — Czado &amp; VK (2023) at tau = 0.7</div>
+  <div class="q-text">In the Czado &amp; VK (2023) simulation with Frank copula, log-normal margins, \(n = 200\), \(\tau = 0.7\), the table reports aver.est = 0.70 and sd.aver.est = 0.07 for \(\hat\tau\). Which statement follows?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q22',false)"><span class="opt-key">A)</span> The estimator of \(\tau\) has large bias because 0.07 ≠ 0.70.</button>
+    <button class="opt-btn" onclick="ans(this,'q22',true)"><span class="opt-key">B)</span> The estimator is nearly unbiased (0.70 ≈ true 0.70) and precise (SD = 0.07), confirming identifiability and good finite-sample performance.</button>
+    <button class="opt-btn" onclick="ans(this,'q22',false)"><span class="opt-key">C)</span> The estimator is biased because the RMSE = 0.07 is larger than the SD = 0.07.</button>
+    <button class="opt-btn" onclick="ans(this,'q22',false)"><span class="opt-key">D)</span> The sample size \(n=200\) is insufficient to estimate \(\tau\) reliably.</button>
+  </div>
+  <div class="feedback" id="fb-q22">aver.est = 0.70 = true value → near-zero bias. SD = RMSE = 0.07 → the mean squared error is essentially all variance, not bias. Larger \(\tau\) (0.7) is estimated more precisely than smaller \(\tau\) (0.2, SD = 0.16), which makes statistical sense — stronger dependence leaves a stronger signal.</div>
+</div>
+
+<!-- Q23 -->
+<div class="mcq-card" id="q23">
+  <div class="q-label">Question 23 · Gaussian Copula — Role of Phi-inverse</div>
+  <div class="q-text">In the Gaussian copula \(\mathcal{C}_\rho(u,v) = \Phi_R(\Phi^{-1}(u), \Phi^{-1}(v))\), \(\Phi^{-1}\) serves to:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q23',false)"><span class="opt-key">A)</span> Normalise the bivariate density to integrate to 1.</button>
+    <button class="opt-btn" onclick="ans(this,'q23',true)"><span class="opt-key">B)</span> Map the uniform inputs \(u, v \in [0,1]\) to standard normal quantiles, so that the bivariate normal CDF \(\Phi_R\) can be applied.</button>
+    <button class="opt-btn" onclick="ans(this,'q23',false)"><span class="opt-key">C)</span> Compute the Fisher information matrix used in MLE.</button>
+    <button class="opt-btn" onclick="ans(this,'q23',false)"><span class="opt-key">D)</span> Apply the Box–Cox transformation to the survival times.</button>
+  </div>
+  <div class="feedback" id="fb-q23">The Gaussian copula uses the probit transform \(\Phi^{-1}\) to convert uniform marginals to normal quantiles. Then \(\Phi_R(\Phi^{-1}(u), \Phi^{-1}(v))\) evaluates the bivariate normal CDF, mapping the result back to \([0,1]\). This is the "normal scores" construction.</div>
+</div>
+
+<!-- Q24 -->
+<div class="mcq-card" id="q24">
+  <div class="q-label">Question 24 · Clayton vs. Frank for Identifiability</div>
+  <div class="q-text"><strong>True or False:</strong> In the Czado &amp; VK (2023) framework, both the Clayton copula and the Frank copula satisfy condition (C2) for identifiability under standard survival models (Weibull, log-normal margins).</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q24',false)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q24',true)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q24">False. The Frank copula always satisfies (C2). For the <em>Clayton copula</em>, the slides state that "another approach is needed" — (C2) is not satisfied and identifiability requires different conditions. This asymmetry is a key practical point: the Frank, Gumbel, and Gaussian copulas are directly covered by the general theorem, but Clayton is not.</div>
+</div>
+
+<!-- Q25 -->
+<div class="mcq-card" id="q25">
+  <div class="q-label">Question 25 · Predicted Survival — Calculation Check</div>
+  <div class="q-text">The transformation model for the liver transplant data predicts that a female patient aged 50 with UKELD = 57 and BMI = 25 has a median survival time of approximately:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q25',false)"><span class="opt-key">A)</span> 100 days</button>
+    <button class="opt-btn" onclick="ans(this,'q25',false)"><span class="opt-key">B)</span> 500 days</button>
+    <button class="opt-btn" onclick="ans(this,'q25',true)"><span class="opt-key">C)</span> 269 days</button>
+    <button class="opt-btn" onclick="ans(this,'q25',false)"><span class="opt-key">D)</span> 1000 days</button>
+  </div>
+  <div class="feedback" id="fb-q25">The slides report directly: "Median survival time: 269 days" for this specific patient profile. The 1-year survival rate is 37%, consistent with a median below 365 days.</div>
+</div>
+
+<!-- Q26 -->
+<div class="mcq-card" id="q26">
+  <div class="q-label">Question 26 · Archimedean Copula — Generator Property</div>
+  <div class="q-text">A valid Archimedean generator \(\psi: [0,1] \to [0,\infty]\) must satisfy which properties?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q26',false)"><span class="opt-key">A)</span> Continuous, strictly <em>increasing</em>, concave, with \(\psi(0) = 0\).</button>
+    <button class="opt-btn" onclick="ans(this,'q26',true)"><span class="opt-key">B)</span> Continuous, strictly <em>decreasing</em>, convex, with \(\psi(1) = 0\).</button>
+    <button class="opt-btn" onclick="ans(this,'q26',false)"><span class="opt-key">C)</span> Continuous, non-negative, with \(\psi(0) = 1\) and \(\psi(1) = \infty\).</button>
+    <button class="opt-btn" onclick="ans(this,'q26',false)"><span class="opt-key">D)</span> Differentiable, symmetric, with \(\psi(0.5) = 0\).</button>
+  </div>
+  <div class="feedback" id="fb-q26">The generator must be: continuous, strictly decreasing (copula must decrease in each argument away from independence), convex, and \(\psi(1) = 0\) (so that \(\mathcal{C}(u,1) = \psi^{[-1]}(\psi(u)+0) = u\), ensuring uniform margins). These are the standard conditions from the slides.</div>
+</div>
+
+<!-- Q27 -->
+<div class="mcq-card" id="q27">
+  <div class="q-label">Question 27 · Transplant Study — Direction of Rho</div>
+  <div class="q-text">In the liver transplant study: "Patients who get a transplant tend to be those who are closer to death." Based on this clinical fact alone (before fitting any model), we would expect \(\rho\) to be:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q27',false)"><span class="opt-key">A)</span> Negative — sicker patients survive longer while waiting.</button>
+    <button class="opt-btn" onclick="ans(this,'q27',true)"><span class="opt-key">B)</span> Positive — sicker patients have shorter \(T\) (sooner death if untransplanted) and shorter \(C\) (sooner transplant due to priority), so \(T\) and \(C\) move in the same direction.</button>
+    <button class="opt-btn" onclick="ans(this,'q27',false)"><span class="opt-key">C)</span> Zero — the allocation committee acts independently of medical condition.</button>
+    <button class="opt-btn" onclick="ans(this,'q27',false)"><span class="opt-key">D)</span> Unknown — it depends on the specific covariates included.</button>
+  </div>
+  <div class="feedback" id="fb-q27">Correct clinical reasoning: sicker → shorter \(T\) and shorter \(C\) simultaneously → positive correlation. The fitted model confirms this with \(\hat\rho = 0.741\). This pre-fitting prediction from scientific reasoning is exactly how one "motivates" the dependence structure before analysis.</div>
+</div>
+
+<!-- Q28 -->
+<div class="mcq-card" id="q28">
+  <div class="q-label">Question 28 · Yeo–Johnson vs. Box–Cox</div>
+  <div class="q-text">A key advantage of the Yeo–Johnson transformation over Box–Cox in the context of the Deresa &amp; VK (2020) model is:</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q28',false)"><span class="opt-key">A)</span> Yeo–Johnson is computationally faster to optimise.</button>
+    <button class="opt-btn" onclick="ans(this,'q28',true)"><span class="opt-key">B)</span> Yeo–Johnson maps \(\mathbb{R} \to \mathbb{R}\) for \(\theta \in [0,2]\), allowing application to \(\log T\) which takes values on the whole real line, whereas Box–Cox is only defined for strictly positive values.</button>
+    <button class="opt-btn" onclick="ans(this,'q28',false)"><span class="opt-key">C)</span> Yeo–Johnson always produces normally distributed outputs, unlike Box–Cox.</button>
+    <button class="opt-btn" onclick="ans(this,'q28',false)"><span class="opt-key">D)</span> Yeo–Johnson has a closed-form MLE, unlike Box–Cox.</button>
+  </div>
+  <div class="feedback" id="fb-q28">Box–Cox maps \(\mathbb{R}^+ \to (-1/\theta, \infty)\), requiring strictly positive inputs. Since \(\log T \in \mathbb{R}\), Box–Cox cannot be directly applied. Yeo–Johnson extends Box–Cox to \(\mathbb{R}\), making it suitable for transforming \(\log T\). This is explicitly stated in the slides.</div>
+</div>
+
+<!-- Q29 -->
+<div class="mcq-card" id="q29">
+  <div class="q-label">Question 29 · Extensions — True/False</div>
+  <div class="q-text"><strong>True or False:</strong> The transformation model of Deresa &amp; VK (2020) can be extended to competing risks by using different Yeo–Johnson transformation parameters for each competing cause of failure.</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q29',true)"><span class="opt-key">True</span></button>
+    <button class="opt-btn" onclick="ans(this,'q29',false)"><span class="opt-key">False</span></button>
+  </div>
+  <div class="feedback" id="fb-q29">True. The slides explicitly list this as an extension: "Extension to competing risks (with different transformations for each risk), and to regimes with independent (administrative) and dependent censoring." Using cause-specific transformations adds flexibility to model different hazard shapes per cause.</div>
+</div>
+
+<!-- Q30 -->
+<div class="mcq-card" id="q30">
+  <div class="q-label">Question 30 · Future Research</div>
+  <div class="q-text">Which of the following is explicitly identified in the slides as a future research challenge for dependent censoring methodology?</div>
+  <div class="options">
+    <button class="opt-btn" onclick="ans(this,'q30',false)"><span class="opt-key">A)</span> Proving that the Kaplan–Meier estimator is always consistent under dependent censoring when \(n \to \infty\).</button>
+    <button class="opt-btn" onclick="ans(this,'q30',false)"><span class="opt-key">B)</span> Showing that Kendall's tau can be nonparametrically estimated from censored survival data.</button>
+    <button class="opt-btn" onclick="ans(this,'q30',true)"><span class="opt-key">C)</span> Development of goodness-of-fit tests for the copula model, and quantile regression under dependent censoring.</button>
+    <button class="opt-btn" onclick="ans(this,'q30',false)"><span class="opt-key">D)</span> Proving that the independence assumption is always valid for randomised controlled trials.</button>
+  </div>
+  <div class="feedback" id="fb-q30">The slides list numerous open problems including: goodness-of-fit tests, quantile regression under dependent censoring, random effects approaches, cure models with dependent censoring, partial identification results, competing risks, investigation of misspecification effects, and confounding. Options A, B, and D are either false or not listed as open problems.</div>
+</div>
+
+</section>
+</div><!-- /container -->
+
+<script>
+let answered = {}, score = 0;
+
+function ans(btn, qid, correct) {
+    if (answered[qid]) return;
+    answered[qid] = true;
+
+    const card   = document.getElementById(qid);
+    const allBtn = card.querySelectorAll('.opt-btn');
+    const fb     = document.getElementById('fb-' + qid);
+
+    allBtn.forEach(b => { b.disabled = true; });
+
+    if (correct) {
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+    } else {
+        btn.classList.add('incorrect');
+        allBtn.forEach(b => {
+            if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('true') !== -1)
+                b.classList.add('revealed');
+        });
+    }
+    if (fb) fb.classList.add('show');
+}
+
+function resetAll() {
+    answered = {}; score = 0;
+    document.getElementById('score').textContent = '0';
+    document.querySelectorAll('.opt-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct','incorrect','revealed');
+    });
+    document.querySelectorAll('.feedback').forEach(f => f.classList.remove('show'));
+    window.scrollTo({ top: document.getElementById('mcq').offsetTop - 80, behavior: 'smooth' });
+}
+
+/* ── Active nav on scroll ── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 130) cur = s.id; });
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+}, { passive: true });
+</script>
+
+
+</body></html>

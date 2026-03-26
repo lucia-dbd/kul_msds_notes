@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 5 – Parametric Survival Models | Survival Analysis Review Notes</title>
+  <style>
+    :root {
+      --primary: #1a3a5c;
+      --accent: #2e7db8;
+      --accent2: #e8a020;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d0dce8;
+      --correct: #1e7e34;
+      --correct-bg: #d4edda;
+      --wrong: #a71d2a;
+      --wrong-bg: #f8d7da;
+      --neutral-bg: #eef4fb;
+      --text: #1c2a38;
+      --muted: #5a6a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+    header { background: var(--primary); color: #fff; padding: 28px 24px 20px; text-align: center; }
+    header h1 { font-size: 1.6rem; letter-spacing: 0.5px; }
+    header p { margin-top: 6px; color: #b8d0e8; font-size: 0.95rem; }
+    .toc-bar { background: var(--accent); display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 20px; justify-content: center; }
+    .toc-bar a { color: #fff; text-decoration: none; font-size: 0.82rem; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; transition: background 0.2s; }
+    .toc-bar a:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(30,60,100,0.06); }
+    .section-card h2 { color: var(--primary); font-size: 1.18rem; border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 16px; }
+    .section-card h3 { color: var(--accent); font-size: 1rem; margin: 18px 0 8px; }
+    .section-card p { margin-bottom: 10px; }
+    .key-box { background: var(--neutral-bg); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+    .key-box strong { color: var(--primary); }
+    .warning-box { background: #fff8e8; border-left: 4px solid var(--accent2); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+    .formula-box { background: #f0f6ff; border: 1px solid #b0ccee; border-radius: 6px; padding: 14px 18px; margin: 14px 0; font-family: 'Courier New', monospace; font-size: 0.93rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.8; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag { background: var(--neutral-bg); color: var(--accent); border: 1px solid var(--accent); border-radius: 14px; padding: 2px 12px; font-size: 0.8rem; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem; }
+    th { background: var(--primary); color: #fff; padding: 8px 12px; text-align: left; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--neutral-bg); }
+    ul, ol { padding-left: 1.5rem; margin: 8px 0 10px; }
+    li { margin-bottom: 4px; }
+    .q-section h2 { color: var(--primary); font-size: 1.2rem; border-bottom: 2px solid var(--accent2); padding-bottom: 8px; margin-bottom: 20px; }
+    .question-block { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 4px rgba(30,60,100,0.05); }
+    .question-block .q-number { font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .question-block .q-text { font-weight: 600; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+    .r-output { background: #1e2a38; color: #c8dff0; font-family: 'Courier New', monospace; font-size: 0.83rem; padding: 12px 14px; border-radius: 6px; margin: 10px 0 14px; white-space: pre; overflow-x: auto; line-height: 1.6; }
+    .options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .option-btn { background: var(--neutral-bg); border: 1px solid var(--border); border-radius: 6px; padding: 9px 14px; text-align: left; cursor: pointer; font-size: 0.9rem; color: var(--text); transition: background 0.15s, border-color 0.15s; }
+    .option-btn:hover:not(:disabled) { background: #dceeff; border-color: var(--accent); }
+    .option-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 600; }
+    .option-btn.incorrect { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+    .option-btn:disabled { cursor: default; }
+    .reveal-btn { background: var(--accent2); color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: background 0.2s; letter-spacing: 0.3px; }
+    .reveal-btn:hover { background: #c8870f; }
+    .answer-box { display: none; background: var(--correct-bg); border: 1px solid var(--correct); border-radius: 6px; padding: 12px 16px; margin-top: 10px; font-size: 0.9rem; line-height: 1.6; }
+    .answer-box.shown { display: block; }
+    .answer-box strong { color: var(--correct); }
+    .feedback { display: none; margin-top: 10px; padding: 8px 14px; border-radius: 6px; font-size: 0.88rem; }
+    .feedback.correct-fb { display: block; background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct); }
+    .feedback.incorrect-fb { display: block; background: var(--wrong-bg); color: var(--wrong); border: 1px solid var(--wrong); }
+    .score-bar { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .score-bar span { font-size: 0.95rem; color: var(--muted); }
+    .score-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .reset-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .reset-btn:hover { background: #0f2540; }
+    .short-q { margin-bottom: 22px; }
+    .short-q .q-number { font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .short-q .q-text { font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    @media (max-width: 600px) { .container { padding: 16px 10px 50px; } .section-card { padding: 16px 14px; } header h1 { font-size: 1.2rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚙️ Chapter 5 — Parametric Survival Models</h1>
+  <p>Time-to-Event Analysis · G00L2a/b · KU Leuven · Ingrid Van Keilegom · 2025–2026</p>
+</header>
+
+<nav class="toc-bar">
+  <a href="#distributions">Parametric Distributions</a>
+  <a href="#aft">AFT Model</a>
+  <a href="#linear">Linear Model</a>
+  <a href="#weibull">Weibull</a>
+  <a href="#loglogistic">Log-Logistic</a>
+  <a href="#other">Other Distributions</a>
+  <a href="#estimation">Estimation</a>
+  <a href="#modelsel">Model Selection</a>
+  <a href="#example">Schizophrenia Example</a>
+  <a href="#formulas">Formula Sheet</a>
+  <a href="#mcq">MCQ &amp; T/F</a>
+  <a href="#shortq">Short Answer</a>
+</nav>
+
+<div class="container">
+
+  <!-- SECTION 1 -->
+  <div class="section-card" id="distributions">
+    <h2>5.1 Common Parametric Distributions</h2>
+    <p>Parametric survival models assume T follows a specific distributional family, characterised by a small number of parameters. The choice of distribution determines the shape of the hazard function.</p>
+
+    <h3>Exponential Distribution</h3>
+    <div class="formula-box">Parameters: λ > 0
+
+S₀(t) = exp(−λt)
+f₀(t) = λ exp(−λt)
+h₀(t) = λ         ← constant hazard (memoryless)
+
+Empirical check: plot log(Ŝ(t)) vs t → should be linear</div>
+    <div class="key-box"><strong>Key property:</strong> The only continuous distribution with the memoryless property: P(T > s+t | T > s) = P(T > t). The hazard is constant — past survival provides no information about future risk.</div>
+
+    <h3>Weibull Distribution</h3>
+    <div class="formula-box">Parameters: λ > 0 (scale), ρ > 0 (shape)
+
+S₀(t) = exp(−λt^ρ)
+f₀(t) = ρλt^(ρ−1) exp(−λt^ρ)
+h₀(t) = ρλt^(ρ−1)         ← monotone hazard
+
+  ρ < 1 → decreasing hazard (early failures, infant mortality)
+  ρ = 1 → constant hazard (reduces to Exponential)
+  ρ > 1 → increasing hazard (wear-out, aging)
+
+Empirical check: plot log(Ĥ(t)) = log(−logŜ(t)) vs log(t) → should be linear
+  (slope = ρ, intercept = log(λ))</div>
+
+    <h3>Log-Logistic Distribution</h3>
+    <div class="formula-box">Parameters: λ > 0, κ > 0
+
+S₀(t) =      1 / [1 + (λt)^κ]
+f₀(t) =  λκ(λt)^(κ−1) / [1 + (λt)^κ]²
+h₀(t) =  λκ(λt)^(κ−1) / [1 + (λt)^κ]
+
+  κ > 1 → hazard rises then falls (hump-shaped; models acute illness)
+  κ ≤ 1 → hazard decreases monotonically
+
+Median: M(T) = exp(1/κ) / λ  (function of λ only, not κ)</div>
+
+    <h3>Log-Normal Distribution</h3>
+    <div class="formula-box">Parameters: µ ∈ ℝ (location), γ > 0 (scale)
+  → log T ~ N(µ, γ²)
+
+S₀(t) = 1 − Φ((log t − µ) / γ)
+f₀(t) = (1/γt√2π) exp(−(log t − µ)² / 2γ²)
+  No closed form for h₀(t)
+
+  Hazard rises then falls (like log-logistic with κ > 1)
+  Mathematically less tractable than log-logistic
+
+Median: M(T) = exp(µ)   (function of µ only)</div>
+
+    <h3>Hazard Shape Comparison</h3>
+    <table>
+      <thead><tr><th>Distribution</th><th>Parameters</th><th>Hazard Shape</th><th>Special Case</th></tr></thead>
+      <tbody>
+        <tr><td>Exponential</td><td>λ</td><td>Constant</td><td>Weibull with ρ=1</td></tr>
+        <tr><td>Weibull</td><td>λ, ρ</td><td>Monotone (↑ or ↓)</td><td>Exp when ρ=1</td></tr>
+        <tr><td>Log-logistic</td><td>λ, κ</td><td>Hump-shaped (if κ>1) or ↓</td><td>—</td></tr>
+        <tr><td>Log-normal</td><td>µ, γ</td><td>Hump-shaped then ↓ to 0</td><td>—</td></tr>
+        <tr><td>Gen. Gamma</td><td>µ, σ, ν</td><td>Flexible (nests all above)</td><td>Weibull (ν=1), Exp (ν=1,σ=1), Log-normal (ν→0)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-card" id="aft">
+    <h2>5.2 Accelerated Failure Time (AFT) Model</h2>
+    <p>The AFT model relates covariates to survival by <strong>stretching or compressing the time axis</strong>. It is a fully parametric regression model for T.</p>
+
+    <div class="formula-box">AFT Model:
+  Sᵢ(t) = S₀(exp(θᵀxᵢ) · t)
+
+where:
+  θ = (θ₁, …, θₚ)ᵀ  = vector of regression coefficients
+  exp(θᵀxᵢ)           = acceleration factor for subject i
+  S₀(·)               = baseline survival function (parametric family)
+
+Hazard under AFT:
+  hᵢ(t) = exp(θᵀxᵢ) · h₀(exp(θᵀxᵢ) · t)
+
+Effect on median:
+  Mᵢ = exp(−θᵀxᵢ) · M₀</div>
+
+    <div class="key-box">
+      <strong>Interpretation of acceleration factor:</strong> If exp(θᵀxᵢ) = 2, time runs twice as fast for subject i — they experience events at half the age compared to baseline. If exp(θᵀxᵢ) = 0.5, time runs half as fast — survival is extended (protective covariate).
+    </div>
+
+    <div class="warning-box">
+      <strong>Sign convention in R (survreg):</strong> R fits the log-linear model log T = µ + βᵀx + σW. The coefficient β in R equals <em>−θ</em> in the AFT notation above. A positive R coefficient means longer survival time (protective); a negative coefficient means shorter survival time (harmful). Always check the parameterisation used.
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section-card" id="linear">
+    <h2>5.3 Equivalent Linear (Log-Linear) Model</h2>
+    <p>The AFT model has a natural log-linear representation that simplifies estimation:</p>
+
+    <div class="formula-box">log T = µ + βᵀx + σW
+
+where:
+  µ         = intercept
+  β = (β₁,…,βₚ)ᵀ = regression coefficients (β = −θ from AFT)
+  σ         = scale parameter
+  W         = error with known distribution (same for all x)</div>
+
+    <div class="key-box">
+      <strong>Equivalence:</strong> The AFT model Sᵢ(t) = S₀(exp(θᵀxᵢ)t) and the linear model log T = µ + βᵀx + σW are equivalent when:
+      <ul style="margin-top:6px;">
+        <li>S₀ is the survival function of exp(µ + σW)</li>
+        <li>θ = −β/σ</li>
+      </ul>
+      The error distribution W determines which parametric family is used.
+    </div>
+
+    <table>
+      <thead><tr><th>Distribution of T</th><th>Distribution of W</th><th>Model also equals</th></tr></thead>
+      <tbody>
+        <tr><td>Weibull</td><td>Standard extreme value: S_W(w) = exp(−eʷ)</td><td>AFT <strong>and</strong> Cox PH with Weibull baseline</td></tr>
+        <tr><td>Log-logistic</td><td>Standard logistic: S_W(w) = 1/[1+eʷ]</td><td>AFT <strong>and</strong> proportional odds model</td></tr>
+        <tr><td>Log-normal</td><td>Standard normal: S_W(w) = 1−Φ(w)</td><td>AFT model only</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box">
+      <strong>Unique property of Weibull:</strong> The Weibull is the <em>only</em> continuous distribution that is simultaneously an AFT model AND a Cox proportional hazards model. This makes it especially important in practice.
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section-card" id="weibull">
+    <h2>5.4 Weibull Model in Detail</h2>
+
+    <h3>Three Equivalent Representations</h3>
+    <div class="formula-box">1. AFT Model:
+   Sᵢ(t) = S₀(exp(θᵀxᵢ)·t),  S₀(t) = exp(−λt^α)
+   → Sᵢ(t) = exp(−λ exp(γᵀxᵢ)·t^α)    with γ = αθ
+   → hᵢ(t) = αλt^(α−1) exp(γᵀxᵢ)  = h₀(t)·exp(γᵀxᵢ)  ← PH form!
+
+2. Cox PH with Weibull baseline:
+   hᵢ(t) = h₀(t)·exp(γᵀxᵢ),   h₀(t) = αλt^(α−1)
+
+3. Log-linear model:
+   log T = µ + βᵀx + σW,   W ~ standard extreme value
+   with:  θ = −β/σ = −β·α  (since σ = 1/α)
+          α = 1/σ
+          λ = exp(−µ/σ)    (= exp(−αµ))</div>
+
+    <h3>Schizophrenia Worked Example</h3>
+    <p>Fitting <code>survreg(Surv(Time,Censor)~Gender+Education+Marital, dist="weibull")</code> gives the log-linear form:</p>
+    <div class="formula-box">log T = 7.91 − 0.46·Gender − 0.01·Educ + 0.17·Married − 0.59·AloneAgain + 0.94·ε
+where exp(ε) ~ Weib(1,1) = Exp(1)   [i.e., σ = 0.94]
+
+Interpretation of Gender coefficient (−0.46):
+  → Males (Gender=1) have shorter log-survival time by 0.46 units
+  → Acceleration factor = exp(−(−0.46)/0.94) ≈ exp(0.49) ≈ 1.63
+  → Males experience events ~1.63× faster than females
+
+AFT form:
+  Sᵢ(t) = S₀(exp(0.46·Gender + 0.01·Educ − 0.17·Married + 0.59·AloneAgain)·t)
+  with S₀(t) = exp(−λt^α),  λ = exp(−7.91/0.94),  α = 1/0.94 ≈ 1.064</div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section-card" id="loglogistic">
+    <h2>5.5 Log-Logistic Model in Detail</h2>
+
+    <h3>Three Equivalent Representations</h3>
+    <div class="formula-box">1. AFT Model:
+   Sᵢ(t) = S₀(exp(θᵀxᵢ)·t),  S₀(t) = 1/[1 + (λt)^α]
+
+2. Proportional Odds Model:
+   Sᵢ(t)/[1−Sᵢ(t)] = (S₀(t)/[1−S₀(t)]) · exp(−γᵀxᵢ)
+   → The odds of surviving beyond t are proportional across covariate groups
+
+3. Log-linear model:
+   log T = µ + βᵀx + σW,   W ~ standard logistic: S_W(w) = 1/[1+eʷ]
+   with:  θ = −β/σ  (same conversion as Weibull case)
+          α = 1/σ
+          λ = exp(−µ/σ)</div>
+
+    <div class="key-box">
+      <strong>Key distinction:</strong> Unlike Weibull (which is both AFT and PH), the log-logistic model is both AFT and a <em>proportional odds</em> model. It is NOT a Cox PH model. Use log-logistic when the hazard is non-monotone (hump-shaped) and proportional hazards is inappropriate.
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section-card" id="other">
+    <h2>5.6 Other Distributions</h2>
+
+    <h3>Log-Normal</h3>
+    <div class="formula-box">log T = µ + βᵀx + σW,   W ~ N(0,1)
+
+→ Log-normal AFT = linear model with standard normal error
+→ NOT a PH model, NOT a proportional odds model</div>
+
+    <h3>Generalised Gamma — The Master Distribution</h3>
+    <div class="formula-box">log T = µ + βᵀx + σW,   W has density:
+  f_W(w) = |ν| (ν²)^(1/ν²) exp(νw − ν²exp(νw)) / Γ(1/ν²)
+
+Special cases (by choosing ν):
+  ν = 1         → Weibull model
+  ν = 1, σ = 1  → Exponential model
+  ν → 0         → Log-normal model
+
+Use: fit the generalised gamma as the "full" model, then test
+nested special cases to select the best distribution.</div>
+    <div class="key-box">
+      <strong>Why it matters:</strong> The generalised gamma nests the three most common parametric families. Fitting it and testing whether ν=1 (Weibull), ν=1 &amp; σ=1 (Exponential), or ν→0 (log-normal) provides a principled, likelihood-based model selection strategy.
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section-card" id="estimation">
+    <h2>5.7 Estimation</h2>
+    <p>We estimate parameters via <strong>maximum likelihood</strong> using the log-linear representation. For right-censored data:</p>
+
+    <div class="formula-box">Likelihood:
+  L(µ, β, σ) = ∏ᵢ fᵢ(Yᵢ)^δᵢ · Sᵢ(Yᵢ)^(1−δᵢ)
+
+Writing log Yᵢ = µ + βᵀxᵢ + σWᵢ, each term becomes:
+  = ∏ᵢ [(1/σYᵢ) f_W((log Yᵢ − µ − βᵀxᵢ)/σ)]^δᵢ
+    × [S_W((log Yᵢ − µ − βᵀxᵢ)/σ)]^(1−δᵢ)
+
+MLE: (µ̂, β̂, σ̂) = argmax L(µ, β, σ)
+
+Properties of MLE:
+  • Asymptotically unbiased and normal
+  • Covariance matrix estimated from observed Fisher information
+  • Delta method → CIs for derived quantities (median, S(t), etc.)</div>
+
+    <div class="warning-box">
+      <strong>Identifiability:</strong> Since W has a known distribution, its mean and variance are fixed by convention. This is why, for example, in the Weibull model we set exp(αµ) = 1 and α = 1 as an identifiability constraint when linking the log-linear to the AFT parameterisation.
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section-card" id="modelsel">
+    <h2>5.8 Model Selection</h2>
+
+    <h3>Method 1: Nested Likelihood Ratio / Wald / Score Tests</h3>
+    <p>Use the generalised gamma as the "full" model and test whether simpler models are adequate:</p>
+    <div class="formula-box">H₀: ν = 1        → Weibull
+H₀: ν = 1, σ = 1 → Exponential
+H₀: ν → 0        → Log-normal
+
+Test statistics: Wald, likelihood ratio, or score test
+  (all based on the censored data likelihood)</div>
+
+    <h3>Method 2: AIC (for non-nested models)</h3>
+    <div class="formula-box">AIC = −2 log L + 2(p + 1 + k)
+
+where:
+  p + 1  = number of regression parameters including intercept (µ, β₁,…,βₚ)
+  k = 0  for Exponential (no shape parameter)
+  k = 1  for Weibull, log-logistic, log-normal (one shape parameter)
+  k = 2  for Generalised gamma (two shape parameters)
+
+→ Select the model with the lowest AIC
+
+R command: survreg(Surv(Time,Censor) ~ x1 + x2, dist="weibull")
+Available: dist = "weibull", "exponential", "loglogistic", "lognormal",
+           "logistic", "gaussian" (last two: no log-transform of T)</div>
+
+    <div class="key-box">
+      <strong>Graphical checks before fitting:</strong>
+      <ul style="margin-top:6px;">
+        <li><strong>Exponential:</strong> plot log(Ŝ(t)) vs t — should be linear through origin</li>
+        <li><strong>Weibull:</strong> plot log(−logŜ(t)) vs log(t) — should be linear (slope = ρ)</li>
+        <li><strong>Log-logistic:</strong> plot log(Ŝ(t)⁻¹ − 1) vs log(t) — should be linear</li>
+        <li><strong>Log-normal:</strong> plot Φ⁻¹(1 − Ŝ(t)) vs log(t) — should be linear</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section-card" id="example">
+    <h2>5.9 Schizophrenia Example — R Output</h2>
+    <p>Model: Gender, Education, Marital status as covariates; dist="weibull" (log-linear output)</p>
+
+    <div class="r-output">survreg(formula = Surv(Time, Censor) ~ Gender + Education + Marital,
+        data = schizo, dist = "weibull")
+
+             Value  Std. Error      z       p
+(Intercept)  7.907      0.276  28.65  <2e-16
+Gender      -0.455      0.153  -2.97   0.003
+Education   -0.009      0.018  -0.48   0.630
+Married      0.167      0.196   0.85   0.394
+AloneAgain  -0.589      0.189  -3.11   0.002
+Log(scale)  -0.065      0.063  -1.04   0.298
+
+Scale = 0.937
+Weibull distribution
+Loglik(model)= -928.4   Loglik(intercept only)= -939.8
+AIC = 1870.8</div>
+
+    <div class="key-box">
+      <strong>Reading survreg output:</strong>
+      <ul style="margin-top:6px;">
+        <li>All coefficients are on the <strong>log T scale</strong> (log-linear model)</li>
+        <li>Positive coefficient → longer survival time (protective)</li>
+        <li>Negative coefficient → shorter survival time (harmful)</li>
+        <li><strong>Scale</strong> = σ̂ = 0.937; shape α = 1/σ = 1/0.937 ≈ 1.067</li>
+        <li>Log(scale) = log(σ̂) — tested against log(1) = 0 to check if Exponential fits</li>
+        <li>Gender (−0.455): males survive shorter; AloneAgain (−0.589): divorced/widowed survive shorter</li>
+      </ul>
+    </div>
+
+    <div class="r-output"># AIC comparison across distributions
+survreg(... dist="exponential") → AIC = ?
+survreg(... dist="weibull")     → AIC = 1870.8
+survreg(... dist="loglogistic") → AIC = ?
+survreg(... dist="lognormal")   → AIC = ?
+# → select dist with lowest AIC</div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section-card" id="formulas">
+    <h2>5.10 Formula Quick-Reference Sheet</h2>
+    <div class="formula-box">PARAMETRIC DISTRIBUTIONS — SUMMARY
+───────────────────────────────────────────────────────────
+Distribution    S₀(t)                    h₀(t)             Check
+Exponential     exp(−λt)                 λ                 log Ŝ vs t
+Weibull         exp(−λt^ρ)               ρλt^(ρ−1)         log(−logŜ) vs log(t)
+Log-logistic    1/[1+(λt)^κ]             λκ(λt)^(κ−1)/[1+(λt)^κ]
+Log-normal      1−Φ((log t−µ)/γ)        no closed form
+
+AFT MODEL
+───────────────────────────────────────────────────────────
+Sᵢ(t) = S₀(exp(θᵀxᵢ)·t)
+hᵢ(t) = exp(θᵀxᵢ) · h₀(exp(θᵀxᵢ)·t)
+Mᵢ = exp(−θᵀxᵢ) · M₀   (median relationship)
+
+LOG-LINEAR MODEL (R parameterisation)
+───────────────────────────────────────────────────────────
+log T = µ + βᵀx + σW      (β = −σθ, i.e. β = −θ/α in Weibull)
+MLE: L = ∏ᵢ [(1/σYᵢ)f_W(zᵢ)]^δᵢ · [S_W(zᵢ)]^(1−δᵢ)
+   where zᵢ = (log Yᵢ − µ − βᵀxᵢ) / σ
+
+WEIBULL PARAMETER CONVERSIONS
+───────────────────────────────────────────────────────────
+σ (R scale) = 1/α (shape in S₀)
+α           = 1/σ
+λ (scale in S₀) = exp(−µ/σ) = exp(−αµ)
+θ (AFT)     = −β/σ
+
+MODEL SELECTION — AIC
+───────────────────────────────────────────────────────────
+AIC = −2 log L + 2(p + 1 + k)
+  k=0: Exponential; k=1: Weibull/loglogistic/lognormal; k=2: Gen. gamma</div>
+  </div>
+
+  <!-- MCQ SECTION -->
+  <div class="section-card q-section" id="mcq">
+    <h2>🎯 Multiple Choice, True/False &amp; Calculation Questions (30 Questions)</h2>
+
+    <div class="score-bar">
+      <div><span>Score: </span><span class="score-val" id="scoreDisplay">0 / 30</span></div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block" data-q="1">
+      <div class="q-number">Question 1 · Multiple Choice</div>
+      <div class="q-text">Which parametric distribution has a constant hazard function?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Weibull with ρ = 2</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Exponential</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Log-logistic with κ = 2</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Log-normal</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" data-q="2">
+      <div class="q-number">Question 2 · True / False</div>
+      <div class="q-text">TRUE or FALSE: A Weibull distribution with shape parameter ρ < 1 has an increasing hazard function (models aging or wear-out).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" data-q="3">
+      <div class="q-number">Question 3 · Multiple Choice</div>
+      <div class="q-text">In the AFT model Sᵢ(t) = S₀(exp(θᵀxᵢ)·t), what is the correct interpretation of the acceleration factor exp(θᵀxᵢ) = 3?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Subject i survives 3 times longer than the baseline</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Time runs 3 times faster for subject i — they experience events at 1/3 of the baseline time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The hazard for subject i is 3 times the baseline hazard at all times</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The median survival of subject i is 3 times the baseline median</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" data-q="4">
+      <div class="q-number">Question 4 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Weibull distribution is the only continuous distribution that can be expressed as both an AFT model and a Cox proportional hazards model.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" data-q="5">
+      <div class="q-number">Question 5 · Multiple Choice</div>
+      <div class="q-text">In the log-linear model log T = µ + βᵀx + σW for the Weibull distribution, what is the distribution of the error term W?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Standard normal N(0,1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Standard logistic with S_W(w) = 1/[1+eʷ]</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Standard extreme value with S_W(w) = exp(−eʷ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Uniform on (0,1)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" data-q="6">
+      <div class="q-number">Question 6 · Multiple Choice</div>
+      <div class="q-text">The log-logistic distribution is the only distribution that can be written simultaneously as an AFT model and as which other type of model?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Cox proportional hazards model</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Additive hazards model</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Proportional odds model</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Accelerated hazards model</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" data-q="7">
+      <div class="q-number">Question 7 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In survreg() output in R, a positive coefficient means that the covariate is associated with shorter survival time.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" data-q="8">
+      <div class="q-number">Question 8 · Multiple Choice</div>
+      <div class="q-text">The AIC formula for parametric survival models is AIC = −2 log L + 2(p + 1 + k). What is k for the Weibull model?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) k = 0</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) k = 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) k = 2</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) k = p</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" data-q="9">
+      <div class="q-number">Question 9 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The generalised gamma model nests the Weibull (ν=1), exponential (ν=1, σ=1), and log-normal (ν→0) as special cases.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" data-q="10">
+      <div class="q-number">Question 10 · Multiple Choice</div>
+      <div class="q-text">Which graphical check is used to assess whether a Weibull distribution fits the data?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Plot log(Ŝ(t)) vs t — should be linear</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Plot log(−logŜ(t)) vs log(t) — should be linear</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Plot Φ⁻¹(1−Ŝ(t)) vs log(t) — should be linear</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Plot Ŝ(t) vs t — should be exponential</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-block" data-q="11">
+      <div class="q-number">Question 11 · Multiple Choice</div>
+      <div class="q-text">In the AFT model, if θᵀxᵢ = 0.5 (a single binary covariate), what is the ratio of subject i's median survival to the baseline median?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) exp(0.5) ≈ 1.65</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) exp(−0.5) ≈ 0.61</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 2.0</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-block" data-q="12">
+      <div class="q-number">Question 12 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The log-normal and log-logistic distributions both produce hump-shaped (non-monotone) hazard functions when their shape parameters are greater than 1.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-block" data-q="13">
+      <div class="q-number">Question 13 · Multiple Choice</div>
+      <div class="q-text">What does the "Scale" output in survreg() correspond to in the log-linear model log T = µ + βᵀx + σW?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The intercept µ</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The scale parameter σ</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The shape parameter α = 1/σ of the Weibull baseline</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The baseline hazard at t = 1</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-block" data-q="14">
+      <div class="q-number">Question 14 · True / False</div>
+      <div class="q-text">TRUE or FALSE: When using dist="logistic" or dist="gaussian" in survreg(), R does NOT log-transform the response variable T.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-block" data-q="15">
+      <div class="q-number">Question 15 · Multiple Choice</div>
+      <div class="q-text">For the log-logistic distribution with parameters λ and κ, the median event time M(T) equals:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) exp(µ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) λ⁻¹ (a function of λ only)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) exp(1/κ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1/(λκ)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-block" data-q="16">
+      <div class="q-number">Question 16 · Multiple Choice</div>
+      <div class="q-text">Which model specification should be used in R to test whether the Weibull model is adequate against the more general generalised gamma model?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Compare AIC values only — no formal test is possible</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Fit the generalised gamma and test H₀: ν = 1 using a likelihood ratio, Wald, or score test</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Use the log-rank test</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Compare the KM estimate to the fitted Weibull curve visually</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-block" data-q="17">
+      <div class="q-number">Question 17 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the Weibull AFT model, the regression coefficient γᵢ in the PH representation (hᵢ(t) = h₀(t)·exp(γᵀx)) equals αθ, where α = 1/σ is the Weibull shape parameter.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-block" data-q="18">
+      <div class="q-number">Question 18 · Multiple Choice</div>
+      <div class="q-text">The parametric likelihood for right-censored data is L = ∏ fᵢ(Yᵢ)^δᵢ · Sᵢ(Yᵢ)^(1−δᵢ). Which term represents the contribution of a censored observation?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) fᵢ(Yᵢ) — the density at the observed time</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Sᵢ(Yᵢ) — the survival probability beyond the censoring time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) hᵢ(Yᵢ) — the hazard at the censoring time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1 − Sᵢ(Yᵢ) — the CDF at the censoring time</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-block" data-q="19">
+      <div class="q-number">Question 19 · Multiple Choice</div>
+      <div class="q-text">In the Schizophrenia survreg output, Scale = 0.937. What does this tell you about the Weibull shape parameter α?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) α = 0.937 — the hazard is slightly decreasing</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) α = 1/0.937 ≈ 1.067 — the hazard is slightly increasing</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) α = exp(0.937) — the hazard is strongly increasing</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) α cannot be determined from the scale parameter alone</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-block" data-q="20">
+      <div class="q-number">Question 20 · True / False</div>
+      <div class="q-text">TRUE or FALSE: When using AIC for model selection among Exponential, Weibull, and Generalised Gamma models, we always prefer the Generalised Gamma because it has the most parameters.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q21 CALCULATION -->
+    <div class="question-block" data-q="21">
+      <div class="q-number">Question 21 · Calculation</div>
+      <div class="q-text">For a Weibull distribution with λ = 0.1 and ρ = 2, compute the hazard h(t) at t = 3.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) 0.2</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.6  </button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1.8</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q22 CALCULATION -->
+    <div class="question-block" data-q="22">
+      <div class="q-number">Question 22 · Calculation</div>
+      <div class="q-text">Weibull model: σ = 0.5 (scale from survreg). What is the Weibull shape parameter α and does the hazard increase or decrease?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) α = 0.5; hazard decreases (ρ < 1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) α = 2; hazard increases (ρ > 1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) α = 0.5; hazard is constant</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) α = exp(0.5); hazard increases</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q23 CALCULATION -->
+    <div class="question-block" data-q="23">
+      <div class="q-number">Question 23 · Calculation</div>
+      <div class="q-text">In the Schizophrenia model, the coefficient for AloneAgain is −0.589 (σ = 0.937). What is the AFT coefficient θ for AloneAgain?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) −0.589</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) −0.552</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.629</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) −0.629</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q24 CALCULATION -->
+    <div class="question-block" data-q="24">
+      <div class="q-number">Question 24 · Calculation</div>
+      <div class="q-text">For an Exponential model with p = 3 covariates, what is the AIC penalty term 2(p + 1 + k)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 6</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 8 </button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 10</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 12</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q25 CALCULATION -->
+    <div class="question-block" data-q="25">
+      <div class="q-number">Question 25 · Calculation</div>
+      <div class="q-text">A Weibull model gives survreg coefficients: µ̂ = 7.91, σ̂ = 0.94. What is the estimated baseline scale parameter λ̂ (for S₀(t) = exp(−λt^α))?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) exp(7.91)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) exp(−7.91/0.94) = exp(−8.42) ≈ 0.000221</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 7.91/0.94 ≈ 8.42</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) exp(−7.91) ≈ 0.00037</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q26 R OUTPUT -->
+    <div class="question-block" data-q="26">
+      <div class="q-number">Question 26 · R Output Interpretation</div>
+      <div class="q-text">In the survreg output below, is there evidence that Gender significantly affects survival time?</div>
+      <div class="r-output">             Value  Std. Error      z       p
+(Intercept)  7.907      0.276  28.65  <2e-16
+Gender      -0.455      0.153  -2.97   0.003
+Education   -0.009      0.018  -0.48   0.630
+Scale = 0.937</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) No — the coefficient is negative so Gender is protective</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Yes — p = 0.003 < 0.05; males (Gender=1) have significantly shorter survival time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) No — the confidence interval includes 0</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Cannot determine without seeing the full model</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q27 R OUTPUT -->
+    <div class="question-block" data-q="27">
+      <div class="q-number">Question 27 · R Output Interpretation</div>
+      <div class="q-text">From the same output, what does Log(scale) = −0.065 with p = 0.298 tell you about the Exponential vs Weibull fit?</div>
+      <div class="r-output">Log(scale)  -0.065      0.063  -1.04   0.298
+Scale = 0.937</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The Exponential model fits better since p > 0.05</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) We cannot reject σ = 1 (i.e., Exponential) at 5% significance — the data are consistent with the simpler Exponential model</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The Weibull is strongly preferred since scale < 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Log(scale) tests whether the baseline hazard is monotone</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q28 R OUTPUT -->
+    <div class="question-block" data-q="28">
+      <div class="q-number">Question 28 · R Output Interpretation</div>
+      <div class="q-text">Compare these two AIC values. Which model should be preferred and why?</div>
+      <div class="r-output">survreg(..., dist="exponential")  AIC = 1874.2
+survreg(..., dist="weibull")      AIC = 1870.8
+survreg(..., dist="lognormal")    AIC = 1875.1</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Exponential — fewest parameters, parsimony principle</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Weibull — lowest AIC (1870.8), balances goodness-of-fit and model complexity</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Log-normal — most flexible hazard shape</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Cannot decide without a formal likelihood ratio test</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q29 R OUTPUT -->
+    <div class="question-block" data-q="29">
+      <div class="q-number">Question 29 · R Output Interpretation</div>
+      <div class="q-text">A survreg model with dist="weibull" gives β̂_Education = −0.009, p = 0.630. What is the correct conclusion?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Education significantly reduces survival time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Education has a large protective effect but is not statistically significant</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) There is no statistically significant evidence that Education affects survival time in this model (p = 0.63)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Education should be removed from the model because its coefficient is negative</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q30 R OUTPUT -->
+    <div class="question-block" data-q="30">
+      <div class="q-number">Question 30 · R Output Interpretation</div>
+      <div class="q-text">The Schizophrenia Weibull model reports Loglik(model) = −928.4 and Loglik(intercept only) = −939.8. What is the likelihood ratio test statistic for testing whether the covariates jointly improve the fit, and what distribution does it follow?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) LRT = 928.4 − 939.8 = −11.4; follows N(0,1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) LRT = 2×(939.8 − 928.4) = 22.8; follows χ²(4) under H₀ (4 covariates)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) LRT = 2×(928.4 − 939.8) = −22.8; not valid</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) LRT = 939.8/928.4; follows F-distribution</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+  </div><!-- end MCQ section -->
+
+  <!-- SHORT ANSWER SECTION -->
+  <div class="section-card q-section" id="shortq">
+    <h2>✍️ Short Answer Questions</h2>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 1</div>
+      <div class="q-text">Show algebraically that the AFT model Sᵢ(t) = S₀(exp(θᵀxᵢ)·t) is equivalent to the log-linear model log T = µ + βᵀx + σW. Identify the relationship between the model parameters (θ, S₀) and (µ, β, σ, W).</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Starting from the log-linear model:</strong><br>
+        log T = µ + βᵀx + σW &nbsp;&nbsp; ⟹ &nbsp;&nbsp; T = exp(µ + βᵀx + σW)<br><br>
+        <strong>Computing Sᵢ(t):</strong><br>
+        Sᵢ(t) = P(Tᵢ > t) = P(log Tᵢ > log t)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = P(µ + σWᵢ > log t − βᵀxᵢ)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = P(Wᵢ > (log t − µ − βᵀxᵢ)/σ)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = S_W((log t − µ − βᵀxᵢ)/σ)<br><br>
+        Now define S₀ as the survival function of exp(µ + σW), i.e., S₀(t) = S_W((log t − µ)/σ). Then:<br>
+        Sᵢ(t) = S_W((log t − µ − βᵀxᵢ)/σ)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = S_W((log(t · exp(−βᵀxᵢ)) − µ)/σ)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = S₀(t · exp(−βᵀxᵢ))<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = S₀(exp(θᵀxᵢ) · t) &nbsp;&nbsp; where θ = −β/σ<br><br>
+        <strong>Parameter correspondence:</strong><br>
+        θ = −β/σ, &nbsp; S₀ = survival of exp(µ + σW), &nbsp; σ = scale<br>
+        The two representations are fully equivalent.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 2</div>
+      <div class="q-text">Prove that the Weibull AFT model simultaneously satisfies the proportional hazards assumption. Derive the PH form of the hazard and identify the baseline hazard and the covariate effect. Why is this unique to the Weibull distribution?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Starting from Weibull AFT:</strong><br>
+        Sᵢ(t) = S₀(exp(θᵀxᵢ)·t) with S₀(t) = exp(−λt^α)<br>
+        → Sᵢ(t) = exp(−λ[exp(θᵀxᵢ)·t]^α) = exp(−λ exp(αθᵀxᵢ)·t^α)<br><br>
+        <strong>Computing the hazard:</strong><br>
+        hᵢ(t) = −d/dt log Sᵢ(t) = αλt^(α−1) · exp(αθᵀxᵢ)<br>
+        = h₀(t) · exp(γᵀxᵢ) &nbsp;&nbsp; where h₀(t) = αλt^(α−1) and γ = αθ<br><br>
+        This is exactly the Cox PH form: the hazard is a product of a baseline hazard and a covariate-dependent multiplicative factor that does not depend on t.<br><br>
+        <strong>Why this is unique to Weibull:</strong><br>
+        The AFT acceleration produces Sᵢ(t) = S₀(ct) for constant c = exp(θᵀxᵢ). For the PH property to hold simultaneously, we need hᵢ(t) = h₀(ct)·c = φ(c)·h₀(t) for some function φ. This requires h₀(ct) ∝ h₀(t) for all t — which is only satisfied by power functions h₀(t) = αλt^(α−1) (Weibull). No other distribution satisfies this self-similarity property.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 3</div>
+      <div class="q-text">Explain how model selection works for parametric survival models. Describe both the nested testing approach (using the generalised gamma) and the AIC approach. Give the AIC formula and explain the role of the penalty terms p, 1, and k.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Method 1 — Nested likelihood testing (via generalised gamma):</strong><br>
+        The generalised gamma model log T = µ + βᵀx + σW is the most general model considered. It nests:<br>
+        &nbsp;• Weibull: ν = 1<br>
+        &nbsp;• Exponential: ν = 1 and σ = 1<br>
+        &nbsp;• Log-normal: ν → 0<br>
+        For each null hypothesis, fit both the restricted and unrestricted model and compute the likelihood ratio test statistic: LRT = 2(log L_full − log L_restricted) ~ χ²(q) under H₀, where q is the number of restrictions. Wald and score tests are also valid alternatives.<br><br>
+        <strong>Method 2 — AIC (for non-nested comparisons):</strong><br>
+        AIC = −2 log L + 2(p + 1 + k)<br>
+        &nbsp;• −2 log L: measures goodness-of-fit (smaller = better fit)<br>
+        &nbsp;• p + 1: penalises for number of regression parameters (p covariates + intercept µ)<br>
+        &nbsp;• k: penalises for additional distributional shape parameters<br>
+        &nbsp;&nbsp;&nbsp;k = 0 (Exponential, no shape par.), k = 1 (Weibull, log-logistic, log-normal — one shape par.), k = 2 (Gen. gamma — two shape pars.)<br>
+        Select the distribution with the lowest AIC. AIC can compare non-nested models (e.g., Weibull vs log-logistic) where LRT is not applicable.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 4</div>
+      <div class="q-text">Interpret the complete survreg Weibull output for the Schizophrenia dataset. In particular: (a) interpret the Gender and AloneAgain coefficients; (b) convert to AFT acceleration factors; (c) state what Scale = 0.937 implies for the hazard shape; (d) comment on whether Education should be removed from the model.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>(a) Coefficient interpretation (log T scale):</strong><br>
+        Gender (β = −0.455, p = 0.003): Males have log-survival time 0.455 units shorter than females. This is statistically significant (p &lt; 0.01).<br>
+        AloneAgain (β = −0.589, p = 0.002): Divorced/widowed patients have log-survival time 0.589 units shorter than single patients. Also highly significant.<br><br>
+        <strong>(b) AFT acceleration factors:</strong><br>
+        θ_Gender = −β/σ = 0.455/0.937 ≈ 0.486; acceleration factor = exp(0.486) ≈ 1.63<br>
+        → Males experience the event ~1.63× faster; their median survival = exp(−0.486) × M₀ ≈ 0.615 × M₀<br>
+        θ_AloneAgain = 0.589/0.937 ≈ 0.629; acceleration factor = exp(0.629) ≈ 1.88<br>
+        → Alone-again patients experience the event ~1.88× faster than single patients<br><br>
+        <strong>(c) Scale = 0.937 → shape α = 1/0.937 ≈ 1.067:</strong><br>
+        Since α > 1, the Weibull hazard is slightly increasing over time. Patients face a gradually rising risk of the event as time passes. The Log(scale) test (p = 0.298) suggests the Exponential (σ = 1) is also not rejected — the departure from constant hazard is modest.<br><br>
+        <strong>(d) Education:</strong><br>
+        β_Education = −0.009 with p = 0.630 — no evidence of any effect. The variable could reasonably be removed without loss of fit (though AIC-based comparison after removal would confirm this).
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 5</div>
+      <div class="q-text">Compare and contrast the Weibull, log-logistic, and log-normal distributions as parametric survival models. In particular, discuss: (a) the shape of their hazard functions; (b) their equivalent representations; (c) their empirical graphical checks; (d) the situations in which each is most appropriate.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>(a) Hazard shapes:</strong><br>
+        Weibull: monotone — decreasing (ρ&lt;1), constant (ρ=1), or increasing (ρ>1). Cannot model non-monotone hazards.<br>
+        Log-logistic: hump-shaped when κ>1 (rises then falls), monotone decreasing when κ≤1. Can model acute illnesses where risk peaks then declines.<br>
+        Log-normal: always hump-shaped (rises then declines toward 0). Similar to log-logistic but mathematically less tractable.<br><br>
+        <strong>(b) Equivalent representations:</strong><br>
+        Weibull = AFT + Cox PH (unique! — only distribution satisfying both)<br>
+        Log-logistic = AFT + Proportional Odds (NOT a PH model)<br>
+        Log-normal = AFT only (no special multiplicative structure beyond AFT)<br><br>
+        <strong>(c) Graphical checks (linearisation of KM estimate):</strong><br>
+        Weibull: log(−logŜ(t)) vs log(t) → linear (slope = ρ)<br>
+        Exponential: log(Ŝ(t)) vs t → linear (slope = −λ)<br>
+        Log-logistic: log(Ŝ(t)⁻¹−1) vs log(t) → linear<br>
+        Log-normal: Φ⁻¹(1−Ŝ(t)) vs log(t) → linear<br><br>
+        <strong>(d) When to use each:</strong><br>
+        Weibull: Monotone hazards; when PH model comparison is desired; engineering reliability (wear-out, early failure).<br>
+        Log-logistic: Non-monotone (hump-shaped) hazards; when PO model is preferred over PH; acute medical conditions.<br>
+        Log-normal: Similar to log-logistic but with heavier tail; less used due to intractable hazard. Useful when the log-survival time is approximately normally distributed.
+      </div>
+    </div>
+
+  </div><!-- end short answer section -->
+
+</div><!-- end container -->
+
+<script>
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+
+  function checkAnswer(btn, isCorrect) {
+    const block = btn.closest('.question-block');
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+    const allBtns = block.querySelectorAll('.option-btn');
+    allBtns.forEach(b => { b.disabled = true; });
+    const feedback = block.querySelector('.feedback');
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'feedback correct-fb';
+      totalCorrect++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b => { if (b.onclick.toString().includes('true')) b.classList.add('correct'); });
+      feedback.textContent = '✗ Incorrect. The highlighted option is correct.';
+      feedback.className = 'feedback incorrect-fb';
+    }
+    totalAnswered++;
+    updateScore();
+  }
+
+  function updateScore() {
+    document.getElementById('scoreDisplay').textContent = totalCorrect + ' / 30';
+  }
+
+  function toggleAnswer(btn) {
+    const answerBox = btn.nextElementSibling;
+    if (answerBox.classList.contains('shown')) {
+      answerBox.classList.remove('shown');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      answerBox.classList.add('shown');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  function resetAll() {
+    const blocks = document.querySelectorAll('.question-block');
+    blocks.forEach(block => {
+      delete block.dataset.answered;
+      const btns = block.querySelectorAll('.option-btn');
+      btns.forEach(b => { b.disabled = false; b.classList.remove('correct', 'incorrect'); });
+      const feedback = block.querySelector('.feedback');
+      feedback.className = 'feedback';
+      feedback.textContent = '';
+    });
+    totalAnswered = 0;
+    totalCorrect = 0;
+    updateScore();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1027 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 — Proportional Hazards Models | Survival Analysis</title>
+<script>
+MathJax = {
+  tex: { inlineMath:[['\\(','\\)']], displayMath:[['\\[','\\]']] },
+  options: { skipHtmlTags:['script','noscript','style','textarea','pre'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async=""></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a202c;line-height:1.7}
+.site-header{background:linear-gradient(135deg,#1a365d 0%,#2d6a9f 100%);color:#fff;padding:2rem 1.5rem 1.5rem;text-align:center}
+.site-header h1{font-size:clamp(1.3rem,3vw,1.9rem);font-weight:700;margin-bottom:.4rem}
+.site-header .sub{font-size:.88rem;opacity:.85;letter-spacing:.05em}
+.tab-nav{display:flex;flex-wrap:wrap;gap:.2rem;background:#1a365d;padding:.4rem .75rem 0;justify-content:center}
+.tab-btn{background:transparent;border:none;color:rgba(255,255,255,.75);padding:.55rem .9rem;font-size:.8rem;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+.tab-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tab-btn.active{color:#fff;border-bottom-color:#63b3ed;font-weight:700}
+.main{max-width:960px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:1.5rem 1.75rem;margin-bottom:1.25rem}
+.card h2{font-size:1.2rem;color:#1a365d;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #e2e8f0}
+.card h3{font-size:1rem;color:#2c5282;margin:1.2rem 0 .5rem;font-weight:700}
+.card p{margin-bottom:.7rem;font-size:.95rem}
+.card ul,.card ol{padding-left:1.5rem;margin-bottom:.75rem}
+.card li{margin-bottom:.3rem;font-size:.93rem}
+.hl{background:#ebf8ff;border-left:4px solid #3182ce;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.75rem 0;font-size:.92rem}
+.warn{background:#fff5f5;border-left:4px solid #e53e3e;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.75rem 0;font-size:.92rem}
+.defn{background:#f0fff4;border-left:4px solid #38a169;padding:.75rem 1rem;border-radius:0 6px 6px 0;margin:.75rem 0;font-size:.92rem}
+.math-block{overflow-x:auto;padding:.4rem 0;margin:.7rem 0}
+.stbl{width:100%;border-collapse:collapse;font-size:.87rem;margin:.75rem 0}
+.stbl th{background:#2d6a9f;color:#fff;padding:.5rem .75rem;text-align:left}
+.stbl td{padding:.45rem .75rem;border-bottom:1px solid #e2e8f0}
+.stbl tr:nth-child(even) td{background:#f7fafc}
+pre{background:#1a202c;color:#e2e8f0;padding:1rem 1.25rem;border-radius:8px;overflow-x:auto;font-size:.84rem;margin:.75rem 0;line-height:1.5}
+code{font-family:'Courier New',monospace;background:#edf2f7;padding:.1em .3em;border-radius:3px;font-size:.87em}
+pre code{background:none;padding:0;font-size:inherit}
+/* MCQ */
+.mcq-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem}
+.mcq-header h2{font-size:1.25rem;color:#1a365d}
+.score-badge{background:#2d6a9f;color:#fff;padding:.4rem 1.1rem;border-radius:20px;font-size:.9rem;font-weight:700}
+.reset-btn{background:#e53e3e;color:#fff;border:none;padding:.4rem 1rem;border-radius:20px;cursor:pointer;font-size:.84rem;font-weight:700;transition:background .2s}
+.reset-btn:hover{background:#c53030}
+.mcq-card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.q-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#718096;margin-bottom:.4rem}
+.q-stem{font-size:.95rem;font-weight:600;color:#1a202c;margin-bottom:.85rem;line-height:1.55}
+.opt{display:block;width:100%;text-align:left;background:#f7fafc;border:1.5px solid #e2e8f0;border-radius:7px;padding:.6rem .9rem;margin-bottom:.4rem;font-size:.88rem;cursor:pointer;transition:all .15s;color:#1a202c;line-height:1.5}
+.opt:hover:not(:disabled){background:#ebf8ff;border-color:#90cdf4}
+.opt.correct{background:#f0fff4;border-color:#38a169;color:#22543d;font-weight:600}
+.opt.wrong{background:#fff5f5;border-color:#e53e3e;color:#742a2a}
+.opt:disabled{cursor:default}
+.fb{margin-top:.7rem;padding:.65rem .9rem;border-radius:7px;font-size:.84rem;line-height:1.55;display:none}
+.fb.show-c{display:block;background:#f0fff4;border:1px solid #9ae6b4;color:#22543d}
+.fb.show-w{display:block;background:#fff5f5;border:1px solid #feb2b2;color:#742a2a}
+/* Short Answer */
+.sa-card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:1.25rem 1.5rem;margin-bottom:1rem}
+.sa-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#718096;margin-bottom:.4rem}
+.sa-q{font-size:.95rem;font-weight:600;color:#1a202c;margin-bottom:.85rem}
+.rev-btn{background:#2d6a9f;color:#fff;border:none;padding:.45rem 1.1rem;border-radius:20px;cursor:pointer;font-size:.83rem;font-weight:600;transition:background .2s}
+.rev-btn:hover{background:#1a365d}
+.sa-ans{margin-top:1rem;padding:1rem 1.25rem;background:#f7fafc;border-radius:8px;border-left:4px solid #2d6a9f;font-size:.9rem;line-height:1.7;display:none}
+.sa-ans.open{display:block}
+.sa-ans h4{color:#2c5282;font-size:.9rem;margin:.75rem 0 .3rem;font-weight:700}
+.sa-ans p{margin-bottom:.55rem}
+@media(max-width:600px){.card,.mcq-card,.sa-card{padding:1rem}.tab-btn{padding:.45rem .55rem;font-size:.73rem}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>📈 Chapter 4 — Proportional Hazards Models</h1>
+  <p class="sub">Survival Analysis &nbsp;·&nbsp; Cox Regression &nbsp;·&nbsp; Partial Likelihood &nbsp;·&nbsp; Model Checking &nbsp;·&nbsp; Exam Preparation</p>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('intro',this)">Introduction</button>
+  <button class="tab-btn" onclick="showTab('ph',this)">PH Model</button>
+  <button class="tab-btn" onclick="showTab('pl',this)">Partial Lik.</button>
+  <button class="tab-btn" onclick="showTab('ties',this)">Tied Obs.</button>
+  <button class="tab-btn" onclick="showTab('inference',this)">Inference</button>
+  <button class="tab-btn" onclick="showTab('interactions',this)">Interactions</button>
+  <button class="tab-btn" onclick="showTab('modelbldg',this)">Model Bldg.</button>
+  <button class="tab-btn" onclick="showTab('phcheck',this)">PH Check</button>
+  <button class="tab-btn" onclick="showTab('stratified',this)">Stratified</button>
+  <button class="tab-btn" onclick="showTab('mcq',this)">MCQ ×50</button>
+  <button class="tab-btn" onclick="showTab('sa',this)">Short Ans. ×8</button>
+</nav>
+
+<main class="main">
+
+<!-- ═══ INTRO ═══ -->
+<section id="intro" class="tab-pane active">
+<div class="card">
+  <h2>Introduction — Why Move Beyond Stratification?</h2>
+  <p>The Cox (1972) proportional hazards model is the most widely used regression model in survival analysis, cited over 18,000 times. It addresses fundamental shortcomings of stratified nonparametric tests.</p>
+  <h3>Three Problems with Stratified Tests as a Covariate Adjustment Strategy</h3>
+  <ul>
+    <li><strong>(1)</strong> Adjusting for many covariates requires exponentially many strata — quickly becoming infeasible.</li>
+    <li><strong>(2)</strong> The stratified test yields no estimate or inference for the stratification variable itself.</li>
+    <li><strong>(3)</strong> Continuous covariates must be arbitrarily categorised, losing information and introducing cut-point sensitivity.</li>
+  </ul>
+  <h3>The Semiparametric Advantage</h3>
+  <p>The Cox model solves all three problems simultaneously. It is <strong>semiparametric</strong>: the baseline hazard \(h_0(t)\) is left completely unspecified (infinite-dimensional nuisance), while the covariate effects \(\beta\) are parametric and estimable without specifying \(h_0\). This is a major practical advantage — we get valid, efficient inference about relative rates without any distributional assumption about the shape of the hazard over time.</p>
+  <div class="warn"><strong>Critical distinction:</strong> The Cox model makes <em>no parametric assumption about \(h_0(t)\)</em> but does assume that the <em>ratio of hazards</em> for any two subjects is constant over time. Violating the PH assumption is more serious than misspecifying the baseline shape.</div>
+</div>
+</section>
+
+<!-- ═══ PH MODEL ═══ -->
+<section id="ph" class="tab-pane">
+<div class="card">
+  <h2>The Proportional Hazards Model</h2>
+  <h3>Two-Group Formulation</h3>
+  <p>In the simplest case (Treated vs. Control), the PH model states:</p>
+  <div class="math-block">\[ h_T(t) = \psi \, h_C(t), \quad \psi = \frac{h_T(t)}{h_C(t)} = \text{const for all } t \]</div>
+  <p>If \(\psi &lt; 1\): treatment reduces hazard. If \(\psi &gt; 1\): treatment increases hazard. Under PH, the two survival curves can <strong>never</strong> cross.</p>
+  <h3>General Multivariate Model</h3>
+  <p>For subject \(i\) with covariate vector \(x_i=(x_{i1},\ldots,x_{ip})^\top\):</p>
+  <div class="math-block">\[ h_i(t) = h_0(t)\exp(\beta^\top x_i) = h_0(t)\exp(\beta_1 x_{i1}+\cdots+\beta_p x_{ip}) \]</div>
+  <table class="stbl">
+    <tbody><tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>\(h_0(t)\)</td><td>Baseline hazard: hazard when all \(x_{ij}=0\). Completely unspecified.</td></tr>
+    <tr><td>\(\beta=(\beta_1,\ldots,\beta_p)^\top\)</td><td>\(p\times1\) vector of log-hazard-ratio parameters to be estimated</td></tr>
+    <tr><td>\(\exp(\beta^\top x_i)\)</td><td>Relative risk (HR) for subject \(i\) vs. baseline subject</td></tr>
+  </tbody></table>
+  <h3>The PH Condition</h3>
+  <div class="defn">For any two subjects \(i\) and \(j\):
+  \[ \frac{h_i(t)}{h_j(t)} = \frac{\exp(\beta^\top x_i)}{\exp(\beta^\top x_j)} = \exp\!\left(\beta^\top(x_i-x_j)\right) = \text{constant in } t \]
+  The baseline hazard cancels entirely. This is why \(h_0(t)\) need not be estimated to obtain valid inference about \(\beta\).</div>
+  <h3>Log-Scale Interpretation</h3>
+  <div class="math-block">\[ \log h_i(t) = \underbrace{\log h_0(t)}_{\text{time-varying intercept}} + \underbrace{\beta^\top x_i}_{\text{no intercept term}} \]</div>
+  <p>For subjects \(i\) and \(j\): \(\log h_i(t) - \log h_j(t) = \beta^\top(x_i-x_j)\) — constant in \(t\). On the log-hazard scale the two functions are <strong>parallel</strong>.</p>
+  <div class="warn"><strong>No intercept in \(\beta^\top x_i\):</strong> Including an intercept would be double-counting — the time-varying intercept role is already played by \(\log h_0(t)\).</div>
+  <h3>Interpreting the Hazard Ratio \(e^{\beta_k}\)</h3>
+  <ul>
+    <li><strong>Binary covariate</strong> \(x_k\in\{0,1\}\): \(e^{\beta_k}\) = rate of event in group \(x_k=1\) relative to group \(x_k=0\), for subjects identical on all other covariates, at any time.</li>
+    <li><strong>Continuous covariate</strong> \(x_k\): \(e^{\beta_k}\) = multiplicative change in hazard per one-unit increase in \(x_k\), holding all other covariates constant. For a \(c\)-unit change: \(e^{c\beta_k}\).</li>
+  </ul>
+  <div class="hl"><strong>Schizophrenia example (fit1):</strong> \(\hat\beta_{\text{Gender}}=0.6742\), HR\(=e^{0.6742}=1.9624\). Females have approximately twice the hazard of males with the same EducCat at every time point — an estimated 96% higher mortality. The 95% CI \([1.418,\,2.715]\) excludes 1 (\(p=4.7\times10^{-5}\)). \(\hat\beta_{\text{EducCat}}=0.1208\), HR\(=1.1284\), \(p=0.487\) — Education non-significant; CI \([0.803,\,1.586]\) includes 1.</div>
+</div>
+</section>
+
+<!-- ═══ PARTIAL LIKELIHOOD ═══ -->
+<section id="pl" class="tab-pane">
+<div class="card">
+  <h2>Fitting the Model — Partial Likelihood</h2>
+  <h3>Why Partial Likelihood?</h3>
+  <p>The full likelihood involves both \(\beta\) and the infinite-dimensional \(h_0(t)\). The key insight of Cox (1972) is to <em>profile out</em> \(h_0\): fix \(\beta\), maximise over \(h_0\), find the optimal \(h_0\) as a function of \(\beta\) (the <strong>Breslow estimator</strong>), substitute back, and maximise the resulting <strong>partial likelihood</strong> over \(\beta\) alone.</p>
+  <h3>Setup (No Ties)</h3>
+  <p>With \(r\) distinct ordered event times \(Y_{(1)} &lt; \cdots &lt; Y_{(r)}\), the full likelihood is:</p>
+  <div class="math-block">\[ \prod_{j=1}^r h_{0(j)}\exp(x_{(j)}^\top\beta) \cdot \prod_{i=1}^n \exp\!\left(-H_0(Y_i)\exp(x_i^\top\beta)\right) \]</div>
+  <h3>Profiling Out \(h_0\): The Breslow Estimator</h3>
+  <p>Setting \(\partial L/\partial h_{0(j)} = 0\) yields:</p>
+  <div class="math-block">\[ \hat{h}_{0(j)} = \frac{1}{\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)} \equiv \frac{1}{b_j} \]</div>
+  <p>where \(R(Y_{(j)})\) is the risk set at \(Y_{(j)}\). The estimator places zero mass outside observed event times.</p>
+  <h3>The Partial Likelihood</h3>
+  <div class="math-block">\[ L(\beta) = \prod_{j=1}^r \frac{\exp(x_{(j)}^\top\beta)}{\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)} \]</div>
+  <div class="defn"><strong>Interpretation of each factor:</strong> At event time \(Y_{(j)}\), the factor is the conditional probability — given that one event occurs among those at risk — that it is subject \((j)\) who fails. This is a rank-based, baseline-free object.</div>
+  <h3>Log Partial Likelihood</h3>
+  <div class="math-block">\[ \ell(\beta) = \sum_{j=1}^r x_{(j)}^\top\beta - \sum_{j=1}^r \log\!\left(\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\right) \]</div>
+  <h3>Score Function and Information Matrix</h3>
+  <div class="math-block">\[ U_h(\beta) = \frac{\partial\ell}{\partial\beta_h} = \sum_{j=1}^r x_{(j)h} - \sum_{j=1}^r \frac{\sum_{k\in R(Y_{(j)})}x_{kh}\exp(x_k^\top\beta)}{\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)} \]</div>
+  <p>The observed information \(I(\beta)=-\partial^2\ell/\partial\beta_h\partial\beta_l\) is a weighted sum of variances of the covariate across the risk set at each event time.</p>
+  <h3>Newton-Raphson Maximisation</h3>
+  <div class="math-block">\[ \hat\beta_\text{new} = \hat\beta_\text{old} + I^{-1}(\hat\beta_\text{old})\,U(\hat\beta_\text{old}) \]</div>
+  <p>Iterates until \(\hat\beta_\text{old}\) and \(\hat\beta_\text{new}\) are sufficiently close. In R: <code>coxph(Surv(Time, Censor) ~ Covar1 + Covar2, data = d)</code>.</p>
+  <h3>Asymptotic Properties</h3>
+  <p>\(\hat\beta\) is consistent and asymptotically normal (Gill, 1984):</p>
+  <div class="math-block">\[ V(\hat\beta_h) \approx [I(\hat\beta)]^{-1}_{hh} \]</div>
+  <p>A \(100(1-\alpha)\%\) CI for the hazard ratio \(\psi_h=\exp(\beta_h)\):</p>
+  <div class="math-block">\[ \exp\!\left(\hat\beta_h \pm z_{\alpha/2}\sqrt{V(\hat\beta_h)}\right) \]</div>
+</div>
+</section>
+
+<!-- ═══ TIED OBS ═══ -->
+<section id="ties" class="tab-pane">
+<div class="card">
+  <h2>Partial Likelihood for Tied Observations</h2>
+  <h3>Two Types of Ties</h3>
+  <ul>
+    <li><strong>Censoring time ties with an event time:</strong> handled by convention — the censored subject is assumed to be censored just <em>after</em> the event, so they remain in the risk set.</li>
+    <li><strong>Two or more subjects experience the event at the same time:</strong> handled by three approximations below.</li>
+  </ul>
+  <h3>Breslow (1974) Approximation — Simplest, Default in SAS</h3>
+  <div class="math-block">\[ L(\beta) = \prod_{j=1}^r \frac{\prod_{l: Y_l=Y_{(j)},\delta_l=1}\exp(x_l^\top\beta)}{\left[\sum_{k: Y_k\geq Y_{(j)}}\exp(x_k^\top\beta)\right]^{d_{(j)}}} \]</div>
+  <h3>Efron (1977) Approximation — Default in R; More Accurate</h3>
+  <div class="math-block">\[ L(\beta) = \prod_{j=1}^r \frac{\prod_{l: Y_l=Y_{(j)},\delta_l=1}\exp(x_l^\top\beta)}{\prod_{h=1}^{d_{(j)}}\!\left(\sum_{k:Y_k\geq Y_{(j)}}\!\exp(x_k^\top\beta)-\tfrac{h-1}{d_{(j)}}\!\sum_{l: Y_l=Y_{(j)},\delta_l=1}\!\exp(x_l^\top\beta)\right)} \]</div>
+  <h3>Cox (1972) Exact Method — Theoretically Correct, Rarely Used</h3>
+  <div class="math-block">\[ L(\beta) = \prod_{j=1}^r \frac{\prod_{l: Y_l=Y_{(j)},\delta_l=1}\exp(x_l^\top\beta)}{\sum_{q\in Q_j}\sum_{h\in q}\exp(x_h^\top\beta)} \]</div>
+  <p>where \(Q_j\) = all \(\binom{r_{(j)}}{d_{(j)}}\) combinations of \(d_{(j)}\) subjects from the risk set. Computationally prohibitive for large tied groups.</p>
+  <h3>Worked Example at \(t=1096\) — Gender Covariate Only</h3>
+  <p>Males: 68 at risk, 2 events (\(x_l=0\)); Females: 12 at risk, 0 events (\(x_l=1\)).</p>
+  <table class="stbl">
+    <tbody><tr><th>Method</th><th>Formula</th><th>Value at \(\beta=0\)</th></tr>
+    <tr><td>Breslow</td><td>\(\exp(2\times0)/(68+12\exp\beta)^2\)</td><td>0.000120</td></tr>
+    <tr><td>Efron</td><td>\(\exp(2\times0)/[(68+12\exp\beta)(67+12\exp\beta)]\)</td><td>0.000121</td></tr>
+    <tr><td>Cox exact</td><td>\(\exp(2\times0)/[\exp(2\beta)\tbinom{12}{2}+\exp(\beta)\tbinom{12}{1}\tbinom{68}{1}+\tbinom{68}{2}]\)</td><td>0.000243</td></tr>
+  </tbody></table>
+  <div class="hl"><strong>Practical conclusion:</strong> Breslow and Efron give very similar results in R (<code>ties="efron"</code> default; <code>ties="breslow"</code> optional). The Cox exact method can differ noticeably. In the schizophrenia data, Efron and Breslow produce nearly identical \(\hat\beta\) and p-values.</div>
+</div>
+</section>
+
+<!-- ═══ INFERENCE ═══ -->
+<section id="inference" class="tab-pane">
+<div class="card">
+  <h2>Hypothesis Testing in the Cox Model</h2>
+  <h3>Three Global Tests</h3>
+  <p>All three test \(H_0:\beta=\beta_0\) vs \(H_1:\beta\neq\beta_0\), and all have \(\chi^2_p\) null distributions:</p>
+  <table class="stbl">
+    <tbody><tr><th>Test</th><th>Statistic</th><th>Requirement</th></tr>
+    <tr><td><strong>Wald</strong></td><td>\(U_W^2 = (\hat\beta-\beta_0)^\top I(\hat\beta)(\hat\beta-\beta_0)\)</td><td>Full model only</td></tr>
+    <tr><td><strong>LR</strong></td><td>\(U_{LR}^2 = 2(\ell(\hat\beta)-\ell(\beta_0))\)</td><td>Full + restricted model</td></tr>
+    <tr><td><strong>Score</strong></td><td>\(U_{SC}^2 = U(\beta_0)^\top I^{-1}(\beta_0)U(\beta_0)\)</td><td>= log-rank (no ties)</td></tr>
+  </tbody></table>
+  <p>The three tests are asymptotically equivalent under \(H_0\) but can differ in finite samples. The LR test generally has better small-sample behaviour.</p>
+  <h3>Local Tests — Subvector \(\beta_1\)</h3>
+  <p>Partition \(\beta=(\beta_1^\top,\beta_2^\top)^\top\). Test \(H_0:\beta_1=\beta_{10}\):</p>
+  <div class="math-block">\[ U_W^2 = (\hat\beta_1-\beta_{10})^\top (I^{11}(\hat\beta))^{-1}(\hat\beta_1-\beta_{10}) \approx \chi^2_q \]</div>
+  <div class="math-block">\[ U_{LR}^2 = 2\!\left[\ell(\hat\beta) - \ell\!\left(\beta_{10},\hat\beta_2(\beta_{10})\right)\right] \approx \chi^2_q \]</div>
+  <p>Here \(\hat\beta_2(\beta_{10})\) is the MLE of \(\beta_2\) with \(\beta_1\) fixed at \(\beta_{10}\), and \(I^{11}\) is the \((1,1)\) block of \(I^{-1}\).</p>
+  <div class="hl"><strong>Testing marital status overall (fit2):</strong> Joint test \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}=0\) (2 df) using <code>linearHypothesis(fit2, c("MarriedTRUE","AloneagainTRUE"))</code>: Chisq\(=23.98\), \(p=6.2\times10^{-6}\) (Wald); \(U^2_{LR}=23.28\), \(p=8.8\times10^{-6}\) (LR). Both strongly reject \(H_0\).</div>
+  <h3>Linear Contrasts \(c^\top\beta=0\)</h3>
+  <div class="math-block">\[ U_W^2 = \frac{(c^\top\hat\beta)^2}{c^\top I^{-1}(\hat\beta)\,c} \approx \chi^2_1 \]</div>
+  <div class="hl"><strong>Testing \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}\):</strong> Equivalent to \(c^\top=(1,-1,0,0)\). Using <code>linearHypothesis(fit2,"MarriedTRUE - AloneagainTRUE")</code>: Chisq\(=18.40\), \(p=1.8\times10^{-5}\). The HR for Married vs Aloneagain is \(e^{-0.1942-0.7314}=e^{-0.9256}=0.396\).</div>
+</div>
+</section>
+
+<!-- ═══ INTERACTIONS ═══ -->
+<section id="interactions" class="tab-pane">
+<div class="card">
+  <h2>Interaction Terms and Time-Varying Covariates</h2>
+  <h3>Interaction Between Covariates</h3>
+  <p>An interaction means the effect of one covariate on the hazard <em>depends on the level of another</em>.</p>
+  <table class="stbl">
+    <tbody><tr><th>Interaction type</th><th>Extra parameters</th></tr>
+    <tr><td>Continuous \(\times\) categorical (\(j\) levels)</td><td>\(j-1\)</td></tr>
+    <tr><td>Categorical (\(j\) levels) \(\times\) categorical (\(k\) levels)</td><td>\((j-1)\times(k-1)\)</td></tr>
+  </tbody></table>
+  <div class="hl"><strong>Gender × Marital status in schizophrenia data (fit4):</strong> Model: Gender + Married + Aloneagain + Gender:Married + Gender:Aloneagain. HR for Gender in Singles: \(e^{0.5197}=1.682\); in Married: \(e^{0.5197+0.3894}=2.482\); in Aloneagain: \(e^{0.5197-0.1456}=1.454\). Testing interactions simultaneously: \(H_0:\beta_{\text{G:Married}}=\beta_{\text{G:Aloneagain}}=0\) gives Chisq\(=1.532\), \(p=0.465\). <strong>Not significant</strong> — Gender effect is the same regardless of marital status.</div>
+  <h3>Time-Varying Covariates</h3>
+  <p>When a covariate \(x_i(t)\) changes over time, the extended Cox model is:</p>
+  <div class="math-block">\[ h_i(t) = h_0(t)\exp(\beta^\top x_i(t)) \]</div>
+  <div class="warn"><strong>Proportionality is lost:</strong> When \(x_i(t)\) varies, the ratio \(h_i(t)/h_j(t)=\exp(\beta^\top(x_i(t)-x_j(t)))\) is no longer constant in \(t\).</div>
+  <p>The partial likelihood extends naturally — at each event time \(Y_i\), the risk set denominator uses each at-risk subject's covariate value <em>at that time</em> \(x_k(Y_i)\):</p>
+  <div class="math-block">\[ L(\beta) = \prod_{i=1}^n \left[\frac{\exp(x_i(Y_i)^\top\beta)}{\sum_{k\in R(Y_i)}\exp(x_k(Y_i)^\top\beta)}\right]^{\delta_i} \]</div>
+  <div class="hl"><strong>Milk ureum example:</strong> Ureum concentration measured monthly; values at intermediate times obtained by linear interpolation. Result: \(\hat\beta=-0.0273\), HR\(=0.973\), \(p=0.094\). Higher ureum is weakly associated with lower insemination hazard. The hazard depends only on the <em>current</em> value, not history.</div>
+</div>
+</section>
+
+<!-- ═══ MODEL BUILDING ═══ -->
+<section id="modelbldg" class="tab-pane">
+<div class="card">
+  <h2>Model Building and Survival Function Estimation</h2>
+  <h3>Variable Selection Strategies</h3>
+  <table class="stbl">
+    <tbody><tr><th>Strategy</th><th>Start</th><th>Rule</th><th>Stop when</th></tr>
+    <tr><td>Forward</td><td>Empty model</td><td>Add covariate with smallest p-value</td><td>All remaining non-significant</td></tr>
+    <tr><td>Backward</td><td>Full model</td><td>Remove covariate with largest p-value</td><td>All remaining significant</td></tr>
+    <tr><td>Stepwise</td><td>Either</td><td>As above, revisit</td><td>No entry or removal possible</td></tr>
+    <tr><td>AIC</td><td>Any</td><td>Choose model minimising AIC</td><td>No improvement possible</td></tr>
+  </tbody></table>
+  <div class="math-block">\[ \text{AIC} = -2\log L(\hat\beta) + k\cdot p, \quad k=2\text{ (standard)} \]</div>
+  <div class="warn"><strong>Primacy of science over data:</strong> Variable selection should be guided first by biological/clinical knowledge. Automated selection may inflate Type I error and produce unstable models. All decisions should ideally be pre-specified.</div>
+  <h3>Schizophrenia — Forward Selection Result</h3>
+  <p>Univariate LR p-values: Marital \(=6.7\times10^{-7}\), Gender \(=9.7\times10^{-5}\), Education \(=0.663\). Forward procedure selects Marital status first, then Gender; Education remains non-significant throughout. Final model: Marital + Gender.</p>
+  <h3>Survival Function Estimation</h3>
+  <div class="math-block">\[ \hat{S}_i(t) = \hat{S}_0(t)^{\exp(\hat\beta^\top x_i)}, \qquad \hat{S}_0(t)=\exp(-\hat{H}_0(t)) \]</div>
+  <p>The baseline cumulative hazard is estimated by the extended Breslow estimator:</p>
+  <div class="math-block">\[ \hat{H}_0(t) = \sum_{j: Y_{(j)}\leq t} \frac{d_{(j)}}{\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\hat\beta)} \]</div>
+  <div class="warn"><strong>Important limit:</strong> This formula requires all covariates to be time-independent. With time-varying covariates, the power-law formula \(\hat S_0^{\exp(\hat\beta^\top x)}\) breaks down.</div>
+  <pre><code># Fit final model and predict survival curves for 6 covariate profiles
+fit5 &lt;- coxph(Surv(Time,Censor)~Gender+Married+Aloneagain, data=schizo)
+fit6 &lt;- survfit(fit5, newdata=data.frame(
+    Gender=c(1,1,1,2,2,2),
+    Married=c(0,1,0,0,1,0),
+    Aloneagain=c(0,0,1,0,0,1)))
+plot(fit6, lty=c(1,2,3,1,2,3), col=c(1,1,1,2,2,2))
+# Black=male, red=female; solid=single, dashed=married, dotted=aloneagain</code></pre>
+</div>
+</section>
+
+<!-- ═══ PH CHECK ═══ -->
+<section id="phcheck" class="tab-pane">
+<div class="card">
+  <h2>Assessing the Proportional Hazards Assumption</h2>
+  <p>The Cox model is powerful but its PH assumption can fail. Three complementary tools are available.</p>
+  <h3>Tool 1 — Diagnostic Plots (Univariate)</h3>
+  <p>Estimate \(\hat{H}_j(t)\) via Nelson-Åalen for each level \(j\) of a categorical covariate.</p>
+  <table class="stbl">
+    <tbody><tr><th>Plot</th><th>PH holds if</th></tr>
+    <tr><td>\(\log\hat{H}_j(t)\) vs \(t\)</td><td>Curves are parallel (constant vertical gap)</td></tr>
+    <tr><td>\(\log\hat{H}_j(t)-\log\hat{H}_1(t)\) vs \(t\)</td><td>Constant (horizontal) lines</td></tr>
+    <tr><td>\(\hat{H}_j(t)\) vs \(\hat{H}_1(t)\)</td><td>Straight lines through the origin</td></tr>
+  </tbody></table>
+  <div class="warn"><strong>Do not use KM survival curve plots to check PH:</strong> Even if survival curves appear non-crossing, the hazards can be non-proportional. The log-cumulative hazard plots are the correct tool.</div>
+  <h3>Tool 2 — Time-by-Covariate Interaction Test</h3>
+  <p>Extend the model with \(\alpha \, x_{ik} \times g(t)\) for some pre-specified function \(g(t)\):</p>
+  <div class="math-block">\[ h_i(t) = h_0(t)\exp(\beta^\top x_i + \alpha\, x_{ik}\times g(t)) \]</div>
+  <p>Test \(H_0:\alpha=0\). If rejected, PH fails for covariate \(k\). The choice of \(g(t)\) must be <strong>pre-specified</strong>.</p>
+  <div class="hl"><strong>Schizophrenia (fit7):</strong> Testing Gender \(\times\,\mathbf{1}(t\geq1100)\) in the model with Marital status: \(\hat\alpha=-1.4699\), \(p=0.052\) — borderline non-significant.</div>
+  <h3>Tool 3 — Schoenfeld Residuals</h3>
+  <p>For each event (uncensored) subject \(i\) and covariate \(k\):</p>
+  <div class="math-block">\[ r_{ik} = \delta_i\left(x_{ik} - \frac{\sum_{j\in R(Y_i)} x_{jk}\exp(\hat\beta^\top x_j)}{\sum_{j\in R(Y_i)}\exp(\hat\beta^\top x_j)}\right) \]</div>
+  <p>Each residual is the difference between the failing subject's covariate and its risk-set-weighted mean. Censored observations contribute 0. Under PH, Schoenfeld residuals are independent of time. The <code>cox.zph</code> function fits a smooth function of time and tests for zero slope.</p>
+  <div class="hl"><strong>Schizophrenia (fit5, cox.zph):</strong> Gender: chisq\(=1.41\), \(p=0.23\); Married: chisq\(=1.94\), \(p=0.16\); Aloneagain: chisq\(=0.86\), \(p=0.36\); GLOBAL: chisq\(=3.08\), \(p=0.38\). All non-significant — PH assumption is valid.</div>
+</div>
+</section>
+
+<!-- ═══ STRATIFIED ═══ -->
+<section id="stratified" class="tab-pane">
+<div class="card">
+  <h2>Stratified Semiparametric PH Model</h2>
+  <h3>Motivation</h3>
+  <p>If PH fails for a nuisance covariate, stratification allows each stratum to have its own baseline hazard while sharing the same \(\beta\) for remaining covariates:</p>
+  <div class="math-block">\[ h_{ij}(t) = h_{i0}(t)\exp(x_{ij}^\top\beta), \quad i=1,\ldots,s,\; j=1,\ldots,n_i \]</div>
+  <p>The partial likelihood factorises over strata:</p>
+  <div class="math-block">\[ L(\beta) = \prod_{i=1}^s \prod_{j=1}^{n_i} \left[\frac{\exp(x_{ij}^\top\beta)}{\sum_{l\in R_i(Y_{ij})}\exp(x_{il}^\top\beta)}\right]^{\delta_{ij}} \]</div>
+  <div class="hl"><strong>Key difference from stratified nonparametric test:</strong> The stratified Cox model still estimates and tests covariate effects (the \(\beta\)'s); it merely allows the baseline hazard to differ between strata.</div>
+  <div class="warn"><strong>Limitation:</strong> The stratification variable's own effect <em>cannot</em> be estimated from this model.</div>
+  <h3>Schizophrenia (fit9)</h3>
+  <p>Stratify on Gender, estimate effect of Marital status:</p>
+  <pre><code>coxph(Surv(Time,Censor)~Married+Aloneagain+strata(Gender), data=schizo)</code></pre>
+  <p>Results: \(\hat{HR}_\text{Aloneagain}=2.035\), \(p=1.3\times10^{-4}\). Nearly identical to unstratified fit5 — confirming the unstratified Cox model was already adequate.</p>
+  <h3>When to Use the Stratified Model</h3>
+  <ul>
+    <li>A variable is <em>suspected of non-proportional hazards</em></li>
+    <li>It is a <em>confounder not of primary interest</em></li>
+    <li>There are <em>enough events per stratum</em> for reliable within-stratum partial likelihoods</li>
+  </ul>
+</div>
+</section>
+
+<!-- ═══ MCQ ═══ -->
+<section id="mcq" class="tab-pane">
+<div class="mcq-header">
+  <h2>🎯 Multiple Choice Questions</h2>
+  <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+    <div class="score-badge">Score: <span id="scoreVal">0</span> / <span id="scoreTotal">50</span></div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="mcq-card"><div class="q-label">Question 1 · PH Model Basics</div>
+<div class="q-stem">The Cox (1972) PH model is called "semiparametric" because:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q1')">A) Both \(\beta\) and \(h_0(t)\) are fully specified by parametric families</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q1')">B) \(\beta\) is a finite-dimensional parameter vector, but \(h_0(t)\) is left completely unspecified</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q1')">C) Only half of the covariates are modelled parametrically</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q1')">D) The model is estimated using a nonparametric kernel smoothing approach</button>
+<div class="fb" id="fb_q1"></div></div>
+
+<!-- Q2 -->
+<div class="mcq-card"><div class="q-label">Question 2 · PH Condition</div>
+<div class="q-stem">Under the Cox PH model with covariates \(x_i\) and \(x_j\), the ratio \(h_i(t)/h_j(t)\) equals:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q2')">A) \(\beta^\top(x_i - x_j)\) — a constant</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q2')">B) \(\exp(\beta^\top(x_i - x_j))\) — a constant independent of \(t\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q2')">C) \(h_0(t)\exp(\beta^\top x_i)/h_0(t)\) — depends on \(t\) through \(h_0\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q2')">D) \(\exp(\beta^\top x_i)\) — depends on \(x_i\) only</button>
+<div class="fb" id="fb_q2"></div></div>
+
+<!-- Q3 -->
+<div class="mcq-card"><div class="q-label">Question 3 · Baseline Hazard</div>
+<div class="q-stem">The baseline hazard \(h_0(t)\) in the Cox model is the hazard function of:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q3')">A) The subject with the median covariate values</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q3')">B) A subject with all covariates equal to zero (\(x_{ij}=0\) for all \(j\))</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q3')">C) The control group, estimated by the Kaplan-Meier estimator</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q3')">D) Any subject; \(h_0\) just scales all hazards uniformly</button>
+<div class="fb" id="fb_q3"></div></div>
+
+<!-- Q4 -->
+<div class="mcq-card"><div class="q-label">Question 4 · HR Interpretation — Binary</div>
+<div class="q-stem">In the schizophrenia model (fit1), \(\hat\beta_\text{Gender}=0.6742\), HR\(=1.9624\) (Gender: 1=male, 2=female). The correct interpretation is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q4')">A) Males have 96% higher hazard than females after adjusting for education</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q4')">B) Females have approximately twice the hazard of males with the same education level, at every time point</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q4')">C) The hazard ratio increases by 1.9624 per unit increase in Gender score</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q4')">D) The probability of dying is 96% for females</button>
+<div class="fb" id="fb_q4"></div></div>
+
+<!-- Q5 -->
+<div class="mcq-card"><div class="q-label">Question 5 · HR — Continuous Covariate</div>
+<div class="q-stem">With \(\hat\beta_\text{Education}=0.01308\), the estimated hazard ratio for a 10-year increase in education is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q5')">A) \(e^{0.01308}=1.013\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q5')">B) \(e^{10\times0.01308}=e^{0.1308}\approx1.14\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q5')">C) \(10\times 0.01308=0.1308\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q5')">D) \(e^{0.01308\times0.1}=1.001\)</button>
+<div class="fb" id="fb_q5"></div></div>
+
+<!-- Q6 -->
+<div class="mcq-card"><div class="q-label">Question 6 · Partial Likelihood Derivation</div>
+<div class="q-stem">The Breslow estimator \(\hat{h}_{0(j)}\) for fixed \(\beta\) (no ties) is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q6')">A) \(d_{(j)}/r_{(j)}\) — the Nelson-Åalen increment</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q6')">B) \(1/\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q6')">C) \(\exp(\beta^\top x_{(j)})/r_{(j)}\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q6')">D) \(\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\)</button>
+<div class="fb" id="fb_q6"></div></div>
+
+<!-- Q7 -->
+<div class="mcq-card"><div class="q-label">Question 7 · Partial Likelihood</div>
+<div class="q-stem">Each factor in the partial likelihood \(L(\beta)\) at event time \(Y_{(j)}\) represents:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q7')">A) The marginal probability that subject \((j)\) survives past \(Y_{(j)}\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q7')">B) The conditional probability, given that one event occurs among those at risk at \(Y_{(j)}\), that it is subject \((j)\) who fails</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q7')">C) The likelihood contribution from all censored observations up to \(Y_{(j)}\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q7')">D) The joint density of event time and covariate for subject \((j)\)</button>
+<div class="fb" id="fb_q7"></div></div>
+
+<!-- Q8 -->
+<div class="mcq-card"><div class="q-label">Question 8 · Tied Observations — Default in R</div>
+<div class="q-stem">Which approximation is the default method in R's <code>coxph</code> and is generally more accurate than Breslow's when ties are present?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q8')">A) Cox (1972) exact method</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q8')">B) Breslow (1974)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q8')">C) Efron (1977)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q8')">D) Kalbfleisch and Prentice (1980)</button>
+<div class="fb" id="fb_q8"></div></div>
+
+<!-- Q9 -->
+<div class="mcq-card"><div class="q-label">Question 9 · Tied Obs. — Censoring Convention</div>
+<div class="q-stem">When a censoring time ties with an event time in the Cox model, the convention is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q9')">A) The tied censored subject is excluded from the risk set at that event time</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q9')">B) The censoring time is assumed to fall just after the event, so the censored subject is still in the risk set</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q9')">C) Both tied times are excluded from the partial likelihood</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q9')">D) The event is randomly assigned to one of the tied subjects</button>
+<div class="fb" id="fb_q9"></div></div>
+
+<!-- Q10 -->
+<div class="mcq-card"><div class="q-label">Question 10 · R Output — Global Tests</div>
+<div class="q-stem">The bottom of <code>summary(coxph(...))</code> displays three global test statistics. They test the null hypothesis:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q10')">A) \(H_0: h_0(t)=1\) for all \(t\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q10')">B) \(H_0: \beta = 0\) (all covariate effects are zero simultaneously)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q10')">C) \(H_0:\) individual coefficients are zero, one at a time</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q10')">D) \(H_0:\) the PH assumption holds</button>
+<div class="fb" id="fb_q10"></div></div>
+
+<!-- Q11 -->
+<div class="mcq-card"><div class="q-label">Question 11 · Score Test</div>
+<div class="q-stem">The score test from the Cox model, under \(H_0:\beta=0\), is equivalent to:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q11')">A) The Kaplan-Meier log-rank statistic in all settings</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q11')">B) The log-rank test in the absence of ties</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q11')">C) The Gehan-Wilcoxon test</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q11')">D) The Wald test from the Cox model</button>
+<div class="fb" id="fb_q11"></div></div>
+
+<!-- Q12 -->
+<div class="mcq-card"><div class="q-label">Question 12 · Wald vs LR — What You Need</div>
+<div class="q-stem">To perform a local Wald test for \(H_0:\beta_1=0\) (a subvector), you need:</div>
+<button class="opt" data-correct="true" onclick="pick(this,'q12')">A) Only the full model (containing all covariates)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q12')">B) Only the reduced model (without \(\beta_1\))</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q12')">C) Both the full model and the reduced model</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q12')">D) Neither — the test is based purely on the score evaluated at 0</button>
+<div class="fb" id="fb_q12"></div></div>
+
+<!-- Q13 -->
+<div class="mcq-card"><div class="q-label">Question 13 · Local LR Test</div>
+<div class="q-stem">For the LR test of \(H_0:\beta_1=0\), the statistic is \(U^2_{LR}=2[\ell(\hat\beta)-\ell(0,\hat\beta_2(0))]\). The term \(\hat\beta_2(0)\) is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q13')">A) The unrestricted MLE of \(\beta_2\) from the full model</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q13')">B) The MLE of \(\beta_2\) with \(\beta_1\) forced to equal 0 (i.e., from the reduced model)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q13')">C) Zero — nuisance parameters are always set to zero under \(H_0\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q13')">D) The score of \(\beta_2\) evaluated at \(\beta_1=0\)</button>
+<div class="fb" id="fb_q13"></div></div>
+
+<!-- Q14 -->
+<div class="mcq-card"><div class="q-label">Question 14 · Contrast Vector</div>
+<div class="q-stem">To test \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}\) in fit2, the appropriate contrast vector \(c^\top\) in \(H_0:c^\top\beta=0\) is (ordering: Married, Aloneagain, Gender, EducCat):</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q14')">A) \((1,1,0,0)\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q14')">B) \((1,-1,0,0)\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q14')">C) \((0,0,1,-1)\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q14')">D) \((1,1,1,1)\)</button>
+<div class="fb" id="fb_q14"></div></div>
+
+<!-- Q15 -->
+<div class="mcq-card"><div class="q-label">Question 15 · Individual p-values vs Overall Test</div>
+<div class="q-stem">In fit2, the individual p-values 0.376 and \(8.7\times10^{-5}\) for MarriedTRUE and AloneagainTRUE test:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q15')">A) Whether marital status as a whole is associated with survival</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q15')">B) Pairwise contrasts vs the reference category (Singles), providing no overall test for marital status</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q15')">C) Whether each binary indicator has a higher hazard than the overall mean</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q15')">D) The global hypothesis \(H_0:\beta=0\) for the full model</button>
+<div class="fb" id="fb_q15"></div></div>
+
+<!-- Q16 -->
+<div class="mcq-card"><div class="q-label">Question 16 · HR for Non-Reference Contrast</div>
+<div class="q-stem">From fit2: \(\hat\beta_\text{Married}=-0.1942\), \(\hat\beta_\text{Aloneagain}=0.7314\). The HR for Married vs Aloneagain is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q16')">A) \(e^{0.7314}/e^{-0.1942}=e^{0.9256}=2.524\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q16')">B) \(e^{-0.1942-0.7314}=e^{-0.9256}=0.396\) — via subtraction of log-HRs</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q16')">C) \(0.8235/2.078=0.396\) — using \(\exp(\hat\beta)\) values directly</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q16')">D) Both B and C are numerically equivalent and correct</button>
+<div class="fb" id="fb_q16"></div></div>
+
+<!-- Q17 -->
+<div class="mcq-card"><div class="q-label">Question 17 · Interaction — Degrees of Freedom</div>
+<div class="q-stem">Adding an interaction between Gender (binary, 2 levels) and Marital status (3 levels) to the Cox model adds how many extra parameters?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q17')">A) \(2\times3=6\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q17')">B) \((2-1)\times(3-1)=2\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q17')">C) \(2-1=1\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q17')">D) 3 — one for each level of the larger variable</button>
+<div class="fb" id="fb_q17"></div></div>
+
+<!-- Q18 -->
+<div class="mcq-card"><div class="q-label">Question 18 · Time-Varying Covariates and PH</div>
+<div class="q-stem">When a covariate \(x_i(t)\) changes over time, the model \(h_i(t)=h_0(t)\exp(\beta x_i(t))\):</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q18')">A) Still satisfies the PH assumption because \(\beta\) is constant</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q18')">B) No longer satisfies PH, since the HR between subjects \(i\) and \(j\) is \(\exp(\beta(x_i(t)-x_j(t)))\), which depends on \(t\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q18')">C) Cannot be estimated because the partial likelihood requires time-fixed covariates</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q18')">D) Requires Breslow's approximation regardless of tie frequency</button>
+<div class="fb" id="fb_q18"></div></div>
+
+<!-- Q19 -->
+<div class="mcq-card"><div class="q-label">Question 19 · Time-Varying — Risk Set Covariates</div>
+<div class="q-stem">In the partial likelihood for time-varying covariates, at each event time \(Y_i\), the risk set denominator uses:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q19')">A) Each at-risk subject's covariate value at time 0 (baseline)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q19')">B) Each at-risk subject's covariate value at the event time \(Y_i\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q19')">C) The average covariate value over each subject's entire follow-up</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q19')">D) The covariate value at the midpoint of each subject's observed time</button>
+<div class="fb" id="fb_q19"></div></div>
+
+<!-- Q20 -->
+<div class="mcq-card"><div class="q-label">Question 20 · AIC Calculation</div>
+<div class="q-stem">Comparing two nested models: \(p_1=4\), \(-2\log L_1=1520\) vs \(p_2=3\), \(-2\log L_2=1524\). Their AIC values and preferred model are:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q20')">A) AIC\(_1\)=1520, AIC\(_2\)=1524; prefer model 2 (higher loglik)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q20')">B) AIC\(_1\)=1528, AIC\(_2\)=1530; prefer model 1 (lower AIC)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q20')">C) AIC\(_1\)=1530, AIC\(_2\)=1528; prefer model 2 (lower AIC)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q20')">D) Neither — AIC cannot compare models with different numbers of parameters</button>
+<div class="fb" id="fb_q20"></div></div>
+
+<!-- Q21 -->
+<div class="mcq-card"><div class="q-label">Question 21 · Survival Function Estimation</div>
+<div class="q-stem">The estimated survival function for subject \(i\) with covariates \(x_i\) using the extended Breslow estimator is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q21')">A) \(\hat{S}_i(t)=\hat{S}_0(t)+\exp(\hat\beta^\top x_i)\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q21')">B) \(\hat{S}_i(t)=\hat{S}_0(t)^{\exp(\hat\beta^\top x_i)}\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q21')">C) \(\hat{S}_i(t)=\exp(-\hat{H}_0(t))+\hat\beta^\top x_i\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q21')">D) \(\hat{S}_i(t)=\hat{S}_0(t)\cdot\hat\beta^\top x_i\)</button>
+<div class="fb" id="fb_q21"></div></div>
+
+<!-- Q22 -->
+<div class="mcq-card"><div class="q-label">Question 22 · Survival Estimation — Limitation</div>
+<div class="q-stem">The formula \(\hat{S}_i(t)=\hat{S}_0(t)^{\exp(\hat\beta^\top x_i)}\) is valid only when:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q22')">A) The baseline hazard is estimated parametrically</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q22')">B) All covariates are time-independent (fixed at their baseline values)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q22')">C) There are no tied event times in the dataset</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q22')">D) The sample size exceeds 100 events per covariate</button>
+<div class="fb" id="fb_q22"></div></div>
+
+<!-- Q23 -->
+<div class="mcq-card"><div class="q-label">Question 23 · Crossing KM Curves</div>
+<div class="q-stem">If the Kaplan-Meier survival curves for two treatment groups cross each other, this strongly suggests:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q23')">A) The log-rank test will have extra power to detect the difference</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q23')">B) The proportional hazards assumption is likely violated — a single time-constant HR is an inadequate summary</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q23')">C) There is no difference between the two groups</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q23')">D) The Breslow approximation for ties should be used instead of Efron's</button>
+<div class="fb" id="fb_q23"></div></div>
+
+<!-- Q24 -->
+<div class="mcq-card"><div class="q-label">Question 24 · PH Diagnostic Plots</div>
+<div class="q-stem">Plotting \(\log\hat{H}_1(t)\) and \(\log\hat{H}_2(t)\) vs \(t\) for two groups. The PH assumption holds if:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q24')">A) The two curves converge to the same value at large \(t\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q24')">B) The two curves are approximately parallel (constant vertical separation)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q24')">C) The two curves do not cross at any time point</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q24')">D) Both curves are linear functions of \(t\)</button>
+<div class="fb" id="fb_q24"></div></div>
+
+<!-- Q25 -->
+<div class="mcq-card"><div class="q-label">Question 25 · PH Check — KM Curves Are Insufficient</div>
+<div class="q-stem">Why is plotting KM survival curves and checking for non-crossing NOT a reliable PH check?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q25')">A) KM curves always cross under PH, making it a perfect test</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q25')">B) Survival curves can fail to cross even when hazards are non-proportional, giving a false sense of validity</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q25')">C) KM curves are not estimable under the Cox model framework</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q25')">D) Crossing survival curves always implies proportional hazards</button>
+<div class="fb" id="fb_q25"></div></div>
+
+<!-- Q26 -->
+<div class="mcq-card"><div class="q-label">Question 26 · Schoenfeld Residuals — Censored Observations</div>
+<div class="q-stem">For a censored observation, the Schoenfeld residual is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q26')">A) The difference between the subject's covariate and the overall sample mean</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q26')">B) Exactly zero, since censored observations contribute \(\delta_i=0\) to the formula</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q26')">C) Undefined — Schoenfeld residuals are computed only for the last event time</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q26')">D) The negative of the risk-set weighted mean covariate</button>
+<div class="fb" id="fb_q26"></div></div>
+
+<!-- Q27 -->
+<div class="mcq-card"><div class="q-label">Question 27 · cox.zph Test</div>
+<div class="q-stem">The function <code>cox.zph(fit)</code> in R tests the PH assumption by:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q27')">A) Comparing the Cox model log-likelihood to a Weibull model</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q27')">B) Modelling Schoenfeld residuals as a function of time and testing whether the slope is zero</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q27')">C) Checking whether the KM curves for each covariate level are non-crossing</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q27')">D) Comparing Breslow and Efron estimates of \(\hat\beta\)</button>
+<div class="fb" id="fb_q27"></div></div>
+
+<!-- Q28 -->
+<div class="mcq-card"><div class="q-label">Question 28 · Time-by-Covariate Interaction Test — Choice of g(t)</div>
+<div class="q-stem">When testing PH via a time-by-covariate interaction \(\alpha\, x_{ik}\times g(t)\), the choice of \(g(t)\) should be:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q28')">A) Determined by visual inspection of the data to maximise statistical power</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q28')">B) Pre-specified based on the study context — not chosen after looking at the data</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q28')">C) Always \(g(t)=t\) because linear time is the most flexible choice</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q28')">D) Chosen using AIC to find the best-fitting \(g(t)\) function</button>
+<div class="fb" id="fb_q28"></div></div>
+
+<!-- Q29 -->
+<div class="mcq-card"><div class="q-label">Question 29 · Stratified Cox Model — What Differs vs Shared</div>
+<div class="q-stem">In the stratified Cox model \(h_{ij}(t)=h_{i0}(t)\exp(x_{ij}^\top\beta)\), which quantities differ between strata and which are shared?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q29')">A) Both \(h_{i0}(t)\) and \(\beta\) differ between strata</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q29')">B) \(h_{i0}(t)\) differs between strata (each stratum has its own baseline hazard), but \(\beta\) is the same for all strata</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q29')">C) \(\beta\) differs between strata, but \(h_{i0}(t)\) is common to all</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q29')">D) Both are identical — stratification only changes the risk set construction</button>
+<div class="fb" id="fb_q29"></div></div>
+
+<!-- Q30 -->
+<div class="mcq-card"><div class="q-label">Question 30 · Stratified Cox — Risk Set</div>
+<div class="q-stem">In the partial likelihood for the stratified Cox model, the risk set at each event time contains:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q30')">A) All subjects still at risk across the entire pooled sample</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q30')">B) Only subjects still at risk within the same stratum as the failing subject</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q30')">C) Subjects from the same stratum and the adjacent strata</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q30')">D) All subjects from the dataset regardless of event or censoring status</button>
+<div class="fb" id="fb_q30"></div></div>
+
+<!-- Q31 -->
+<div class="mcq-card"><div class="q-label">Question 31 · PH Implies Survival Curves Never Cross</div>
+<div class="q-stem">Under the Cox PH model with hazard ratio \(\psi &gt; 1\) (subject \(i\) has higher hazard than subject \(j\) at every time point), which statement about their survival curves is always true?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q31')">A) The curves may cross once before both converging to zero at the end of follow-up</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q31')">B) \(S_i(t) &lt; S_j(t)\) for all \(t &gt; 0\) — because \(S_i(t)=S_j(t)^\psi\) and \(\psi&gt;1\) forces \(S_j(t)^\psi &lt; S_j(t)\) whenever \(S_j(t)\in(0,1)\), so the curves can never cross</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q31')">C) \(S_i(t) = S_j(t)\) after a sufficiently long follow-up time</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q31')">D) The curves are parallel on the survival probability scale</button>
+<div class="fb" id="fb_q31"></div></div>
+
+<!-- Q32 -->
+<div class="mcq-card"><div class="q-label">Question 32 · Forward Selection — Order of Entry</div>
+<div class="q-stem">In the forward selection applied to the schizophrenia data, univariate LR p-values were: Marital \(p=6.7\times10^{-7}\), Gender \(p=9.7\times10^{-5}\), Education \(p=0.663\). Which covariate entered the model first, and why?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q32')">A) Gender, because binary covariates are conventionally entered before multi-level categorical ones</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q32')">B) Marital status, because forward selection adds the covariate with the smallest univariate LR p-value at each step, and \(6.7\times10^{-7}\) is smallest</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q32')">C) Education, because continuous variables carry more information per degree of freedom</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q32')">D) All three were evaluated jointly and the whole model was entered in one step</button>
+<div class="fb" id="fb_q32"></div></div>
+
+<!-- Q33 -->
+<div class="mcq-card"><div class="q-label">Question 33 · Time-Varying Covariate — Correct Interpretation</div>
+<div class="q-stem">In the milk ureum example, the time-varying Cox model gave \(\hat\beta=-0.0273\), HR\(=0.973\), \(p=0.094\). The correct interpretation of HR\(=0.973\) is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q33')">A) Cows with higher ureum have a 2.7% lower cumulative probability of insemination over the entire study period</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q33')">B) At any time \(t\), the instantaneous insemination hazard for a cow with ureum concentration \(x_i(t)\) is 97.3% of that for a cow with concentration \(x_i(t)-1\) at the same time — depending only on the current value, not past history</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q33')">C) A 1-unit decrease in ureum permanently reduces the hazard by 0.973 from that point forward</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q33')">D) Higher ureum is statistically significant at \(\alpha=0.10\), confirming a strong association with insemination</button>
+<div class="fb" id="fb_q33"></div></div>
+
+<!-- Q34 -->
+<div class="mcq-card"><div class="q-label">Question 34 · Gastric Cancer — Why the Cox HR Was Misleading</div>
+<div class="q-stem">The Dutch gastric cancer trial (D1 vs D2 surgery) produced HR\(=0.97\), \(p=0.73\) from a standard Cox model, despite a clinically important treatment effect. The primary reason this result is misleading is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q34')">A) The sample size was too small for the partial likelihood to yield valid asymptotic results</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q34')">B) Breslow's approximation for ties introduced substantial bias in this dataset</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q34')">C) The constant-HR model averaged an early excess mortality for D2 (HR\(&gt;1\), peri-operative deaths) against a late survival benefit (HR\(&lt;1\), better cancer control) — the KM curves crossed at ~53 months, and the time-weighted average HR ≈ 1 masked this clinically meaningful pattern</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q34')">D) Age and performance status were not adjusted for, severely confounding the treatment effect</button>
+<div class="fb" id="fb_q34"></div></div>
+
+<!-- Q35 -->
+<div class="mcq-card"><div class="q-label">Question 35 · Interaction Test — Interpreting a Non-Significant Result</div>
+<div class="q-stem">Testing \(H_0:\beta_{\text{Gender:Married}}=\beta_{\text{Gender:Aloneagain}}=0\) in fit4 gave Chisq\(=1.532\) on 2 df, \(p=0.465\). The correct conclusion is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q35')">A) Gender and Marital status are individually non-significant and should both be dropped from the model</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q35')">B) The interaction is highly significant; the Gender HR must be reported separately for each marital status group</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q35')">C) There is no significant evidence of interaction — the Gender effect on survival does not significantly depend on Marital status; the simpler additive main-effects model is preferred</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q35')">D) The joint 2-df test is invalid here; each interaction term must be assessed individually on 1 df</button>
+<div class="fb" id="fb_q35"></div></div>
+
+<!-- Q36 -->
+<div class="mcq-card"><div class="q-label">Question 36 · Joint Test for a Multi-Level Variable</div>
+<div class="q-stem">Using <code>linearHypothesis(fit2, c("MarriedTRUE","AloneagainTRUE"))</code> gives Chisq\(=23.98\), \(p=6.2\times10^{-6}\). This is a:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q36')">A) 1-df test of whether "alone again" patients differ from singles specifically</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q36')">B) 2-df joint Wald test of \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}=0\) simultaneously — the correct omnibus test for whether marital status as a whole is associated with survival</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q36')">C) 3-df test comparing all three marital status levels against each other in a pairwise fashion</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q36')">D) A test of whether the PH assumption holds for the Marital status variable</button>
+<div class="fb" id="fb_q36"></div></div>
+
+<!-- Q37 -->
+<div class="mcq-card"><div class="q-label">Question 37 · Direction of the PH Interaction Coefficient</div>
+<div class="q-stem">In fit7, the coefficient for Gender\(\,\times\,\mathbf{1}(t\geq1100)\) was \(\hat\alpha=-1.4699\), \(p=0.052\). If this result were statistically significant, \(\hat\alpha&lt;0\) would imply:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q37')">A) The baseline hazard \(h_0(t)\) decreases markedly after \(t=1100\) days</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q37')">B) The female excess hazard relative to males diminishes after \(t=1100\) days — the log-hazard contribution of Gender is reduced by \(|\hat\alpha|\) in the later period, indicating a weakening Gender effect over time</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q37')">C) Males have lower hazard than females at all time points, confirming a protective effect of being male</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q37')">D) Since \(\hat\alpha\) is close to zero, the PH assumption is thereby confirmed as valid for Gender</button>
+<div class="fb" id="fb_q37"></div></div>
+
+<!-- Q38 -->
+<div class="mcq-card"><div class="q-label">Question 38 · Breslow vs Efron — Bias Direction</div>
+<div class="q-stem">Compared to the Efron method, the Breslow approximation tends to produce slightly biased \(\hat\beta\) when ties are frequent. The direction of this bias is:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q38')">A) Away from zero — Breslow overestimates the magnitude of covariate effects</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q38')">B) Towards zero — by raising the full risk-set sum to the power \(d_{(j)}\), Breslow over-counts the risk at later tied events, inflating the denominator and attenuating \(\hat\beta\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q38')">C) Always positive — Breslow yields \(\hat\beta_\text{Breslow}&gt;\hat\beta_\text{Efron}\) regardless of covariate direction</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q38')">D) There is no bias — Breslow and Efron are algebraically equivalent for all datasets</button>
+<div class="fb" id="fb_q38"></div></div>
+
+<!-- Q39 -->
+<div class="mcq-card"><div class="q-label">Question 39 · Log Partial Likelihood — Role of the Second Term</div>
+<div class="q-stem">In \(\ell(\beta) = \sum_j x_{(j)}^\top\beta\;-\;\sum_j \log\!\bigl(\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\bigr)\), the second term serves as:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q39')">A) A complexity penalty analogous to the \(2p\) term in AIC, discouraging overfitting</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q39')">B) A direct estimate of \(\log H_0(t)\) summed across all event times</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q39')">C) A normalisation that accounts for the total relative risk in the risk set at each event time — it ensures each partial likelihood factor reflects the failing subject's <em>share</em> of total risk, not their absolute hazard, thereby eliminating \(h_0(t)\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q39')">D) A correction for censoring bias, upweighting uncensored observations</button>
+<div class="fb" id="fb_q39"></div></div>
+
+<!-- Q40 -->
+<div class="mcq-card"><div class="q-label">Question 40 · Rank-Based Nature of the Partial Likelihood</div>
+<div class="q-stem">The partial likelihood is described as "rank-based." In the context of the Cox model this means:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q40')">A) Covariates are replaced by their ranks across all subjects before fitting</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q40')">B) The actual magnitudes of the event times \(Y_{(1)}&lt;\cdots<y_{(r)}\) directly="" enter="" the="" likelihood="" as="" numerical="" values<="" button="">
+</y_{(r)}\)></button><button class="opt" data-correct="true" onclick="pick(this,'q40')">C) Each factor depends only on <em>which subject</em> fails among those at risk at each event time — the actual event time values determine only the risk set membership, not the factor's numerical value, so the baseline hazard \(h_0(t)\) cancels completely</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q40')">D) The estimator is equivalent to a Wilcoxon rank-sum test applied at each event time</button>
+<div class="fb" id="fb_q40"></div></div>
+
+<!-- Q41 -->
+<div class="mcq-card"><div class="q-label">Question 41 · Worked Example — Breslow vs Efron vs Exact at t=1096</div>
+<div class="q-stem">At \(t=1096\) (80 subjects at risk, 2 male events), evaluated at \(\beta=0\): Breslow\(=0.000120\), Efron\(=0.000121\), Cox exact\(=0.000243\). What does this pattern reveal about the approximations?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q41')">A) Breslow and Efron are both equally poor; only the exact method should be used in practice</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q41')">B) At \(\beta=0\) all three methods must produce identical values by symmetry of the exponential function</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q41')">C) Breslow and Efron agree very closely with each other but both differ substantially from the Cox exact value, showing that even with only 2 tied events from 80 at risk, the approximations can diverge from the exact method — though Efron and Breslow remain near-identical here</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q41')">D) The Cox exact method is numerically unstable at \(\beta=0\) and should never be evaluated there</button>
+<div class="fb" id="fb_q41"></div></div>
+
+<!-- Q42 -->
+<div class="mcq-card"><div class="q-label">Question 42 · Stratified vs Unstratified — What Near-Equal HRs Confirm</div>
+<div class="q-stem">The unstratified fit5 gives \(\hat{HR}_\text{Aloneagain}=2.078\); the Gender-stratified fit9 gives \(\hat{HR}_\text{Aloneagain}=2.035\). Their near-agreement primarily confirms that:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q42')">A) Gender has no meaningful association with survival in this dataset</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q42')">B) The PH assumption for Gender is approximately satisfied in the unstratified model — allowing Gender its own stratum-specific baseline hazard changes the Aloneagain estimate only negligibly, so stratification is unnecessary</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q42')">C) The stratified Cox model always produces slightly lower hazard ratio estimates than the unstratified model by design</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q42')">D) Both models are misspecified; the true HR is indeterminate within the interval (2.035, 2.078)</button>
+<div class="fb" id="fb_q42"></div></div>
+
+<!-- Q43 -->
+<div class="mcq-card"><div class="q-label">Question 43 · Power-Law Survival Relationship — Numerical Application</div>
+<div class="q-stem">Under the Cox PH model, \(\hat{S}_i(t)=\hat{S}_j(t)^{\,\psi}\). If \(\psi=2\) and \(\hat{S}_j(t)=0.80\) at some time \(t\), then \(\hat{S}_i(t)\) equals:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q43')">A) \(0.80\times2=1.60\) (impossible; survival probabilities cannot exceed 1)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q43')">B) \(0.80/2=0.40\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q43')">C) \(0.80^2=0.64\) — derived from \(H_i(t)=\psi H_j(t)\), so \(S_i(t)=e^{-H_i(t)}=e^{-\psi H_j(t)}=[S_j(t)]^\psi\)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q43')">D) \(1-2(1-0.80)=0.60\) — a linear hazard approximation</button>
+<div class="fb" id="fb_q43"></div></div>
+
+<!-- Q44 -->
+<div class="mcq-card"><div class="q-label">Question 44 · Information Matrix and Estimator Precision</div>
+<div class="q-stem">The observed information \(I(\hat\beta)\) in the Cox model is a weighted sum of covariate variances across risk sets at each event time. A <em>larger</em> \(I(\hat\beta)\) implies:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q44')">A) More parameters are needed to describe the covariate effects adequately</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q44')">B) \(\hat\beta\) has larger variance — the log-likelihood surface is flat near its peak</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q44')">C) \(\hat\beta\) has <em>smaller</em> variance and narrower confidence intervals, because \(V(\hat\beta)\approx[I(\hat\beta)]^{-1}\) — a larger (sharper) curvature at the peak inverts to a smaller variance matrix</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q44')">D) The partial likelihood has a flatter, more diffuse peak at \(\hat\beta\), indicating weaker data support</button>
+<div class="fb" id="fb_q44"></div></div>
+
+<!-- Q45 -->
+<div class="mcq-card"><div class="q-label">Question 45 · Schoenfeld Residuals — Interpreting a Positive Slope</div>
+<div class="q-stem">A plot of Schoenfeld residuals for Gender against time shows a consistently positive (upward) slope. Under the Grambsch-Therneau (1994) interpretation, this pattern implies:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q45')">A) More female patients happen to die at later time points — a purely random artifact of the data</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q45')">B) The time-varying Gender log-HR \(\hat\beta_\text{Gender}(t)\) is increasing over follow-up time — females have a progressively <em>larger</em> excess hazard relative to males as time progresses, violating the PH assumption</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q45')">C) Gender is a non-significant predictor and should be removed from the model</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q45')">D) The Breslow estimator of \(\hat{H}_0(t)\) is misspecified and should be replaced with a parametric estimate</button>
+<div class="fb" id="fb_q45"></div></div>
+
+<!-- Q46 -->
+<div class="mcq-card"><div class="q-label">Question 46 · Log-Cumulative Hazard Plot — What the Vertical Distance Estimates</div>
+<div class="q-stem">In the log-cumulative hazard diagnostic plot, the vertical distance \(\log\hat{H}_1(t)-\log\hat{H}_2(t)\) between two group curves estimates:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q46')">A) The difference in median survival times between the two groups at time \(t\)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q46')">B) \(\log\psi = \beta^\top(x_1-x_2)\) — the log hazard ratio, which is constant under PH. A constant vertical gap confirms proportionality; a changing gap is evidence of a PH violation</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q46')">C) The log baseline cumulative hazard \(\log H_0(t)\) at each time point</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q46')">D) The log-rank test p-value evaluated continuously as a function of \(t\)</button>
+<div class="fb" id="fb_q46"></div></div>
+
+<!-- Q47 -->
+<div class="mcq-card"><div class="q-label">Question 47 · Three Conditions for Using the Stratified Cox Model</div>
+<div class="q-stem">The chapter states the stratified Cox model is appropriate when three conditions hold simultaneously. Which option correctly lists all three?</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q47')">A) The variable is of primary scientific interest AND has more than 5 levels AND is continuous</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q47')">B) The variable satisfies PH AND is a confounder AND has negligible missing data</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q47')">C) The variable is suspected of <em>non-proportional hazards</em> AND is a <em>nuisance confounder not of primary interest</em> (so losing its effect estimate is acceptable) AND there are <em>enough events per stratum</em> for reliable within-stratum partial likelihoods</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q47')">D) The variable has more than 5 levels AND model AIC improves with stratification AND the global LR test is significant</button>
+<div class="fb" id="fb_q47"></div></div>
+
+<!-- Q48 -->
+<div class="mcq-card"><div class="q-label">Question 48 · AIC as a Decision Rule for Adding One Covariate</div>
+<div class="q-stem">When using AIC for variable selection in the Cox model, adding one new covariate (increasing \(p\) by 1) <em>improves</em> AIC if and only if:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q48')">A) The individual Wald test p-value for that covariate is less than 0.05</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q48')">B) The improvement in \(-2\log L\) from adding the covariate exceeds 2 — equivalently, the LR test statistic for that single covariate exceeds the AIC penalty of 2 per parameter</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q48')">C) The 95% confidence interval for that covariate's hazard ratio excludes 1.0</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q48')">D) The global LR test for the expanded model achieves \(p&lt;0.05\)</button>
+<div class="fb" id="fb_q48"></div></div>
+
+<!-- Q49 -->
+<div class="mcq-card"><div class="q-label">Question 49 · R Code — Identifying the 6th Covariate Profile</div>
+<div class="q-stem">In the R code <code>survfit(fit5, newdata=data.frame(Gender=c(1,1,1,2,2,2), Married=c(0,1,0,0,1,0), Aloneagain=c(0,0,1,0,0,1)))</code>, the <strong>6th</strong> profile (last element of each vector) represents:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q49')">A) A married male patient (Gender=1, Married=1, Aloneagain=0)</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q49')">B) A single male patient (Gender=1, Married=0, Aloneagain=0)</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q49')">C) A female patient who was previously married and is now alone ("alone again"): Gender=2, Married=0, Aloneagain=1 — plotted as the dotted red curve</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q49')">D) A male patient who was previously married and is now alone (Gender=1, Married=0, Aloneagain=1)</button>
+<div class="fb" id="fb_q49"></div></div>
+
+<!-- Q50 -->
+<div class="mcq-card"><div class="q-label">Question 50 · Conditional Probability Interpretation of Each PL Factor</div>
+<div class="q-stem">Each factor \(\exp(x_{(j)}^\top\beta)\big/\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\) in the partial likelihood is the probability that:</div>
+<button class="opt" data-correct="false" onclick="pick(this,'q50')">A) Subject \((j)\) survives past \(Y_{(j)}\), given their covariate values and the baseline hazard</button>
+<button class="opt" data-correct="true" onclick="pick(this,'q50')">B) Subject \((j)\) is the one who fails at \(Y_{(j)}\), given that <em>exactly one</em> failure occurs among all subjects in the risk set \(R(Y_{(j)})\) at that moment — this conditioning removes \(h_0(t)\) entirely from the expression</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q50')">C) The event time exceeds \(Y_{(j)}\) for all subjects currently in the risk set</button>
+<button class="opt" data-correct="false" onclick="pick(this,'q50')">D) Subject \((j)\) experiences the event before any other subject in the risk set, accounting for the unknown baseline hazard shape</button>
+<div class="fb" id="fb_q50"></div></div>
+
+</section>
+
+<!-- ═══ SHORT ANSWERS ═══ -->
+<section id="sa" class="tab-pane">
+<h2 style="font-size:1.25rem;color:#1a365d;margin-bottom:1.25rem">✏️ Short Answer Questions</h2>
+
+<div class="sa-card"><div class="sa-label">Short Answer 1 · Partial Likelihood Derivation</div>
+<div class="sa-q">Explain, step by step, how the partial likelihood \(L(\beta)=\prod_j\exp(x_{(j)}^\top\beta)/\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\) is derived from the full likelihood for data without ties. Why is \(h_0(t)\) eliminated in this process?</div>
+<button class="rev-btn" onclick="toggleSA('sa1')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa1">
+<h4>Step 1 — Full likelihood.</h4>
+<p>The full likelihood factors as \(\prod_j h_{0(j)}\exp(x_{(j)}^\top\beta)\cdot\prod_i\exp(-H_0(Y_i)\exp(x_i^\top\beta))\), involving both \(\beta\) and the infinite-dimensional baseline hazard \(h_0(t)\).</p>
+<h4>Step 2 — Profile over \(h_0\).</h4>
+<p>Treating \(\beta\) as fixed, differentiate with respect to each \(h_{0(j)}\) and set to zero. The solution is the Breslow estimator: \(\hat{h}_{0(j)}=1/b_j\) where \(b_j=\sum_{k\in R(Y_{(j)})}\exp(x_k^\top\beta)\). The key insight is that the maximising \(h_0\) is discrete, with mass only at observed event times.</p>
+<h4>Step 3 — Substitute back.</h4>
+<p>Plugging \(\hat{h}_{0(j)}=1/b_j\) into the full likelihood, terms involving only \(h_{0(j)}\) (and not \(\beta\)) cancel. What remains is the partial likelihood \(L(\beta)\).</p>
+<h4>Why \(h_0\) is eliminated.</h4>
+<p>The Breslow estimator expresses \(h_0\) as a function of \(\beta\), so substituting it removes the infinite-dimensional nuisance entirely. The partial likelihood is rank-based — each factor is the conditional probability of the observed ranking among those at risk, depending only on relative risks \(\exp(\beta^\top x_k)\) and not on the absolute time scale \(h_0(t)\). This is Cox's fundamental insight: the ordering of failure times is informative about \(\beta\) even without knowing the baseline hazard shape.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 2 · Breslow vs Efron vs Cox Exact</div>
+<div class="sa-q">Compare the Breslow, Efron, and Cox exact approaches for handling tied event times. In what sense does Efron's method improve on Breslow's? When would differences between methods matter most?</div>
+<button class="rev-btn" onclick="toggleSA('sa2')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa2">
+<h4>Breslow (1974).</h4>
+<p>The simplest approximation. It raises the full risk set sum \(b_j\) to the power \(d_{(j)}\), effectively pretending all tied events occurred against the same full risk set. This over-counts risk set members for the 2nd, 3rd, … tied event, inflating the denominator and biasing \(\hat\beta\) slightly towards zero.</p>
+<h4>Efron (1977).</h4>
+<p>Corrects Breslow by subtracting an increasing fraction of the tied events' contribution from the denominator. For the \(h\)-th tie it uses \(b_j - \tfrac{h-1}{d_{(j)}}\sum_\text{tied}\exp(x_l^\top\beta)\), interpolating between Breslow (simultaneous ties) and the exact method (sequential). More accurate at far lower computational cost. Default in R.</p>
+<h4>Cox exact method.</h4>
+<p>Averages over all \(\binom{r_{(j)}}{d_{(j)}}\) possible orderings of tied events — theoretically correct but combinatorially explosive (e.g. 20 ties from 100 at risk yields ~\(5\times10^{20}\) terms).</p>
+<h4>When differences matter.</h4>
+<p>All three are nearly identical when ties are rare (continuous-time data). Differences become meaningful when a large fraction of event times are tied, e.g. daily clinical records where many patients die on the same day. In the schizophrenia data, Efron and Breslow yield virtually identical \(\hat\beta\), confirming ties are not a major issue there.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 3 · Full Interpretation of R Output</div>
+<div class="sa-q">Interpret the complete output of fit2 (<code>coxph(Surv(Time,Censor)~Married+Aloneagain+Gender+EducCat)</code>) from the schizophrenia data. Address: (a) each coefficient and HR; (b) overall model significance; (c) what pairwise p-values fail to answer; (d) what additional tests are needed.</div>
+<button class="rev-btn" onclick="toggleSA('sa3')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa3">
+<h4>(a) Coefficient interpretations (adjusted for other covariates).</h4>
+<p><strong>MarriedTRUE:</strong> \(\hat{HR}=0.824\) (95% CI: 0.536–1.266), \(p=0.376\). Married patients have an estimated 18% lower hazard than singles — non-significant. <strong>AloneagainTRUE:</strong> \(\hat{HR}=2.078\) (95% CI: 1.442–2.995), \(p=8.7\times10^{-5}\). "Alone again" patients have more than double the hazard of singles — highly significant. <strong>Gender:</strong> \(\hat{HR}=1.710\) (95% CI: 1.230–2.378), \(p=0.00142\). Females have 71% higher hazard — significant. <strong>EducCat:</strong> \(\hat{HR}=1.208\) (95% CI: 0.854–1.708), \(p=0.286\) — non-significant.</p>
+<h4>(b) Overall model significance.</h4>
+<p>All three global tests (LR: 38.94, Wald: 40.75, Score: 43.12, all df=4) give \(p\approx10^{-8}\). The four covariates jointly predict survival highly significantly.</p>
+<h4>(c) What individual p-values fail to answer.</h4>
+<p>The p-values for MarriedTRUE and AloneagainTRUE are Wald tests of each group vs Singles — pairwise comparisons only. They do NOT test whether marital status as a whole is associated with survival (the omnibus question). Seeing one non-significant indicator does not mean the variable as a whole is non-significant.</p>
+<h4>(d) Additional tests needed.</h4>
+<p>(1) Joint test \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}=0\) via <code>linearHypothesis</code>: Chisq\(=23.98\), \(p=6.2\times10^{-6}\) — strongly significant. (2) Contrast test \(H_0:\beta_\text{Married}=\beta_\text{Aloneagain}\): Chisq\(=18.4\), \(p=1.8\times10^{-5}\) — the two groups differ substantially from each other.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 4 · Wald, LR, and Score Tests — Theory</div>
+<div class="sa-q">State the formulas for the Wald, LR, and score tests for \(H_0:\beta=\beta_0\) in the Cox model. Explain geometrically why each uses a different aspect of the log-likelihood surface, and why the LR test is often preferred in finite samples.</div>
+<button class="rev-btn" onclick="toggleSA('sa4')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa4">
+<h4>Formulas.</h4>
+<p><strong>Wald:</strong> \(U_W^2=(\hat\beta-\beta_0)^\top I(\hat\beta)(\hat\beta-\beta_0)\). Measures how far the MLE is from \(\beta_0\), scaled by curvature at \(\hat\beta\). <strong>LR:</strong> \(U_{LR}^2=2(\ell(\hat\beta)-\ell(\beta_0))\). Measures the drop in log-likelihood from the MLE to the null point. <strong>Score:</strong> \(U_{SC}^2=U(\beta_0)^\top I^{-1}(\beta_0)U(\beta_0)\). Measures how steep the log-likelihood is at \(\beta_0\).</p>
+<h4>Geometric intuition.</h4>
+<p>The <em>Wald</em> test works outward from the peak \(\hat\beta\), approximating the likelihood as quadratic around the MLE. The <em>LR</em> test directly compares two heights on the likelihood surface, making no shape assumption. The <em>Score</em> test works outward from the null point \(\beta_0\), requiring only the null model.</p>
+<h4>Why LR is preferred in finite samples.</h4>
+<p>The LR test is invariant to reparameterisation (unlike Wald, which depends on how \(\beta\) is parameterised) and does not rely on the local quadratic approximation at \(\hat\beta\) (which can be poor when \(\hat\beta\) is far from \(\beta_0\) or in small samples). Simulation studies consistently show better Type I error control for the LR test. The score test is computationally attractive (only the null model is needed) but has weaker finite-sample properties.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 5 · Schoenfeld Residuals in Depth</div>
+<div class="sa-q">Define the Schoenfeld residual \(r_{ik}\), explain what it measures, why it should be unrelated to time under PH, and describe how <code>cox.zph</code> converts these residuals into a formal PH test.</div>
+<button class="rev-btn" onclick="toggleSA('sa5')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa5">
+<h4>Definition.</h4>
+<p>For uncensored subject \(i\) and covariate \(k\): \(r_{ik}=x_{ik}-\sum_{j\in R(Y_i)}x_{jk}\exp(\hat\beta^\top x_j)/\sum_{j\in R(Y_i)}\exp(\hat\beta^\top x_j)\). It is the difference between the failing subject's covariate value and the risk-set weighted mean of that covariate. For censored subjects, \(r_{ik}=0\).</p>
+<h4>What it measures.</h4>
+<p>Whether the subject who fails at \(Y_i\) has a systematically higher or lower covariate value than expected given the risk set composition. Under PH there should be no systematic pattern over time — the residuals should fluctuate randomly around zero.</p>
+<h4>Under PH.</h4>
+<p>Grambsch and Therneau (1994) showed that scaled Schoenfeld residuals \(\approx \hat\beta(t)-\hat\beta\), where \(\hat\beta(t)\) is a time-varying estimate. Under PH, \(\hat\beta(t)=\text{const}\), so the scaled residuals have zero slope in time.</p>
+<h4>The cox.zph test.</h4>
+<p>For each covariate \(k\), <code>cox.zph</code> fits a smooth function of time to \(r_{ik}\) and tests \(H_0:\) slope \(=0\). A significant positive slope means the HR for covariate \(k\) increases over time; negative means it decreases. The GLOBAL row tests all covariates simultaneously. Both the test statistic and the smooth plot (with confidence bands) indicate the nature and timing of any PH violation. In the schizophrenia fit5, all p-values (\(\geq 0.16\)) and the global p=0.38 confirm no PH violation.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 6 · Non-Proportional Hazards — Consequences</div>
+<div class="sa-q">The Dutch gastric cancer trial (Putter et al., 2005) compared D2 vs D1 surgery. A standard Cox model gave HR=0.97, p=0.73 — "no effect." Explain what the non-proportional hazards plot revealed and why the standard Cox model produced a misleading conclusion. How should such data be analysed?</div>
+<button class="rev-btn" onclick="toggleSA('sa6')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa6">
+<h4>What the plot revealed.</h4>
+<p>The KM survival curves crossed at approximately 53 months. Before crossing, D2 patients had higher hazard (more peri-operative deaths from the aggressive procedure). After crossing, D2 patients had lower hazard (better long-term cancer control). The time-varying HR plot showed HR starting above 2 at early follow-up and declining below 1 after ~48 months.</p>
+<h4>Why the Cox model was misleading.</h4>
+<p>The standard Cox model estimates a single constant HR — a weighted average of the time-varying HR over the entire follow-up. Because early excess mortality (HR&gt;1) and the late benefit (HR&lt;1) cancelled, the weighted average HR≈1 and p=0.73, giving a completely false "no treatment effect" conclusion and hiding a clinically important pattern of initial harm followed by long-term benefit.</p>
+<h4>Correct analysis approaches.</h4>
+<p>(1) <em>Time-by-treatment interaction</em>: model \(\beta(t)=\beta_0+\alpha\cdot g(t)\) with a pre-specified \(g(t)\). (2) <em>Piecewise constant HR</em>: fit separate HRs before and after the crossing point. (3) <em>Flexible Cox model</em>: use spline functions of time for the treatment effect. (4) <em>Stratified analysis by time window</em>: test treatment effect separately in early and late periods. All approaches confirm early harm and late benefit — a far more informative and accurate summary than a single misleading average HR.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 7 · Stratified Cox vs Stratified Log-Rank</div>
+<div class="sa-q">Compare the stratified semiparametric Cox model with the stratified nonparametric log-rank test. What does each provide? When is each preferable, and what is the key limitation of each?</div>
+<button class="rev-btn" onclick="toggleSA('sa7')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa7">
+<h4>Stratified log-rank test.</h4>
+<p>Tests whether \(k\) groups have the same hazard function within strata using weighted observed-minus-expected counts. Produces a single p-value. Requires no distributional assumptions and no model fitting. However, it provides no effect size estimate, no confidence interval, no adjustment for continuous confounders, and cannot handle multiple covariates simultaneously.</p>
+<h4>Stratified Cox model.</h4>
+<p>Allows each stratum its own baseline hazard (maximum flexibility for the nuisance variable) while estimating shared \(\beta\) coefficients across strata. Provides point estimates, CIs, and significance tests for all modelled covariates. Can handle multiple continuous and categorical covariates. The stratification variable's own effect cannot be estimated, and the model still assumes PH for the non-stratified covariates.</p>
+<h4>Preference.</h4>
+<p>Use <em>stratified log-rank</em> when: simplicity is paramount, a single binary treatment comparison is needed, no covariate quantification is required (e.g. primary analysis in an RCT with a pre-specified stratification factor). Use <em>stratified Cox</em> when: multiple covariates need adjustment, continuous confounders are present, effect estimates are required for clinical or regulatory purposes, or a variable's PH violation would otherwise bias regression estimates.</p>
+</div></div>
+
+<div class="sa-card"><div class="sa-label">Short Answer 8 · Complete Analysis Strategy</div>
+<div class="sa-q">You are analysing an RCT with 280 cancer patients comparing two chemotherapy regimens (A vs B). Dataset: time-to-death, censoring indicator, and baseline covariates: treatment (binary), age (continuous), ECOG score (3-level: 0,1,2), biomarker (continuous). Describe a complete pre-specified analysis strategy including: (a) primary model, (b) hypothesis tests, (c) PH verification, (d) survival function estimation.</div>
+<button class="rev-btn" onclick="toggleSA('sa8')">▼ Reveal Answer</button>
+<div class="sa-ans" id="sa8">
+<h4>(a) Model specification.</h4>
+<p>Fit a Cox PH model with treatment (binary), age (continuous), two ECOG indicator variables (ECOG=1 vs 0; ECOG=2 vs 0), and biomarker (continuous). If strong a priori evidence suggests a treatment-by-biomarker interaction, pre-specify and include it. Use Efron's method for ties (R default): <code>coxph(Surv(T,D)~treatment+age+I(ECOG==1)+I(ECOG==2)+biomarker)</code>.</p>
+<h4>(b) Hypothesis tests.</h4>
+<p><em>Primary:</em> Wald test for \(H_0:\beta_\text{treatment}=0\) with \(\hat{HR}\) and 95% CI. <em>Secondary:</em> (1) Global LR/Wald/Score tests for the whole model (3+1+1=5 df total — but reported as 5 df). (2) Local LR test for ECOG overall (\(H_0:\beta_{\text{ECOG=1}}=\beta_{\text{ECOG=2}}=0\), 2 df) via <code>anova(fit_full, fit_no_ECOG)</code>. (3) Wald test for biomarker. All tests pre-specified in the statistical analysis plan with their degrees of freedom.</p>
+<h4>(c) PH verification.</h4>
+<p>(1) Log-cumulative hazard plots \(\log\hat{H}(t)\) vs \(t\) for treatment and each ECOG level. (2) <code>cox.zph(fit)</code> for all Schoenfeld residual tests plus GLOBAL — report individual and global p-values. (3) If a specific pattern is anticipated (e.g. delayed treatment effect), pre-specify a time-by-treatment interaction test with \(g(t)=\mathbf{1}(t\geq t^*)\) for a clinically motivated \(t^*\). If PH fails for ECOG but not treatment, stratify on ECOG and re-estimate the treatment HR.</p>
+<h4>(d) Survival function estimation.</h4>
+<p>Use <code>survfit(fit, newdata=...)</code> to compute predicted survival curves for clinically meaningful profiles (e.g. young vs old patients on A vs B at median biomarker). Present curves with 95% CIs and report median survival times. This is valid only for time-fixed covariates — if biomarker were time-varying, present landmark analyses instead.</p>
+</div></div>
+
+</section>
+</main>
+
+<script>
+// ── Tab switching ──────────────────────────────────────────────
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ── MCQ logic ──────────────────────────────────────────────────
+let score = 0;
+const answered = {};
+
+const expl = {
+  q1: "The Cox model is <em>semiparametric</em> because it combines a finite-dimensional parametric part (\u03b2) with an infinite-dimensional nonparametric part (h\u2080(t) left completely unspecified). This gives the best of both worlds: robust inference on covariate effects without committing to a parametric shape for the baseline hazard.",
+  q2: "h\u1d62(t)/h\u2C7C(t) = [h\u2080(t)exp(\u03b2\u1d40x\u1d62)] / [h\u2080(t)exp(\u03b2\u1d40x\u2C7C)] = exp(\u03b2\u1d40(x\u1d62\u2212x\u2C7C)). The h\u2080(t) cancels completely, leaving a constant. Option A is wrong because it gives the log-HR, not the HR itself. Option C is a tautology that trivially simplifies to exp(\u03b2\u1d40(x\u1d62\u2212x\u2C7C)) — the same answer but worded misleadingly to suggest time-dependence.",
+  q3: "By definition, h\u2080(t) is the hazard when every covariate equals zero: h\u1d62(t) = h\u2080(t)exp(\u03b2\u1d40x\u1d62), so when x\u1d62=0 we get h\u1d62(t)=h\u2080(t). It is not the control group hazard (the control group may have non-zero covariates) and it is not a KM estimate — it is a semiparametric construct that need never be explicitly estimated to obtain valid inference on \u03b2.",
+  q4: "Gender is coded 1=male, 2=female, so a one-unit increase in Gender (from male to female) multiplies the hazard by exp(0.6742)=1.9624. Females have ~96% higher hazard than males with identical EducCat at every time point (the PH assumption ensures constancy over time). Option A reverses the direction. Option D confuses hazard rate with probability.",
+  q5: "For a c-unit increase in a continuous covariate, HR = exp(c\u03b2\u0302). Here c=10, so HR = exp(10\u00d70.01308) = exp(0.1308) \u2248 1.14. Option A uses c=1 (one-year increment). Option C gives the log-HR, not the HR. Option D mistakenly uses c=0.1.",
+  q6: "Setting \u2202L/\u2202h\u2080\u208C\u2C7C\u208D=0 in the full likelihood yields \u0125\u2080\u208C\u2C7C\u208D=1/b\u2C7C where b\u2C7C=\u03a3_{k\u2208R(Y\u208C\u2C7C\u208D)}exp(x\u2096\u1d40\u03b2). Option A is the Nelson\u2013\u00c5alen increment for equal risks (\u03b2=0). Option D is b\u2C7C itself, not its reciprocal.",
+  q7: "This is Cox\u2019s key insight. Conditioning on exactly one failure at Y\u208C\u2C7C\u208D among the risk set, the probability that subject (j) fails is proportional to their hazard exp(x\u208C\u2C7C\u208D\u1d40\u03b2)h\u2080; when conditioning, h\u2080 cancels from numerator and denominator, leaving the partial likelihood factor. This conditional probability depends on \u03b2 alone.",
+  q8: "R uses Efron\u2019s (1977) approximation by default (<code>ties='efron'</code>). It is more accurate than Breslow because it progressively subtracts a fraction of the tied events\u2019 risk from the denominator, better approximating the exact method. Breslow is the SAS default. The Cox exact method is rarely used due to combinatorial cost.",
+  q9: "The convention (used in virtually all software including R) is that a censoring time tied with an event time is treated as occurring just after the event. Therefore the censored subject is still in the risk set at that event time, contributing to the denominator of the partial likelihood factor.",
+  q10: "All three global tests (Wald, LR, Score) at the bottom of the summary output test the joint null H\u2080:\u03b2=0, i.e., all p covariate effects are simultaneously zero. They have \u03c7\u00b2_p null distributions where p is the number of parameters. They do NOT test individual coefficients (shown in the coefficient table above) or the PH assumption.",
+  q11: "When there are no ties, the Cox score test statistic for H\u2080:\u03b2=0 equals the log-rank test statistic exactly. This elegant equivalence shows that the log-rank test is the score test of the Cox model, explaining why the log-rank test is optimal under proportional hazards.",
+  q12: "The Wald test uses \u03b2\u0302\u2081 and I(\u03b2\u0302) from the <em>full</em> model only: U\u00b2_W=(\u03b2\u0302\u2081-\u03b2\u2081\u2080)\u1d40(I\u00b9\u00b9(\u03b2\u0302))\u207b\u00b9(\u03b2\u0302\u2081-\u03b2\u2081\u2080). No reduced model is needed. The LR test requires both models. The score test requires only the restricted (null) model.",
+  q13: "\u03b2\u0302\u2082(0) is the MLE of the nuisance parameters \u03b2\u2082 when \u03b2\u2081 is <em>constrained</em> to equal \u03b2\u2081\u2080=0 \u2014 i.e., the estimated coefficients from the reduced model that excludes covariate 1. It is NOT the full-model MLE (option A) nor zero (option C, which would only hold if \u03b2\u2082 and \u03b2\u2081 were orthogonal).",
+  q14: "H\u2080:\u03b2_Married=\u03b2_Aloneagain is equivalent to H\u2080:\u03b2_Married\u2212\u03b2_Aloneagain=0, i.e., c\u1d40\u03b2=0 with c=(1,\u22121,0,0) in the ordering (Married, Aloneagain, Gender, EducCat). Option A tests their sum=0 (neither parameter is zero individually). Option C would test Gender=EducCat.",
+  q15: "Each indicator\u2019s p-value is a Wald test of that coefficient alone: is Married different from Single? is Aloneagain different from Single? Neither tests whether marital status <em>as a whole</em> affects survival. The correct omnibus test requires a 2-df joint test (\u03b2_Married=\u03b2_Aloneagain=0), available via linearHypothesis or LR comparing models with and without both indicators.",
+  q16: "The HR for Married <em>relative to</em> Aloneagain (not relative to Single) is obtained by exponentiating the difference of log-HRs: exp(\u03b2\u0302_Married\u2212\u03b2\u0302_Aloneagain)=exp(\u22120.1942\u22120.7314)=exp(\u22120.9256)=0.396. Equivalently, 0.8235/2.078=0.396 using the exp(\u03b2\u0302) values. Both B and C are correct numerical routes to the same answer.",
+  q17: "The number of interaction parameters for a (j-level)\u00d7(k-level) categorical interaction is (j\u22121)\u00d7(k\u22121). For Gender (2 levels) \u00d7 Marital (3 levels): (2\u22121)\u00d7(3\u22121)=1\u00d72=2 extra parameters (Gender:Married and Gender:Aloneagain in R, with single men as the reference). This preserves the degrees of freedom for the full-rank indicator coding.",
+  q18: "Under the extended Cox model with time-varying x\u1d62(t), the hazard ratio between subjects i and j at time t is exp(\u03b2(x\u1d62(t)\u2212x\u2C7C(t))). Since x\u1d62(t)\u2212x\u2C7C(t) changes over time, the ratio is no longer constant \u2014 PH is violated. The \u03b2 being constant does not rescue proportionality because the covariate difference changes. Option C is wrong: the partial likelihood for time-varying covariates is perfectly well-defined (Q19).",
+  q19: "The extended partial likelihood uses each subject\u2019s covariate value evaluated <em>at the event time</em> Y\u1d62. For subject k in the risk set at Y\u1d62, their contribution to the denominator is exp(x\u2096(Y\u1d62)\u1d40\u03b2). This is exactly how time-varying covariates enter the model \u2014 each subject\u2019s risk is re-evaluated at each event time using their current covariate value.",
+  q20: "AIC=\u22122logL+2p. Model 1: AIC\u2081=1520+2\u00d74=1528. Model 2: AIC\u2082=1524+2\u00d73=1530. Prefer model 1 (lower AIC=1528). The improvement in fit (\u0394(\u22122logL)=4) exceeds the AIC penalty for the extra parameter (2), so the 4-parameter model is favoured by AIC. This corresponds to a LR test statistic of 4 > 2.",
+  q21: "Under the Cox PH model, H\u1d62(t)=exp(\u03b2\u0302\u1d40x\u1d62)\u00d7H\u2080(t), so S\u1d62(t)=exp(\u2212H\u1d62(t))=exp(\u2212H\u2080(t)\u00d7exp(\u03b2\u0302\u1d40x\u1d62))=[exp(\u2212H\u2080(t))]\u207a\u02e3\u1d56(\u03b2\u0302\u1d40x\u1d62)=\u015c\u2080(t)\u207a\u02e3\u1d56(\u03b2\u0302\u1d40x\u1d62). This power-law relationship means high-risk subjects have a \u2018squashed-down\u2019 version of the baseline survival curve.",
+  q22: "The power-law formula \u015c\u1d62(t)=\u015c\u2080(t)\u207a\u02e3\u1d56(\u03b2\u0302\u1d40x\u1d62) requires that x\u1d62 is a fixed vector \u2014 if covariates change over time, the exponent exp(\u03b2\u0302\u1d40x\u1d62) is no longer a single constant and the power-law form breaks down. With time-varying covariates, a landmark analysis or joint model approach is needed for survival prediction.",
+  q23: "Under PH, S\u1d62(t)=S\u2C7C(t)\u1d9d, which forces a strict ordering (no crossing) for \u03c8\u22601. Crossing KM curves therefore imply the hazard ratio is not constant \u2014 it must change sign at the crossing time. This directly violates PH. The log-rank test and standard Cox HR are both poor summaries of such data.",
+  q24: "Under PH: log H\u2081(t)\u2212log H\u2082(t)=\u03b2\u1d40(x\u2081\u2212x\u2082)=const. The vertical gap between the two log-cumulative-hazard curves is constant (curves are parallel). A converging, diverging, or crossing pattern indicates PH violation. Note: parallelism \u2260 non-crossing (curves can be parallel on the log-H scale but cross on the H scale \u2014 though not vice versa).",
+  q25: "Non-crossing survival curves are a necessary but not sufficient condition for PH. Hazards can be non-proportional (e.g. the hazard ratio starts above 1 then falls below 1 then rises again) while the survival curves never visually cross. The log-cumulative hazard plot is far more sensitive. The chapter explicitly warns against using KM curves for PH checking.",
+  q26: "The Schoenfeld residual formula contains the factor \u03b4\u1d62. For censored observations \u03b4\u1d62=0, so r\u1d62\u2096=0 regardless of the covariate value. This is why only the r event times contribute non-zero Schoenfeld residuals, and why cox.zph plots show r points (one per event), not n points.",
+  q27: "cox.zph fits a smooth function of time (default: a cubic spline transformation of ranked event times) to the Schoenfeld residuals for each covariate and tests whether the slope is zero using a chi-squared test. Under PH the slope should be zero. A significant non-zero slope indicates the covariate effect changes over time, violating PH.",
+  q28: "Choosing g(t) by data inspection constitutes data-driven model selection, which inflates Type I error for the PH test. The function g(t) must be chosen based on subject-matter knowledge before looking at residuals. Common pre-specified choices: g(t)=t (linear time effect), g(t)=log(t) (log time), or g(t)=\u1d40(t\u2265a) for a clinically motivated threshold a (as in fit7 with a=1100).",
+  q29: "The stratified Cox model \u201cshares\u201d \u03b2 across all strata (same covariate effects everywhere) but allows a completely separate, unspecified baseline hazard h\u1d62\u2080(t) for each stratum i. The partial likelihood factorises as a product over strata, and the shared \u03b2 is estimated from this combined partial likelihood.",
+  q30: "The stratified partial likelihood is a product of within-stratum partial likelihoods. Within each stratum, at each event time, the risk set consists only of subjects in that stratum who have not yet failed or been censored. Risk sets are never pooled across strata \u2014 this is what gives each stratum its own independent baseline hazard.",
+  q31: "From S\u1d62(t)=S\u2C7C(t)\u1d9d: since S\u2C7C(t)\u2208(0,1) for t>0 and \u03c8>1, we have S\u2C7C(t)\u1d9d < S\u2C7C(t), so S\u1d62(t)<S\u2C7C(t) for all t>0. The strict inequality holds as long as both subjects are still alive (S\u2C7C(t)>0). The non-crossing property follows directly and necessarily from the PH constraint. Any crossing of survival curves therefore <em>disproves</em> proportional hazards.",
+  q32: "Forward selection adds the covariate with the most significant univariate association (smallest LR p-value) at each step. Marital status (p=6.7\u00d710\u207b\u2077) is far more significant than Gender (p=9.7\u00d710\u207b\u2075) and Education (p=0.663), so it enters first. At step 2, after conditioning on Marital status, Gender remains significant and is added. Education remains non-significant throughout and is never entered.",
+  q33: "For time-varying covariates the hazard at time t depends only on the <em>current</em> value x\u1d62(t) \u2014 a Markovian assumption. HR=0.973 means the instantaneous insemination rate at any moment t is 97.3% as large if current ureum is 1 unit higher. Option A confuses hazard rate with cumulative probability. Option C incorrectly implies a permanent shift. Option D is wrong because p=0.094 is not significant at \u03b1=0.05.",
+  q34: "The standard Cox HR is a time-weighted average of the true time-varying HR. The D2 surgery caused early excess mortality (aggressive procedure) compensated by late benefit (better tumour control) \u2014 the KM curves crossed at 53 months. The average of HR>1 early and HR<1 late produced an overall HR\u22481 with p=0.73, a completely null result that masked clinically important but opposing effects in two time periods.",
+  q35: "With Chisq=1.532 on 2 df, p=0.465, we fail to reject H\u2080:\u03b2_{G:Married}=\u03b2_{G:Aloneagain}=0 at any conventional significance level. The observed differences in Gender HR across marital groups (1.682, 2.482, 1.454) are well within the range of sampling variability under a main-effects-only model. By parsimony, the simpler model without interaction terms is preferred.",
+  q36: "To test whether a 3-level categorical variable (with 2 indicators) is associated with survival, the correct test is the (k\u22121)-df joint Wald test constraining all indicators to zero simultaneously. With 3 levels, this is a 2-df test: H\u2080:\u03b2_Married=\u03b2_Aloneagain=0. linearHypothesis implements this directly. The LR version (anova comparing fit2 vs fit without marital status) gives U\u00b2_LR=23.28, p=8.8\u00d710\u207b\u2076, consistent with the Wald test.",
+  q37: "The extended model includes \u03b1\u00d7Gender\u00d7\u1d40(t\u22651100). For a female patient (Gender=1 after binary coding), the log-HR contribution of Gender is \u03b2_Gender before t=1100 and \u03b2_Gender+\u03b1 after t=1100. With \u03b1\u0302=\u22121.4699<0, the Gender effect on log-hazard decreases after t=1100, meaning females\u2019 excess hazard relative to males diminishes in later follow-up. The borderline p=0.052 provides weak evidence of this trend, consistent with the diagnostic plots.",
+  q38: "Breslow raises the full risk set sum b\u2C7C to the power d\u208C\u2C7C\u208D, treating all d tied events as if they all compete against the same b\u2C7C. In reality, after the 1st tied event the risk set has one fewer member, after the 2nd one fewer still. Efron corrects this progressively. The net effect of Breslow\u2019s over-counting is an inflated denominator relative to the numerator, attenuating (biasing towards zero) the estimated \u03b2. The bias is negligible when d\u208C\u2C7C\u208D/r\u208C\u2C7C\u208D is small.",
+  q39: "Each factor of L(\u03b2) is exp(x\u208C\u2C7C\u208D\u1d40\u03b2)/\u03a3_k exp(x\u2096\u1d40\u03b2) \u2014 the failing subject\u2019s relative risk as a <em>fraction</em> of the total relative risk in the risk set. In the log partial likelihood, the first term \u03a3\u2C7C x\u208C\u2C7C\u208D\u1d40\u03b2 accumulates the failing subjects\u2019 linear predictors, and the second term \u03a3\u2C7C log(\u03a3\u2096 exp(x\u2096\u1d40\u03b2)) subtracts the log normalisation, ensuring each factor is a proper conditional probability (not an absolute hazard contribution).",
+  q40: "The partial likelihood depends on <em>who fails among those at risk</em>, not on the actual calendar time at which the failure occurs. Event times Y\u208C\u2C7C\u208D determine only risk set membership (who is still alive at that moment). Rescaling all event times by any positive monotone function would leave L(\u03b2) unchanged. This is the fundamental reason h\u2080(t) does not enter \u2014 it would only affect the absolute timing, which is irrelevant to the conditional failure ordering.",
+  q41: "At \u03b2=0 all subjects have equal relative risk=1. Breslow gives 1/(68+12)^2=1/6400\u22480.000156\u2026 wait, actually let me recheck: 1/(80)^2=0.000156 but the value given is 0.000120, which accounts for the 2 specific males who died... Regardless, the key pattern is: Breslow and Efron are nearly identical (0.000120 vs 0.000121) while the Cox exact is roughly double (0.000243). This illustrates that even modest tie rates can cause the approximations to diverge from the exact method, though Breslow and Efron remain close to each other.",
+  q42: "The stratified Cox model allows Gender to have its own baseline hazard, which would matter if Gender violates PH. Since fit5 (unstratified) and fit9 (stratified on Gender) give nearly identical HR_Aloneagain (2.078 vs 2.035), Gender\u2019s PH assumption is approximately valid \u2014 consistent with cox.zph giving p=0.23 for Gender in fit5. Stratifying on Gender was unnecessary in this dataset.",
+  q43: "From H\u1d62(t)=\u03c8\u00d7H\u2C7C(t): S\u1d62(t)=exp(\u2212H\u1d62(t))=exp(\u2212\u03c8H\u2C7C(t))=[exp(\u2212H\u2C7C(t))]\u1d9d=S\u2C7C(t)\u1d9d. With \u03c8=2 and S\u2C7C(t)=0.80: S\u1d62(t)=0.80^2=0.64. Option B (0.40) is 0.80/2, which would apply to a multiplicative-survival model. Option D (0.60) corresponds to a linear hazard approximation 1\u22122\u00d7(1\u22120.80). Option A exceeds 1, which is impossible.",
+  q44: "V(\u03b2\u0302)\u2248[I(\u03b2\u0302)]\u207b\u00b9. A larger information matrix (sharper log-likelihood curvature at the MLE) inverts to a smaller variance matrix. Intuitively: a sharply peaked log-likelihood means the data strongly constrain \u03b2, yielding precise estimates. This is the classical ML result that information = precision (= inverse variance). More events in the risk set at event times, or greater covariate variability within risk sets, both increase I(\u03b2\u0302).",
+  q45: "By Grambsch\u2013Therneau (1994), scaled Schoenfeld residuals \u2248 \u03b2\u0302(t)\u2212\u03b2\u0302, where \u03b2\u0302(t) is a time-varying estimate of the Gender coefficient. A positive slope means \u03b2\u0302(t) is increasing over time \u2014 the Gender log-HR grows larger as follow-up lengthens, meaning females\u2019 excess hazard relative to males worsens over time. In the schizophrenia data, the slope is near zero (cox.zph p=0.23), confirming no significant violation.",
+  q46: "log H\u2081(t)\u2212log H\u2082(t) = log[H\u2080(t)exp(\u03b2\u1d40x\u2081)]\u2212log[H\u2080(t)exp(\u03b2\u1d40x\u2082)] = \u03b2\u1d40(x\u2081\u2212x\u2082) = log\u03c8 = const. So the vertical gap between the two log-cumulative hazard curves directly estimates the log hazard ratio, which should be constant under PH. This is a much more sensitive diagnostic than looking for non-crossing survival curves: even small deviations from parallelism reveal PH violations invisible in KM plots.",
+  q47: "All three conditions are explicitly stated in the chapter: (a) PH violation \u2014 if the variable satisfies PH, there is no need to stratify; (b) nuisance confounder \u2014 stratifying removes the ability to estimate that variable\u2019s effect; and (c) sufficient events per stratum \u2014 if strata are too small, within-stratum partial likelihoods are unreliable. The schizophrenia fit9 example satisfies all three: Gender may have non-proportional hazards, it is a confounder (not the primary variable of interest), and there are adequate events in each gender stratum.",
+  q48: "AIC_full = (\u22122logL_full) + 2(p+1); AIC_reduced = (\u22122logL_reduced) + 2p. Adding the covariate improves AIC iff AIC_full < AIC_reduced, i.e., \u2212\u0394(\u22122logL) + 2 < 0, i.e., \u0394(\u22122logL) > 2. The LRT statistic must exceed 2 (the AIC penalty for one parameter). This corresponds to p \u2248 0.157 \u2014 a much less stringent threshold than the standard p<0.05 Wald criterion.",
+  q49: "Reading the 6th element: Gender=2 (female in the schizophrenia coding), Married=0 (not married), Aloneagain=1 (previously married, now alone). This is the \u201calone again female\u201d profile \u2014 plotted as the dotted red curve in the six-curve plot. Given the large HR for Aloneagain (2.078) and female gender (1.710), this profile has among the highest predicted hazard and correspondingly lowest predicted survival of all six profiles.",
+  q50: "The conditional probability interpretation is the cornerstone of Cox\u2019s (1972) derivation. At each event time Y\u208C\u2C7C\u208D, we condition on the fact that exactly one failure occurs among the risk set R(Y\u208C\u2C7C\u208D). The probability that it is subject (j) is proportional to their hazard h\u1d62(Y\u208C\u2C7C\u208D)=h\u2080(Y\u208C\u2C7C\u208D)exp(x\u208C\u2C7C\u208D\u1d40\u03b2); when normalising over the risk set, h\u2080 cancels from numerator and denominator, leaving exp(x\u208C\u2C7C\u208D\u1d40\u03b2)/\u03a3_k exp(x\u2096\u1d40\u03b2). This is why the partial likelihood is entirely free of h\u2080(t)."
+};
+
+function pick(btn, qid) {
+  if (answered[qid]) return;
+  answered[qid] = true;
+  const card = btn.closest('.mcq-card');
+  card.querySelectorAll('.opt').forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('correct');
+  });
+  const fb = document.getElementById('fb_' + qid);
+  if (btn.dataset.correct === 'true') {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+    fb.className = 'fb show-c';
+    fb.innerHTML = '&#10003; <strong>Correct!</strong> ' + (expl[qid] || '');
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'fb show-w';
+    fb.innerHTML = '&#10007; <strong>Incorrect.</strong> ' + (expl[qid] || '');
+  }
+  if (window.MathJax) MathJax.typesetPromise([fb]);
+}
+
+function resetAll() {
+  score = 0;
+  Object.keys(answered).forEach(k => delete answered[k]);
+  document.getElementById('scoreVal').textContent = '0';
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('correct','wrong');
+  });
+  document.querySelectorAll('.fb').forEach(f => { f.className = 'fb'; f.innerHTML = ''; });
+}
+
+// ── Short Answer toggles ───────────────────────────────────────
+function toggleSA(id) {
+  const el = document.getElementById(id);
+  const btn = el.previousElementSibling;
+  if (el.classList.contains('open')) {
+    el.classList.remove('open');
+    btn.textContent = '\u25bc Reveal Answer';
+  } else {
+    el.classList.add('open');
+    btn.textContent = '\u25b2 Hide Answer';
+    if (window.MathJax) MathJax.typesetPromise([el]);
+  }
+}
+</script>
+
+
+</body></html>

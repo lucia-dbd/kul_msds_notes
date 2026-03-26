@@ -1,0 +1,841 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3 — Nonparametric Hypothesis Testing | Survival Analysis</title>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background-color:#f5f6fa;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:15px;line-height:1.75;color:#2c2c3a;max-width:960px;margin:0 auto;padding:24px 16px}
+
+/* ── Header ── */
+.page-header{background:linear-gradient(135deg,#1a3a5c,#2e6da4);color:#fff;border-radius:14px;padding:28px 36px;margin-bottom:24px;box-shadow:0 4px 18px rgba(30,80,140,.18)}
+.page-header h1{font-size:1.8em;font-weight:700;letter-spacing:.3px;margin:0 0 6px}
+.page-header .subtitle{font-size:.92em;opacity:.82;font-weight:400}
+
+/* ── Nav bar  border-radius:0, links border-radius:0 ── */
+.nav-bar{background:#fff;border:1px solid #dde3ef;border-radius:0;padding:10px 18px;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:8px;box-shadow:0 1px 6px rgba(0,0,0,.06);position:sticky;top:8px;z-index:200}
+.nav-bar a{background:#eef2fb;color:#2e6da4;border-radius:0;padding:4px 14px;font-size:.85em;font-weight:600;text-decoration:none;transition:background .2s,color .2s}
+.nav-bar a:hover{background:#2e6da4;color:#fff}
+.nav-bar a.nav-mcq{background:#fff3cd;color:#856404}
+.nav-bar a.nav-mcq:hover{background:#f59e0b;color:#fff}
+.nav-bar a.nav-sa{background:#d1ecf1;color:#0c5460}
+.nav-bar a.nav-sa:hover{background:#0c5460;color:#fff}
+
+/* ── Notes section  no border-left ── */
+.notes-section{background:#fff;border-radius:12px;padding:28px 36px;margin-bottom:28px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.notes-section h2{color:#1a3a5c;font-size:1.25em;font-weight:700;border-bottom:2px solid #eef2fb;padding-bottom:8px;margin:0 0 16px}
+.notes-section h3{color:#2e6da4;font-size:1.05em;font-weight:700;margin:20px 0 8px}
+.notes-section h4{color:#1a3a5c;font-size:.97em;font-weight:600;margin:14px 0 6px;font-style:italic}
+.notes-section p{margin-bottom:10px}
+.notes-section ul,.notes-section ol{padding-left:1.5em;margin-bottom:10px}
+.notes-section li{margin-bottom:4px}
+
+/* ── Content boxes  border-radius:0 ── */
+.key-point{background:#eef6ff;border-left:4px solid #2e6da4;border-radius:0;padding:12px 18px;margin:14px 0}
+.example-box{background:#f0f7ee;border-left:4px solid #4caf50;border-radius:0;padding:12px 18px;margin:14px 0}
+.theorem-box{background:#f3f0ff;border-left:4px solid #7c4dff;border-radius:0;padding:14px 20px;margin:16px 0}
+.warning-box{background:#fff8e1;border-left:4px solid #ffc107;border-radius:0;padding:12px 18px;margin:14px 0}
+.computation-box{background:#fdf3f3;border-left:4px solid #e57373;border-radius:0;padding:12px 18px;margin:14px 0}
+.formula-box{background:#f8f9ff;border:1px solid #c8d4f0;border-radius:8px;padding:16px 20px;margin:14px 0;overflow-x:auto;text-align:center}
+
+/* ── R code ── */
+.r-block{background:#1e2535;color:#c9d8e8;border-radius:8px;padding:14px 18px;font-family:'Courier New',monospace;font-size:.82em;line-height:1.7;margin:12px 0;overflow-x:auto;white-space:pre}
+.r-block .cmt{color:#6fa8c8}.r-block .fn{color:#f0c040}.r-block .out{color:#7de8b2}
+
+/* ── Tables  no border-radius, no overflow:hidden ── */
+.tbl-wrap{margin:18px 0;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+table{width:100%;border-collapse:collapse;font-size:.93em}
+thead tr{background:#2e6da4;color:#fff;font-weight:600;text-align:left}
+tbody tr:nth-child(even){background:#f0f4fb}
+tbody tr:nth-child(odd){background:#fff}
+tbody tr:hover{background:#dce8f8}
+th,td{padding:10px 14px;border-bottom:1px solid #e2e8f4}
+
+/* ── MCQ section ── */
+.mcq-section{background:#fff;border-radius:12px;padding:28px 36px;margin-bottom:28px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.mcq-section>h2{color:#92400e;font-size:1.2em;font-weight:700;border-bottom:2px solid #fff3cd;padding-bottom:8px;margin:0 0 8px}
+.mcq-header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px}
+.score-display{background:#fff3cd;border:1px solid #ffc107;border-radius:20px;padding:5px 18px;font-weight:700;color:#856404;display:inline-block;font-size:.95em}
+.reset-btn{background:#f59e0b;color:#fff;border:none;border-radius:20px;padding:5px 18px;font-size:.88em;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
+.reset-btn:hover{background:#d97706}
+
+/* ── MCQ card ── */
+.mcq-card{background:#f9fafb;border:1px solid #e5e9f2;border-radius:10px;padding:20px 24px;margin-bottom:20px}
+.question-label{font-size:.8em;font-weight:700;color:#2e6da4;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.question-stem{font-weight:600;color:#1a1a2e;margin-bottom:14px;font-size:1em}
+
+/* ── Option buttons ── */
+.option-btn{display:block;width:100%;background:#fff;border:1.5px solid #d0d8ea;border-radius:8px;padding:10px 16px;margin:6px 0;text-align:left;cursor:pointer;font-size:.95em;color:#2c2c3a;font-family:inherit;transition:all .18s;line-height:1.6}
+.option-btn:hover:not(:disabled){background:#eef2fb;border-color:#2e6da4}
+.option-btn.correct{background:#d4edda!important;border-color:#28a745!important;color:#155724!important;font-weight:700}
+.option-btn.incorrect{background:#f8d7da!important;border-color:#dc3545!important;color:#721c24!important;font-weight:600}
+.option-btn.reveal-correct{background:#d4edda!important;border-color:#28a745!important;color:#155724!important;font-weight:700;opacity:.82}
+.option-btn:disabled{cursor:default}
+
+/* ── Feedback ── */
+.feedback-bar{border-radius:6px;padding:8px 14px;margin-top:10px;font-size:.9em;font-weight:600;display:none;line-height:1.65}
+.feedback-bar.correct{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.feedback-bar.incorrect{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+
+/* ── SA section  no border-left ── */
+.sa-section{background:#fff;border-radius:12px;padding:28px 36px;margin-bottom:28px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.sa-section>h2{color:#4a148c;font-size:1.2em;font-weight:700;border-bottom:2px solid #ede9ff;padding-bottom:8px;margin:0 0 16px}
+.sa-card{background:#faf9ff;border:1px solid #e2dcf5;border-radius:10px;padding:20px 24px;margin-bottom:20px}
+.sa-card .question-label{color:#6f42c1;font-size:.8em;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.sa-card .question-stem{font-weight:600;color:#1a1a2e;font-size:1em;margin-bottom:2px}
+.reveal-btn{background:#6f42c1;color:#fff;border:none;border-radius:20px;padding:7px 22px;font-size:.88em;font-weight:600;cursor:pointer;margin-top:12px;transition:background .2s;font-family:inherit;display:inline-block}
+.reveal-btn:hover{background:#5a32a3}
+.answer-panel{background:#f3f0ff;border:1px solid #d4c8f5;border-radius:8px;padding:18px 22px;margin-top:14px;font-size:.95em;line-height:1.8;display:none}
+.answer-panel strong{color:#4a148c}
+
+/* ── Utilities ── */
+.section-anchor{scroll-margin-top:75px}
+hr.divider{border:none;border-top:1.5px solid #eef2fb;margin:22px 0}
+code{background:#eef2fb;padding:1px 5px;border-radius:4px;font-family:'Courier New',monospace;font-size:.85em;color:#1a3a5c}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:12px 0}
+
+@media(max-width:640px){
+  body{padding:12px 10px}
+  .page-header{padding:20px 18px}
+  .page-header h1{font-size:1.35em}
+  .notes-section,.mcq-section,.sa-section{padding:18px 16px}
+  .mcq-card,.sa-card{padding:14px}
+  .two-col{grid-template-columns:1fr}
+  .nav-bar{position:relative;top:0}
+  .section-anchor{scroll-margin-top:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="page-header">
+  <h1>📊 Chapter 3 — Hypothesis Testing in a Nonparametric Setting</h1>
+  <div class="subtitle">Survival Analysis · Statistical Methods · Exam Preparation Notes</div>
+</header>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav-bar">
+  <a href="#overview">Overview</a>
+  <a href="#one-sample">One-Sample</a>
+  <a href="#two-sample">Two-Sample</a>
+  <a href="#weights">Weights</a>
+  <a href="#ksample">K-Sample &amp; Trend</a>
+  <a href="#stratified">Stratified &amp; Matched</a>
+  <a href="#mcq" class="nav-mcq">MCQ ×30</a>
+  <a href="#sa" class="nav-sa">Short Answer ×8</a>
+</nav>
+
+<!-- ═══ OVERVIEW ═══ -->
+<section id="overview" class="notes-section section-anchor">
+  <h2>Overview &amp; General Principle</h2>
+  <p>Nonparametric hypothesis testing in survival analysis addresses two broad questions: (1) does a single censored sample arise from a population with a <em>specified</em> hazard function \(h_0(t)\), and (2) do two or more groups share the same hazard function? All tests share a unified structure built on <strong>weighted observed-minus-expected statistics</strong>.</p>
+  <div class="key-point">
+    <strong>Two goals of this chapter:</strong> testing the hazard of <em>one</em> population against a known \(h_0(t)\), and comparing hazard functions across <em>two or more</em> populations without assuming any parametric family.
+  </div>
+  <h3>The Common Architecture</h3>
+  <p>At each ordered event time \(Y_{(j)}\) (\(j=1,\ldots,r\)) in the (pooled) sample, we measure the discrepancy between what was <em>observed</em> and what would be <em>expected</em> under \(H_0\). A non-negative weight \(w(Y_{(j)})\) scales each contribution. The test statistic is the weighted sum of discrepancies, standardised by its standard deviation.</p>
+  <div class="warning-box">
+    <strong>Critical rule:</strong> The weight function must be chosen <em>a priori</em>, before inspecting the data. Choosing the weight post-hoc to minimise the p-value invalidates the test.
+  </div>
+  <h3>Notation Summary</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>\(Y_{(1)}&lt;\cdots<y_{(r)}\)< td=""></y_{(r)}\)<></td><td>Ordered distinct event times in the (pooled) sample</td></tr>
+      <tr><td>\(d_{(j)}\)</td><td>Number of events at time \(Y_{(j)}\)</td></tr>
+      <tr><td>\(r_{(j)}\)</td><td>Number at risk just before \(Y_{(j)}\)</td></tr>
+      <tr><td>\(d_{(j)k},\;r_{(j)k}\)</td><td>Events and risk set in group \(k\) at time \(Y_{(j)}\)</td></tr>
+      <tr><td>\(H_0(t)\)</td><td>Cumulative hazard specified under \(H_0\)</td></tr>
+      <tr><td>\(w(t)\)</td><td>Weight function; \(w(t)=0\) for \(t&gt;Y_{(r)}\)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Tests at a Glance</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Test</th><th>Weight \(w(Y_{(j)})\)</th><th>Emphasis</th></tr></thead>
+    <tbody>
+      <tr><td>Log-rank</td><td>\(1\)</td><td>Equal; optimal under proportional hazards</td></tr>
+      <tr><td>Gehan–Wilcoxon</td><td>\(r_{(j)}\)</td><td>Early differences; censoring-dependent</td></tr>
+      <tr><td>Tarone–Ware</td><td>\(\sqrt{r_{(j)}}\)</td><td>Early differences (moderate)</td></tr>
+      <tr><td>Peto–Peto</td><td>\(\hat{S}_{\text{mod}}(Y_{(j)})\)</td><td>Early; less sensitive to censoring than Gehan</td></tr>
+      <tr><td>Fleming–Harrington \(G(p,q)\)</td><td>\(\hat{S}(Y_{(j-1)})^p(1-\hat{S}(Y_{(j-1)}))^q\)</td><td>Flexible: early (\(p{&gt;}q\)), late (\(p{&lt;}q\)), middle (\(p{=}q{&gt;}0\))</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══ ONE-SAMPLE ═══ -->
+<section id="one-sample" class="notes-section section-anchor">
+  <h2>One-Sample Tests</h2>
+  <h3>Hypotheses</h3>
+  <p>Given a censored sample of size \(n\), test whether the data are consistent with a <em>known</em> hazard function \(h_0(t)\):</p>
+  <div class="formula-box">
+    \[ H_0: h(t)=h_0(t)\;\forall t\leq Y_{(r)}, \qquad H_1: h(t)\neq h_0(t)\text{ for some }t \]
+  </div>
+  <h3>General Statistic</h3>
+  <div class="formula-box">
+    \[ U = \sum_j w(Y_{(j)})\frac{d_{(j)}}{r_{(j)}} - \int_0^{Y_{(r)}} w(s)\,h_0(s)\,ds, \qquad \operatorname{Var}(U)=\int_0^{Y_{(r)}}\frac{w^2(s)\,h_0(s)}{r(s)}\,ds \]
+  </div>
+  <p>For large \(n\): \(Z=U/\sqrt{\operatorname{Var}(U)}\approx N(0,1)\).</p>
+  <hr class="divider">
+  <h3>One-Sample Log-Rank Test</h3>
+  <div class="key-point">
+    <strong>Weight function:</strong> \(w(t)=r(t)\) (number currently at risk).
+  </div>
+  <p>With this choice the integral telescopes via \(\int_0^{Y_{(r)}}r(s)\,h_0(s)\,ds=\sum_{i=1}^n H_0(Y_i)\):</p>
+  <div class="formula-box">
+    \[ U = \underbrace{\sum_j d_{(j)}}_{O} - \underbrace{\sum_{i=1}^n H_0(Y_i)}_{E} = O - E \]
+  </div>
+  <div class="theorem-box">
+    <strong>Key simplification:</strong> When \(w(t)=r(t)\), \(\operatorname{Var}(U)=\sum_{i=1}^n H_0(Y_i)=E\). Therefore:
+    \[ Z = \frac{O-E}{\sqrt{E}} \approx N(0,1) \quad\text{under }H_0. \]
+  </div>
+  <div class="r-block"><span class="cmt"># One-sample log-rank: H₀ is Exp(mean=1000), so H₀(t) = t/1000</span>
+sp &lt;- <span class="fn">exp</span>(-0.001 * schizo$Time)
+<span class="fn">survdiff</span>(Surv(Time, Censor) ~ <span class="fn">offset</span>(sp), data = schizo)</div>
+  <h4>Worked example — Schizophrenia data (\(H_0:\text{Exp}(\mu=1000)\))</h4>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Quantity</th><th>Formula</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Observed \(O\)</td><td>\(\sum\delta_i\)</td><td>163</td></tr>
+      <tr><td>Expected \(E\)</td><td>\(\tfrac{1}{1000}\sum Y_i\)</td><td>204.3</td></tr>
+      <tr><td>\(z_\text{obs}\)</td><td>\((163-204.3)/\sqrt{204.3}\)</td><td>\(-2.89\)</td></tr>
+      <tr><td>Two-sided \(p\)</td><td>\(2P(Z&gt;2.89)\)</td><td>0.004</td></tr>
+      <tr><td>Decision (\(\alpha=0.05\))</td><td>—</td><td>Reject \(H_0\)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="example-box"><strong>Interpretation:</strong> \(O<e\) means="" fewer="" deaths="" than="" exp(1000)="" predicts="" —="" patients="" survive="" <em="">longer, so \(H_0\) is rejected.</e\)></div>
+  <hr class="divider">
+  <h3>Harrington–Fleming Family (One-Sample)</h3>
+  <div class="formula-box">
+    \[ w(t)=r(t)\cdot S_0(t)^p\cdot(1-S_0(t))^q,\quad p,q\geq0 \]
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>\(p\)</th><th>\(q\)</th><th>Name</th><th>Emphasis</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td>One-sample log-rank</td><td>Equal over all event times</td></tr>
+      <tr><td>1</td><td>0</td><td>One-sample Wilcoxon</td><td>Early deviations</td></tr>
+      <tr><td>0</td><td>\(&gt;0\)</td><td>—</td><td>Late deviations</td></tr>
+      <tr><td>\(&gt;0\)</td><td>\(&gt;0\)</td><td>—</td><td>Middle-period deviations</td></tr>
+    </tbody>
+  </table></div>
+  <div class="computation-box"><strong>Comparison (schizophrenia):</strong> Log-rank gives \(Z=-2.89\); Wilcoxon (\(p=1\)) gives \(Z=-3.13\). Both reject \(H_0\). Neither is universally more powerful — the ordering depends on where the departure from \(H_0\) is concentrated.</div>
+</section>
+
+<!-- ═══ TWO-SAMPLE ═══ -->
+<section id="two-sample" class="notes-section section-anchor">
+  <h2>Two-Sample Tests</h2>
+  <h3>Hypotheses</h3>
+  <div class="formula-box">
+    \[ H_0: h_1(t)=h_2(t)\;\forall t, \qquad H_1: h_1(t)\neq h_2(t)\text{ for some }t \]
+  </div>
+  <h3>The 2×2 Table at Each Event Time</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Group</th><th>Events</th><th>No event</th><th>At risk</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>\(d_{(j)1}\)</td><td>\(r_{(j)1}-d_{(j)1}\)</td><td>\(r_{(j)1}\)</td></tr>
+      <tr><td>2</td><td>\(d_{(j)2}\)</td><td>\(r_{(j)2}-d_{(j)2}\)</td><td>\(r_{(j)2}\)</td></tr>
+      <tr><td><strong>Total</strong></td><td>\(d_{(j)}\)</td><td>\(r_{(j)}-d_{(j)}\)</td><td>\(r_{(j)}\)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>General Weighted Statistic</h3>
+  <div class="formula-box">
+    \[ U = \sum_j w(Y_{(j)})\!\left[d_{(j)1} - d_{(j)}\frac{r_{(j)1}}{r_{(j)}}\right] = \sum_j w(Y_{(j)})(O_j - E_j) \]
+  </div>
+  <div class="theorem-box">
+    <strong>Variance via hypergeometric:</strong> Conditional on \(d_{(j)},r_{(j)1},r_{(j)}\), the count \(d_{(j)1}\sim\text{Hypergeometric}\) under \(H_0\):
+    \[ \operatorname{Var}(U)=\sum_j w^2(Y_{(j)})\cdot d_{(j)}\cdot\frac{r_{(j)1}}{r_{(j)}}\cdot\left(1-\frac{r_{(j)1}}{r_{(j)}}\right)\cdot\frac{r_{(j)}-d_{(j)}}{r_{(j)}-1} \]
+    Under \(H_0\): \(Z=U/\sqrt{\operatorname{Var}(U)}\approx N(0,1)\), or \(Z^2\sim\chi^2_1\).
+  </div>
+  <hr class="divider">
+  <h3>Worked Example — Gender Comparison</h3>
+  <div class="r-block"><span class="cmt"># Log-rank (rho=0, default)</span>
+<span class="fn">survdiff</span>(Surv(Time, Censor) ~ Gender, data = schizo)
+
+<span class="out">            N Observed Expected (O-E)^2/E (O-E)^2/V
+Gender=1  187      101    123.1      3.97      16.8
+Gender=2   93       62     39.9     12.26      16.8
+Chisq= 16.8  on 1 degrees of freedom,  p= 4e-05</span></div>
+  <div class="example-box"><strong>Conclusion:</strong> Reject \(H_0\) (\(p=4\times10^{-5}\)). Males (Gender=1): \(O=101 &lt; E=123.1\) — better survival than females.</div>
+  <div class="warning-box"><strong>Reading R output:</strong> <code>(O-E)²/V</code> uses the full hypergeometric variance; <code>(O-E)²/E</code> uses only the marginal approximation. For two groups, both (O-E)²/V values equal <code>Chisq</code>. For \(l&gt;2\), the (O-E)²/V values do <em>not</em> sum to Chisq.</div>
+</section>
+
+<!-- ═══ WEIGHTS ═══ -->
+<section id="weights" class="notes-section section-anchor">
+  <h2>Weight Functions in Detail</h2>
+  <h3>Log-Rank — \(w(Y_{(j)})=1\)</h3>
+  <p>All event times receive equal weight. This is the <strong>score test from the Cox proportional hazards model</strong> and is locally most powerful when \(h_1(t)/h_2(t)=\text{const}\). In R: <code>survdiff(..., rho=0)</code> (default).</p>
+  <h3>Gehan–Wilcoxon — \(w(Y_{(j)})=r_{(j)}\)</h3>
+  <p>Generalises the two-sample Wilcoxon rank-sum test to censored data. The risk set \(r_{(j)}\) is largest at the start, giving more weight to <strong>early differences</strong>. Drawback: depends on the censoring distribution, complicating cross-study comparisons.</p>
+  <h3>Tarone–Ware — \(w(Y_{(j)})=\sqrt{r_{(j)}}\)</h3>
+  <p>Compromise between log-rank and Gehan: emphasises early departures but less aggressively.</p>
+  <h3>Peto–Peto — \(w(Y_{(j)})=\hat{S}_{\text{mod}}(Y_{(j)})\)</h3>
+  <div class="formula-box">
+    \[ \hat{S}_{\text{mod}}(Y_{(j)})=\prod_{k:\,Y_{(k)}\leq Y_{(j)}}\!\left(1-\frac{d_{(k)}}{r_{(k)}+1}\right) \]
+  </div>
+  <p>The denominator \(r_{(k)}+1\) (not \(r_{(k)}\)) gives better weight properties and reduces sensitivity to censoring. In R: <code>survdiff(..., rho=1)</code>.</p>
+  <h3>Fleming–Harrington \(G(p,q)\)</h3>
+  <div class="formula-box">
+    \[ w(Y_{(j)})=\hat{S}(Y_{(j-1)})^p\,(1-\hat{S}(Y_{(j-1)}))^q \]
+  </div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>\(p\)</th><th>\(q\)</th><th>Emphasis</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td>Equal</td><td>Log-rank</td></tr>
+      <tr><td>\(&gt;0\)</td><td>0</td><td>Early</td><td>\(p=1\): Peto–Peto</td></tr>
+      <tr><td>0</td><td>\(&gt;0\)</td><td>Late</td><td>Useful when effects build over time</td></tr>
+      <tr><td>\(=q&gt;0\)</td><td>\(=p&gt;0\)</td><td>Middle</td><td>Max at \(\hat{S}=0.5\)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key-point"><strong>Intuition for \(G(0,q)\):</strong> Early, \(\hat{S}\approx1\) so \((1-\hat{S})^q\approx0\) — near-zero weight. Late, \(\hat{S}\) is small so \((1-\hat{S})^q\approx1\) — large weight. Perfectly targets <em>late</em> differences (e.g. delayed immunotherapy effects).</div>
+  <div class="warning-box"><strong>Decision guide (pre-specify):</strong><br>
+  • Proportional hazards expected → <strong>log-rank</strong>.<br>
+  • Treatment acts quickly → <strong>Gehan or \(G(p&gt;0,0)\)</strong>.<br>
+  • Effects build over time (immunotherapy, vaccine) → <strong>\(G(0,q&gt;0)\)</strong>.<br>
+  • No prior knowledge → <strong>log-rank</strong> (standard default).
+  </div>
+</section>
+
+<!-- ═══ K-SAMPLE ═══ -->
+<section id="ksample" class="notes-section section-anchor">
+  <h2>K-Sample Test and Test for Trend</h2>
+  <h3>Comparing \(l\) Populations</h3>
+  <div class="formula-box">
+    \[ H_0: h_1(t)=\cdots=h_l(t)\;\forall t \]
+  </div>
+  <p>For group \(k\): \(U_k=\sum_j w(Y_{(j)})[d_{(j)k}-d_{(j)}r_{(j)k}/r_{(j)}]\).</p>
+  <div class="theorem-box">
+    <strong>Linear dependence:</strong> \(\sum_{k=1}^l U_k=0\) exactly. The \(l\times l\) covariance matrix is <em>singular</em>. Work with \(\mathbf{U}=(U_1,\ldots,U_{l-1})^\top\):
+    \[ \mathbf{U}^\top\,\widehat{\operatorname{Var}}(\mathbf{U})^{-1}\,\mathbf{U}\approx\chi^2_{l-1}\quad\text{under }H_0. \]
+  </div>
+  <h4>Worked example — Marital status (\(l=3\))</h4>
+  <div class="r-block"><span class="fn">survdiff</span>(Surv(Time, Censor) ~ Marital, data = schizo)
+
+<span class="out">              N Observed Expected (O-E)^2/E (O-E)^2/V
+Marital=1   105       55     67.0      2.14      3.71
+Marital=2    72       37     55.1      5.93      9.24
+Marital=3   103       71     41.0     22.00     30.69
+Chisq= 31.4  on 2 degrees of freedom,  p= 1e-07</span></div>
+  <div class="example-box"><strong>Conclusion:</strong> \(p=10^{-7}\) — reject \(H_0\). Marital=3 (alone): \(O=71\gg E=41\) — worst survival. Note: the individual (O-E)²/V values (3.71 + 9.24 + 30.69 = 43.6 ≠ 31.4) do <em>not</em> sum to Chisq when \(l&gt;2\) because off-diagonal covariances are ignored.</div>
+  <hr class="divider">
+  <h3>Test for Trend</h3>
+  <p>When \(l\) groups have a <strong>natural ordering</strong>, a trend test with linear scores \(c_k=k\) exploits that ordering:</p>
+  <div class="formula-box">
+    \[ U=\sum_{k=1}^l c_k U_k,\quad Z=\frac{U}{\sqrt{\operatorname{Var}(U)}}\approx N(0,1)\quad\text{(one-sided)} \]
+  </div>
+  <p>This is a 1-df test, more powerful than the \((l-1)\)-df omnibus test when the true alternative is monotone.</p>
+  <div class="warning-box"><strong>Power trade-off:</strong> The trend test gains power for monotone alternatives at the cost of losing power for non-monotone alternatives (e.g. U-shaped or crossing hazards).</div>
+</section>
+
+<!-- ═══ STRATIFIED ═══ -->
+<section id="stratified" class="notes-section section-anchor">
+  <h2>Stratified Tests and Matched Pairs</h2>
+  <h3>Motivation</h3>
+  <p>If variable \(B\) is both unequally distributed across treatment groups <em>and</em> independently associated with survival, it confounds the comparison. A stratified test controls for \(B\) by computing O and E within each stratum, then combining.</p>
+  <h3>Stratified Statistic</h3>
+  <div class="formula-box">
+    \[ U_{k\bullet}=\sum_{b=1}^m U_{kb},\qquad \operatorname{Cov}(U_{k\bullet},U_{k'\bullet})=\sum_{b=1}^m \operatorname{Cov}(U_{kb},U_{k'b}) \]
+  </div>
+  <div class="key-point"><strong>Core principle:</strong> O and E are computed using only <em>within-stratum</em> risk sets and event times, then summed across strata. This removes between-stratum confounding.</div>
+  <div class="r-block"><span class="fn">survdiff</span>(Surv(Time, Censor) ~ Group + <span class="fn">strata</span>(B), data = mydata)</div>
+  <h4>Worked example — Gender stratified by marital status</h4>
+  <div class="two-col">
+    <div class="computation-box"><strong>Unstratified:</strong><br>Chisq = 16.8, \(p=4\times10^{-5}\)</div>
+    <div class="example-box"><strong>Stratified by marital:</strong><br>Chisq = 10.8, \(p=0.001\)</div>
+  </div>
+  <p>After stratification, chi-squared drops from 16.8 to 10.8 — part of the gender effect was confounded by marital status. A significant residual gender effect remains (\(p=0.001\)).</p>
+  <hr class="divider">
+  <h3>Matched Pairs Test</h3>
+  <p>Special case: \(m\) strata each of size 2. Let \(D_j\) = number of pairs where the subject from group \(j\) dies first.</p>
+  <div class="formula-box">
+    \[ Z=\frac{D_1-D_2}{\sqrt{D_1+D_2}}\approx N(0,1) \]
+  </div>
+  <div class="theorem-box"><strong>Remarkable result:</strong> Regardless of the weight function chosen, the matched pairs statistic always reduces to \(Z=(D_1-D_2)/\sqrt{D_1+D_2}\). The weight cancels algebraically because within-stratum risk sets of size 2 reduce to ±½ per informative pair.</div>
+  <div class="warning-box"><strong>Uninformative pairs:</strong> Pairs where neither subject has yet experienced the event (no ordering can be established) contribute nothing to \(D_1\) or \(D_2\) and are ignored.</div>
+</section>
+
+<!-- ═══════════════════════ MCQ ═══════════════════════ -->
+<section id="mcq" class="mcq-section section-anchor">
+  <h2>🎯 Multiple Choice Questions</h2>
+  <div class="mcq-header">
+    <span class="score-display">Score: <span id="scoreVal">0</span> / <span id="scoreTotal">30</span></span>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+  </div>
+
+  <!-- Q1 -->
+  <div class="mcq-card"><div class="question-label">Question 1 · One-Sample Tests</div>
+  <div class="question-stem">In the one-sample log-rank test, which weight function \(w(t)\) is used?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q1')">A) \(w(t)=1\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q1')">B) \(w(t)=r(t)\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q1')">C) \(w(t)=\sqrt{r(t)}\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q1')">D) \(w(t)=\hat{S}(t)\)</button>
+  <div class="feedback-bar" id="fb_q1"></div></div>
+
+  <!-- Q2 -->
+  <div class="mcq-card"><div class="question-label">Question 2 · One-Sample Tests</div>
+  <div class="question-stem">When \(w(t)=r(t)\), the variance \(\operatorname{Var}(U)\) in the one-sample log-rank test equals:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q2')">A) \(O\) (total observed events)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q2')">B) \(E=\sum_{i=1}^n H_0(Y_i)\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q2')">C) \(\sqrt{O\cdot E}\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q2')">D) \((O-E)^2\)</button>
+  <div class="feedback-bar" id="fb_q2"></div></div>
+
+  <!-- Q3 -->
+  <div class="mcq-card"><div class="question-label">Question 3 · One-Sample — Calculation</div>
+  <div class="question-stem">In the schizophrenia example, \(O=163\) and \(E=204.3\). Compute \(z_\text{obs}=(O-E)/\sqrt{E}\).</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q3')">A) \(+2.89\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q3')">B) \(-2.89\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q3')">C) \(-1.96\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q3')">D) \(+0.20\)</button>
+  <div class="feedback-bar" id="fb_q3"></div></div>
+
+  <!-- Q4 -->
+  <div class="mcq-card"><div class="question-label">Question 4 · One-Sample Tests</div>
+  <div class="question-stem">In the Harrington–Fleming family with \(p=1,\,q=0\), which one-sample test is obtained?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q4')">A) One-sample log-rank</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q4')">B) One-sample Wilcoxon</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q4')">C) Tarone–Ware test</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q4')">D) Peto–Peto test</button>
+  <div class="feedback-bar" id="fb_q4"></div></div>
+
+  <!-- Q5 -->
+  <div class="mcq-card"><div class="question-label">Question 5 · Two-Sample Tests</div>
+  <div class="question-stem">The observed-minus-expected contribution for group 1 at event time \(Y_{(j)}\) is:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q5')">A) \(d_{(j)1}-r_{(j)1}/r_{(j)}\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q5')">B) \(d_{(j)1}-d_{(j)}\cdot r_{(j)1}/r_{(j)}\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q5')">C) \(d_{(j)1}-d_{(j)}/r_{(j)}\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q5')">D) \(d_{(j)1}\cdot r_{(j)}/d_{(j)}\)</button>
+  <div class="feedback-bar" id="fb_q5"></div></div>
+
+  <!-- Q6 -->
+  <div class="mcq-card"><div class="question-label">Question 6 · Two-Sample Tests</div>
+  <div class="question-stem">Conditional on \(d_{(j)},r_{(j)1},r_{(j)}\), the count \(d_{(j)1}\) follows which distribution under \(H_0\)?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q6')">A) Binomial\((d_{(j)},\;r_{(j)1}/r_{(j)})\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q6')">B) Hypergeometric with parameters \(r_{(j)},r_{(j)1},d_{(j)}\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q6')">C) Poisson\((d_{(j)}\cdot r_{(j)1}/r_{(j)})\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q6')">D) Normal\((d_{(j)}\cdot r_{(j)1}/r_{(j)},1)\)</button>
+  <div class="feedback-bar" id="fb_q6"></div></div>
+
+  <!-- Q7 -->
+  <div class="mcq-card"><div class="question-label">Question 7 · Two-Sample — R Output</div>
+  <div class="question-stem">From the gender log-rank: Gender=1 has \(N=187,\,O=101,\,E=123.1\); Chisq=16.8, \(p=4\times10^{-5}\). Which statement is most accurate?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q7')">A) Fail to reject \(H_0\); the p-value is too small to trust</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q7')">B) Reject \(H_0\); males (\(O&lt;E\)) have better survival than females</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q7')">C) Reject \(H_0\); males have worse survival because their (O-E)²/E is smaller</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q7')">D) \(p=4\times10^{-5}\) is the probability that \(H_0\) is true</button>
+  <div class="feedback-bar" id="fb_q7"></div></div>
+
+  <!-- Q8 -->
+  <div class="mcq-card"><div class="question-label">Question 8 · Two-Sample Tests</div>
+  <div class="question-stem">The two-sample log-rank test has optimal power when:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q8')">A) One group has a much larger sample size</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q8')">B) The hazard rates are proportional throughout the entire follow-up period</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q8')">C) Events are concentrated at very early time points</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q8')">D) The two survival curves cross each other at a known time</button>
+  <div class="feedback-bar" id="fb_q8"></div></div>
+
+  <!-- Q9 -->
+  <div class="mcq-card"><div class="question-label">Question 9 · Weight Functions</div>
+  <div class="question-stem">Which statement best characterises the Gehan–Wilcoxon weight \(w(Y_{(j)})=r_{(j)}\)?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q9')">A) Gives equal weight throughout follow-up</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q9')">B) Gives most weight to late event times when the risk set is smallest</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q9')">C) Gives most weight to early event times and depends heavily on the censoring distribution</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q9')">D) Is based on an estimate of the common survival function</button>
+  <div class="feedback-bar" id="fb_q9"></div></div>
+
+  <!-- Q10 -->
+  <div class="mcq-card"><div class="question-label">Question 10 · Weight Functions</div>
+  <div class="question-stem">The Peto–Peto estimate \(\hat{S}_\text{mod}\) uses \(r_{(k)}+1\) rather than \(r_{(k)}\) in the denominator. The main reason is:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q10')">A) It makes the estimate identical to the Kaplan–Meier</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q10')">B) It gives better statistical weight properties and reduces sensitivity to the censoring distribution</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q10')">C) It adjusts for overdispersion in the event counts</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q10')">D) It accounts for tied survival times in the risk set</button>
+  <div class="feedback-bar" id="fb_q10"></div></div>
+
+  <!-- Q11 -->
+  <div class="mcq-card"><div class="question-label">Question 11 · Weight Functions — R Syntax</div>
+  <div class="question-stem">Calling <code>survdiff(Surv(T,D)~Group, data=d, rho=1)</code> performs which test?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q11')">A) Log-rank with \(w=1\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q11')">B) Tarone–Ware with \(w=\sqrt{r_{(j)}}\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q11')">C) Fleming–Harrington \(G(1,0)\), equivalent to Peto–Peto — emphasises early differences</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q11')">D) Test for trend with linear scores</button>
+  <div class="feedback-bar" id="fb_q11"></div></div>
+
+  <!-- Q12 -->
+  <div class="mcq-card"><div class="question-label">Question 12 · Weight Functions</div>
+  <div class="question-stem">In the Fleming–Harrington family, choosing \(p=0,\,q&gt;0\) emphasises <em>late</em> differences because:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q12')">A) \((1-\hat{S})^q\approx0\) when \(\hat{S}\approx0\) (late follow-up)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q12')">B) \((1-\hat{S})^q\approx0\) when \(\hat{S}\approx1\) (early), but \(\approx1\) when \(\hat{S}\) has fallen (late)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q12')">C) The pooled survival function is always zero after the last event</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q12')">D) \(p=0\) removes all weights from the first event time only</button>
+  <div class="feedback-bar" id="fb_q12"></div></div>
+
+  <!-- Q13 -->
+  <div class="mcq-card"><div class="question-label">Question 13 · K-Sample Test</div>
+  <div class="question-stem">When comparing \(l=4\) populations with the log-rank test, the null distribution is:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q13')">A) \(N(0,1)\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q13')">B) \(\chi^2_4\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q13')">C) \(\chi^2_3\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q13')">D) \(\chi^2_1\)</button>
+  <div class="feedback-bar" id="fb_q13"></div></div>
+
+  <!-- Q14 -->
+  <div class="mcq-card"><div class="question-label">Question 14 · K-Sample Test</div>
+  <div class="question-stem">Why is it incorrect to include all \(l\) components \((U_1,\ldots,U_l)\) in the chi-squared quadratic form?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q14')">A) The components are independent, so the covariance matrix is diagonal</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q14')">B) \(\sum_k U_k=0\) always, making the \(l\times l\) covariance matrix singular and non-invertible</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q14')">C) Only the largest \(U_k\) contributes to the test</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q14')">D) The chi-squared approximation requires exactly \(l\) degrees of freedom</button>
+  <div class="feedback-bar" id="fb_q14"></div></div>
+
+  <!-- Q15 -->
+  <div class="mcq-card"><div class="question-label">Question 15 · K-Sample — R Output</div>
+  <div class="question-stem">Marital=3 has \(O=71,\,E=41.0\); Chisq=31.4 on df=2, \(p=10^{-7}\). The correct conclusion is:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q15')">A) Fail to reject \(H_0\); the marital groups have equal survival</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q15')">B) Reject \(H_0\) (\(\chi^2_2=31.4\)); Marital=3 has much worse survival (\(O\gg E\))</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q15')">C) Reject \(H_0\); all three groups have identical hazard rates</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q15')">D) The test uses df=3 because there are 3 groups</button>
+  <div class="feedback-bar" id="fb_q15"></div></div>
+
+  <!-- Q16 -->
+  <div class="mcq-card"><div class="question-label">Question 16 · Test for Trend</div>
+  <div class="question-stem">For ordered groups with \(H_1: h_1(t)\leq\cdots\leq h_l(t)\) and linear scores \(c_k=k\), we reject \(H_0\) for:</div>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q16')">A) Large positive values of \(Z=U/\sqrt{\operatorname{Var}(U)}\) (one-sided right-tail)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q16')">B) Large negative values of \(Z\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q16')">C) \(Z^2&gt;\chi^2_{l-1,\alpha}\) (two-sided omnibus)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q16')">D) \(|Z|&gt;1.96\) regardless of direction</button>
+  <div class="feedback-bar" id="fb_q16"></div></div>
+
+  <!-- Q17 -->
+  <div class="mcq-card"><div class="question-label">Question 17 · Test for Trend</div>
+  <div class="question-stem">The trend test uses 1 degree of freedom instead of \(l-1\). This means:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q17')">A) It is always more powerful than the omnibus K-sample test</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q17')">B) It is more powerful for monotone alternatives but may be less powerful for non-monotone alternatives</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q17')">C) It can only be applied to exactly two groups</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q17')">D) It is equivalent to the omnibus test when \(l=2\)</button>
+  <div class="feedback-bar" id="fb_q17"></div></div>
+
+  <!-- Q18 -->
+  <div class="mcq-card"><div class="question-label">Question 18 · Stratified Tests</div>
+  <div class="question-stem">In the stratified log-rank test, observed and expected counts are computed:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q18')">A) Once using the pooled dataset, then multiplied by stratum-specific weights</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q18')">B) Separately within each stratum using only within-stratum risk sets, then summed across strata</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q18')">C) Using the overall survival function from all strata combined</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q18')">D) Using only the largest stratum and extrapolating to others</button>
+  <div class="feedback-bar" id="fb_q18"></div></div>
+
+  <!-- Q19 -->
+  <div class="mcq-card"><div class="question-label">Question 19 · Matched Pairs — Calculation</div>
+  <div class="question-stem">In a matched-pairs study with \(D_1=18\) and \(D_2=7\), compute \(Z\).</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q19')">A) \((18-7)/\sqrt{50}=1.56\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q19')">B) \((18-7)/\sqrt{18+7}=11/5=2.20\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q19')">C) \(18/\sqrt{50}=2.55\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q19')">D) \((18+7)/\sqrt{18\times7}=2.27\)</button>
+  <div class="feedback-bar" id="fb_q19"></div></div>
+
+  <!-- Q20 -->
+  <div class="mcq-card"><div class="question-label">Question 20 · Matched Pairs</div>
+  <div class="question-stem">The matched pairs statistic \(Z=(D_1-D_2)/\sqrt{D_1+D_2}\) is remarkable because:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q20')">A) It depends on the weight — log-rank gives a different result from Wilcoxon</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q20')">B) It is the same regardless of the weight, because the weight cancels algebraically in stratum pairs of size 2</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q20')">C) It only applies when both groups have the same censoring distribution</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q20')">D) It requires no assumption about the common hazard function</button>
+  <div class="feedback-bar" id="fb_q20"></div></div>
+
+  <!-- Q21 -->
+  <div class="mcq-card"><div class="question-label">Question 21 · Theory</div>
+  <div class="question-stem">The two-sample log-rank test (\(w=1\)) is equivalent to the score test from which statistical model?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q21')">A) Accelerated failure time (AFT) model</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q21')">B) Cox proportional hazards model</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q21')">C) Parametric Weibull regression</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q21')">D) Nelson–Åalen product-limit estimator</button>
+  <div class="feedback-bar" id="fb_q21"></div></div>
+
+  <!-- Q22 -->
+  <div class="mcq-card"><div class="question-label">Question 22 · Weight Functions</div>
+  <div class="question-stem">When two survival curves cross midway through follow-up, the log-rank test typically:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q22')">A) Has increased power because the crossing creates a larger cumulative difference</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q22')">B) Has reduced power because early and late contributions to \(U\) have opposite signs and cancel</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q22')">C) Is still the most powerful test regardless of the crossing pattern</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q22')">D) Automatically switches to the Gehan–Wilcoxon test when curves cross</button>
+  <div class="feedback-bar" id="fb_q22"></div></div>
+
+  <!-- Q23 -->
+  <div class="mcq-card"><div class="question-label">Question 23 · Two-Sample Tests</div>
+  <div class="question-stem">In a two-sample log-rank output, Group A has Observed = 45 and Expected = 62 under \(H_0\). Which statement is correct?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q23')">A) Group A experienced more events than predicted, indicating worse survival</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q23')">B) Group A experienced fewer events than predicted, indicating better survival; \(U_A=O-E\) is negative</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q23')">C) The test statistic \(U\) is positive for Group A</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q23')">D) No conclusion can be drawn without knowing the p-value</button>
+  <div class="feedback-bar" id="fb_q23"></div></div>
+
+  <!-- Q24 -->
+  <div class="mcq-card"><div class="question-label">Question 24 · Weight Functions — Clinical Context</div>
+  <div class="question-stem">A new immunotherapy is expected to show no early benefit but a substantial survival advantage after ~6 months (delayed effect). Which weight should be pre-specified?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q24')">A) Log-rank, \(w=1\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q24')">B) Gehan–Wilcoxon, \(w=r_{(j)}\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q24')">C) Fleming–Harrington \(G(0,q)\) with \(q&gt;0\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q24')">D) Tarone–Ware, \(w=\sqrt{r_{(j)}}\)</button>
+  <div class="feedback-bar" id="fb_q24"></div></div>
+
+  <!-- Q25 -->
+  <div class="mcq-card"><div class="question-label">Question 25 · Weight Functions</div>
+  <div class="question-stem">The Fleming–Harrington \(G(1,1)\) weight is proportional to \(\hat{S}(t)(1-\hat{S}(t))\). When is this weight maximised?</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q25')">A) At the very beginning of follow-up when \(\hat{S}\approx1\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q25')">B) When \(\hat{S}\approx0.5\), i.e., around the median survival time</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q25')">C) At the last event time when \(\hat{S}\approx0\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q25')">D) The weight is constant throughout follow-up</button>
+  <div class="feedback-bar" id="fb_q25"></div></div>
+
+  <!-- Q26 -->
+  <div class="mcq-card"><div class="question-label">Question 26 · K-Sample Test</div>
+  <div class="question-stem">For a K-sample log-rank test comparing \(l=5\) groups, the degrees of freedom of the null chi-squared distribution is:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q26')">A) 5</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q26')">B) 4</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q26')">C) 3</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q26')">D) 1</button>
+  <div class="feedback-bar" id="fb_q26"></div></div>
+
+  <!-- Q27 -->
+  <div class="mcq-card"><div class="question-label">Question 27 · One-Sample Tests — Derivation</div>
+  <div class="question-stem">The identity \(\int_0^{Y_{(r)}} r(s)\,h_0(s)\,ds = \sum_{i=1}^n H_0(Y_i)\) holds because:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q27')">A) The Nelson–Åalen estimator is consistent for \(H_0\)</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q27')">B) Subject \(i\) contributes to \(r(s)\) exactly on \([0,Y_i]\), so their integral contribution is \(\int_0^{Y_i}h_0(s)\,ds=H_0(Y_i)\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q27')">C) Censoring times and event times are exchangeable under \(H_0\)</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q27')">D) \(h_0(s)\) is assumed constant between observed event times</button>
+  <div class="feedback-bar" id="fb_q27"></div></div>
+
+  <!-- Q28 -->
+  <div class="mcq-card"><div class="question-label">Question 28 · Stratified Tests — R Syntax</div>
+  <div class="question-stem">In <code>survdiff(Surv(T,D) ~ Treatment + strata(Hospital), data=d)</code>, the term <code>strata(Hospital)</code>:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q28')">A) Tests whether Hospital is independently associated with survival</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q28')">B) Allows each hospital its own baseline hazard, removing hospital as a confounder in the Treatment comparison</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q28')">C) Restricts the analysis to a single hospital</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q28')">D) Adds a Hospital × Treatment interaction term</button>
+  <div class="feedback-bar" id="fb_q28"></div></div>
+
+  <!-- Q29 -->
+  <div class="mcq-card"><div class="question-label">Question 29 · Matched Pairs</div>
+  <div class="question-stem">In a matched-pairs survival study, a pair is "uninformative" (contributes nothing to \(D_1\) or \(D_2\)) when:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q29')">A) Both subjects in the pair experienced the event before the study ended</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q29')">B) Neither subject has yet experienced the event, so no within-pair ordering can be established</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q29')">C) The two subjects were matched on the wrong covariates</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q29')">D) The pair belongs to a stratum with very few subjects</button>
+  <div class="feedback-bar" id="fb_q29"></div></div>
+
+  <!-- Q30 -->
+  <div class="mcq-card"><div class="question-label">Question 30 · Research Integrity</div>
+  <div class="question-stem">A researcher inspects the data, notices the survival curves diverge mainly in the first 6 months, then chooses Gehan–Wilcoxon to maximise the chi-squared. This practice:</div>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q30')">A) Is standard and improves statistical power</button>
+  <button class="option-btn" data-correct="true" onclick="pick(this,'q30')">B) Inflates the Type I error rate, invalidating the nominal significance level</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q30')">C) Is acceptable if a Bonferroni correction is applied afterwards</button>
+  <button class="option-btn" data-correct="false" onclick="pick(this,'q30')">D) Produces conservative p-values, making the test too strict</button>
+  <div class="feedback-bar" id="fb_q30"></div></div>
+
+</section><!-- end MCQ -->
+
+<!-- ═══════════════════════ SHORT ANSWER ═══════════════════════ -->
+<section id="sa" class="sa-section section-anchor">
+  <h2>✏️ Short Answer Questions</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · One-Sample Log-Rank</div>
+    <div class="question-stem">Starting from the general weighted statistic, show step-by-step how choosing \(w(t)=r(t)\) leads to \(U=O-E\) where \(E=\sum_i H_0(Y_i)\), and why \(\operatorname{Var}(U)=E\).</div>
+    <button class="reveal-btn" id="rev_sa1" onclick="toggleAnswer('sa1')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa1">
+      <strong>Step 1 — Observed term.</strong> With \(w(t)=r(t)\), the sum \(\sum_j r_{(j)}\cdot d_{(j)}/r_{(j)}=\sum_j d_{(j)}=O\).<br><br>
+      <strong>Step 2 — Expected term.</strong> \(r(s)=\sum_{i=1}^n\mathbf{1}\{Y_i\geq s\}\), so by Fubini:
+      \[\int_0^{Y_{(r)}}r(s)\,h_0(s)\,ds=\sum_i\int_0^{Y_i}h_0(s)\,ds=\sum_i H_0(Y_i)=E.\]
+      Each subject \(i\) is in the risk set exactly on \([0,Y_i]\), contributing \(H_0(Y_i)\).<br><br>
+      <strong>Step 3 — Simplification.</strong> \(U=O-E\).<br><br>
+      <strong>Variance.</strong> \(\operatorname{Var}(U)=\int r^2(s)\,h_0(s)/r(s)\,ds=\int r(s)\,h_0(s)\,ds=E\). Therefore \(Z=(O-E)/\sqrt{E}\sim N(0,1)\) — elegantly analogous to a one-sample chi-squared test, and trivially computed from any parametric \(H_0\).
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Two-Sample Tests</div>
+    <div class="question-stem">Explain why \(d_{(j)1}\) follows a hypergeometric (not binomial) distribution under \(H_0\). Identify the finite-population correction (FPC) factor and discuss what happens to it when \(d_{(j)}\ll r_{(j)}\).</div>
+    <button class="reveal-btn" id="rev_sa2" onclick="toggleAnswer('sa2')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa2">
+      <strong>Hypergeometric vs Binomial.</strong> Under \(H_0\), the \(d_{(j)}\) failures at time \(Y_{(j)}\) are distributed among the \(r_{(j)}\) at-risk individuals <em>without replacement</em> (each subject can die at most once). Sampling without replacement from a finite population of size \(r_{(j)}\) is precisely the hypergeometric setup. If failures were independent Bernoulli trials (with replacement), the binomial would apply.<br><br>
+      <strong>Variance and FPC.</strong>
+      \[\operatorname{Var}(d_{(j)1})=d_{(j)}\cdot\frac{r_{(j)1}}{r_{(j)}}\cdot\frac{r_{(j)2}}{r_{(j)}}\cdot\underbrace{\frac{r_{(j)}-d_{(j)}}{r_{(j)}-1}}_{\text{FPC}}\]
+      The FPC \((r_{(j)}-d_{(j)})/(r_{(j)}-1)&lt;1\) reduces the variance below the binomial value, reflecting the constraint that total deaths are fixed at \(d_{(j)}\).<br><br>
+      <strong>When \(d_{(j)}\ll r_{(j)}\).</strong> FPC \(\approx(r_{(j)}-0)/(r_{(j)}-1)\approx1\), so the hypergeometric variance approaches the binomial variance. In typical survival data at any given event time, this approximation is very accurate.
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Weight Functions</div>
+    <div class="question-stem">Compare the log-rank and Gehan–Wilcoxon tests in terms of (i) optimal alternatives, (ii) sensitivity to the censoring distribution, and (iii) practical recommendations. Give a concrete clinical example where each is preferred.</div>
+    <button class="reveal-btn" id="rev_sa3" onclick="toggleAnswer('sa3')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa3">
+      <strong>(i) Optimal alternatives.</strong> The <strong>log-rank</strong> (\(w=1\)) is the score test from the Cox PH model and is locally most powerful when \(h_1(t)/h_2(t)=\text{const}\). The <strong>Gehan–Wilcoxon</strong> (\(w=r_{(j)}\)) is more powerful when groups differ predominantly early — a large, decreasing hazard ratio over time.<br><br>
+      <strong>(ii) Censoring sensitivity.</strong> The log-rank weight (constant 1) is completely unaffected by censoring. The Gehan weight equals the risk set size, which is directly shaped by the censoring pattern. Consequently, Gehan statistics from studies with different censoring mechanisms are not directly comparable — a problem for meta-analysis.<br><br>
+      <strong>(iii) Examples.</strong> Log-rank: comparing overall survival between two chemotherapy arms in an RCT, where a persistent proportional treatment effect is expected throughout follow-up. Gehan: comparing post-operative wound infection rates between two antibiotic prophylaxis protocols, where any protective benefit is expected to manifest immediately and fade quickly — early differences dominate.
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · K-Sample Test</div>
+    <div class="question-stem">In the marital status analysis (3 groups), Chisq = 31.4 on df = 2. Explain why the three individual (O-E)²/V values (3.71, 9.24, 30.69) do <em>not</em> sum to 31.4, while for the two-group gender analysis both (O-E)²/V values equal 16.8.</div>
+    <button class="reveal-btn" id="rev_sa4" onclick="toggleAnswer('sa4')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa4">
+      <strong>Why they don't sum (3 groups).</strong> The omnibus statistic \(\mathbf{U}^\top\hat{\Sigma}^{-1}\mathbf{U}\) uses the full \(2\times2\) covariance matrix, including <em>off-diagonal</em> terms \(\operatorname{Cov}(U_1,U_2)\neq0\). The quantity (O-E)²/V for group \(k\) uses only the diagonal variance \(V_{kk}\), ignoring cross-covariances. Summing all three ignores these interactions, so the sum (43.6) exceeds the correct statistic (31.4). R reports (O-E)²/V as a rough diagnostic for which group drives the discrepancy, not as additive components.<br><br>
+      <strong>Why they are equal (2 groups).</strong> With \(l=2\), the linear constraint \(U_1+U_2=0\) forces \(U_2=-U_1\) and \(\Sigma_{11}=\Sigma_{22}\). The scalar quadratic form becomes \(U_1^2/\Sigma_{11}=U_2^2/\Sigma_{22}=\text{Chisq}\). Both groups yield the same (O-E)²/V, each equal to Chisq, with no off-diagonal terms to account for in the \(1\times1\) case.
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Stratified Tests</div>
+    <div class="question-stem">The unstratified log-rank for gender gives Chisq = 16.8 (\(p=4\times10^{-5}\)); stratifying by marital status gives Chisq = 10.8 (\(p=0.001\)). Explain the reduction and assess whether the gender effect is "real".</div>
+    <button class="reveal-btn" id="rev_sa5" onclick="toggleAnswer('sa5')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa5">
+      <strong>Why the statistic decreased.</strong> Marital status is both (a) unequally distributed between genders and (b) independently predictive of survival (its own Chisq = 31.4). It therefore confounds the unstratified gender comparison. By stratifying, we compute O and E within each marital stratum using only within-stratum risk sets. This holds marital status constant, removing between-stratum confounding. The drop from 16.8 to 10.8 (Δ = 6.0 Chisq units) represents the portion of the apparent gender effect attributable to the gender–marital-status association.<br><br>
+      <strong>Is the gender effect real?</strong> Yes — Chisq = 10.8, \(p=0.001\) remains highly significant after stratification. The stratified result gives a cleaner estimate of the true within-marital-status gender effect. Males still have O &lt; E within strata, indicating genuinely better survival independent of marital status. A Cox model including both covariates would confirm and quantify this.
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Weight Functions — Censoring Dependence</div>
+    <div class="question-stem">Explain in detail why the Gehan–Wilcoxon test's dependence on the censoring distribution is a practical problem. How does the Peto–Peto modification address this, and what residual limitation remains?</div>
+    <button class="reveal-btn" id="rev_sa6" onclick="toggleAnswer('sa6')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa6">
+      <strong>The problem with Gehan's weight.</strong> \(w(Y_{(j)})=r_{(j)}\) is the number at risk at time \(Y_{(j)}\). This is determined not only by the event times but also by the censoring times — if censoring is heavy or occurs early, \(r_{(j)}\) drops rapidly, reducing weight on intermediate event times. Two studies comparing the same two treatments but with different follow-up protocols will produce different \(r_{(j)}\) sequences and thus different test statistics, making Gehan statistics incomparable across trials and problematic for meta-analysis.<br><br>
+      <strong>Peto–Peto solution.</strong> Replace \(r_{(j)}\) with \(\hat{S}_\text{mod}(Y_{(j)})\), an estimate of the common survival function under \(H_0\). This weight decreases smoothly from 1 to 0 following the estimated survival curve, independently of the specific censoring pattern in any given study. Two studies with the same true survival functions but different censoring will produce similar \(\hat{S}_\text{mod}\) sequences, giving more comparable statistics.<br><br>
+      <strong>Residual limitation.</strong> \(\hat{S}_\text{mod}\) is still estimated from data and so is not entirely censoring-free — heavily censored data will produce a noisier \(\hat{S}_\text{mod}\). Moreover, the Peto–Peto weight still emphasises early event times (since \(\hat{S}_\text{mod}\) is largest early), so it retains the early-emphasis characteristic of Gehan.
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · Trend Test vs Omnibus</div>
+    <div class="question-stem">Explain the rationale for using linear scores in the trend test. Under what circumstances do you prefer the trend test over the omnibus \(\chi^2_{l-1}\) test, and when does the omnibus test have the advantage?</div>
+    <button class="reveal-btn" id="rev_sa7" onclick="toggleAnswer('sa7')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa7">
+      <strong>Rationale for linear scores.</strong> If the groups are ordered (dose levels, age categories, disease severity stages), the scientifically natural alternative hypothesis is monotone: hazard increases or decreases in order of the groups. Assigning scores \(c_k=k\) (or any strictly monotone sequence) and forming \(U=\sum_k c_k U_k\) produces a single linear combination of the group-specific statistics. This concentrates all 1 df on the direction of the expected trend, rather than spreading df across all possible group patterns.<br><br>
+      <strong>When to prefer the trend test.</strong> Use the 1-df trend test when the groups have a meaningful natural order <em>and</em> the scientific hypothesis is that the response is monotone in that order (e.g. increasing radiation dose → monotonically increasing tumour suppression; higher education → monotonically better survival). The 1-df test can be substantially more powerful than the \((l-1)\)-df omnibus test when the truth is indeed monotone.<br><br>
+      <strong>When the omnibus test has the advantage.</strong> When there is no natural ordering, or when the true alternative may be non-monotone (e.g. a U-shaped dose–response where moderate doses are beneficial but very high doses are harmful, or when survival curves cross between strata), the omnibus \(\chi^2_{l-1}\) test detects arbitrary patterns. Using the trend test in such cases would "miss" the non-monotone signal and lose power relative to the omnibus. The choice must be pre-specified based on the scientific question.
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Pre-specified Analysis Strategy</div>
+    <div class="question-stem">Design a pre-specified hypothesis testing strategy for a Phase III trial comparing a standard chemotherapy (Group 1) versus a checkpoint inhibitor immunotherapy (Group 2) in advanced non-small cell lung cancer. The follow-up is 3 years. Biological rationale suggests the immunotherapy will show no early benefit (0–6 months) but increasing benefit thereafter. Justify your weight function choice, state your \(H_0\) and \(H_1\) precisely, and discuss power implications.</div>
+    <button class="reveal-btn" id="rev_sa8" onclick="toggleAnswer('sa8')">▼ Reveal Answer</button>
+    <div class="answer-panel" id="ans_sa8">
+      <strong>Hypotheses.</strong>
+      \[H_0: h_1(t)=h_2(t)\;\forall t\leq 3\text{ years}\]
+      \[H_1: h_2(t)<h_1(t)\text{ for="" some="" }t\in(6\text{="" months},3\text{="" years}]\text{="" (immunotherapy="" reduces="" hazard="" late)}\]="" one-sided="" test="" at="" \(\alpha="0.025\)" (conventional="" confirmatory="" trials),="" or="" two-sided=""><br>
+      <strong>Weight function choice: Fleming–Harrington \(G(0,1)\).</strong> The weight \(w(Y_{(j)})=1-\hat{S}(Y_{(j-1)})\) is near zero early (when \(\hat{S}\approx1\)) and increases as the survival function falls — exactly aligned with the biological expectation. Pre-registering \(G(0,1)\) in the Statistical Analysis Plan (SAP) before database lock is mandatory.<br><br>
+      <strong>Power implications.</strong> Compared to the log-rank: the chosen weight will have substantially higher power if the delayed-effect assumption is correct, because it does not waste df on the early "null" period. Conversely, if the immunotherapy actually acts immediately (unexpectedly), the \(G(0,1)\) test will have lower power than the log-rank. This trade-off is unavoidable — optimal power is always conditional on the assumed alternative. Sensitivity analyses using both log-rank (\(G(0,0)\)) and \(G(0,1)\) should be pre-specified as secondary analyses, with the primary analysis based on the pre-specified \(G(0,1)\) only.
+    </h_1(t)\text{></div>
+  </div>
+
+</section><!-- end SA -->
+
+<script>
+/* ─── Explanations ─── */
+var expl = {
+  q1: "The one-sample log-rank uses <strong>w(t) = r(t)</strong> (risk set size). This leads to U = O − E and Var(U) = E, giving Z = (O−E)/√E. Note: the <em>two-sample</em> log-rank uses w = 1 (equal weight); the labelling is a common source of confusion.",
+  q2: "With w(t) = r(t), Var(U) = ∫r(s)h₀(s)/r(s)·r²(s) ds... simplifying: Var(U) = ∫r(s)h₀(s)ds = Σᵢ H₀(Yᵢ) = <strong>E</strong>. This enables Z = (O−E)/√E.",
+  q3: "z = (163 − 204.3)/√204.3 = −41.3/14.29 = <strong>−2.89</strong>. Negative value: fewer deaths than Exp(1000) predicts → patients survive <em>longer</em> than the null hypothesis. Two-sided p ≈ 0.004 → reject H₀.",
+  q4: "With p=1, q=0: w(t) = r(t)·S₀(t)¹·(1-S₀(t))⁰ = r(t)·S₀(t) — the <strong>one-sample Wilcoxon</strong>. Setting p=q=0 recovers the log-rank; Tarone–Ware uses √r(t); Peto–Peto is defined for two-sample comparison.",
+  q5: "Under H₀, events are allocated proportionally to risk-set sizes: E_j = d_(j)·r_(j)1/r_(j) by the hypergeometric mean. The discrepancy is d_(j)1 − d_(j)·r_(j)1/r_(j).",
+  q6: "Events are assigned among at-risk individuals <em>without replacement</em> (each person can die at most once at a given time). This sampling-without-replacement scheme from a finite population is the hypergeometric distribution. If events were independent Bernoulli trials (with replacement), we'd have binomial.",
+  q7: "Chisq = 16.8, p = 4×10⁻⁵ → <strong>reject H₀</strong>. Gender=1 (males): O = 101 &lt; E = 123.1 → <em>fewer</em> deaths than expected → <strong>better</strong> survival. The p-value is the probability of observing such extreme data <em>if H₀ were true</em>, not the probability that H₀ is true.",
+  q8: "The log-rank test equals the score test from the Cox PH model and is <strong>locally most powerful under proportional hazards</strong>: h₁(t)/h₂(t) = constant throughout follow-up. When the hazard ratio changes over time (non-PH) the log-rank may lose power.",
+  q9: "r_(j) is largest early (many at risk) and decreases monotonically, so <strong>early event times dominate</strong>. The key drawback: r_(j) is determined by the censoring pattern. Different censoring across studies means different weights, making Gehan statistics incomparable.",
+  q10: "Using r_(k)+1 gives <strong>better statistical properties</strong> for use as a weight (the modified KM is slightly conservative) and crucially makes the weight <em>less sensitive</em> to the censoring distribution, addressing Gehan's main weakness while retaining the early-emphasis character.",
+  q11: "In survdiff, rho = ρ in G(ρ,0). With <strong>rho=1</strong>: w = Ŝ¹·(1-Ŝ)⁰ = Ŝ_mod — the Peto–Peto weight. Since Ŝ is largest early, early differences receive more weight. rho=0 gives the log-rank (equal weight).",
+  q12: "Early in follow-up Ŝ ≈ 1, so (1-Ŝ)^q ≈ 0 — near-zero weight on early times. Late in follow-up Ŝ has fallen, so (1-Ŝ)^q approaches 1 — large weight on late times. This <strong>targets differences that emerge over time</strong>, such as delayed treatment effects.",
+  q13: "Since Σ Uₖ = 0, we drop one component and work with (l−1) = <strong>3</strong> linearly independent statistics. Under H₀: U^T Σ⁻¹ U ~ χ²_{l−1} = χ²₃ for l = 4.",
+  q14: "<strong>Σₖ Uₖ = 0 always</strong> — at each event time, O − E contributions sum to zero across groups. This makes the l×l covariance matrix rank-deficient (singular), so its inverse does not exist. We must drop one group to obtain an invertible (l−1)×(l−1) sub-matrix.",
+  q15: "Overall <strong>Chisq = 31.4 on df = l−1 = 2</strong>, p = 10⁻⁷ → reject H₀ overwhelmingly. Marital=3: O = 71 ≫ E = 41 → worst survival. Note: 3.71 + 9.24 + 30.69 = 43.64 ≠ 31.4, because (O-E)²/V ignores off-diagonal covariances when l > 2.",
+  q16: "Under H₁ with increasing hazard (higher group index = higher hazard), higher-indexed groups have more events than expected: U = Σcₖ Uₖ is large and <strong>positive</strong>. Reject H₀ for large positive Z — a one-sided right-tail test.",
+  q17: "The trend test uses <strong>1 df</strong> vs l−1 for omnibus, concentrating all power on the monotone direction. For truly monotone alternatives the trend test is substantially more powerful. For non-monotone alternatives (e.g. U-shaped, crossing hazards), the omnibus test may outperform it.",
+  q18: "O and E are computed <strong>within each stratum separately</strong> (using only within-stratum risk sets and event times), then summed: U_{k•} = Σ_b U_{kb}. This ensures the confounding variable is held constant throughout the comparison, analogous to a blocked experiment.",
+  q19: "Z = (D₁ − D₂)/√(D₁ + D₂) = (18 − 7)/√25 = <strong>11/5 = 2.20</strong>. Two-sided p = 2P(Z > 2.20) ≈ 0.028. Only the 25 informative pairs (D₁ + D₂) contribute; uninformative pairs are irrelevant.",
+  q20: "Within each pair-stratum of size 2, the weight-multiplied contributions reduce to ±½ per informative pair regardless of w. The weight cancels in both numerator and variance, giving <strong>Z = (D₁−D₂)/√(D₁+D₂)</strong> for any weight function.",
+  q21: "The log-rank test statistic equals the efficient score ∂ℓ/∂β|_{β=0} from the <strong>Cox partial likelihood</strong>, making it the most powerful test under proportional hazards. It has no direct connection to the AFT model, Weibull regression, or KM estimator in this way.",
+  q22: "Under a crossing-hazard alternative, early contributions to U = Σw(O_j − E_j) are positive (one group better) and late contributions are negative (the other group better), or vice versa. These <strong>cancel</strong>, pushing U towards zero and reducing power dramatically. Combination tests or 2-df approaches are preferable.",
+  q23: "O &lt; E means the group experienced <strong>fewer deaths</strong> than the equal-hazard null predicts → <strong>better survival</strong>. The contribution U_A = O − E is negative for Group A. Since Σ Uₖ = 0 exactly, Group B must have O &gt; E (worse survival).",
+  q24: "G(0,q): early, Ŝ ≈ 1 so (1−Ŝ)^q ≈ 0 — near-zero weight; later, Ŝ has fallen so (1−Ŝ)^q approaches 1 — large weight. This <strong>precisely targets the late event times</strong> where the immunotherapy benefit is expected. Log-rank and Gehan would dilute power with uninformative early times.",
+  q25: "Ŝ(1−Ŝ) is the product of two terms moving in opposite directions: Ŝ decreases from 1 to 0 while (1−Ŝ) increases from 0 to 1. The product is maximised at <strong>Ŝ = 0.5</strong>, i.e., around the median survival time, targeting middle-period differences.",
+  q26: "Σₖ Uₖ = 0 always → drop one component → work with (l−1) = <strong>4</strong> linearly independent statistics with a non-singular 4×4 covariance matrix. The null distribution is χ²₄.",
+  q27: "r(s) = Σᵢ 1{Yᵢ ≥ s}, so ∫r(s)h₀(s)ds = Σᵢ ∫₀^{Yᵢ} h₀(s)ds = Σᵢ H₀(Yᵢ). <strong>Each subject i contributes to r(s) exactly on [0, Yᵢ]</strong>, so their cumulative integral is precisely H₀(Yᵢ). This Fubini-type exchange of sum and integral is the key algebraic step.",
+  q28: "strata(Hospital) computes O and E within each hospital using only within-hospital risk sets, then pools. This <strong>allows each hospital its own baseline hazard</strong> and removes hospital as a confounder in the Treatment comparison — analogous to blocking in a randomised experiment. It does not estimate or test the hospital effect.",
+  q29: "D₁ counts pairs where the group-1 subject's event time is shorter; D₂ counts the reverse. If <strong>neither subject has yet failed</strong> (no within-pair event ordering is observable), the pair provides no information about which group dies first and contributes nothing to D₁ or D₂.",
+  q30: "Pre-specifying the weight function is required for valid inference. <strong>Selecting the weight post-hoc</strong> to maximise the test statistic exploits the observed pattern in the data — a form of p-hacking. Each individual test would be valid had it been pre-specified, but the implicit multiple testing inflates the Type I error far above the nominal α. A Bonferroni correction does not fix this because the optimisation is over a continuous family of tests."
+};
+
+var answered = {};
+var correctCount = 0;
+var totalQ = 30;
+
+function pick(btn, qId) {
+  if (answered.hasOwnProperty(qId)) return;
+  answered[qId] = true;
+  var card = btn.closest('.mcq-card');
+  var allBtns = card.querySelectorAll('.option-btn');
+  var isCorrect = (btn.dataset.correct === 'true');
+  allBtns.forEach(function(b){ b.disabled = true; });
+  if (isCorrect) {
+    btn.classList.add('correct');
+    correctCount++;
+  } else {
+    btn.classList.add('incorrect');
+    allBtns.forEach(function(b){
+      if (b.dataset.correct === 'true') b.classList.add('reveal-correct');
+    });
+  }
+  var fb = card.querySelector('.feedback-bar');
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.innerHTML = (isCorrect ? '✅ <strong>Correct!</strong> ' : '❌ <strong>Incorrect.</strong> ') + (expl[qId] || '');
+  fb.style.display = 'block';
+  updateScore();
+  if (typeof MathJax !== 'undefined') MathJax.typeset([fb]);
+}
+
+function updateScore() {
+  document.getElementById('scoreVal').textContent = correctCount;
+  document.getElementById('scoreTotal').textContent = totalQ;
+}
+
+function resetAll() {
+  answered = {};
+  correctCount = 0;
+  document.querySelectorAll('.option-btn').forEach(function(b){
+    b.disabled = false;
+    b.classList.remove('correct','incorrect','reveal-correct','selected');
+  });
+  document.querySelectorAll('.feedback-bar').forEach(function(fb){
+    fb.style.display = 'none';
+    fb.innerHTML = '';
+  });
+  updateScore();
+}
+
+function toggleAnswer(id) {
+  var panel = document.getElementById('ans_' + id);
+  var btn   = document.getElementById('rev_' + id);
+  var show  = (panel.style.display === 'none' || panel.style.display === '');
+  panel.style.display = show ? 'block' : 'none';
+  btn.textContent = show ? '▲ Hide Answer' : '▼ Reveal Answer';
+  if (show && typeof MathJax !== 'undefined') MathJax.typeset([panel]);
+}
+
+updateScore();
+</script>
+
+
+</body></html>

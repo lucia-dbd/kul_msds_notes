@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 2 – Nonparametric Estimation | Survival Analysis Review Notes</title>
+  <style>
+    :root {
+      --primary: #1a3a5c;
+      --accent: #2e7db8;
+      --accent2: #e8a020;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d0dce8;
+      --correct: #1e7e34;
+      --correct-bg: #d4edda;
+      --wrong: #a71d2a;
+      --wrong-bg: #f8d7da;
+      --neutral-bg: #eef4fb;
+      --text: #1c2a38;
+      --muted: #5a6a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+    header { background: var(--primary); color: #fff; padding: 28px 24px 20px; text-align: center; }
+    header h1 { font-size: 1.6rem; letter-spacing: 0.5px; }
+    header p { margin-top: 6px; color: #b8d0e8; font-size: 0.95rem; }
+    .toc-bar { background: var(--accent); display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 20px; justify-content: center; }
+    .toc-bar a { color: #fff; text-decoration: none; font-size: 0.82rem; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; transition: background 0.2s; }
+    .toc-bar a:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(30,60,100,0.06); }
+    .section-card h2 { color: var(--primary); font-size: 1.18rem; border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 16px; }
+    .section-card h3 { color: var(--accent); font-size: 1rem; margin: 18px 0 8px; }
+    .section-card p { margin-bottom: 10px; }
+    .key-box { background: var(--neutral-bg); border-left: 4px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+    .key-box strong { color: var(--primary); }
+    .warning-box { background: #fff8e8; border-left: 4px solid var(--accent2); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+    .formula-box { background: #f0f6ff; border: 1px solid #b0ccee; border-radius: 6px; padding: 14px 18px; margin: 14px 0; font-family: 'Courier New', monospace; font-size: 0.93rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.8; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag { background: var(--neutral-bg); color: var(--accent); border: 1px solid var(--accent); border-radius: 14px; padding: 2px 12px; font-size: 0.8rem; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem; }
+    th { background: var(--primary); color: #fff; padding: 8px 12px; text-align: left; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--neutral-bg); }
+    ul, ol { padding-left: 1.5rem; margin: 8px 0 10px; }
+    li { margin-bottom: 4px; }
+    .q-section h2 { color: var(--primary); font-size: 1.2rem; border-bottom: 2px solid var(--accent2); padding-bottom: 8px; margin-bottom: 20px; }
+    .question-block { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 4px rgba(30,60,100,0.05); }
+    .question-block .q-number { font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .question-block .q-text { font-weight: 600; color: var(--text); margin-bottom: 12px; line-height: 1.5; }
+    .r-output { background: #1e2a38; color: #c8dff0; font-family: 'Courier New', monospace; font-size: 0.83rem; padding: 12px 14px; border-radius: 6px; margin: 10px 0 14px; white-space: pre; overflow-x: auto; line-height: 1.6; }
+    .options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .option-btn { background: var(--neutral-bg); border: 1px solid var(--border); border-radius: 6px; padding: 9px 14px; text-align: left; cursor: pointer; font-size: 0.9rem; color: var(--text); transition: background 0.15s, border-color 0.15s; }
+    .option-btn:hover:not(:disabled) { background: #dceeff; border-color: var(--accent); }
+    .option-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); font-weight: 600; }
+    .option-btn.incorrect { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+    .option-btn:disabled { cursor: default; }
+    .reveal-btn { background: var(--accent2); color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: background 0.2s; letter-spacing: 0.3px; }
+    .reveal-btn:hover { background: #c8870f; }
+    .answer-box { display: none; background: var(--correct-bg); border: 1px solid var(--correct); border-radius: 6px; padding: 12px 16px; margin-top: 10px; font-size: 0.9rem; line-height: 1.6; }
+    .answer-box.shown { display: block; }
+    .answer-box strong { color: var(--correct); }
+    .feedback { display: none; margin-top: 10px; padding: 8px 14px; border-radius: 6px; font-size: 0.88rem; }
+    .feedback.correct-fb { display: block; background: var(--correct-bg); color: var(--correct); border: 1px solid var(--correct); }
+    .feedback.incorrect-fb { display: block; background: var(--wrong-bg); color: var(--wrong); border: 1px solid var(--wrong); }
+    .score-bar { background: var(--card); border: 2px solid var(--accent); border-radius: 10px; padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .score-bar span { font-size: 0.95rem; color: var(--muted); }
+    .score-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .reset-btn { background: var(--primary); color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .reset-btn:hover { background: #0f2540; }
+    .short-q { margin-bottom: 22px; }
+    .short-q .q-number { font-size: 0.75rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+    .short-q .q-text { font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    @media (max-width: 600px) { .container { padding: 16px 10px 50px; } .section-card { padding: 16px 14px; } header h1 { font-size: 1.2rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📐 Chapter 2 — Nonparametric Estimation</h1>
+  <p>Time-to-Event Analysis · G00L2a/b · KU Leuven · Ingrid Van Keilegom · 2025–2026</p>
+</header>
+
+<nav class="toc-bar">
+  <a href="#likelihood">Likelihood</a>
+  <a href="#km">Kaplan-Meier</a>
+  <a href="#redistrib">Redistribution</a>
+  <a href="#na">Nelson-Aalen</a>
+  <a href="#ci">Confidence Intervals</a>
+  <a href="#mean-median">Mean &amp; Median</a>
+  <a href="#truncation">Left Truncation</a>
+  <a href="#formulas">Formula Sheet</a>
+  <a href="#mcq">MCQ &amp; T/F</a>
+  <a href="#shortq">Short Answer</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section-card" id="likelihood">
+    <h2>2.1 Nonparametric Likelihood Functions</h2>
+    <p>All nonparametric estimators in this chapter are derived by maximising a <strong>nonparametric likelihood</strong> that correctly accounts for censoring and/or truncation. The key insight is to factorise the full likelihood and drop uninformative censoring terms.</p>
+
+    <h3>Likelihood for Right Censored Data</h3>
+    <p>For a random sample (Y<sub>i</sub>, δ<sub>i</sub>) with Y<sub>i</sub> = min(T<sub>i</sub>, C<sub>i</sub>), δ<sub>i</sub> = I(T<sub>i</sub> ≤ C<sub>i</sub>), and assuming <strong>uninformative (independent) censoring</strong>:</p>
+    <div class="formula-box">Full likelihood contribution:
+  event (δ=1):     (1−G(Yᵢ)) · f(Yᵢ)
+  censored (δ=0):  (1−F(Yᵢ)) · g(Yᵢ)
+
+Drop non-informative G and g terms → survival likelihood:
+
+L = ∏ᵢ f(Yᵢ)^δᵢ · S(Yᵢ)^(1−δᵢ)  =  ∏ᵢ h(Yᵢ)^δᵢ · S(Yᵢ)
+
+Equivalently:  L = ∏_{i∈D} f(Yᵢ)  ·  ∏_{i∈R} S(Yᵢ)
+  D = index set of event times
+  R = index set of right-censored times</div>
+    <div class="key-box">
+      <strong>Interpretation:</strong> An observed event at Y<sub>i</sub> contributes f(Y<sub>i</sub>) = h(Y<sub>i</sub>)·S(Y<sub>i</sub>); a censored observation contributes only S(Y<sub>i</sub>) = P(T > Y<sub>i</sub>). The censored value tells us only that the subject was still alive at Y<sub>i</sub>.
+    </div>
+
+    <h3>General Likelihood: All Censoring Types</h3>
+    <div class="formula-box">L = ∏_{i∈D} f(Yᵢ)  ·  ∏_{i∈R} S(Yᵢ)  ·  ∏_{i∈L} [1−S(Yᵢ)]  ·  ∏_{i∈I} [S(lᵢ)−S(rᵢ)]
+
+  D = exact event times          R = right-censored
+  L = left-censored              I = interval (lᵢ, rᵢ)</div>
+
+    <h3>Likelihood with Left Truncation</h3>
+    <p>If subject i is left-truncated at time a<sub>i</sub>, we condition on T ≥ a<sub>i</sub>, dividing each term by S(a<sub>i</sub>):</p>
+    <div class="formula-box">L = ∏_{i∈D} f(Yᵢ)/S(aᵢ)  ·  ∏_{i∈R} S(Yᵢ)/S(aᵢ)  ·  ∏_{i∈L} [S(aᵢ)−S(Yᵢ)]/S(aᵢ)  ·  ∏_{i∈I} [S(lᵢ)−S(rᵢ)]/S(aᵢ)
+
+Right truncation at bᵢ: replace S(aᵢ) with 1−S(bᵢ)</div>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section-card" id="km">
+    <h2>2.2 Kaplan-Meier Estimator</h2>
+    <p>The <strong>Kaplan-Meier (KM) estimator</strong> is the nonparametric MLE of S(t) for right-censored data. Proposed in the most-cited statistics paper of all time: Kaplan &amp; Meier (JASA, 1958) — ranked #1 among all statistics papers with over 25,000 citations.</p>
+
+    <h3>Notation</h3>
+    <div class="tag-list">
+      <span class="tag">Y₍₁₎ ≤ … ≤ Y₍ᵣ₎ : ordered event times</span>
+      <span class="tag">d₍ⱼ₎ : events at Y₍ⱼ₎</span>
+      <span class="tag">r₍ⱼ₎ : risk set size just before Y₍ⱼ₎</span>
+    </div>
+    <p><strong>Risk set r₍ⱼ₎</strong> = number of subjects who have not yet died and were not censored just before Y₍ⱼ₎.</p>
+
+    <h3>Formula (derived as MLE)</h3>
+    <div class="formula-box">Ŝ(t) = ∏_{j: Y₍ⱼ₎ ≤ t}  (r₍ⱼ₎ − d₍ⱼ₎) / r₍ⱼ₎  =  ∏_{j: Y₍ⱼ₎ ≤ t} (1 − d₍ⱼ₎/r₍ⱼ₎)
+
+Discrete hazard estimate at each event time: ĥ₍ⱼ₎ = d₍ⱼ₎/r₍ⱼ₎  (from MLE)</div>
+
+    <h3>Worked Example</h3>
+    <p>Data: Time = (2, 3, 5, 7, 8), Censor δ = (1, 0, 1, 1, 0)</p>
+    <table>
+      <thead><tr><th>Time</th><th>δ</th><th>d₍ⱼ₎</th><th>r₍ⱼ₎</th><th>(r−d)/r</th><th>Ŝ(t)</th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td>1</td><td>1</td><td>5</td><td>4/5 = 0.800</td><td><strong>0.800</strong></td></tr>
+        <tr><td>3</td><td>0</td><td>0</td><td>4</td><td>— (censored)</td><td>0.800</td></tr>
+        <tr><td>5</td><td>1</td><td>1</td><td>3</td><td>2/3 = 0.667</td><td><strong>0.533</strong></td></tr>
+        <tr><td>7</td><td>1</td><td>1</td><td>2</td><td>1/2 = 0.500</td><td><strong>0.267</strong></td></tr>
+        <tr><td>8</td><td>0</td><td>0</td><td>1</td><td>— (censored)</td><td>0.267</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Properties</h3>
+    <ul>
+      <li><strong>Step function:</strong> jumps only at event times; constant at censored times</li>
+      <li>Jumps grow larger as time increases (smaller risk set)</li>
+      <li><strong>Uncensored case:</strong> reduces to empirical survival function Ŝ(t) = (1/n)∑I(Yᵢ > t)</li>
+      <li>If largest observation is censored: Ŝ(t) never reaches 0 — three conventions: set to 0, hold constant, or leave undefined beyond Y<sub>n</sub></li>
+    </ul>
+
+    <div class="warning-box">
+      <strong>Key exam point:</strong> Ŝ(t) only steps down at event times. A censored observation at time t reduces the risk set for future events but does NOT cause a step in Ŝ(t). At time 3 (censored) and time 8 (censored) in the example above, Ŝ stays flat.
+    </div>
+
+    <h3>Greenwood's Variance Formula &amp; Asymptotic Normality</h3>
+    <div class="formula-box">V̂ₐₛ(Ŝ(t)) = Ŝ²(t) · ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / [r₍ⱼ₎ · (r₍ⱼ₎ − d₍ⱼ₎)]
+
+Asymptotic normality:
+  [Ŝ(t) − S(t)] / √V̂ₐₛ(Ŝ(t))  →  N(0, 1)</div>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section-card" id="redistrib">
+    <h2>2.3 Redistribution-to-the-Right Principle</h2>
+    <p>An alternative, intuitive algorithm to compute the KM estimator:</p>
+    <ol>
+      <li>Assign initial mass <strong>1/n</strong> to each of the n observations</li>
+      <li>Find the first censored observation; redistribute its mass equally among all observations to its right</li>
+      <li>Move to the next censored observation (using updated masses) and repeat</li>
+      <li>Continue until all censored observations have been processed</li>
+      <li>The accumulated masses at each event time equal the KM jump sizes</li>
+    </ol>
+    <div class="key-box">
+      <strong>Intuition:</strong> A censored individual's probability is "passed forward" to surviving subjects — it is not lost but reallocated to those still at risk. This shows that KM is a weighted empirical survival function where censored observations redistribute their weight rightward.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section-card" id="na">
+    <h2>2.4 Nelson-Aalen Estimator</h2>
+    <p>Proposed independently by Nelson (Technometrics, 1972) and Aalen (Annals of Statistics, 1978). Directly estimates the <strong>cumulative hazard H(t)</strong>.</p>
+
+    <div class="formula-box">Nelson-Aalen estimator:
+  Ĥ(t) = ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / r₍ⱼ₎       for t ≤ Y₍ᵣ₎
+
+Asymptotic variance:
+  V̂ₐₛ(Ĥ(t)) = ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / r²₍ⱼ₎
+
+Asymptotic normality:
+  [Ĥ(t) − H(t)] / √V̂ₐₛ(Ĥ(t))  →  N(0, 1)</div>
+
+    <h3>Alternative KM Estimator via Nelson-Aalen</h3>
+    <div class="formula-box">Ŝₐₗₜ(t) = exp(−Ĥ(t)) = ∏_{j: Y₍ⱼ₎ ≤ t} exp(−d₍ⱼ₎/r₍ⱼ₎)
+
+In R: stype=2 in survfit()</div>
+
+    <div class="key-box">
+      <strong>KM vs Nelson-Aalen based:</strong> Both are asymptotically equivalent. Ŝₐₗₜ(t) often performs better in <em>small samples</em> — since exp(−d/r) ≥ (r−d)/r, it gives slightly higher (less biased) survival estimates when sample sizes are small.
+    </div>
+
+    <h3>Worked Example</h3>
+    <p>Data: Time = (2, 3, 5, 7, 8), Censor = (1, 0, 1, 1, 0) — event times only:</p>
+    <table>
+      <thead><tr><th>Y₍ⱼ₎</th><th>d₍ⱼ₎</th><th>r₍ⱼ₎</th><th>d/r</th><th>Ĥ(t) cumulative</th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td>1</td><td>5</td><td>0.200</td><td>0.200</td></tr>
+        <tr><td>5</td><td>1</td><td>3</td><td>0.333</td><td>0.533</td></tr>
+        <tr><td>7</td><td>1</td><td>2</td><td>0.500</td><td>1.033</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section-card" id="ci">
+    <h2>2.5 Confidence Intervals for S(t)</h2>
+
+    <h3>Plain CI — conf.type = "plain" (not recommended)</h3>
+    <div class="formula-box">Ŝ(t) ± z_{α/2} · √V̂ₐₛ(Ŝ(t))
+
+Problem: may yield values outside [0, 1]</div>
+
+    <h3>Log-Log Transformation — conf.type = "log-log" ✓ preferred</h3>
+    <div class="formula-box">Transform: θ = log(−log S(t))   maps [0,1] → (−∞, +∞)
+
+Variance of log(−logŜ(t)):
+  V̂ₐₛ(log(−logŜ(t))) = (1/logŜ(t))² · ∑ d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎−d₍ⱼ₎)]
+
+CI on log-log scale: log(−logŜ(t)) ± z_{α/2} · √V̂ₐₛ
+
+Back-transform: Ŝ(t)^exp(+c) and Ŝ(t)^exp(−c)
+  where c = z_{α/2} · √V̂ₐₛ(log(−logŜ(t)))</div>
+    <div class="warning-box">
+      <strong>Why log-log is preferred:</strong> The transformation maps [0,1] to the whole real line, ensuring that after back-transformation, the CI bounds always lie within [0,1]. The plain CI can produce nonsensical negative lower bounds or upper bounds above 1.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section-card" id="mean-median">
+    <h2>2.6 Mean and Median Survival Estimation</h2>
+
+    <h3>Restricted Mean Survival Time</h3>
+    <p>Since E(T) = ∫₀^∞ S(t) dt, we plug in Ŝ(t). If the largest observation Y<sub>n</sub> is censored, Ŝ(t) is inconsistent in the right tail — two practical solutions:</p>
+    <div class="formula-box">Proposal 1 (upper limit = Yₙ):
+  μ̂_{Yₙ} = ∫₀^{Yₙ} Ŝ(t) dt     [assume event immediately after last censoring]
+
+Proposal 2 (user-defined upper limit tₘₐₓ):
+  μ̂_{tₘₐₓ} = ∫₀^{tₘₐₓ} Ŝ(t) dt  [Ŝ(t) = Ŝ(Yₙ) for Yₙ ≤ t ≤ tₘₐₓ]
+
+Variance:
+  V̂ₐₛ(μ̂_τ) = ∑ⱼ [∫_{Y₍ⱼ₎}^τ Ŝ(t)dt]² · d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎−d₍ⱼ₎)]
+
+95% CI: μ̂_τ ± 1.96·√V̂ₐₛ(μ̂_τ)
+
+R: print(fit, print.rmean=TRUE)           # τ = Yₙ
+   print(fit, print.rmean=TRUE, rmean=10) # τ = 10</div>
+    <div class="warning-box">
+      <strong>Important:</strong> Both estimators are <em>inconsistent</em> for the true mean μ. But given censoring in the right tail, no nonparametric method can do better. Always report which upper limit τ was used — it directly affects the estimate.
+    </div>
+
+    <h3>Quantile Estimation</h3>
+    <p>The median is preferred over the mean for skewed survival data. It can be consistently estimated when censoring is not too heavy.</p>
+    <div class="formula-box">p-th quantile estimator:
+  x̂ₚ = inf{ t : Ŝ(t) ≤ 1−p }
+     = smallest t at which Ŝ(t) drops to or below 1−p
+
+Median = x̂_{0.5} (smallest t with Ŝ(t) ≤ 0.5)
+
+CI for xₚ (inversion — avoids density estimation):
+  { t : |[Ŝ(t)−(1−p)] / √V̂ₐₛ(Ŝ(t))| ≤ z_{α/2} }
+
+R: quantile(fit, probs=c(0.10, 0.25, 0.50, 0.75, 0.90))</div>
+    <div class="key-box">
+      <strong>NA in quantile output:</strong> If Ŝ(t) never drops to 1−p (e.g., the curve stays above 0.1 for all observed t), the quantile is not estimable and R returns NA. Common for upper quantiles under heavy censoring.
+    </div>
+
+    <h3>Schizophrenia Example Summary (n = 280, 42% censored)</h3>
+    <table>
+      <thead><tr><th>Quantity</th><th>Estimate</th><th>95% CI</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>S(20 days)</td><td>0.964</td><td>[0.934, 0.980]</td><td>log-log CI</td></tr>
+        <tr><td>Restricted mean</td><td>978 days</td><td>[897, 1059]</td><td>τ = 1794</td></tr>
+        <tr><td>Median (50th pct)</td><td>933 days</td><td>[757, 1099]</td><td>—</td></tr>
+        <tr><td>10th percentile</td><td>136 days</td><td>[60, 198]</td><td>—</td></tr>
+        <tr><td>90th percentile</td><td>1794 days</td><td>[1784, NA]</td><td>Upper bound not estimable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 7 ===== -->
+  <div class="section-card" id="truncation">
+    <h2>2.7 Left Truncated &amp; Right Censored Data</h2>
+    <p>When subject i is left-truncated at L<sub>i</sub>, only those with T<sub>i</sub> ≥ L<sub>i</sub> enter the sample. The KM formula structure stays the same, but the risk set is redefined.</p>
+
+    <h3>Modified Risk Set</h3>
+    <div class="formula-box">r₍ⱼ₎ = #{ i : Lᵢ ≤ Y₍ⱼ₎ ≤ Yᵢ }
+= subjects under observation both before and up to event time Y₍ⱼ₎</div>
+
+    <h3>Lynden-Bell Estimator (1971)</h3>
+    <p>We can only estimate a <strong>conditional</strong> survival function Sₗ(t) = P(T > t | T ≥ l) for l ≤ min(L<sub>i</sub>):</p>
+    <div class="formula-box">Ŝₗ(t) = 1                                           if t < l
+       = ∏_{j: l ≤ Y₍ⱼ₎ ≤ t}  (1 − d₍ⱼ₎/r₍ⱼ₎)      if t ≥ l
+
+R: survfit(Surv(Trunc, Time, Censor) ~ 1)
+   [three-column Surv: left truncation time, event time, δ]</div>
+    <div class="key-box">
+      <strong>Impact of truncation:</strong> The modified risk set is smaller than in the non-truncated case (subjects with L<sub>i</sub> > Y₍ⱼ₎ are excluded), making estimates less precise with wider CIs. Compare Ŝ(2) = 0.800 without truncation vs Ŝ(2) = 0.500 with truncation times (0,0,2,3,5) in the slides example.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 8 ===== -->
+  <div class="section-card" id="formulas">
+    <h2>2.8 Formula Quick-Reference Sheet</h2>
+    <div class="formula-box">KAPLAN-MEIER
+─────────────────────────────────────────────────────────
+Ŝ(t) = ∏_{j: Y₍ⱼ₎ ≤ t}  (r₍ⱼ₎ − d₍ⱼ₎) / r₍ⱼ₎
+
+GREENWOOD'S VARIANCE
+─────────────────────────────────────────────────────────
+V̂ₐₛ(Ŝ(t)) = Ŝ²(t) · ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / [r₍ⱼ₎(r₍ⱼ₎ − d₍ⱼ₎)]
+
+NELSON-AALEN
+─────────────────────────────────────────────────────────
+Ĥ(t) = ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / r₍ⱼ₎
+V̂ₐₛ(Ĥ(t)) = ∑_{j: Y₍ⱼ₎ ≤ t}  d₍ⱼ₎ / r²₍ⱼ₎
+Ŝₐₗₜ(t) = exp(−Ĥ(t))
+
+LOG-LOG CONFIDENCE INTERVAL FOR S(t)
+─────────────────────────────────────────────────────────
+V̂ₐₛ(log(−logŜ(t))) = (1/logŜ(t))² · ∑ d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎ − d₍ⱼ₎)]
+CI: [ Ŝ(t)^exp(+c) ,  Ŝ(t)^exp(−c) ]
+  where c = z_{α/2} · √V̂ₐₛ(log(−logŜ(t)))
+
+RESTRICTED MEAN
+─────────────────────────────────────────────────────────
+μ̂_τ = ∫₀^τ Ŝ(t) dt
+V̂ₐₛ(μ̂_τ) = ∑ⱼ [∫_{Y₍ⱼ₎}^τ Ŝ(t)dt]² · d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎ − d₍ⱼ₎)]
+
+QUANTILE ESTIMATOR
+─────────────────────────────────────────────────────────
+x̂ₚ = inf{ t : Ŝ(t) ≤ 1 − p }     median: p = 0.5
+
+R COMMANDS
+─────────────────────────────────────────────────────────
+library(survival)
+fit  <- survfit(Surv(Time, Censor) ~ 1)               # KM (stype=1 default)
+fit  <- survfit(Surv(Time, Censor) ~ 1, stype=2)      # Nelson-Aalen based
+fit  <- survfit(Surv(Time, Censor) ~ 1, conf.type="log-log")
+summary(fit)
+print(fit, print.rmean=TRUE)
+print(fit, print.rmean=TRUE, rmean=tmax)
+quantile(fit, probs=c(0.10, 0.25, 0.50, 0.75, 0.90))
+# Left truncation:
+fit5 <- survfit(Surv(Trunc, Time, Censor) ~ 1)</div>
+  </div>
+
+  <!-- ===== MCQ SECTION ===== -->
+  <div class="section-card q-section" id="mcq">
+    <h2>🎯 Multiple Choice, True/False &amp; Calculation Questions (30 Questions)</h2>
+
+    <div class="score-bar">
+      <div><span>Score: </span><span class="score-val" id="scoreDisplay">0 / 30</span></div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block" data-q="1">
+      <div class="q-number">Question 1 · Multiple Choice</div>
+      <div class="q-text">What does the Kaplan-Meier estimator Ŝ(t) look like as a function of time?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) A smooth continuous curve decreasing from 1 to 0</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) A right-continuous step function that jumps downward only at observed event times</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) A step function that jumps at both event times and censoring times</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) A piecewise linear function connecting the event times</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" data-q="2">
+      <div class="q-number">Question 2 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In the nonparametric survival likelihood, a right-censored observation at time Yᵢ contributes f(Yᵢ) to the likelihood.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" data-q="3">
+      <div class="q-number">Question 3 · Multiple Choice</div>
+      <div class="q-text">In the KM worked example (Time = 2,3,5,7,8; Censor = 1,0,1,1,0), what is Ŝ(4)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.667</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) 0.533</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 0.800</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.400</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" data-q="4">
+      <div class="q-number">Question 4 · True / False</div>
+      <div class="q-text">TRUE or FALSE: If the largest observation in a dataset is right-censored, the Kaplan-Meier estimator will necessarily reach 0.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" data-q="5">
+      <div class="q-number">Question 5 · Multiple Choice</div>
+      <div class="q-text">The Greenwood formula estimates the variance of Ŝ(t) as:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Ŝ(t) · ∑ d₍ⱼ₎/r₍ⱼ₎</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Ŝ²(t) · ∑ d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎ − d₍ⱼ₎)]</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) ∑ d₍ⱼ₎/r²₍ⱼ₎</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Ŝ²(t) · ∑ d₍ⱼ₎/r²₍ⱼ₎</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" data-q="6">
+      <div class="q-number">Question 6 · Multiple Choice</div>
+      <div class="q-text">The Nelson-Aalen estimator directly estimates:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The survival function S(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) The hazard function h(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The cumulative hazard function H(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The mean residual life function mrl(t)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" data-q="7">
+      <div class="q-number">Question 7 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The plain (untransformed) confidence interval for S(t) is always preferred over the log-log transformed CI because it has a simpler formula.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" data-q="8">
+      <div class="q-number">Question 8 · Multiple Choice</div>
+      <div class="q-text">In R, what does stype=2 in survfit() produce?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The standard Kaplan-Meier estimator</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The alternative survival estimator based on exp(−Nelson-Aalen)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) A parametric exponential survival curve</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) A log-log transformed KM curve</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" data-q="9">
+      <div class="q-number">Question 9 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Kaplan-Meier estimator is the nonparametric maximum likelihood estimator of the survival function for right-censored data.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" data-q="10">
+      <div class="q-number">Question 10 · Multiple Choice</div>
+      <div class="q-text">In the redistribution-to-the-right principle, what happens to the mass of a censored observation?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) It is discarded from the analysis</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) It is redistributed equally to all other observations</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) It is redistributed equally to all observations to its right</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) It is added to the mass of the nearest event time</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-block" data-q="11">
+      <div class="q-number">Question 11 · Multiple Choice</div>
+      <div class="q-text">Which contribution does a left-censored observation at time Yᵢ make to the general nonparametric likelihood?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) S(Yᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) f(Yᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) 1 − S(Yᵢ) = F(Yᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) S(lᵢ) − S(rᵢ)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-block" data-q="12">
+      <div class="q-number">Question 12 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The alternative KM estimator Ŝₐₗₜ(t) = exp(−Ĥ(t)) is asymptotically equivalent to the standard KM estimator Ŝ(t), but performs better in small samples.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-block" data-q="13">
+      <div class="q-number">Question 13 · Multiple Choice</div>
+      <div class="q-text">How is the pth quantile x̂ₚ estimated from the KM curve?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The largest t for which Ŝ(t) ≥ 1 − p</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The smallest t for which Ŝ(t) ≤ 1 − p</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The t at which Ŝ(t) = p</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The value where h(t) equals p</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-block" data-q="14">
+      <div class="q-number">Question 14 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The restricted mean estimator μ̂_τ is a consistent estimator of the true mean E(T).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-block" data-q="15">
+      <div class="q-number">Question 15 · Multiple Choice</div>
+      <div class="q-text">In the Schizophrenia study (n = 280), what is the censoring rate?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 58.2% (163/280)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 41.8% (117/280)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 70.7%</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 28.0%</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-block" data-q="16">
+      <div class="q-number">Question 16 · Multiple Choice</div>
+      <div class="q-text">When computing the KM estimator with left truncation, the risk set r₍ⱼ₎ at event time Y₍ⱼ₎ includes:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) All n subjects in the study</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) All subjects who have not yet experienced the event</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Subjects i with Lᵢ ≤ Y₍ⱼ₎ ≤ Yᵢ (under observation before and up to Y₍ⱼ₎)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Subjects who entered the study at exactly time Y₍ⱼ₎</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-block" data-q="17">
+      <div class="q-number">Question 17 · True / False</div>
+      <div class="q-text">TRUE or FALSE: An interval-censored observation (lᵢ, rᵢ) contributes S(lᵢ) − S(rᵢ) to the general nonparametric likelihood.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-block" data-q="18">
+      <div class="q-number">Question 18 · Multiple Choice</div>
+      <div class="q-text">Why is the median preferred over the mean for summarising survival data?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The median is always larger than the mean in survival analysis</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) The median can always be estimated consistently regardless of censoring</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Survival data are often right-skewed and censoring makes the mean hard to estimate consistently; the median is robust to both</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The median requires no assumptions about the survival distribution</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-block" data-q="19">
+      <div class="q-number">Question 19 · Multiple Choice</div>
+      <div class="q-text">In the general likelihood with left truncation at aᵢ, the contribution of a right-censored subject is:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) S(Yᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) f(Yᵢ)/S(aᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) S(Yᵢ)/S(aᵢ)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) [S(aᵢ) − S(Yᵢ)]/S(aᵢ)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-block" data-q="20">
+      <div class="q-number">Question 20 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Kaplan-Meier paper (1958) is the most-cited paper in all of statistics, with over 25,000 citations.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q21 CALCULATION -->
+    <div class="question-block" data-q="21">
+      <div class="q-number">Question 21 · Calculation</div>
+      <div class="q-text">Using the worked example (Time=2,3,5,7,8; Censor=1,0,1,1,0), compute the Nelson-Aalen estimate Ĥ(5).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.200</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 0.533</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.333</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1.033</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q22 CALCULATION -->
+    <div class="question-block" data-q="22">
+      <div class="q-number">Question 22 · Calculation</div>
+      <div class="q-text">Using Greenwood's formula for the worked example, compute V̂ₐₛ(Ŝ(5)) given Ŝ(5) = 0.533, d₍₁₎=1, r₍₁₎=5, d₍₂₎=1, r₍₂₎=3.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.0284</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 0.0616</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.1000</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 0.0444</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q23 CALCULATION -->
+    <div class="question-block" data-q="23">
+      <div class="q-number">Question 23 · Calculation</div>
+      <div class="q-text">Using the example data, what is the KM estimate of the median survival time (i.e., x̂_{0.5})?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) t = 5 (Ŝ(5) = 0.533)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) t = 7 (Ŝ(7) = 0.267 ≤ 0.5; first time Ŝ drops to or below 0.5)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) t = 2 (first event time)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The median cannot be estimated because the curve never reaches 0.5</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q24 CALCULATION -->
+    <div class="question-block" data-q="24">
+      <div class="q-number">Question 24 · Calculation</div>
+      <div class="q-text">For the Schizophrenia study (n=280), the restricted mean was 978 days with se = 41.5. What is the 95% CI for the mean?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) [936.5, 1019.5]</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) [897, 1059]</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) [757, 1099]</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) [933, 1023]</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q25 CALCULATION -->
+    <div class="question-block" data-q="25">
+      <div class="q-number">Question 25 · Calculation</div>
+      <div class="q-text">In the truncation example, truncation times are (0,0,2,3,5) and event times are (2,3,5,7,8). What is r₍ⱼ₎ at event time Y₍ⱼ₎ = 5?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 3 (as in the non-truncated case)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 2 (subjects with Lᵢ ≤ 5 ≤ Yᵢ: those with truncation times 0,0 and event/censor times ≥ 5)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 5 (all subjects)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q26 R OUTPUT -->
+    <div class="question-block" data-q="26">
+      <div class="q-number">Question 26 · R Output Interpretation</div>
+      <div class="q-text">Interpret the following R output. What does the "survival" value of 0.533 at time 5 represent?</div>
+      <div class="r-output"> time n.risk n.event survival std.err lower 95% CI upper 95% CI
+    2      5       1    0.800   0.179           0.516            1
+    5      3       1    0.533   0.248           0.214            1
+    7      2       1    0.267   0.226           0.051            1</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 53.3% of subjects experienced the event by time 5</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The estimated probability of surviving beyond time 5 is 53.3%</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 53.3% of subjects were at risk at time 5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The hazard rate at time 5 is 0.533</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q27 R OUTPUT -->
+    <div class="question-block" data-q="27">
+      <div class="q-number">Question 27 · R Output Interpretation</div>
+      <div class="q-text">In the same R output above, why does the upper 95% CI show "1" at all three time points?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) There is a coding error in R — the CI should never equal 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) With only 5 subjects, the sample is very small; the CI is wide and the plain upper bound is truncated at 1 (the maximum possible survival probability)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The log-log transformation forces the upper CI to 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) It means all subjects are still alive at the upper bound</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q28 R OUTPUT -->
+    <div class="question-block" data-q="28">
+      <div class="q-number">Question 28 · R Output Interpretation</div>
+      <div class="q-text">Interpret this output from the Schizophrenia KM analysis:</div>
+      <div class="r-output">     n events rmean* se(rmean) median 0.95LCL 0.95UCL
+[1,] 280    163    978      41.5    933     757    1099
+     * restricted mean with upper limit = 1794</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The mean survival is 933 days and the median is 978 days</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The restricted mean survival is 978 days (upper limit 1794); median is 933 days with 95% CI [757, 1099]</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) All 280 patients survived to 978 days</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The study followed patients for 1794 days and all had the event</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q29 R OUTPUT -->
+    <div class="question-block" data-q="29">
+      <div class="q-number">Question 29 · R Output Interpretation</div>
+      <div class="q-text">In the quantile output below, why do the 75th and 90th percentile upper CI bounds show NA?</div>
+      <div class="r-output">$quantile
+ 10  25  50  75  90
+  2   5   7  NA  NA
+
+$upper
+ 10  25  50  75  90
+ NA  NA  NA  NA  NA</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The data were entered incorrectly</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Those percentiles are below 0 and cannot be estimated</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The KM curve never drops to 1−p for p = 0.75 and 0.90; with heavy censoring and small samples, the upper tails cannot be estimated</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) NA means those percentiles equal zero</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q30 R OUTPUT -->
+    <div class="question-block" data-q="30">
+      <div class="q-number">Question 30 · R Output Interpretation</div>
+      <div class="q-text">The following R code fits the KM estimator with left truncation. What does the three-column Surv object represent?</div>
+      <div class="r-output">> Trunc = c(0,0,2,3,5)
+> fit5 = survfit(Surv(Trunc, Time, Censor) ~ 1)
+> summary(fit5)
+ time n.risk n.event survival std.err lower 95% CI upper 95% CI
+    2      2       1    0.500   0.354       0.1250            1
+    5      2       1    0.250   0.250       0.0352            1
+    7      2       1    0.125   0.153       0.0113            1</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Three separate studies being compared simultaneously</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Start time, end time, and group variable for stratified analysis</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Left truncation time, observed time (event or censoring), and censoring indicator δ — needed to correctly define the risk set under truncation</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Minimum, maximum, and mean survival for each subject</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+  </div><!-- end MCQ section -->
+
+  <!-- ===== SHORT ANSWER SECTION ===== -->
+  <div class="section-card q-section" id="shortq">
+    <h2>✍️ Short Answer Questions</h2>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 1</div>
+      <div class="q-text">Derive the Kaplan-Meier estimator from first principles. Starting from the nonparametric log-likelihood for right-censored data, show why the MLE takes the product-limit form Ŝ(t) = ∏_{j: Y₍ⱼ₎ ≤ t} (1 − d₍ⱼ₎/r₍ⱼ₎).</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Step 1 — Log-likelihood:</strong><br>
+        For right-censored data with uninformative censoring:<br>
+        log L = ∑ᵢ [δᵢ log f(Yᵢ) + (1−δᵢ) log S(Yᵢ)]<br><br>
+        <strong>Step 2 — Nonparametric substitution:</strong><br>
+        Replace f(Yᵢ) = S(Yᵢ⁻) − S(Yᵢ), the mass placed at Yᵢ. It can be shown that the maximiser over all distributions must be a step function placing mass only at observed event times. Writing Ŝ(t) = ∏_{j: Y₍ⱼ₎ ≤ t} (1 − h₍ⱼ₎) for some jump sizes h₍ⱼ₎, the log-likelihood becomes:<br>
+        log L = ∑ⱼ [d₍ⱼ₎ log h₍ⱼ₎ + (r₍ⱼ₎ − d₍ⱼ₎) log(1 − h₍ⱼ₎)]<br><br>
+        <strong>Step 3 — MLE for each h₍ⱼ₎:</strong><br>
+        Differentiating with respect to each h₍ⱼ₎ and setting to zero:<br>
+        d/dh₍ⱼ₎ log L = d₍ⱼ₎/h₍ⱼ₎ − (r₍ⱼ₎ − d₍ⱼ₎)/(1 − h₍ⱼ₎) = 0<br>
+        ⟹ ĥ₍ⱼ₎ = d₍ⱼ₎/r₍ⱼ₎<br><br>
+        <strong>Step 4 — Plug in:</strong><br>
+        Ŝ(t) = ∏_{j: Y₍ⱼ₎ ≤ t} (1 − ĥ₍ⱼ₎) = ∏_{j: Y₍ⱼ₎ ≤ t} (r₍ⱼ₎ − d₍ⱼ₎)/r₍ⱼ₎   ✓
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 2</div>
+      <div class="q-text">Explain the redistribution-to-the-right principle and use it to compute the KM estimator for the example data: Time = (2, 3, 5, 7, 8), Censor = (1, 0, 1, 1, 0). Verify your answer matches the formula-based calculation.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Algorithm:</strong> Each observation starts with mass 1/5 = 0.2. Process censored observations in time order, redistributing their mass equally to all observations to their right.<br><br>
+        <strong>Initial masses:</strong> t=2: 0.2, t=3: 0.2, t=5: 0.2, t=7: 0.2, t=8: 0.2<br><br>
+        <strong>t=3 is censored:</strong> Its mass 0.2 is redistributed to t=5, t=7, t=8 (3 observations to the right), adding 0.2/3 ≈ 0.0667 each.<br>
+        Updated masses: t=2: 0.2, t=5: 0.2667, t=7: 0.2667, t=8: 0.2667<br><br>
+        <strong>t=8 is censored:</strong> Its updated mass 0.2667 is redistributed — but there are no observations to its right. Under the convention that Ŝ(Yₙ) stays at its last value, this mass is simply not redistributed further.<br><br>
+        <strong>Final masses at event times:</strong> t=2: 0.200, t=5: 0.2667, t=7: 0.2667<br><br>
+        <strong>KM via redistribution:</strong><br>
+        Ŝ(2) = 1 − 0.200 = 0.800 ✓<br>
+        Ŝ(5) = 0.800 − 0.2667 = 0.533 ✓<br>
+        Ŝ(7) = 0.533 − 0.2667 = 0.267 ✓<br><br>
+        These match exactly the formula-based values from the table.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 3</div>
+      <div class="q-text">Why is the log-log transformation preferred over the plain (untransformed) approach when constructing confidence intervals for S(t)? Describe the transformation, its variance, and the back-transformation step to obtain the CI for S(t).</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Problem with the plain CI:</strong><br>
+        The plain CI Ŝ(t) ± z_{α/2}√V̂ₐₛ(Ŝ(t)) is symmetric around Ŝ(t) and can produce values outside [0,1], e.g., a negative lower bound when Ŝ(t) is close to 0, or an upper bound above 1 when Ŝ(t) is close to 1. Survival probabilities must lie in [0,1], so this is mathematically inadmissible.<br><br>
+        <strong>Log-log transformation:</strong><br>
+        Define θ(t) = log(−log S(t)). This maps S(t) ∈ (0,1) to θ(t) ∈ (−∞, +∞), so a CI on the θ-scale can take any real value and will always back-transform to [0,1].<br><br>
+        <strong>Variance of log(−logŜ(t)):</strong><br>
+        By the delta method:<br>
+        V̂ₐₛ(log(−logŜ(t))) = (1/logŜ(t))² · ∑ d₍ⱼ₎/[r₍ⱼ₎(r₍ⱼ₎ − d₍ⱼ₎)]<br><br>
+        <strong>CI on log-log scale:</strong><br>
+        log(−logŜ(t)) ± z_{α/2} · √V̂ₐₛ(log(−logŜ(t)))<br><br>
+        <strong>Back-transformation:</strong><br>
+        If the CI on the log-log scale is (L, U), then:<br>
+        CI for S(t): (exp(−exp(U)), exp(−exp(L))) = (Ŝ(t)^exp(c), Ŝ(t)^exp(−c))<br>
+        where c = z_{α/2}·√V̂ₐₛ. This always lies in [0,1]. In R: conf.type="log-log".
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 4</div>
+      <div class="q-text">Describe how the presence of left truncation changes the Kaplan-Meier estimation procedure. What can and cannot be estimated? Use the slides example (truncation times = 0,0,2,3,5; event times = 2,3,5,7,8) to illustrate the impact on the risk set and the resulting estimates.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>What changes:</strong> With left truncation at Lᵢ, subject i only enters the risk set at times ≥ Lᵢ. Subjects with Lᵢ > Y₍ⱼ₎ are NOT at risk at event time Y₍ⱼ₎ — they haven't entered the study yet.<br><br>
+        <strong>New risk set:</strong> r₍ⱼ₎ = #{i : Lᵢ ≤ Y₍ⱼ₎ ≤ Yᵢ}<br><br>
+        <strong>What can be estimated:</strong> Only a conditional survival function Sₗ(t) = P(T > t | T ≥ l) for l ≤ min(Lᵢ). The unconditional S(t) is not identifiable from truncated data alone.<br><br>
+        <strong>Illustration:</strong><br>
+        Truncation times Lᵢ = (0,0,2,3,5); Times Yᵢ = (2,3,5,7,8); Censor = (1,0,1,1,0)<br><br>
+        At event time Y₍₁₎ = 2: Risk set = {i : Lᵢ ≤ 2 ≤ Yᵢ} = {subjects 1,2} → r₍₁₎ = 2<br>
+        Compare: without truncation, r₍₁₎ = 5<br><br>
+        Result: Ŝₗ(2) = (2−1)/2 = 0.500 vs Ŝ(2) = 0.800 without truncation.<br><br>
+        The survival estimates are lower and standard errors are much wider (see: std.err = 0.354 at t=2 with truncation vs 0.179 without). This makes intuitive sense: fewer subjects are effectively at risk early in the study when truncation times are non-zero.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 5</div>
+      <div class="q-text">Compare and contrast the Kaplan-Meier estimator Ŝ(t) and the Nelson-Aalen based estimator Ŝₐₗₜ(t) = exp(−Ĥ(t)). What are their similarities and differences? Under what circumstances should Ŝₐₗₜ(t) be preferred, and why?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Similarities:</strong>
+        <ul style="margin-top:6px;">
+          <li>Both are nonparametric step-function estimators of S(t)</li>
+          <li>Both are derived from the same underlying data (Y<sub>i</sub>, δᵢ)</li>
+          <li>Both are asymptotically equivalent: for large n, they converge to the same limit S(t)</li>
+          <li>Both produce the same qualitative features: steps at event times only, correct handling of censoring</li>
+        </ul>
+        <strong>Differences:</strong>
+        <ul style="margin-top:6px;">
+          <li>KM is derived as the nonparametric MLE directly maximising the log-likelihood; NA-based uses the relation S(t) = exp(−H(t))</li>
+          <li>KM uses (r−d)/r at each step; NA-based uses exp(−d/r) — since exp(−x) ≥ 1−x for x > 0, we always have Ŝₐₗₜ(t) ≥ Ŝ(t)</li>
+          <li>For large r₍ⱼ₎ (small d/r), exp(−d/r) ≈ 1−d/r, so both are very similar</li>
+        </ul>
+        <strong>When Ŝₐₗₜ(t) is preferred:</strong><br>
+        In small samples, Ŝ(t) can be downward biased — particularly when the risk set is small (d/r is not small). Since Ŝₐₗₜ(t) ≥ Ŝ(t) always, it provides a slightly higher and often less biased estimate in small-sample scenarios. Simulation studies have shown better finite-sample performance for Ŝₐₗₜ(t). In R: use stype=2 in survfit().
+      </div>
+    </div>
+
+  </div><!-- end short answer section -->
+
+</div><!-- end container -->
+
+<script>
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+
+  function checkAnswer(btn, isCorrect) {
+    const block = btn.closest('.question-block');
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const allBtns = block.querySelectorAll('.option-btn');
+    allBtns.forEach(b => { b.disabled = true; });
+
+    const feedback = block.querySelector('.feedback');
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'feedback correct-fb';
+      totalCorrect++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b => {
+        if (b.onclick.toString().includes('true')) b.classList.add('correct');
+      });
+      feedback.textContent = '✗ Incorrect. The highlighted option is correct.';
+      feedback.className = 'feedback incorrect-fb';
+    }
+
+    totalAnswered++;
+    updateScore();
+  }
+
+  function updateScore() {
+    document.getElementById('scoreDisplay').textContent = totalCorrect + ' / 30';
+  }
+
+  function toggleAnswer(btn) {
+    const answerBox = btn.nextElementSibling;
+    if (answerBox.classList.contains('shown')) {
+      answerBox.classList.remove('shown');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      answerBox.classList.add('shown');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  function resetAll() {
+    const blocks = document.querySelectorAll('.question-block');
+    blocks.forEach(block => {
+      delete block.dataset.answered;
+      const btns = block.querySelectorAll('.option-btn');
+      btns.forEach(b => { b.disabled = false; b.classList.remove('correct', 'incorrect'); });
+      const feedback = block.querySelector('.feedback');
+      feedback.className = 'feedback';
+      feedback.textContent = '';
+    });
+    totalAnswered = 0;
+    totalCorrect = 0;
+    updateScore();
+  }
+</script>
+</body>
+</html>

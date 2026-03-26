@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chapter 1 – Basic Concepts | Survival Analysis Review Notes</title>
+  <style>
+    :root {
+      --primary: #1a3a5c;
+      --accent: #2e7db8;
+      --accent2: #e8a020;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --border: #d0dce8;
+      --correct: #1e7e34;
+      --correct-bg: #d4edda;
+      --wrong: #a71d2a;
+      --wrong-bg: #f8d7da;
+      --neutral-bg: #eef4fb;
+      --text: #1c2a38;
+      --muted: #5a6a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 24px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.6rem; letter-spacing: 0.5px; }
+    header p { margin-top: 6px; color: #b8d0e8; font-size: 0.95rem; }
+    .toc-bar {
+      background: var(--accent);
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 10px 20px; justify-content: center;
+    }
+    .toc-bar a {
+      color: #fff; text-decoration: none; font-size: 0.82rem;
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px; border-radius: 20px;
+      transition: background 0.2s;
+    }
+    .toc-bar a:hover { background: rgba(255,255,255,0.3); }
+    .container { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px rgba(30,60,100,0.06);
+    }
+    .section-card h2 {
+      color: var(--primary);
+      font-size: 1.18rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section-card h3 {
+      color: var(--accent);
+      font-size: 1rem;
+      margin: 18px 0 8px;
+    }
+    .section-card p { margin-bottom: 10px; }
+    .key-box {
+      background: var(--neutral-bg);
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .key-box strong { color: var(--primary); }
+    .warning-box {
+      background: #fff8e8;
+      border-left: 4px solid var(--accent2);
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      margin: 12px 0;
+    }
+    .formula-box {
+      background: #f0f6ff;
+      border: 1px solid #b0ccee;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.93rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+    .tag {
+      background: var(--neutral-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 2px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    table {
+      width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.9rem;
+    }
+    th {
+      background: var(--primary); color: #fff;
+      padding: 8px 12px; text-align: left;
+    }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:nth-child(even) td { background: var(--neutral-bg); }
+    ul, ol { padding-left: 1.5rem; margin: 8px 0 10px; }
+    li { margin-bottom: 4px; }
+
+    /* ===== QUIZ ===== */
+    .q-section h2 {
+      color: var(--primary);
+      font-size: 1.2rem;
+      border-bottom: 2px solid var(--accent2);
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+    }
+    .question-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px rgba(30,60,100,0.05);
+    }
+    .question-block .q-number {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+    .question-block .q-text {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .r-output {
+      background: #1e2a38;
+      color: #c8dff0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.83rem;
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin: 10px 0 14px;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    .options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .option-btn {
+      background: var(--neutral-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 14px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: #dceeff; border-color: var(--accent);
+    }
+    .option-btn.correct {
+      background: var(--correct-bg); border-color: var(--correct);
+      color: var(--correct); font-weight: 600;
+    }
+    .option-btn.incorrect {
+      background: var(--wrong-bg); border-color: var(--wrong);
+      color: var(--wrong);
+    }
+    .option-btn:disabled { cursor: default; }
+    .reveal-btn {
+      background: var(--accent2);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .reveal-btn:hover { background: #c8870f; }
+    .answer-box {
+      display: none;
+      background: var(--correct-bg);
+      border: 1px solid var(--correct);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .answer-box.shown { display: block; }
+    .answer-box strong { color: var(--correct); }
+    .feedback {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+    .feedback.correct-fb {
+      display: block;
+      background: var(--correct-bg);
+      color: var(--correct);
+      border: 1px solid var(--correct);
+    }
+    .feedback.incorrect-fb {
+      display: block;
+      background: var(--wrong-bg);
+      color: var(--wrong);
+      border: 1px solid var(--wrong);
+    }
+    .score-bar {
+      background: var(--card);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .score-bar span { font-size: 0.95rem; color: var(--muted); }
+    .score-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+    .reset-btn {
+      background: var(--primary); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 8px 20px; font-size: 0.85rem;
+      cursor: pointer; font-weight: 600;
+    }
+    .reset-btn:hover { background: #0f2540; }
+    .short-q { margin-bottom: 22px; }
+    .short-q .q-number {
+      font-size: 0.75rem; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+    }
+    .short-q .q-text { font-weight: 600; margin-bottom: 10px; line-height: 1.5; }
+    @media (max-width: 600px) {
+      .container { padding: 16px 10px 50px; }
+      .section-card { padding: 16px 14px; }
+      header h1 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📊 Chapter 1 — Basic Concepts in Survival Analysis</h1>
+  <p>Time-to-Event Analysis · G00L2a/b · KU Leuven · Ingrid Van Keilegom · 2025–2026</p>
+</header>
+
+<nav class="toc-bar">
+  <a href="#whatis">What Is Survival Analysis?</a>
+  <a href="#functions">Key Functions</a>
+  <a href="#censoring">Censoring</a>
+  <a href="#truncation">Truncation</a>
+  <a href="#datasets">Datasets</a>
+  <a href="#formulas">Formula Sheet</a>
+  <a href="#mcq">MCQ &amp; T/F</a>
+  <a href="#shortq">Short Answer</a>
+</nav>
+
+<div class="container">
+
+  <!-- ===== SECTION 1 ===== -->
+  <div class="section-card" id="whatis">
+    <h2>1.1 What is Survival Analysis?</h2>
+    <p><strong>Survival analysis</strong> (also known as <em>duration analysis</em> in economics and <em>reliability analysis</em> in engineering) is an area of statistics that models and studies the <strong>time until an event of interest</strong> occurs.</p>
+
+    <h3>Why Standard Regression is Insufficient</h3>
+    <p>For some subjects the event of interest cannot be observed for various reasons:</p>
+    <ul>
+      <li>The event has not yet occurred at the <strong>end of the study</strong></li>
+      <li>A different event occurs <strong>before</strong> the event of interest (competing event)</li>
+      <li>A subject <strong>withdraws</strong> or is lost to follow-up</li>
+    </ul>
+    <div class="key-box">
+      <strong>Goal of survival analysis:</strong> To model time-to-event data appropriately, and to make correct inference that accounts for these special features (censoring, truncation) — which standard regression methods ignore.
+    </div>
+
+    <h3>Fields and Terminology</h3>
+    <div class="tag-list">
+      <span class="tag">Medicine: Survival Analysis</span>
+      <span class="tag">Economics: Duration Analysis</span>
+      <span class="tag">Engineering: Reliability Analysis</span>
+      <span class="tag">Agriculture</span>
+      <span class="tag">Sociology</span>
+    </div>
+
+    <table>
+      <thead><tr><th>Field</th><th>Typical Event of Interest</th></tr></thead>
+      <tbody>
+        <tr><td>Medicine</td><td>Death, relapse, time to cure from a disease</td></tr>
+        <tr><td>Sociology (duration analysis)</td><td>Time to find new job, time to re-arrest after release</td></tr>
+        <tr><td>Engineering (reliability)</td><td>Time to failure of a machine or component</td></tr>
+        <tr><td>Agriculture</td><td>Time until a farm's first case of a disease</td></tr>
+        <tr><td>Finance</td><td>Time to default on a credit</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 2 ===== -->
+  <div class="section-card" id="functions">
+    <h2>1.2 Common Functions in Survival Analysis</h2>
+    <p>Let <em>T</em> be a non-negative continuous random variable representing the time until the event of interest. Knowing <em>any one</em> of the five functions below is sufficient to determine all others.</p>
+
+    <div class="tag-list">
+      <span class="tag">Survival Function S(t)</span>
+      <span class="tag">Cumulative Hazard H(t)</span>
+      <span class="tag">Hazard Function h(t)</span>
+      <span class="tag">Mean Residual Life mrl(t)</span>
+      <span class="tag">Distribution F(t)</span>
+    </div>
+
+    <h3>Survival Function</h3>
+    <div class="formula-box">S(t) = P(T > t) = 1 − F(t)</div>
+    <ul>
+      <li>Probability that a randomly selected individual survives <em>beyond</em> time t</li>
+      <li><strong>Decreasing</strong> function; takes values in [0, 1]</li>
+      <li>S(0) = 1 and S(∞) = 0</li>
+    </ul>
+
+    <h3>Cumulative Hazard Function</h3>
+    <div class="formula-box">H(t) = −log S(t)     ⟺     S(t) = exp(−H(t))</div>
+    <ul>
+      <li>Increasing function; takes values in [0, +∞]</li>
+    </ul>
+
+    <h3>Hazard Function (Hazard Rate)</h3>
+    <div class="formula-box">h(t) = lim[Δt→0] P(t ≤ T &lt; t+Δt | T ≥ t) / Δt
+
+    = f(t) / S(t)  =  −d/dt log S(t)  =  d/dt H(t)</div>
+    <ul>
+      <li>Measures the <strong>instantaneous risk</strong> of the event right after time t, given the individual is alive at t</li>
+      <li>Always <strong>positive</strong>, but not necessarily monotone — can take many shapes</li>
+    </ul>
+
+    <table>
+      <thead><tr><th>Distribution</th><th>Hazard Shape</th><th>Example Application</th></tr></thead>
+      <tbody>
+        <tr><td>Exponential</td><td>Constant h(t) = λ</td><td>Memoryless processes</td></tr>
+        <tr><td>Weibull (ρ &lt; 1)</td><td>Decreasing (DFR)</td><td>Infant mortality, early failures</td></tr>
+        <tr><td>Weibull (ρ &gt; 1)</td><td>Increasing (IFR)</td><td>Wear-out failures, aging</td></tr>
+        <tr><td>Bathtub shape</td><td>Decreasing then increasing</td><td>Human life course, electronics</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box">
+      <strong>Exam tip:</strong> The hazard function is the most important summary of survival data precisely because its flexible shape can capture many real-world phenomena that the distribution function F(t) obscures.
+    </div>
+
+    <h3>Mean Residual Life Function</h3>
+    <div class="formula-box">mrl(t) = E(T − t | T > t) = ∫[t to ∞] S(s) ds / S(t)</div>
+    <ul>
+      <li>The <strong>expected remaining lifetime</strong> for an individual who has survived to age t</li>
+    </ul>
+
+    <h3>Mean Lifetime</h3>
+    <div class="formula-box">E(T) = mrl(0) = ∫[0 to ∞] s·f(s) ds = ∫[0 to ∞] S(s) ds</div>
+
+    <h3>Summary: Relationships Between Functions</h3>
+    <table>
+      <thead><tr><th>From</th><th>To S(t)</th><th>To h(t)</th><th>To H(t)</th></tr></thead>
+      <tbody>
+        <tr><td>S(t)</td><td>—</td><td>f(t)/S(t)</td><td>−log S(t)</td></tr>
+        <tr><td>h(t)</td><td>exp(−∫h(s)ds)</td><td>—</td><td>∫[0 to t] h(s) ds</td></tr>
+        <tr><td>H(t)</td><td>exp(−H(t))</td><td>d/dt H(t)</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 3 ===== -->
+  <div class="section-card" id="censoring">
+    <h2>1.3 Incomplete Data: Censoring</h2>
+    <p>Censoring occurs when for certain individuals, the time to the event is only known to lie <strong>within a certain interval</strong> — a bound is known but not the exact event time.</p>
+
+    <div class="key-box">
+      <strong>Important distinction:</strong> With <em>censoring</em>, the subject IS in the sample and we have at least partial information. With <em>truncation</em>, the subject is entirely absent — no information at all.
+    </div>
+
+    <h3>Right Censoring (most common)</h3>
+    <p>Only a <strong>lower bound</strong> for the survival time is known. Two latent variables:</p>
+    <div class="formula-box">T = true survival time     C = censoring time
+
+Observed data: Y = min(T, C)   and   δ = I(T ≤ C)
+  δ = 1  →  event was observed
+  δ = 0  →  observation is censored</div>
+
+    <table>
+      <thead><tr><th>Type</th><th>Description</th><th>Censoring time</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Type I</strong></td><td>All subjects followed for a fixed time period</td><td>Same for all censored subjects</td></tr>
+        <tr><td><strong>Type II</strong></td><td>Study ends after a predetermined r events occur</td><td>= failure time of the r-th subject</td></tr>
+        <tr><td><strong>Random</strong></td><td>Subjects enter/leave at different times; various reasons for censoring</td><td>Random variable C</td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning-box">
+      <strong>Independence assumption:</strong> For random right censoring, we assume T and C are independent. This is necessary because Y = min(T,C) means the joint relationship between T and C is not identifiable from data (Tsiatis, 1975). Independence is the most natural assumption and holds in many contexts.
+    </div>
+
+    <h3>HIV Study Example (Random Right Censoring)</h3>
+    <p>Study enrolled patients Jan 2005–Dec 2006; ended Dec 2008. Event = death due to AIDS. Causes of censoring: death due to other cause, loss to follow-up, still alive at end of study.</p>
+
+    <table>
+      <thead><tr><th>Patient</th><th>Status</th><th>Time (months)</th><th>δ</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Dropped out</td><td>3</td><td>0 (censored)</td></tr>
+        <tr><td>2</td><td>Dead due to AIDS</td><td>6</td><td>1 (event)</td></tr>
+        <tr><td>3</td><td>Dead due to accident</td><td>5</td><td>0 (censored)</td></tr>
+        <tr><td>4</td><td>Alive at end of study</td><td>37</td><td>0 (censored)</td></tr>
+        <tr><td>5</td><td>Dead due to AIDS</td><td>22</td><td>1 (event)</td></tr>
+        <tr><td>6</td><td>Dead due to AIDS</td><td>12</td><td>1 (event)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Left Censoring</h3>
+    <p>The subject has <strong>already experienced the event</strong> before entering the study — only an <strong>upper bound</strong> is known.</p>
+    <div class="formula-box">Y' = max(T, C')     δ' = I(T > C')
+
+Example: Children entering a malaria study may have already had malaria
+→ T &lt; C', so only an upper bound for infection time is available</div>
+
+    <h3>Interval Censoring</h3>
+    <p>The event is only known to occur <strong>within an interval (L, U)</strong>. The exact survival time is <em>never</em> observed — unlike right or left censoring where at least the observed time is exact.</p>
+    <div class="key-box">
+      <strong>Occurs when:</strong> Diagnostic tests are used at scheduled visits rather than continuous monitoring. Example: malaria is detected between the last negative and first positive test — T ∈ (last negative, first positive).
+    </div>
+  </div>
+
+  <!-- ===== SECTION 4 ===== -->
+  <div class="section-card" id="truncation">
+    <h2>1.4 Incomplete Data: Truncation</h2>
+    <p>Truncation occurs when individuals of a <strong>subset of the population of interest do not appear in the sample at all</strong>. No information is recorded for them — they are entirely absent.</p>
+
+    <h3>Left Truncation</h3>
+    <p>Subjects must satisfy a condition (reach truncation time L) before they can enter the study. Individuals who experience the event <em>before</em> L are permanently excluded.</p>
+    <div class="formula-box">Data: (T, L) observed only if T ≥ L
+
+Example 1: HIV study — subjects who die between HIV infection and 
+  seroconversion never qualify for inclusion.
+Example 2: Insurance — accidents below a cost threshold are never 
+  declared (left truncation from the insurer's perspective).</div>
+
+    <h3>Right Truncation</h3>
+    <p>Only subjects who <strong>have already experienced the event</strong> are included in the sample. Those with long survival times (or competing events) are never recorded.</p>
+    <div class="formula-box">Data: (T, R) observed only if T ≤ R
+
+Example: AIDS incubation study — only AIDS patients are enrolled,
+  so those with T > R (long incubation / died of other cause first)
+  are never seen in the data.</div>
+
+    <h3>Censoring vs. Truncation: Key Distinction</h3>
+    <table>
+      <thead><tr><th>Feature</th><th>Censoring</th><th>Truncation</th></tr></thead>
+      <tbody>
+        <tr><td>Subject in sample?</td><td>Yes</td><td>No — completely absent</td></tr>
+        <tr><td>Information available</td><td>Partial (a bound on T)</td><td>None at all</td></tr>
+        <tr><td>Right version</td><td>T > C; lower bound known</td><td>Only subjects with T ≤ R are observed</td></tr>
+        <tr><td>Left version</td><td>T &lt; C'; upper bound known</td><td>Only subjects with T ≥ L are observed</td></tr>
+        <tr><td>Ecology example</td><td>Chemical below detection limit (left censoring)</td><td>Stars too dim to see (left truncation)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 5 ===== -->
+  <div class="section-card" id="datasets">
+    <h2>1.5 Motivating Datasets</h2>
+    <table>
+      <thead><tr><th>#</th><th>Dataset</th><th>Field</th><th>Event</th><th>Censoring Rate / Notes</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>JTPA Unemployment Study</td><td>Economics</td><td>Finding a job</td><td>Right censored; &gt;20,000 adults; treatment vs. control group</td></tr>
+        <tr><td>2</td><td>Time to Degree Completion</td><td>Education</td><td>Graduation</td><td>Right censored; 160,933 students; 1992–2012</td></tr>
+        <tr><td>3</td><td>German Credit Data</td><td>Finance</td><td>Default on credit</td><td>Right censored; 1,000 credits; 70.7% censoring rate</td></tr>
+        <tr><td>4</td><td>Norwegian Birth Registry</td><td>Sociology</td><td>Second birth</td><td>Right censored; 53,558 women; covariates: mother's age, first child gender</td></tr>
+      </tbody>
+    </table>
+    <div class="warning-box">
+      <strong>Note on the German Credit Data:</strong> A censoring rate of 70.7% means only ~29% of credits actually defaulted in the study period. Ignoring censoring here would severely bias estimates of the time-to-default distribution.
+    </div>
+  </div>
+
+  <!-- ===== SECTION 6 ===== -->
+  <div class="section-card" id="formulas">
+    <h2>1.6 Formula Quick-Reference Sheet</h2>
+    <div class="formula-box">SURVIVAL & RELATED FUNCTIONS
+────────────────────────────────────────────
+S(t)    = P(T > t) = 1 − F(t) = exp(−H(t))
+F(t)    = 1 − S(t)
+f(t)    = −S'(t) = h(t)·S(t)
+
+HAZARD AND CUMULATIVE HAZARD
+────────────────────────────────────────────
+h(t)    = f(t)/S(t) = −d/dt log S(t) = H'(t)
+H(t)    = −log S(t) = ∫[0→t] h(s) ds
+S(t)    = exp(−H(t))
+
+MEAN RESIDUAL LIFE
+────────────────────────────────────────────
+mrl(t)  = E(T − t | T > t) = ∫[t→∞] S(s) ds / S(t)
+E(T)    = mrl(0) = ∫[0→∞] S(s) ds
+
+RIGHT CENSORING DATA STRUCTURE
+────────────────────────────────────────────
+Y       = min(T, C)
+δ       = I(T ≤ C)     [1 = event, 0 = censored]
+
+USEFUL EXPONENTIAL SPECIAL CASE
+────────────────────────────────────────────
+If T ~ Exp(λ):
+  f(t) = λe^(−λt),  S(t) = e^(−λt),  h(t) = λ (constant)
+  H(t) = λt,         E(T) = 1/λ</div>
+  </div>
+
+  <!-- ===== MCQ SECTION ===== -->
+  <div class="section-card q-section" id="mcq">
+    <h2>🎯 Multiple Choice, True/False &amp; Calculation Questions (30 Questions)</h2>
+
+    <div class="score-bar">
+      <div>
+        <span>Score: </span><span class="score-val" id="scoreDisplay">0 / 30</span>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question-block" data-q="1">
+      <div class="q-number">Question 1 · Multiple Choice</div>
+      <div class="q-text">Which of the following is the correct definition of the survival function S(t)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) P(T ≤ t) — the probability of experiencing the event by time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) P(T > t) — the probability of surviving beyond time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) −log S(t) — the cumulative hazard</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) f(t)/S(t) — the instantaneous risk</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-block" data-q="2">
+      <div class="q-number">Question 2 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The hazard function h(t) must be a monotonically increasing or decreasing function of time.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-block" data-q="3">
+      <div class="q-number">Question 3 · Multiple Choice</div>
+      <div class="q-text">In a random right-censored study, a patient withdraws from a cancer trial at month 10 without experiencing the event. Which is the correct observed data pair (Y, δ)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Y = 10, δ = 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Y = 10, δ = 0</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Y = 0, δ = 1</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Y = ∞, δ = 0</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-block" data-q="4">
+      <div class="q-number">Question 4 · Multiple Choice</div>
+      <div class="q-text">Which relationship correctly links the cumulative hazard H(t) to the survival function S(t)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) H(t) = 1 − S(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) H(t) = log S(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) H(t) = −log S(t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) H(t) = S(t) / f(t)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-block" data-q="5">
+      <div class="q-number">Question 5 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In survival analysis, truncation and censoring are the same concept — in both cases the subject appears in the data with partial information about their survival time.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-block" data-q="6">
+      <div class="q-number">Question 6 · Multiple Choice</div>
+      <div class="q-text">The mean lifetime E(T) can be computed as:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) ∫[0 to ∞] f(s) ds</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) ∫[0 to ∞] h(s) ds</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) ∫[0 to ∞] S(s) ds</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) S(0) / h(0)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-block" data-q="7">
+      <div class="q-number">Question 7 · Multiple Choice</div>
+      <div class="q-text">In Type II right censoring, the study terminates when:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) A fixed calendar date is reached</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) All n subjects have experienced the event</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) A pre-determined number r out of n subjects have experienced the event</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The investigator decides the study has run long enough</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-block" data-q="8">
+      <div class="q-number">Question 8 · True / False</div>
+      <div class="q-text">TRUE or FALSE: For random right censoring, we must assume that the survival time T and the censoring time C are independent, because the relationship between T and C is not identifiable from observed data alone.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-block" data-q="9">
+      <div class="q-number">Question 9 · Multiple Choice</div>
+      <div class="q-text">In an astronomy study, stars are only observable if they are bright enough for the telescope to detect. Stars that are too dim never appear in the dataset. This is an example of:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Right censoring</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Left censoring</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Left truncation</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) Interval censoring</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-block" data-q="10">
+      <div class="q-number">Question 10 · Multiple Choice</div>
+      <div class="q-text">Which of the following correctly describes left censoring?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The subject has not yet experienced the event at study end; only a lower bound on T is known</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The subject has already experienced the event before entering the study; only an upper bound on T is known</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The subject is entirely absent from the sample because the event occurred too early</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The event occurred within a known interval (L, U) but the exact time is unknown</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-block" data-q="11">
+      <div class="q-number">Question 11 · True / False</div>
+      <div class="q-text">TRUE or FALSE: In interval censoring, we never observe the exact survival time — only the interval in which it falls is known.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-block" data-q="12">
+      <div class="q-number">Question 12 · Multiple Choice</div>
+      <div class="q-text">The hazard function h(t) is best interpreted as:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The probability of dying exactly at time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) The cumulative risk of the event from 0 to t</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) The instantaneous risk of experiencing the event just after time t, given survival to time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The probability of surviving beyond time t</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="question-block" data-q="13">
+      <div class="q-number">Question 13 · Multiple Choice</div>
+      <div class="q-text">In the HIV study example, patient 3 died due to a car accident 5 months after diagnosis. What are the correct values for (Y, δ)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Y = 5, δ = 1 (event observed)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) Y = 5, δ = 0 (censored — death was not due to AIDS)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) Y = 0, δ = 0 (no time elapsed)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) This patient should be excluded from the dataset entirely</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="question-block" data-q="14">
+      <div class="q-number">Question 14 · True / False</div>
+      <div class="q-text">TRUE or FALSE: If S(t) = exp(−H(t)), then H(t) can be recovered as H(t) = log S(t).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q15 -->
+    <div class="question-block" data-q="15">
+      <div class="q-number">Question 15 · Multiple Choice</div>
+      <div class="q-text">Left truncation in an HIV study occurs when:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Patients withdraw from the study before the event occurs</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) Patients are already HIV-positive when they enter the study</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Individuals who die between HIV infection and seroconversion are never included in the study</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The exact time of HIV infection is unknown and falls in an interval</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="question-block" data-q="16">
+      <div class="q-number">Question 16 · Multiple Choice</div>
+      <div class="q-text">Which dataset from the course notes has a censoring rate of 70.7%?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Norwegian Birth Registry</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) JTPA Unemployment Study</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) German Credit Data</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) HIV Mortality Study</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="question-block" data-q="17">
+      <div class="q-number">Question 17 · True / False</div>
+      <div class="q-text">TRUE or FALSE: Survival analysis is only applicable to medical data where the event is death.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="question-block" data-q="18">
+      <div class="q-number">Question 18 · Multiple Choice</div>
+      <div class="q-text">The mean residual life function mrl(t) measures:</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The probability of surviving beyond time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The expected remaining lifetime for an individual who has already survived to age t</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The instantaneous rate of the event at time t</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The total accumulated hazard from 0 to t</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="question-block" data-q="19">
+      <div class="q-number">Question 19 · Multiple Choice</div>
+      <div class="q-text">In the German Credit Data, censoring occurs because (select the most complete answer):</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) Some credits were never issued in the first place</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) The dataset was too small to observe all defaults</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) Some credits never ran into arrears, were settled, written off, or were still active at study end</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The loan officers withheld default information</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q20 -->
+    <div class="question-block" data-q="20">
+      <div class="q-number">Question 20 · True / False</div>
+      <div class="q-text">TRUE or FALSE: The Weibull distribution with shape parameter ρ = 1 reduces to the Exponential distribution with a constant hazard.</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">TRUE</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">FALSE</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q21 — CALCULATION -->
+    <div class="question-block" data-q="21">
+      <div class="q-number">Question 21 · Calculation</div>
+      <div class="q-text">If S(t) = exp(−2t) for t ≥ 0, what is the hazard function h(t) and the mean lifetime E(T)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, true)">A) h(t) = 2 (constant); E(T) = 1/2</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) h(t) = 2t; E(T) = 1/4</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) h(t) = e^(−2t); E(T) = 2</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) h(t) = 2; E(T) = 2</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q22 — CALCULATION -->
+    <div class="question-block" data-q="22">
+      <div class="q-number">Question 22 · Calculation</div>
+      <div class="q-text">The cumulative hazard at t = 3 is H(3) = 1.5. What is the estimated survival probability S(3)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.50</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 0.223</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.777</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1.5</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q23 — CALCULATION -->
+    <div class="question-block" data-q="23">
+      <div class="q-number">Question 23 · Calculation</div>
+      <div class="q-text">Given f(t) = 3e^(−3t) for t ≥ 0, what is the survival function S(t)?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 1 − e^(−3t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) e^(−3t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 3e^(−3t)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1/3</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q24 — CALCULATION -->
+    <div class="question-block" data-q="24">
+      <div class="q-number">Question 24 · Calculation</div>
+      <div class="q-text">Given a constant hazard h(t) = 0.5 for all t ≥ 0, compute the survival probability S(2).</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 0.632</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 0.368</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 0.5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 1.0</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q25 — CALCULATION -->
+    <div class="question-block" data-q="25">
+      <div class="q-number">Question 25 · Calculation</div>
+      <div class="q-text">In a study of 5 subjects with observed times (2, 4*, 6, 8*, 10) where * denotes right censoring, what are the values of the censoring indicators δ?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) δ = (1, 1, 1, 1, 1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">B) δ = (0, 1, 0, 1, 0)</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">C) δ = (1, 0, 1, 0, 1)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) δ = (0, 0, 1, 0, 1)</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q26 — R OUTPUT -->
+    <div class="question-block" data-q="26">
+      <div class="q-number">Question 26 · R Output Interpretation</div>
+      <div class="q-text">Interpret the "survival" column at time 5 in the following Kaplan-Meier output:</div>
+      <div class="r-output">      time n.risk n.event survival std.err lower 95% CI upper 95% CI
+         2     10       3    0.700  0.1449        0.465         1.000
+         5      7       2    0.500  0.1581        0.272         0.919
+        10      5       1    0.400  0.1549        0.193         0.829</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) At time 5, 50% of subjects are still at risk</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The estimated probability of surviving beyond time 5 is 50%</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) At time 5, the hazard rate is 0.5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) At time 5, 50% of subjects have been censored</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q27 — R OUTPUT -->
+    <div class="question-block" data-q="27">
+      <div class="q-number">Question 27 · R Output Interpretation</div>
+      <div class="q-text">What does n.risk = 7 at time 5 mean in the Kaplan-Meier output above?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 7 subjects have already experienced the event by time 5</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 7 subjects are still under observation and at risk of the event just before time 5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 7 subjects were censored by time 5</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) 7 subjects entered the study exactly at time 5</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q28 — R OUTPUT -->
+    <div class="question-block" data-q="28">
+      <div class="q-number">Question 28 · R Output Interpretation</div>
+      <div class="q-text">A patient record shows time = 15, status = 0. What does status = 0 indicate in a standard R survival dataset?</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The patient experienced the event at time 15</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The patient was right-censored at time 15 — the event was not observed</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The patient's data is missing</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The patient was left-truncated at time 15</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q29 — R OUTPUT -->
+    <div class="question-block" data-q="29">
+      <div class="q-number">Question 29 · R Output Interpretation</div>
+      <div class="q-text">What does the output below tell you about the censoring rate in this dataset?</div>
+      <div class="r-output">> table(data$status)
+
+  0   1 
+707 293</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) 29.3% of observations are censored</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) 70.7% of observations are censored (status = 0)</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) 70.7% of subjects experienced the event</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The censoring rate cannot be determined from a table() output</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+    <!-- Q30 — R OUTPUT -->
+    <div class="question-block" data-q="30">
+      <div class="q-number">Question 30 · R Output Interpretation</div>
+      <div class="q-text">What does the "+" symbol mean in the following survival object output?</div>
+      <div class="r-output">> library(survival)
+> surv_obj <- Surv(time = df$time, event = df$status)
+> surv_obj[1:4]
+[1]  3+  6 5+ 37+</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer(this, false)">A) The subject experienced the event at that time</button>
+        <button class="option-btn" onclick="checkAnswer(this, true)">B) The observation is right-censored — the event had not occurred by that time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">C) The subject was left-truncated at that time</button>
+        <button class="option-btn" onclick="checkAnswer(this, false)">D) The survival time is uncertain and needs verification</button>
+      </div>
+      <div class="feedback"></div>
+    </div>
+
+  </div><!-- end MCQ section -->
+
+  <!-- ===== SHORT ANSWER SECTION ===== -->
+  <div class="section-card q-section" id="shortq">
+    <h2>✍️ Short Answer Questions</h2>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 1</div>
+      <div class="q-text">Define the hazard function h(t) formally (including the limit definition) and explain in plain language what it measures. Why is the hazard function considered the most informative summary of survival data?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Formal definition:</strong><br>
+        h(t) = lim[Δt→0] P(t ≤ T &lt; t+Δt | T ≥ t) / Δt = f(t) / S(t) = −d/dt log S(t)<br><br>
+        <strong>Plain language interpretation:</strong> h(t) measures the instantaneous risk of experiencing the event in the next infinitesimally small time interval, given that the individual has already survived to time t. Unlike the density f(t), the hazard is conditional on current survival — it describes the "force of mortality" at age t for those still alive at t.<br><br>
+        <strong>Why it is most informative:</strong> The hazard function can take a wide variety of shapes (constant, increasing, decreasing, bathtub, hump-shaped) that correspond to distinct real-world phenomena:
+        <ul style="margin-top:8px;">
+          <li>Constant h(t): Exponential — memoryless, no aging effect</li>
+          <li>Decreasing h(t): Weibull with ρ &lt; 1 — "infant mortality" or early failure</li>
+          <li>Increasing h(t): Weibull with ρ > 1 — aging or wear-out</li>
+          <li>Bathtub shape: High early risk (defects), low mid-life risk, rising late-life risk (aging)</li>
+        </ul>
+        The survival function S(t) often looks similarly shaped across distributions, making it less discriminating. The hazard provides a more sensitive diagnostic of the underlying failure mechanism.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 2</div>
+      <div class="q-text">Explain the difference between right censoring, left censoring, and interval censoring using concrete examples from the course. For each type, state what is observed and what is unknown about the survival time T.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Right censoring:</strong><br>
+        Observed: Y = min(T, C), δ = I(T ≤ C). Unknown: whether the event eventually occurred after the last observation.<br>
+        Example: In the HIV study, patient 4 is alive at study end (Dec 2008) after 37 months. We know T > 37 (lower bound), but the true death time is unknown.<br><br>
+        <strong>Left censoring:</strong><br>
+        Observed: Y' = max(T, C'), δ' = I(T > C'). Unknown: the exact time of event — only that it occurred before the study entry date.<br>
+        Example: Children (ages 2–10) entering a malaria study may already have malaria antibodies. If infected before enrolment, we know T &lt; entry age (upper bound), but not the exact infection time.<br><br>
+        <strong>Interval censoring:</strong><br>
+        Observed: (L, U) such that L &lt; T &lt; U. The exact time T is NEVER known — not even approximately.<br>
+        Example: A malaria diagnostic test is negative at month 3 and positive at month 6. We know the infection occurred in (3, 6), but not the exact day. This is typical when assessments are made at scheduled visits rather than continuously.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 3</div>
+      <div class="q-text">Distinguish between left truncation and right truncation. Give one example of each from the course notes (not the same as above), and explain why truncated subjects cannot simply be treated as censored observations.</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Left truncation:</strong> Subjects must reach a threshold condition L before entering the study. Those who experience the event before time L are never recorded. Data: (T, L) observed only if T ≥ L.<br>
+        Example (insurance): Car accidents involving costs below a certain threshold are never declared to the insurer. The insurer's dataset only contains accidents with high enough cost to trigger a claim — those with T &lt; threshold are left-truncated.<br><br>
+        <strong>Right truncation:</strong> Only subjects who have already experienced the event are included. Data: (T, R) observed only if T ≤ R.<br>
+        Example (AIDS): When studying HIV-seroconversion to AIDS incubation time using an AIDS patient registry, patients with long incubation periods (T > R) or who die from other causes before developing AIDS are never recorded.<br><br>
+        <strong>Why truncation ≠ censoring:</strong><br>
+        With censoring, the subject IS in the sample and we have a time bound. With truncation, the subject is entirely absent — we have zero information about them. If we incorrectly treated left-truncated subjects as censored, we would pretend they entered the study and were observed up to L, when in reality they never entered. This creates a systematic, non-random missingness that introduces bias into survival estimates. The truncation mechanism must be explicitly modelled by conditioning the likelihood on the condition T ≥ L (left) or T ≤ R (right).
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 4</div>
+      <div class="q-text">Prove that E(T) = ∫[0 to ∞] S(s) ds starting from the standard definition E(T) = ∫[0 to ∞] s·f(s) ds. What assumption is required for this result to hold?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Proof by integration by parts:</strong><br>
+        E(T) = ∫[0→∞] s·f(s) ds<br><br>
+        Let u = s and dv = f(s) ds, so du = ds and v = F(s) = 1 − S(s).<br>
+        Then: E(T) = [s·(1 − S(s))]|[0→∞] − ∫[0→∞] (1 − S(s)) ds<br><br>
+        The boundary term: as s → ∞, s·(1 − S(s)) = s·F(s). This equals zero if E(T) is finite (i.e., s·S(s) → 0 as s → ∞). At s = 0, the term is 0.<br><br>
+        Therefore: E(T) = 0 − ∫[0→∞] (1 − S(s)) ds + ∫[0→∞] ds<br><br>
+        But ∫[0→∞] (1 − S(s)) ds and ∫[0→∞] 1 ds diverge individually; using the correct IBP result directly:<br><br>
+        E(T) = ∫[0→∞] s f(s) ds = −[s·S(s)]|[0→∞] + ∫[0→∞] S(s) ds = 0 + ∫[0→∞] S(s) ds<br><br>
+        Hence <strong>E(T) = ∫[0 to ∞] S(s) ds</strong> ✓<br><br>
+        <strong>Required assumption:</strong> T must be non-negative and have finite expectation — specifically, lim[s→∞] s·S(s) = 0. This holds whenever E(T) &lt; ∞.
+      </div>
+    </div>
+
+    <div class="short-q">
+      <div class="q-number">Short Answer 5</div>
+      <div class="q-text">A researcher ignores censoring in the German Credit Data and simply computes the sample mean of observed times (including censored ones) as an estimate of the mean time to default. Explain in detail why this produces a biased estimate and in which direction the bias goes. What should the researcher do instead?</div>
+      <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+      <div class="answer-box">
+        <strong>Model Answer:</strong><br><br>
+        <strong>Why the naive mean is biased:</strong><br>
+        The German Credit Data has a 70.7% censoring rate — 707 out of 1,000 credits did not default during the study period. These censored observations have observed times Y = min(T, C) that are smaller than their true (unobserved) default times T. Including Y for censored subjects in a simple average treats their last-seen time as if it were their true event time, systematically understating the time to default for those subjects.<br><br>
+        <strong>Direction of bias:</strong> The naive mean is <em>downward biased</em> (too small). Because censored subjects' true default times T would have been longer than their observed Y = C, using Y instead of T underestimates the true average time to default.<br><br>
+        <strong>What the researcher should do instead:</strong><br>
+        <ul>
+          <li>Use the <strong>Kaplan-Meier estimator</strong> to estimate the full survival function Ŝ(t), which properly accounts for censoring at each event time.</li>
+          <li>Estimate E(T) as ∫[0→τ] Ŝ(s) ds (restricted mean survival time up to the largest observation τ), or use the area under the KM curve.</li>
+          <li>If a parametric model is appropriate, fit an Exponential, Weibull, or other distribution by maximum likelihood using the proper censored likelihood, then use E(T) = 1/λ or the appropriate formula.</li>
+        </ul>
+        Both approaches formally account for the incomplete information in censored observations and yield consistent estimates of the true mean time to default.
+      </div>
+    </div>
+
+  </div><!-- end short answer section -->
+
+</div><!-- end container -->
+
+<script>
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+
+  function checkAnswer(btn, isCorrect) {
+    const block = btn.closest('.question-block');
+    if (block.dataset.answered) return;
+    block.dataset.answered = 'true';
+
+    const allBtns = block.querySelectorAll('.option-btn');
+    allBtns.forEach(b => { b.disabled = true; });
+
+    const feedback = block.querySelector('.feedback');
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'feedback correct-fb';
+      totalCorrect++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b => {
+        if (b.onclick.toString().includes('true')) {
+          b.classList.add('correct');
+        }
+      });
+      feedback.textContent = '✗ Incorrect. The highlighted option is correct.';
+      feedback.className = 'feedback incorrect-fb';
+    }
+
+    totalAnswered++;
+    updateScore();
+  }
+
+  function updateScore() {
+    document.getElementById('scoreDisplay').textContent = totalCorrect + ' / 30';
+  }
+
+  function toggleAnswer(btn) {
+    const answerBox = btn.nextElementSibling;
+    if (answerBox.classList.contains('shown')) {
+      answerBox.classList.remove('shown');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      answerBox.classList.add('shown');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+
+  function resetAll() {
+    const blocks = document.querySelectorAll('.question-block');
+    blocks.forEach(block => {
+      delete block.dataset.answered;
+      const btns = block.querySelectorAll('.option-btn');
+      btns.forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct', 'incorrect');
+      });
+      const feedback = block.querySelector('.feedback');
+      feedback.className = 'feedback';
+      feedback.textContent = '';
+    });
+    totalAnswered = 0;
+    totalCorrect = 0;
+    updateScore();
+  }
+</script>
+
+</body>
+</html>
