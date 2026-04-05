@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Data Analytics – Lecture 2: Data Science Packages</title>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin-top: 20px; }
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    border-radius: 0;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .computation-note {
+    background: #fdf3f3;
+    border-left: 4px solid #e57373;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  code {
+    background: #f0f0f5;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #c0392b;
+  }
+  pre {
+    background: #1e2230;
+    color: #d4d4d4;
+    border-radius: 8px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.6;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd) { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; }
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+  }
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #2e6da4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mcq-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    font-size: 1.0em;
+  }
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #d0d8ea;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 6px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c2c3a;
+    transition: all 0.18s;
+    font-family: inherit;
+  }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .feedback-bar {
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+  .feedback-bar.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #4a0e6a; font-size: 1.2em; }
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1;
+    font-size: 0.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .reveal-btn {
+    background: #6f42c1;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 22px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff;
+    border: 1px solid #d4c8f5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+    font-size: 0.95em;
+    line-height: 1.8;
+    display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+  .reset-btn {
+    background: #1a3a5c;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 9px 28px;
+    font-size: 0.92em;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+  .check-btn {
+    background: #2e6da4;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 20px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .check-btn:hover { background: #1a3a5c; }
+  .section-divider { border: none; border-top: 2px solid #eef2fb; margin: 32px 0; }
+  .package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .package-card {
+    background: #f8faff;
+    border: 1px solid #dde3ef;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .package-card .pkg-name { font-weight: 700; color: #1a3a5c; font-size: 1em; margin-bottom: 4px; }
+  .package-card .pkg-use { font-size: 0.85em; color: #555; }
+  .tag {
+    display: inline-block;
+    background: #eef2fb;
+    color: #2e6da4;
+    border-radius: 10px;
+    padding: 2px 10px;
+    font-size: 0.78em;
+    font-weight: 600;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Modern Data Analytics — Lecture 2</h1>
+  <div class="subtitle">Data Science Packages · KU Leuven · Exam Preparation Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#packages">Package Ecosystem</a>
+  <a href="#modules">Modules & Packages</a>
+  <a href="#numpy">NumPy</a>
+  <a href="#pandas">Pandas</a>
+  <a href="#viz">Data Visualization</a>
+  <a href="#pypi">PyPI</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ===== STUDY NOTES ===== -->
+
+<div class="notes-section" id="packages">
+  <h2>1. The Python Package Ecosystem</h2>
+
+  <p>Python's power for data science comes not from the base language alone, but from a rich ecosystem of packages developed by the open-source community and companies. These packages implement commonly needed behaviors so you don't have to start from scratch.</p>
+
+  <div class="key-point">
+    <strong>Key insight:</strong> Packages serve two purposes — (1) <em>code organisation</em> within a project, and (2) <em>sharing and reusing code</em> across the broader developer community via repositories like PyPI.
+  </div>
+
+  <h3>Key packages by domain</h3>
+  <div class="package-grid">
+    <div class="package-card"><div class="pkg-name">pandas</div><div class="pkg-use">Data manipulation &amp; analysis. Heterogeneous tabular data, labeled axes.</div><span class="tag">Data</span></div>
+    <div class="package-card"><div class="pkg-name">NumPy</div><div class="pkg-use">Numerical computing, N-dimensional arrays, mathematical operations.</div><span class="tag">Math</span></div>
+    <div class="package-card"><div class="pkg-name">Plotly</div><div class="pkg-use">Interactive data visualizations with hover, zoom, pan.</div><span class="tag">Viz</span></div>
+    <div class="package-card"><div class="pkg-name">matplotlib</div><div class="pkg-use">Static, animated 2D plots &amp; graphs.</div><span class="tag">Viz</span></div>
+    <div class="package-card"><div class="pkg-name">scikit-learn</div><div class="pkg-use">Machine learning algorithms, model selection, preprocessing.</div><span class="tag">ML</span></div>
+    <div class="package-card"><div class="pkg-name">TensorFlow</div><div class="pkg-use">Neural networks and deep learning.</div><span class="tag">ML</span></div>
+    <div class="package-card"><div class="pkg-name">NetworkX</div><div class="pkg-use">Network/graph analysis.</div><span class="tag">Networks</span></div>
+    <div class="package-card"><div class="pkg-name">Stanza</div><div class="pkg-use">Text analytics and NLP.</div><span class="tag">NLP</span></div>
+    <div class="package-card"><div class="pkg-name">GeoPandas</div><div class="pkg-use">Geospatial data extension of pandas.</div><span class="tag">Geo</span></div>
+    <div class="package-card"><div class="pkg-name">SciPy</div><div class="pkg-use">Scientific computing on top of NumPy.</div><span class="tag">Science</span></div>
+  </div>
+
+  <h3>Installing and importing packages</h3>
+  <p>Packages are distributed via <strong>PyPI</strong> (Python Package Index) and installed with <code>pip</code>:</p>
+  <pre>pip install pandas          # Step 1: install
+import pandas as pd         # Step 2: import with alias</pre>
+
+  <div class="warning-box">
+    <strong>⚠ Important:</strong> When you import a module, its top-level code is executed immediately. This can have side effects — be mindful of what code lives at module level vs inside functions.
+  </div>
+
+  <p>Packages are installed into your environment's <code>site-packages</code> folder (e.g., <code>lib/python3.10/site-packages/pandas/</code>). When you write <code>from pandas import DataFrame</code>, Python locates the <code>DataFrame</code> class in that folder.</p>
+</div>
+
+<div class="notes-section" id="modules">
+  <h2>2. Code Organisation: Modules & Packages</h2>
+
+  <p>As Python projects grow, organising code becomes critical. OOP lets you group related functionality into classes; <strong>modules</strong> and <strong>packages</strong> let you group related classes into files and folders.</p>
+
+  <h3>Modules</h3>
+  <div class="theorem-box">
+    <strong>Definition:</strong> A <em>module</em> is any <code>.py</code> file containing valid Python code. The filename (without <code>.py</code>) becomes the module name.
+  </div>
+  <p>Example: A file <code>models.py</code> containing a <code>LinearRegression</code> class becomes the <code>models</code> module.</p>
+
+  <h3>Importing modules — three patterns</h3>
+  <table>
+    <thead><tr><th>Syntax</th><th>Effect</th><th>Access</th></tr></thead>
+    <tbody>
+      <tr><td><code>import &lt;module&gt;</code></td><td>Imports entire module</td><td><code>module.ClassName()</code></td></tr>
+      <tr><td><code>from &lt;module&gt; import &lt;Class&gt;</code></td><td>Imports specific class(es)</td><td><code>ClassName()</code> directly</td></tr>
+      <tr><td><code>import pandas as pd</code></td><td>Imports with alias</td><td><code>pd.DataFrame()</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Directory constraint:</strong> By default, the module file and the script using it must be in the <em>same directory</em> for a simple import to work.
+  </div>
+
+  <h3>Packages</h3>
+  <p>When a project has many modules, Python lets you organise them into a <strong>package</strong> — a hierarchical folder structure. A package named <code>mda</code> can contain subpackages like <code>classification</code> and <code>regression</code>, each with their own <code>models.py</code>.</p>
+
+  <div class="example-box">
+    <strong>Example structure:</strong><br>
+    <code>mda/classification/models.py</code> → <code>LogisticRegression</code><br>
+    <code>mda/regression/models.py</code> → <code>LinearRegression</code><br><br>
+    <strong>Import with dot notation:</strong><br>
+    <code>from mda.regression.models import LinearRegression</code><br>
+    <code>from mda.classification.models import LogisticRegression</code>
+  </div>
+
+  <h3>The <code>__init__.py</code> file</h3>
+  <p>Adding an <code>__init__.py</code> file to a package folder allows you to define what gets imported when the package itself is imported. This simplifies imports for users of your package:</p>
+  <pre>
+# mda/__init__.py
+from .regression.models import LinearRegression
+from .classification.models import LogisticRegression
+
+# User can now write:
+from mda import LinearRegression
+from mda import LogisticRegression</pre>
+  <div class="key-point">
+    <strong>The <code>__init__.py</code> is executed when the package is imported</strong> — put only necessary setup code here, not heavy computation.
+  </div>
+</div>
+
+<div class="notes-section" id="numpy">
+  <h2>3. NumPy</h2>
+
+  <p>NumPy introduces the <strong>ndarray</strong> — a fundamental data structure for numerical computing that dramatically outperforms Python's built-in lists in both memory usage and computational speed.</p>
+
+  <h3>Array dimensions</h3>
+  <table>
+    <thead><tr><th>Dimension</th><th>Shape example</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td>1D array (vector)</td><td><code>(4,)</code></td><td>A single feature column</td></tr>
+      <tr><td>2D array (matrix)</td><td><code>(2, 3)</code></td><td>Rows × Columns of data</td></tr>
+      <tr><td>3D array (tensor)</td><td><code>(4, 3, 2)</code></td><td>Image data (height, width, channels)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Why NumPy outperforms Python lists</h3>
+  <p>NumPy achieves two major performance gains:</p>
+
+  <div class="key-point">
+    <strong>(1) Memory efficiency — storage:</strong> A Python list stores pointers to objects scattered across memory. A NumPy array stores all values contiguously in a single <em>data buffer</em> with a fixed type. This eliminates pointer indirection and reduces memory fragmentation.
+  </div>
+
+  <div class="key-point">
+    <strong>(2) Memory efficiency — operations:</strong> NumPy offers two strategies when transforming arrays:
+    <ul>
+      <li><strong>Copy</strong> (<code>arr[[0,2,4]]</code>): Creates a new data buffer. Safe from side effects, but uses more memory.</li>
+      <li><strong>View</strong> (<code>arr[::2]</code>): Reuses the original data buffer with new metadata (shape, strides). Memory-efficient, but modifying the view modifies the original.</li>
+    </ul>
+  </div>
+
+  <h3>Memory layout: strides</h3>
+  <p>NumPy stores 2D arrays in <strong>row-major order (C order)</strong> by default — rows are stored consecutively. <strong>Column-major order (Fortran order)</strong> stores columns consecutively. Slicing can change the stride (step between elements in memory), which may affect contiguity.</p>
+
+  <div class="theorem-box">
+    <strong>Metadata of a NumPy array:</strong> Length · Type · Shape · Strides<br>
+    The <em>data buffer</em> contains the actual values. Memory is always 1D — the shape/stride metadata creates the illusion of 2D/3D structure.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Common mistake:</strong> "Memory is 2D" — it is not. A 2D NumPy array is still stored as a flat 1D sequence in memory. The <em>strides</em> tell Python how many bytes to jump to reach the next row or column.
+  </div>
+</div>
+
+<div class="notes-section" id="pandas">
+  <h2>4. Pandas</h2>
+
+  <p>Pandas is a structured abstraction built on top of NumPy. It inherits NumPy's memory model while adding support for heterogeneous data types, labeled axes (indices and column names), and alignment.</p>
+
+  <h3>NumPy vs pandas: key differences</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>NumPy</th><th>Pandas</th></tr></thead>
+    <tbody>
+      <tr><td>Data types</td><td>Homogeneous (all same type)</td><td>Heterogeneous (columns can differ)</td></tr>
+      <tr><td>Labeling</td><td>No labeling mechanism</td><td>Labeled axes (index + column names)</td></tr>
+      <tr><td>Row/column identity</td><td>No concept</td><td>Alignment at row/column level</td></tr>
+      <tr><td>Memory model</td><td>NumPy ndarray</td><td>Inherits NumPy memory model</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>DataFrame structure:</strong> A DataFrame is a collection of <em>Series</em> objects. Each Series is a 1D array (a column). All columns share the same index. Columns may have different dtypes. This is analogous to a 2D NumPy array but with labeled axes.
+  </div>
+
+  <h3>Indexing in pandas</h3>
+  <p>In NumPy, elements are accessed by their <em>integer position</em>. Pandas adds label-based access:</p>
+  <pre>
+df.loc[:, ['First', 'Last', 'Math']]   # label-based
+df.iloc[0, 0] = 100                    # position-based</pre>
+
+  <h3>Copy-on-Write (pandas ≥ 3.0)</h3>
+  <p>In older pandas, a "view" of a DataFrame shared the underlying data buffer. Modifying the view would modify the original — leading to the infamous <code>SettingWithCopyWarning</code>.</p>
+
+  <div class="theorem-box">
+    <strong>Copy-on-Write guarantee:</strong> Any DataFrame or Series derived from another always <em>behaves as a copy</em>. Under the hood, pandas uses a <strong>Block Reference Tracker (BRT)</strong> to lazily decide when to actually copy data — copying only when a write operation occurs and the block is shared. This balances usability with memory efficiency.
+  </div>
+
+  <div class="example-box">
+    <strong>Example of the old problem:</strong><br>
+    <code>grades = df["grade"]</code> — this was a view<br>
+    <code>grades.iloc[0] = "E"</code> — this would silently modify <code>df</code> too!<br><br>
+    With CoW (pandas ≥ 3.0), <code>grades</code> behaves as an independent copy — <code>df</code> is not affected.
+  </div>
+
+  <h3>Copy-on-Write write mechanism</h3>
+  <p>When you perform a write operation (<code>df2.iloc[0,0] = 100</code>):</p>
+  <ol>
+    <li>Check: is the underlying block referenced by another DataFrame?</li>
+    <li>If <strong>yes</strong>: create a copy of the data block; create a new BRT for this DataFrame.</li>
+    <li>If <strong>no</strong>: update the data block in-place (no copy needed).</li>
+  </ol>
+
+  <h3>Pandas extensions: GeoPandas</h3>
+  <p>GeoPandas extends pandas by adding a geometry column to DataFrames, enabling geospatial analysis. It inherits the DataFrame interface fully — it's not just syntax-compatible, it actually inherits from <code>DataFrame</code> in the class hierarchy.</p>
+</div>
+
+<div class="notes-section" id="viz">
+  <h2>5. Data Visualization</h2>
+
+  <p>Choosing the right visualization library depends on the use case:</p>
+  <table>
+    <thead><tr><th>Library</th><th>Best for</th><th>Interactivity</th></tr></thead>
+    <tbody>
+      <tr><td><strong>matplotlib</strong></td><td>Static 2D plots (line, bar, scatter, histogram)</td><td>None (static)</td></tr>
+      <tr><td><strong>Plotly</strong></td><td>Interactive charts with hover, zoom, pan, selection</td><td>High (JS-based)</td></tr>
+      <tr><td><strong>Altair</strong></td><td>Complex, layered declarative visualizations</td><td>Medium</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Plotly — two interfaces</h3>
+  <div class="key-point">
+    <strong>plotly.express (px):</strong> High-level interface. Takes a pandas DataFrame as input, auto-infers plot settings. Best for quickly creating common chart types with minimal code.
+  </div>
+  <div class="key-point">
+    <strong>plotly.graph_objects (go):</strong> Low-level interface. Full control over individual plot objects (traces, axes, layouts). More verbose but more powerful and flexible.
+  </div>
+
+  <h3>Typical plotly.graph_objects workflow</h3>
+  <pre>
+import plotly.graph_objects as go
+fig = go.Figure()                        # 1. Initialize empty figure
+fig.add_trace(go.Scatter(...))           # 2. Add traces (layers)
+fig.update_traces(mode='markers', ...)  # 3. Style all traces
+fig.update_layout(title='...')           # 4. Set global layout
+fig.show()                               # 5. Render</pre>
+
+  <div class="warning-box">
+    <strong>⚠ Key difference from matplotlib:</strong> In plotly, you always call methods on the <em>figure object</em>. In matplotlib, you often call functions on the module directly. Plotly's object must be referenced explicitly (<code>fig.add_trace</code>, not just <code>add_trace</code>).
+  </div>
+
+  <h3>Dashboarding tools</h3>
+  <p>For production dashboards, the ecosystem includes: <strong>Plotly Dash</strong>, <strong>Streamlit</strong>, <strong>Tableau</strong>, <strong>Power BI</strong>, <strong>Looker</strong>, <strong>Grafana</strong>, and others. Plotly Dash is highlighted in the course as it integrates directly with Python and Plotly charts.</p>
+</div>
+
+<div class="notes-section" id="pypi">
+  <h2>6. Publishing Packages on PyPI</h2>
+
+  <p>Publishing your own package to PyPI follows a 4-step process:</p>
+
+  <table>
+    <thead><tr><th>Step</th><th>Action</th><th>Key tool</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Adopt the correct file structure</td><td>Manual</td></tr>
+      <tr><td>2</td><td>Test your package locally (editable install)</td><td><code>pip install -e .</code></td></tr>
+      <tr><td>3</td><td>Build the package (source + wheel)</td><td><code>python -m build</code> + <code>twine check dist/*</code></td></tr>
+      <tr><td>4</td><td>Upload to (Test)PyPI</td><td><code>twine upload -r testpypi dist/*</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Required file structure (minimum example)</h3>
+  <div class="example-box">
+    <code>src/mda/__init__.py</code> — package initializer<br>
+    <code>src/mda/example.py</code> — your module(s)<br>
+    <code>tests/dummy.py</code> — test suite (pytest)<br>
+    <code>LICENSE</code> — open source license (e.g. MIT)<br>
+    <code>manifest.in</code> — files to include when building<br>
+    <code>pyproject.toml</code> — build system + project metadata<br>
+    <code>readme.md</code> — project description (shown on PyPI)
+  </div>
+
+  <h3>The <code>pyproject.toml</code> file</h3>
+  <p>This file has two sections:</p>
+  <ul>
+    <li><strong>[build-system]</strong>: Specifies <em>how</em> to build (e.g., using <code>setuptools</code>). Transforms Python files into a distributable wheel (<code>.whl</code>).</li>
+    <li><strong>[project]</strong>: Metadata — name, version, description, authors, license, Python requirements. These are displayed on PyPI.</li>
+  </ul>
+
+  <div class="warning-box">
+    <strong>⚠ The package name must be globally unique on PyPI.</strong> You cannot upload a package with a name already taken.
+  </div>
+
+  <h3>Build outputs</h3>
+  <p>Running <code>python -m build</code> produces two files in <code>dist/</code>:</p>
+  <ul>
+    <li><code>.whl</code> (wheel) — used during installation by pip</li>
+    <li><code>.tar.gz</code> — source distribution, a copy of your package code</li>
+  </ul>
+
+  <div class="key-point">
+    <strong>Editable installs</strong> (<code>pip install -e .</code>) let you install your package locally while still being able to edit source files — no reinstallation needed after every change. Essential for development.
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ===== MCQ SECTION ===== -->
+
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions</h2>
+  <p>Select your answer and click <strong>Check</strong>. Use <strong>Reset Quiz</strong> at the bottom to start over.</p>
+  <div style="margin-bottom: 18px;">Score: <span class="score-display" id="score-display">0 / 0</span></div>
+
+  <div id="mcq-container"></div>
+
+  <button class="reset-btn" onclick="resetQuiz()">↺ Reset Quiz</button>
+</div>
+
+<!-- ===== SHORT ANSWER SECTION ===== -->
+
+<div class="sa-section" id="sa">
+  <h2>Short Answer Questions</h2>
+  <p>Think through your answer, then reveal the model answer.</p>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  {q:"A Python module is best defined as:", opts:["A folder containing multiple .py files","Any .py file containing valid Python code","A compiled binary library","A virtual environment"], ans:1, exp:"A module is simply any .py file. A folder of modules is called a package."},
+  {q:"When you run `import models` in a script, which requirement must be met by default?", opts:["models.py must be in the Python standard library","models.py must be in the same directory as the script","models.py must be installed via pip","models.py must start with an __init__ block"], ans:1, exp:"By default, Python searches for modules in the current directory first. Without package structure or sys.path modification, same-directory is required."},
+  {q:"Which import syntax allows you to call `LinearRegression()` directly without any module prefix?", opts:["import models","from models import LinearRegression","import models as lr","import LinearRegression from models"], ans:1, exp:"`from module import ClassName` brings the class into the current namespace, enabling direct use."},
+  {q:"TRUE or FALSE: Running `import pandas` executes all code at the top level of the pandas package.", opts:["True","False"], ans:0, exp:"True. When a module/package is imported, its top-level code executes immediately. This is why heavy computations should not be at module level."},
+  {q:"A package in Python is created by:", opts:["Writing a .pkg file","Using a folder structure (with optional __init__.py files)","Compiling .py files into .pyc","Registering on PyPI"], ans:1, exp:"Packages are folder-based. Python 3 supports namespace packages (no __init__.py needed), but __init__.py is still common to control imports."},
+  {q:"Given package `mda` with subpackage `regression` containing `models.py`, which import is correct?", opts:["import mda/regression/models","from mda.regression.models import LinearRegression","from mda import regression.models.LinearRegression","import LinearRegression from mda.regression"], ans:1, exp:"Dot-notation traverses the package hierarchy. This is the standard way to import from nested packages."},
+  {q:"The __init__.py file in a package is executed:", opts:["Only when you explicitly call it","When the package is imported","When Python starts","When pip installs the package"], ans:1, exp:"__init__.py runs automatically whenever the package (or a subpackage/module within it) is imported. It can set up the package's public API."},
+  {q:"A NumPy array stores data:", opts:["As a Python list of objects with pointers","In a contiguous block of memory (data buffer) with uniform type","Across multiple non-contiguous memory locations","As a dictionary of index-value pairs"], ans:1, exp:"NumPy's core advantage: contiguous memory with a single fixed type eliminates pointer indirection, enabling vectorized CPU operations."},
+  {q:"TRUE or FALSE: The physical memory layout of a 2D NumPy array is actually 2-dimensional.", opts:["True","False"], ans:1, exp:"False. Memory is always 1D. Shape and strides metadata create the logical 2D structure — the data buffer remains a flat sequence of bytes."},
+  {q:"What is a NumPy 'stride'?", opts:["The number of elements in a row","The number of bytes to skip to reach the next element along an axis","The total size of the array in bytes","The step size when using np.arange"], ans:1, exp:"Strides define how many bytes to advance in memory to move one step along each axis. This is how NumPy supports multi-dimensional indexing on flat memory."},
+  {q:"Which NumPy operation produces a VIEW (no new data buffer)?", opts:["arr[[0,2,4]]","arr[::2]","np.copy(arr)","arr.astype(float)"], ans:1, exp:"Slicing with `arr[::2]` returns a view — the stride is changed to 2 but the original data buffer is reused. Fancy indexing (arr[[0,2,4]]) always creates a copy."},
+  {q:"The advantage of a NumPy COPY over a VIEW is:", opts:["It uses less memory","Changes to the copy do not affect the original","It is faster to create","It automatically updates when the original changes"], ans:1, exp:"A copy has its own independent data buffer, so modifying it has no side effects on the original. This is safer but uses more memory."},
+  {q:"TRUE or FALSE: Pandas DataFrames can hold columns of different data types (e.g., string and float in the same DataFrame).", opts:["True","False"], ans:0, exp:"True. Unlike NumPy which requires homogeneous types, pandas manages heterogeneous data — each column (Series) can have its own dtype."},
+  {q:"A pandas DataFrame is best described as:", opts:["A 2D NumPy array with extra methods","A structured abstraction over NumPy arrays, with labeled axes and heterogeneous column types","A dictionary of Python lists","A SQL table stored in memory"], ans:1, exp:"DataFrames inherit NumPy's memory model but add labeled axes (index + columns), heterogeneous dtypes, and alignment operations."},
+  {q:"Which pandas method accesses data by LABEL?", opts:["iloc","loc","at (integer only)","ix (deprecated)"], ans:1, exp:"`loc` is label-based. `iloc` is integer position-based. Both are essential — confusing them is a common source of bugs."},
+  {q:"What problem did the SettingWithCopyWarning indicate in older pandas?", opts:["A column had mixed types","Modifying a derived DataFrame/Series could silently modify the original","The DataFrame was too large to fit in memory","A NaN value was introduced by an operation"], ans:1, exp:"In pandas < 3.0, derived objects might share the underlying data buffer (view). Writes to the view would propagate back to the original, often unexpectedly."},
+  {q:"In pandas Copy-on-Write (≥ 3.0), a copy is actually created:", opts:["Always, whenever a DataFrame is derived","Only when a write operation occurs on a shared block","When a DataFrame is printed","When the DataFrame is sorted"], ans:1, exp:"CoW is lazy — it defers the actual copy until a mutation is about to occur. If no write happens, the underlying buffer is shared (memory efficient)."},
+  {q:"The Block Reference Tracker (BRT) in pandas CoW is responsible for:", opts:["Tracking the number of rows in a DataFrame","Keeping track of which data blocks are shared between multiple DataFrame objects","Caching query results","Managing missing value imputation"], ans:1, exp:"The BRT enables CoW — it knows which blocks (think: NumPy arrays) are referenced by more than one DataFrame, triggering a copy only when needed."},
+  {q:"TRUE or FALSE: GeoPandas is a completely separate library from pandas with no inheritance relationship.", opts:["True","False"], ans:1, exp:"False. GeoDataFrame inherits from pandas DataFrame at the class level — it IS a DataFrame with an added geometry column, not a separate data structure."},
+  {q:"Plotly.express is preferable over plotly.graph_objects when:", opts:["You need fine-grained control over individual traces and axes","You want to quickly create standard charts with minimal code from a DataFrame","You need to create 3D surface plots","You are building a Dash application"], ans:1, exp:"plotly.express is high-level and auto-infers settings from a DataFrame. For quick standard charts, it dramatically reduces boilerplate."},
+  {q:"In plotly.graph_objects, layers/data series added to a figure are called:", opts:["Layers","Plots","Traces","Series"], ans:2, exp:"In Plotly's terminology, each data series added via `fig.add_trace()` is called a 'trace'. Examples: go.Scatter, go.Bar, go.Pie."},
+  {q:"Which method in plotly.graph_objects sets properties common to ALL traces?", opts:["fig.update_layout()","fig.update_traces()","fig.add_layout_image()","fig.set_style()"], ans:1, exp:"`fig.update_traces()` applies settings to all traces at once. `fig.update_layout()` controls overall figure appearance (title, axis labels, etc.)."},
+  {q:"TRUE or FALSE: matplotlib is better suited than Plotly for creating interactive visualizations with hover-over tooltips.", opts:["True","False"], ans:1, exp:"False. Plotly is purpose-built for interactive visualizations. matplotlib produces static images by default (though limited interactivity is possible with backends)."},
+  {q:"Altair is built on top of:", opts:["D3.js only","The Vega-Lite visualization grammar","matplotlib's API","Plotly's graph objects"], ans:1, exp:"Altair is a Python wrapper for the Vega-Lite specification — a declarative JSON grammar for creating visualizations, compiled to interactive JavaScript."},
+  {q:"To publish a package to PyPI, the package name must be:", opts:["Unique within your organization","Globally unique across all of PyPI","Less than 20 characters","All lowercase"], ans:1, exp:"PyPI is a global registry — no two packages can share the same name. This is enforced at upload time."},
+  {q:"What does `pip install -e .` do?", opts:["Encrypts your package before installation","Installs your package in 'editable' mode so source changes take effect without reinstalling","Exports your package metadata","Erases the previous version before installing"], ans:1, exp:"Editable installs (-e flag) install the package by reference to your source directory. Changes to the source files are immediately reflected without reinstalling."},
+  {q:"The `pyproject.toml` file contains two main sections. Which pair is correct?", opts:["[metadata] and [scripts]","[build-system] and [project]","[setup] and [install]","[config] and [dependencies]"], ans:1, exp:"[build-system] specifies how to build (e.g., setuptools). [project] contains metadata like name, version, description, and author info."},
+  {q:"Running `python -m build` produces which two file types?", opts:[".zip and .tar","whl and .tar.gz",".egg and .whl",".py and .pyc"], ans:1, exp:"The wheel (.whl) is used by pip during installation. The .tar.gz is the source distribution — a copy of your raw package code."},
+  {q:"Which tool is used to check a built package for errors and to upload it to PyPI?", opts:["build","setuptools","twine","poetry"], ans:2, exp:"Twine is the standard tool for checking (`twine check dist/*`) and uploading (`twine upload`) packages to PyPI."},
+  {q:"TRUE or FALSE: TestPyPI is identical to PyPI in all aspects except that packages uploaded there are not publicly distributed on the real PyPI.", opts:["True","False"], ans:0, exp:"True. TestPyPI is a sandbox version of PyPI — perfect for testing the full upload workflow without polluting the real package index."},
+  {q:"In the package `mda`, if __init__.py imports LinearRegression from the regression subpackage, a user can write:", opts:["import mda.regression.LinearRegression","from mda import LinearRegression","from mda.regression import models.LinearRegression","import LinearRegression"], ans:1, exp:"The __init__.py exposes LinearRegression at the mda package level, so `from mda import LinearRegression` works — shorter and cleaner than the full path."},
+  {q:"Which of these is a dashboarding tool built specifically for Python data scientists that integrates with Plotly?", opts:["Grafana","Tableau","Plotly Dash","Power BI"], ans:2, exp:"Plotly Dash allows building interactive web dashboards entirely in Python, using Plotly charts. Grafana/Tableau/Power BI require separate tooling or SQL."},
+  {q:"TRUE or FALSE: `from models import LinearRegression` and `import models` both cause `models.py` top-level code to execute.", opts:["True","False"], ans:0, exp:"True. Both forms of import execute the module's top-level code. The difference is only in what gets bound to the local namespace."},
+  {q:"A NumPy array with shape (5, 1) and strides (8, 8) vs the same array reshaped to (5,) — what changes?", opts:["The data buffer changes","Only the metadata (shape/strides) changes — the data buffer stays the same","The dtype changes","A copy is always created when reshaping"], ans:1, exp:"Reshaping changes metadata (shape and strides), not the data buffer. No new memory allocation occurs — the same contiguous data is reinterpreted."},
+  {q:"Which of the following is NOT a reason pandas is built on top of NumPy?", opts:["To inherit NumPy's efficient memory model","To use stride-based slicing","To gain Copy-on-Write behavior inherited from NumPy","To avoid reimplementing low-level array operations"], ans:2, exp:"Copy-on-Write is a pandas-specific behavior (introduced in pandas 3.0). NumPy itself does not guarantee CoW — it provides views and copies, but the CoW logic is pandas' own."},
+  {q:"In Plotly graph_objects, `fig.update_layout(title='My Chart', yaxis_zeroline=False)` modifies:", opts:["Individual trace data","The overall figure appearance and axis settings","Only the y-axis data","The color scheme of all traces"], ans:1, exp:"`update_layout` controls non-data aspects: title, axis labels, gridlines, margins, legend, background, etc. It does not modify trace data."},
+  {q:"TRUE or FALSE: A Python list and a NumPy array with the same data use the same amount of memory.", opts:["True","False"], ans:1, exp:"False. A Python list stores object pointers (8 bytes each) plus the objects themselves (each int object ~28 bytes). NumPy stores raw integers contiguously (4 or 8 bytes each). NumPy is typically ~5-10x more memory efficient."},
+  {q:"The `manifest.in` file in a PyPI package determines:", opts:["The version of Python required","Which files to include when building the distribution package","The public API of the package","Licensing terms"], ans:1, exp:"manifest.in controls which non-Python files (data files, docs, etc.) are bundled into the source distribution when `python -m build` is run."},
+  {q:"Which pandas operation triggers a copy under Copy-on-Write semantics?", opts:["Reading a value: `df.loc[0, 'col']`","Writing a value to a derived DataFrame: `df2.iloc[0,0] = 100` when df2 shares a block with df","Printing a DataFrame","Checking `df.dtypes`"], ans:1, exp:"CoW only triggers on write operations when the block is shared. Read operations never trigger a copy."},
+  {q:"In the course's learning path, what comes AFTER the Packages session (Session 2–4)?", opts:["Preliminary Knowledge Module","Session 1 (Intro + OOP)","Group project","Final exam"], ans:2, exp:"The course flow is: Preliminary Knowledge → Session 1 (Intro + OOP) → Sessions 2–4 (Packages: NumPy, pandas, Plotly, sklearn) → Group project."},
+  {q:"TRUE or FALSE: `plotly.express` always requires a pandas DataFrame as input and cannot work with other data structures.", opts:["True","False"], ans:1, exp:"False. plotly.express can work with lists, dicts, and other data structures, though DataFrames are the most common and well-supported input format."},
+  {q:"What is the key advantage of plotly.graph_objects over plotly.express?", opts:["It requires less code","It automatically detects the best chart type","It gives fine-grained control over every visual element of the figure","It is faster to render"], ans:2, exp:"graph_objects is a low-level API — you can customize every trace, axis, annotation, and layout property in detail, at the cost of more verbose code."},
+  {q:"When importing a subpackage like `from mda.regression.models import LinearRegression`, which files are executed?", opts:["Only models.py","Only mda/__init__.py","mda/__init__.py, mda/regression/__init__.py (if it exists), and mda/regression/models.py","Only the __init__.py files"], ans:2, exp:"Python executes each package's __init__.py as it traverses the hierarchy, plus the final module file. This ensures all package-level setup occurs."},
+  {q:"TRUE or FALSE: Installing a package via `pip install pandas` places it in the same directory as your script.", opts:["True","False"], ans:1, exp:"False. Pip installs packages into the environment's `site-packages` directory (e.g., `lib/python3.10/site-packages/`), not your project folder."},
+  {q:"Which describes the 'Row-major (C order)' memory layout in NumPy?", opts:["Columns are stored consecutively in memory","Rows are stored consecutively in memory","Elements are stored by diagonal","Data is interleaved row-by-row and column-by-column"], ans:1, exp:"C order (row-major) stores each row as a contiguous block. This is NumPy's default. Accessing row elements is cache-friendly; column access may cause cache misses."},
+  {q:"What does `twine check dist/*` do before uploading?", opts:["Encrypts the distribution files","Checks for common mistakes and validates the package metadata","Compresses the wheel file","Verifies your PyPI credentials"], ans:1, exp:"Twine check validates the distribution files for common issues (missing metadata, README rendering problems, etc.) before you attempt the actual upload."},
+  {q:"TRUE or FALSE: In plotly.graph_objects, you can create a figure and add all traces in a single constructor call.", opts:["True","False"], ans:0, exp:"True. You can pass data directly to `go.Figure(data=go.Scatter(...))`. The `add_trace` pattern is the incremental alternative."},
+  {q:"GeoPandas' GeoDataFrame inherits from pandas DataFrame. This means it:", opts:["Has the same memory layout as a regular DataFrame, plus a geometry column","Is a completely new data structure","Cannot use standard pandas operations like groupby","Uses a different indexing system"], ans:0, exp:"Because GeoDataFrame inherits from DataFrame at the class level, all standard pandas operations (groupby, merge, loc, etc.) work seamlessly."},
+  {q:"The primary difference between PyPI and TestPyPI is:", opts:["TestPyPI requires paid accounts","TestPyPI is a sandbox for testing — packages uploaded there are not on the real PyPI index","TestPyPI only accepts binary packages","TestPyPI has no authentication"], ans:1, exp:"TestPyPI is intentionally separate from the production PyPI. It lets developers practice the full upload flow without accidentally publishing to the global package index."},
+  {q:"TRUE or FALSE: A NumPy view and its parent array always have the same shape.", opts:["True","False"], ans:1, exp:"False. A slice like `arr[::2]` returns a view with a different shape (fewer elements) but the same data buffer. The view and parent can have entirely different shapes."}
+];
+
+const saData = [
+  {
+    q:"Explain why modifying a NumPy view can affect the original array but modifying a copy does not. Use the concepts of data buffer, metadata, and strides in your answer.",
+    a:"A NumPy <strong>view</strong> shares the same <em>data buffer</em> as the original array — only new <em>metadata</em> (shape, strides) is created. Because both the view and the original point to the same region of memory, a write operation via the view modifies those bytes, which the original also reads. A <strong>copy</strong> allocates a new, independent data buffer and copies the values into it. The original and copy now point to different memory regions, so writes to one do not affect the other. This trade-off — memory safety vs. memory efficiency — is why NumPy exposes both mechanisms."
+  },
+  {
+    q:"A colleague argues that pandas Copy-on-Write (CoW, pandas ≥ 3.0) always copies data when you derive one DataFrame from another. Is this correct? Describe what actually happens and why the design choice was made.",
+    a:"This is incorrect. CoW is <strong>lazy</strong> — it only copies the underlying data block when a <em>write operation</em> is about to occur on a block shared between two DataFrames. The Block Reference Tracker (BRT) keeps track of shared blocks. If only read operations occur, the derived DataFrame silently reuses the original's data buffer (memory efficient). A copy is triggered only when necessary (a write to a shared block). This design achieves the best of both worlds: the <em>usability guarantee</em> (derived objects always behave as independent copies — no SettingWithCopyWarning) and <em>memory efficiency</em> (no unnecessary duplication)."
+  },
+  {
+    q:"Describe the full 4-step process of publishing a Python package to PyPI. For each step, specify the primary tool or command used.",
+    a:"<strong>Step 1 — File structure:</strong> Adopt the correct project layout: `src/&lt;package_name&gt;/` for source code, `tests/` for tests, plus `LICENSE`, `manifest.in`, `pyproject.toml`, and `readme.md`. No specific tool — manual organisation.<br><strong>Step 2 — Local testing (editable install):</strong> Run `python -m pip install -e .` to install the package in editable mode. Changes to source files take effect immediately without reinstalling.<br><strong>Step 3 — Build:</strong> Run `python -m build` to create the distribution packages (`dist/*.whl` wheel file and `dist/*.tar.gz` source archive). Run `twine check dist/*` to validate.<br><strong>Step 4 — Upload:</strong> Run `twine upload -r testpypi dist/*` (or without `-r testpypi` for the real PyPI). You need a PyPI account and an API key."
+  },
+  {
+    q:"Compare plotly.express and plotly.graph_objects. When would you choose one over the other? Give a concrete scenario for each.",
+    a:"<strong>plotly.express (px)</strong> is a high-level interface that takes a pandas DataFrame and auto-infers axis mappings, color, etc., from column names. Best for: quickly prototyping a scatter plot of a DataFrame during exploratory analysis — e.g., `px.scatter(df, x='population', y='murders', color='region')` in a few seconds.<br><strong>plotly.graph_objects (go)</strong> is a low-level interface giving control over every trace, axis, annotation, and layout element. Best for: production-quality custom dashboards — e.g., overlaying a scatter trace and a trendline with different marker sizes, custom hover templates, and dual y-axes. The flexibility comes at the cost of more verbose code."
+  },
+  {
+    q:"Explain the difference between a Python module and a Python package. How does the `__init__.py` file relate to packages, and what is its purpose?",
+    a:"A <strong>module</strong> is a single `.py` file. Any valid Python file can be imported as a module. A <strong>package</strong> is a folder containing multiple modules organised in a hierarchy. Packages allow dot-notation imports (e.g., `from mda.regression.models import LinearRegression`). The `__init__.py` file is placed inside a package folder and is executed automatically when the package is imported. Its purpose is to define the package's public API — you can import and re-export specific classes so users can write `from mda import LinearRegression` instead of the full path. It can also perform package-level setup (e.g., setting `__all__`)."
+  },
+  {
+    q:"Why is a pandas DataFrame described as a 'structured abstraction over NumPy' rather than simply a 2D NumPy array? What specific capabilities does it add, and what does it inherit?",
+    a:"A DataFrame <strong>inherits</strong> from NumPy: its underlying storage uses NumPy arrays (one per block/column group), its memory model (copy/view semantics, stride-based slicing), and Copy-on-Write behavior. What pandas <strong>adds</strong>: (1) <em>heterogeneous dtypes</em> — different columns can have different types, unlike a NumPy array which requires a single dtype; (2) <em>labeled axes</em> — both rows (index) and columns have names, enabling label-based access with `.loc`; (3) <em>alignment</em> — operations between DataFrames automatically align on row/column labels; (4) high-level operations like groupby, merge, pivot, and missing value handling. So the DataFrame is not just a NumPy array with methods — it is a richer abstraction that solves real data wrangling problems NumPy was not designed for."
+  },
+  {
+    q:"A data science team notices that after running `grades = df['grade']` and `grades.iloc[0] = 'E'`, the original `df` is also modified in their older pandas version. Explain why this happens and how pandas ≥ 3.0 Copy-on-Write resolves it.",
+    a:"In pandas < 3.0, `df['grade']` may return a <strong>view</strong> — a Series sharing the same underlying NumPy data buffer as `df`. When you write `grades.iloc[0] = 'E'`, you are writing into that shared buffer, which `df` also reads — hence the silent modification. This behaviour was unpredictable because whether you got a view or a copy depended on internal pandas decisions, leading to the <code>SettingWithCopyWarning</code>. In pandas ≥ 3.0, <strong>Copy-on-Write</strong> guarantees that `grades` always <em>behaves</em> as an independent copy. When `grades.iloc[0] = 'E'` is executed, the BRT detects that the underlying block is shared with `df`, and pandas creates a new data buffer for `grades` before performing the write. `df` is completely unaffected."
+  },
+  {
+    q:"What is the difference between `import <module>` and `from <module> import <ClassName>` beyond just syntax? Consider what gets bound to the namespace and any implications for code clarity and potential conflicts.",
+    a:"<strong>`import module`</strong>: The module object is bound to the local namespace under the module name. Classes/functions must be accessed as `module.ClassName()`. Advantage: avoids name conflicts; makes the origin of symbols explicit. Disadvantage: more verbose.<br><strong>`from module import ClassName`</strong>: Only `ClassName` is bound to the local namespace. You can call `ClassName()` directly. Advantage: cleaner, shorter code. Disadvantage: if another module also defines a `ClassName`, importing both with `from` syntax causes a name collision (the second import overwrites the first). Additionally, if the module name is long, the `as` alias pattern (`import numpy as np`) provides readability without the namespace pollution risk."
+  },
+  {
+    q:"Describe the memory layout implications of creating a NumPy array with shape (3, 4) in default C order. How are the elements stored physically, and what happens to the strides when you transpose it?",
+    a:"In C (row-major) order, a (3, 4) array stores elements row by row: `[row0_col0, row0_col1, row0_col2, row0_col3, row1_col0, ...]`. For a 64-bit (8-byte) dtype, strides are `(32, 8)` — to advance one row, jump 32 bytes (4 elements × 8 bytes); to advance one column, jump 8 bytes. When you <strong>transpose</strong> (`.T`), NumPy does NOT rearrange the data buffer. Instead, it swaps the shape `(4, 3)` and swaps the strides to `(8, 32)`. The same physical memory is now read in a different order. This is a zero-copy operation — just a metadata change. The transposed array is a view in column-major (Fortran) order. Operations on a non-contiguous transposed array may be slower due to cache misses."
+  },
+  {
+    q:"A student says: 'I should always use views instead of copies in NumPy to save memory.' Critically evaluate this statement — when is it correct, and when could it lead to bugs?",
+    a:"The statement is <strong>partially correct</strong> but dangerously oversimplified. <em>When views are safe</em>: if you need a read-only window into a large array (e.g., processing a slice without modifying it), views avoid unnecessary memory duplication — critical for huge datasets. <em>When views cause bugs</em>: if you modify the view expecting the original to stay unchanged, you will silently corrupt data. Example: `subset = big_array[100:200]`; `subset[:] = 0` also zeroes `big_array[100:200]`. The correct approach is: (1) use views for read-only access to save memory; (2) use copies when you need independent data. Pandas CoW solves this at a higher level by deferring copies until a write actually occurs, combining the benefits of both approaches."
+  }
+];
+
+let answered = 0, correct = 0;
+const mcqState = {};
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = 'mcq-' + i;
+    let optsHTML = item.opts.map((o, j) =>
+      `<button class="option-btn" id="opt-${i}-${j}" onclick="selectOption(${i},${j})">${String.fromCharCode(65+j)}. ${o}</button>`
+    ).join('');
+    card.innerHTML = `
+      <div class="question-label">Question ${i+1} of ${mcqData.length}</div>
+      <div class="question-stem">${item.q}</div>
+      ${optsHTML}
+      <button class="check-btn" id="check-${i}" onclick="checkAnswer(${i})">Check answer</button>
+      <div id="feedback-${i}"></div>
+    `;
+    container.appendChild(card);
+    mcqState[i] = {selected: null, checked: false};
+  });
+  updateScore();
+}
+
+function selectOption(qi, oi) {
+  if (mcqState[qi].checked) return;
+  mcqState[qi].selected = oi;
+  const numOpts = mcqData[qi].opts.length;
+  for (let j = 0; j < numOpts; j++) {
+    const btn = document.getElementById(`opt-${qi}-${j}`);
+    btn.className = 'option-btn' + (j === oi ? ' selected' : '');
+  }
+}
+
+function checkAnswer(qi) {
+  if (mcqState[qi].checked) return;
+  const sel = mcqState[qi].selected;
+  if (sel === null) { alert('Please select an answer first.'); return; }
+  mcqState[qi].checked = true;
+  answered++;
+  const correctIdx = mcqData[qi].ans;
+  const numOpts = mcqData[qi].opts.length;
+  for (let j = 0; j < numOpts; j++) {
+    const btn = document.getElementById(`opt-${qi}-${j}`);
+    btn.disabled = true;
+    if (j === correctIdx && j === sel) btn.className = 'option-btn correct';
+    else if (j === sel && j !== correctIdx) btn.className = 'option-btn incorrect';
+    else if (j === correctIdx) btn.className = 'option-btn reveal-correct';
+    else btn.className = 'option-btn';
+  }
+  const isCorrect = sel === correctIdx;
+  if (isCorrect) correct++;
+  const fb = document.getElementById(`feedback-${qi}`);
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.innerHTML = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + mcqData[qi].exp;
+  document.getElementById(`check-${qi}`).style.display = 'none';
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = `${correct} / ${answered}`;
+}
+
+function resetQuiz() {
+  answered = 0; correct = 0;
+  Object.keys(mcqState).forEach(k => { mcqState[k] = {selected: null, checked: false}; });
+  renderMCQ();
+}
+
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+    card.innerHTML = `
+      <div class="question-label">Short Answer ${i+1}</div>
+      <p style="font-weight:600;color:#1a1a2e;margin:8px 0 10px;">${item.q}</p>
+      <button class="reveal-btn" onclick="toggleAnswer(${i}, this)">Reveal model answer</button>
+      <div class="answer-panel" id="sa-ans-${i}">${item.a}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleAnswer(i, btn) {
+  const panel = document.getElementById('sa-ans-' + i);
+  if (panel.style.display === 'none' || panel.style.display === '') {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide answer';
+  } else {
+    panel.style.display = 'none';
+    btn.textContent = 'Reveal model answer';
+  }
+}
+
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

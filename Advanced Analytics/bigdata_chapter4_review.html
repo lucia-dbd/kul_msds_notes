@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Learning — Chapter 4 Complete | Exam Notes</title>
+
+<script>
+// Map every anchor id to its parent part.
+// This keeps the two-level navigation synchronized with direct hash links.
+const navPartMap = {
+  part1: ['intro', 'history', 'perceptron', 'gradient', 'xor', 'backprop', 'activation', 'init', 'gdvariants', 'overfit', 'p1mcq', 'p1sa'],
+  part2: ['cnns', 'resnet', 'batchnorm', 'augment', 'cnntasks', 'adversarial', 'blackbox', 'p2mcq', 'p2sa'],
+  part3: ['deepdream', 'style', 'ae', 'vae', 'gans', 'diffusion', 'clip', 'p3mcq', 'p3sa']
+};
+
+// Resolve the active part from the current hash.
+// Fall back to Part 1 so the navigation never renders without a visible submenu.
+function getPartByHash(hashValue) {
+  const cleanHash = (hashValue || '').replace(/^#/, '');
+  if (!cleanHash) {
+    return 'part1';
+  }
+  for (const [partKey, idList] of Object.entries(navPartMap)) {
+    if (idList.includes(cleanHash)) {
+      return partKey;
+    }
+  }
+  return 'part1';
+}
+
+// Keep the top-level part buttons and submenu panels in sync.
+// Every navigation state change goes through this function.
+function setActiveNavPart(partKey) {
+  document.querySelectorAll('.nav-part-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.part === partKey);
+  });
+  document.querySelectorAll('.nav-submenu').forEach(function(panel) {
+    panel.classList.toggle('active', panel.dataset.partPanel === partKey);
+  });
+}
+
+// Highlight the second-level anchor that matches the current hash.
+function setActiveNavLink(hashValue) {
+  const cleanHash = (hashValue || '').replace(/^#/, '');
+  document.querySelectorAll('.nav-submenu a').forEach(function(link) {
+    const targetHash = (link.getAttribute('href') || '').replace(/^#/, '');
+    link.classList.toggle('active-link', cleanHash !== '' && targetHash === cleanHash);
+  });
+}
+
+// Initialize navigation behavior.
+// 1. Open the correct part on first load.
+// 2. Switch only the submenu when a top-level part button is clicked.
+// 3. Preserve native anchor navigation by syncing on hash changes.
+document.addEventListener('DOMContentLoaded', function() {
+  setActiveNavPart(getPartByHash(window.location.hash));
+  setActiveNavLink(window.location.hash);
+
+  document.querySelectorAll('.nav-part-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      setActiveNavPart(btn.dataset.part);
+    });
+  });
+
+  document.querySelectorAll('.nav-submenu a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      const targetHash = link.getAttribute('href');
+      const targetPart = getPartByHash(targetHash);
+      setActiveNavPart(targetPart);
+      setActiveNavLink(targetHash);
+    });
+  });
+});
+
+// Sync navigation state for back/forward navigation and external deep links.
+window.addEventListener('hashchange', function() {
+  setActiveNavPart(getPartByHash(window.location.hash));
+  setActiveNavLink(window.location.hash);
+});
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* Part divider headers */
+  .part-header {
+    background: linear-gradient(135deg, #0f2942, #1d5080);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 16px 28px;
+    margin: 36px 0 20px 0;
+    font-size: 1.1em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(30,80,140,0.15);
+  }
+
+  /* Offset anchor scrolling so sticky navigation does not cover headings. */
+  .part-header,
+  .notes-section,
+  .mcq-section,
+  .sa-section {
+    scroll-margin-top: 160px;
+  }
+
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 28px;
+    position: sticky;
+    top: 12px;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(17,40,74,0.12);
+    backdrop-filter: blur(10px);
+  }
+  .nav-top-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .nav-title {
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #6a7a93;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .nav-part-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav-part-btn {
+    background: #eef2fb;
+    color: #2e6da4;
+    border: 1px solid #d8e1f2;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 0.88em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  .nav-part-btn:hover,
+  .nav-part-btn.active {
+    background: #2e6da4;
+    color: #ffffff;
+    border-color: #2e6da4;
+  }
+  .nav-submenu {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav-submenu.active {
+    display: flex;
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4;
+    border-radius: 20px; padding: 4px 14px;
+    font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .nav-bar a.active-link {
+    background-color: #1a3a5c;
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .nav-bar {
+      top: 8px;
+      padding: 12px 14px;
+    }
+    .nav-top-row {
+      align-items: flex-start;
+    }
+    .nav-bar a {
+      font-size: 0.82em;
+      padding: 5px 12px;
+    }
+  }
+
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4; font-size: 1.05em; font-weight: 700;
+    margin-top: 20px; margin-bottom: 6px;
+  }
+
+  .key-point       { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; border-radius:0 8px 8px 0; }
+  .example-box     { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; border-radius:0 8px 8px 0; }
+  .theorem-box     { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; border-radius:0 8px 8px 0; }
+  .warning-box     { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; border-radius:0 8px 8px 0; }
+  .computation-box { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; border-radius:0 8px 8px 0; }
+  .formula-box     { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; overflow-x:auto; }
+
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+
+  /* MCQ */
+  .mcq-section {
+    background-color:#ffffff; border-radius:12px;
+    padding:28px 36px; margin-bottom:28px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color:#92400e; font-size:1.2em; margin-top:0; }
+  .score-display {
+    background:#fff3cd; border:1px solid #ffc107; border-radius:20px;
+    padding:5px 18px; font-weight:700; color:#856404;
+    display:inline-block; font-size:0.95em; margin-left:12px;
+  }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem  { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+
+  .option-btn {
+    display:block; width:100%; background:#ffffff;
+    border:1.5px solid #d0d8ea; border-radius:8px;
+    padding:10px 16px; margin:6px 0;
+    text-align:left; cursor:pointer;
+    font-size:0.95em; color:#2c2c3a;
+    font-family:inherit; transition:all 0.18s;
+  }
+  .option-btn:hover         { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.selected      { background:#dce8f8; border-color:#2e6da4; color:#1a3a5c; font-weight:600; }
+  .option-btn.correct       { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; pointer-events:none; }
+  .option-btn.incorrect     { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; pointer-events:none; }
+  .option-btn.reveal-correct{ background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; pointer-events:none; }
+  .option-btn.disabled      { pointer-events:none; opacity:0.6; }
+
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; line-height:1.6; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+
+  .submit-btn {
+    background:#2e6da4; color:#ffffff; border:none; border-radius:20px;
+    padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer;
+    margin-top:10px; transition:background 0.2s; font-family:inherit;
+  }
+  .submit-btn:hover    { background:#1a3a5c; }
+  .submit-btn:disabled { background:#aab8c9; cursor:not-allowed; }
+
+  .reset-btn {
+    background:#6c757d; color:#ffffff; border:none; border-radius:20px;
+    padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer;
+    margin-top:14px; margin-left:8px; transition:background 0.2s; font-family:inherit;
+  }
+  .reset-btn:hover { background:#495057; }
+
+  /* SA */
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section h2 { color:#1a3a5c; font-size:1.2em; margin-top:0; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem  { font-weight:600; color:#1a1a2e; margin-bottom:14px; }
+
+  .reveal-btn {
+    background:#6f42c1; color:#ffffff; border:none; border-radius:20px;
+    padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer;
+    margin-top:12px; transition:background 0.2s; font-family:inherit;
+  }
+  .reveal-btn:hover { background:#5a32a3; }
+
+  .answer-panel {
+    background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px;
+    padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8;
+    display:none;
+  }
+  .answer-panel strong { color:#4a148c; }
+  .answer-panel ul { margin:8px 0 8px 20px; }
+  .answer-panel li { margin-bottom:4px; }
+
+  .timeline { position:relative; padding-left:28px; margin:16px 0; }
+  .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:linear-gradient(to bottom,#2e6da4,#7c4dff); }
+  .timeline-item { position:relative; margin-bottom:12px; }
+  .timeline-item::before { content:''; position:absolute; left:-24px; top:7px; width:10px; height:10px; border-radius:50%; background:#2e6da4; border:2px solid #fff; box-shadow:0 0 0 2px #2e6da4; }
+  .timeline-item .year { display:inline-block; background:#2e6da4; color:#fff; font-size:0.78em; font-weight:700; padding:1px 8px; border-radius:10px; margin-right:6px; }
+
+  mjx-container { overflow-x:auto; max-width:100%; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<div class="page-header">
+  <h1>📘 Deep Learning — Chapter 4 · Complete Exam Notes</h1>
+  <div class="subtitle">Advanced Analytics · Parts 1, 2 &amp; 3 · Study Notes + 75 MCQ/T-F + 15 Short Answer Questions</div>
+</div>
+
+<!-- ═══════════════════════════ NAV ═══════════════════════════ -->
+<div class="nav-bar">
+  <!-- Top-level navigation only switches parts so the bar stays compact. -->
+  <div class="nav-top-row">
+    <span class="nav-title">Quick Navigation</span>
+    <div class="nav-part-tabs">
+      <button type="button" class="nav-part-btn active" data-part="part1">Part 1</button>
+      <button type="button" class="nav-part-btn" data-part="part2">Part 2</button>
+      <button type="button" class="nav-part-btn" data-part="part3">Part 3</button>
+    </div>
+  </div>
+
+  <!-- Second-level links keep the original anchors so all existing jumps still work. -->
+  <div class="nav-submenu active" data-part-panel="part1">
+    <a href="#intro">Basic Idea</a>
+    <a href="#history">History</a>
+    <a href="#perceptron">Perceptron</a>
+    <a href="#gradient">Gradient Descent</a>
+    <a href="#xor">XOR / MLP</a>
+    <a href="#backprop">Backprop</a>
+    <a href="#activation">Activation Fns</a>
+    <a href="#init">Init &amp; Loss</a>
+    <a href="#gdvariants">GD &amp; Optimizers</a>
+    <a href="#overfit">Overfitting</a>
+    <a href="#p1mcq" class="nav-mcq">P1 MCQ (25)</a>
+    <a href="#p1sa" class="nav-sa">P1 SA (5)</a>
+  </div>
+
+  <div class="nav-submenu" data-part-panel="part2">
+    <a href="#cnns">CNNs</a>
+    <a href="#resnet">ResNet</a>
+    <a href="#batchnorm">Batch Norm</a>
+    <a href="#augment">Augmentation</a>
+    <a href="#cnntasks">CNN Tasks</a>
+    <a href="#adversarial">Adversarial</a>
+    <a href="#blackbox">Interpretability</a>
+    <a href="#p2mcq" class="nav-mcq">P2 MCQ (25)</a>
+    <a href="#p2sa" class="nav-sa">P2 SA (5)</a>
+  </div>
+
+  <div class="nav-submenu" data-part-panel="part3">
+    <a href="#deepdream">Deep Dream</a>
+    <a href="#style">Style Transfer</a>
+    <a href="#ae">Autoencoders</a>
+    <a href="#vae">VAEs</a>
+    <a href="#gans">GANs</a>
+    <a href="#diffusion">Diffusion</a>
+    <a href="#clip">CLIP</a>
+    <a href="#p3mcq" class="nav-mcq">P3 MCQ (25)</a>
+    <a href="#p3sa" class="nav-sa">P3 SA (5)</a>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PART 1
+═══════════════════════════════════════════════════════════════ -->
+<div class="part-header">📗 Part 1 — Foundations: Perceptron, MLP, Backpropagation &amp; Training</div>
+
+<!-- 1. BASIC IDEA -->
+<div class="notes-section" id="intro">
+  <h2>1. The Basic Idea</h2>
+  <div class="key-point">
+    Neural networks are <strong>loosely modeled on the human brain</strong>. Mathematical "neurons" are connected together and the network is asked to solve a problem repeatedly — each time <strong>strengthening connections that lead to success</strong> and weakening those that lead to failure.
+  </div>
+  <p>Biological analogy: Dendrites receive input → Cell body integrates → Axon transmits signal → Axon Terminal delivers output to next neuron.</p>
+  <p>The key concept is <strong>representation learning</strong>: rather than hand-engineering features, deep networks learn hierarchical representations directly from raw data.</p>
+</div>
+
+<!-- 2. HISTORY -->
+<div class="notes-section" id="history">
+  <h2>2. A Brief History</h2>
+  <div class="timeline">
+    <div class="timeline-item"><span class="year">1943</span> <strong>McCulloch &amp; Pitts</strong> — Electronic Brain. Adjustable weights, but weights not learned.</div>
+    <div class="timeline-item"><span class="year">1957</span> <strong>Rosenblatt</strong> — Perceptron with learnable weights &amp; threshold. → <em>Golden Age begins.</em></div>
+    <div class="timeline-item"><span class="year">1960</span> <strong>Widrow &amp; Hoff</strong> — ADALINE.</div>
+    <div class="timeline-item"><span class="year">1969</span> <strong>Minsky &amp; Papert</strong> — XOR Problem proved perceptrons cannot solve non-linear problems. → <em>AI Winter begins.</em></div>
+    <div class="timeline-item"><span class="year">1986</span> <strong>Rumelhart, Hinton, Williams</strong> — Multi-layered Perceptron + Backpropagation. Solves nonlinear problems; but large computation, local optima, overfitting remain challenges.</div>
+    <div class="timeline-item"><span class="year">1995</span> <strong>Vapnik &amp; Cortes</strong> — SVM. Limitation: kernel function requires human intervention.</div>
+    <div class="timeline-item"><span class="year">2006</span> <strong>Hinton &amp; Ruslan</strong> — Deep Neural Network with Pretraining. Hierarchical feature learning.</div>
+  </div>
+</div>
+
+<!-- 3. PERCEPTRON -->
+<div class="notes-section" id="perceptron">
+  <h2>3. The Perceptron</h2>
+  <p>A perceptron works over numerical <strong>input units</strong> \(x_1, x_2, \ldots, x_n\). Each neuron outputs an <strong>activation</strong>; for input neurons this equals the raw data value.</p>
+
+  <div class="key-point">
+    <strong>Weighted sum:</strong>
+    \[ \text{net} = \sum_i w_i x_i \]
+    Every input \(x_i\) is multiplied by weight \(w_i\) and the results are summed.
+  </div>
+
+  <div class="key-point">
+    <strong>Activation function</strong> \(f(\cdot)\) maps the weighted sum to the output:
+    \[ \hat{y} = f\!\left(\sum_i w_i x_i\right) \]
+    Weights are <strong>fixed once trained</strong>; the activation changes with each input instance.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Bias term \(w_b\):</strong> an extra input unit with activation fixed to 1 and its own learnable weight — analogous to the intercept in a regression model:
+    \[ \hat{y} = f\!\left(\sum_i w_i x_i + w_b\right) \]
+  </div>
+</div>
+
+<!-- 4. GRADIENT DESCENT -->
+<div class="notes-section" id="gradient">
+  <h2>4. Gradient Descent &amp; Sigmoid Derivation</h2>
+  <p>The loss \(L\) is a function of the weights. We minimise it by iteratively stepping in the direction of steepest descent (negative gradient).</p>
+
+  <div class="computation-box">
+    <strong>Full gradient derivation — sigmoid perceptron with squared loss</strong><br>
+    Let \(o = \sum_i w_i x_i + b\), \(\hat{y} = \sigma(o)\), \(L = (y - \hat{y})^2\):
+    \[
+    \frac{\partial L}{\partial w_i}
+    = 2(y-\hat{y})(-1)\,\sigma(o)\!\left(1-\sigma(o)\right) x_i
+    \]
+    Using the sigmoid derivative \(\sigma'(o) = \sigma(o)(1-\sigma(o))\). The positive scalar \(\sigma(o)(1-\sigma(o))\) can be absorbed into the learning rate.
+  </div>
+
+  <div class="key-point">
+    <strong>Weight update rule:</strong>
+    \[ w_i \;\leftarrow\; w_i - \lambda\,\frac{\partial L}{\partial w_i} \]
+    where \(\lambda > 0\) is the <strong>learning rate</strong>.
+  </div>
+
+  <div class="warning-box">
+    <strong>Learning rate \(\lambda\) — crucial hyperparameter:</strong><br>
+    • <strong>Too high</strong> → overshoots the minimum; training diverges<br>
+    • <strong>Too low</strong> → very slow convergence; risk of getting stuck in local minima<br>
+    • A local minimum for one weight is not necessarily a local minimum for all weights simultaneously.
+  </div>
+</div>
+
+<!-- 5. XOR / MLP -->
+<div class="notes-section" id="xor">
+  <h2>5. XOR Problem &amp; Multi-Layer Perceptron (MLP)</h2>
+  <p>The <strong>XOR problem</strong>: a single perceptron can only learn linearly separable functions. XOR is not linearly separable, so a single layer fails. The solution is to add <strong>hidden layers</strong>.</p>
+
+  <div class="key-point">
+    <strong>Universal Approximation Theorem:</strong> An MLP with a <em>single</em> hidden layer and a non-linear activation function can approximate any continuous function to arbitrary precision — given enough hidden units.
+  </div>
+
+  <p>In practice, <strong>depth</strong> (more layers) is preferred over width (more units in one layer) because deeper networks learn hierarchical, compositional representations more efficiently.</p>
+
+  <h3>Automatic Differentiation</h3>
+  <p>Deep learning frameworks (TensorFlow, PyTorch) use <strong>automatic differentiation</strong>: they build a computational graph of all operations during the forward pass, then automatically compute exact gradients via the chain rule during backpropagation — no need to derive gradients by hand.</p>
+</div>
+
+<!-- 6. BACKPROP -->
+<div class="notes-section" id="backprop">
+  <h2>6. Backpropagation &amp; Chain Rule</h2>
+  <div class="theorem-box">
+    <strong>Chain Rule:</strong> For composed functions \(L = f(g(h(\mathbf{w})))\):
+    \[ \frac{\partial L}{\partial w} = \frac{\partial L}{\partial f} \cdot \frac{\partial f}{\partial g} \cdot \frac{\partial g}{\partial h} \cdot \frac{\partial h}{\partial w} \]
+  </div>
+
+  <p>Backpropagation applies the chain rule layer-by-layer from the output back to the input, computing the gradient of the loss with respect to every weight. Gradients are then used in the weight update rule.</p>
+
+  <div class="warning-box">
+    <strong>Vanishing gradients:</strong> In deep networks with sigmoid/tanh activations, repeated multiplication of small derivatives \(\sigma'(o) \in (0, 0.25]\) causes gradients to shrink exponentially toward the input layers — early layers learn extremely slowly or not at all.
+  </div>
+</div>
+
+<!-- 7. ACTIVATION FUNCTIONS -->
+<div class="notes-section" id="activation">
+  <h2>7. Activation Functions</h2>
+
+  <table>
+    <thead><tr><th>Function</th><th>Formula</th><th>Key Property</th><th>Issue</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sigmoid</strong></td><td>\(\sigma(x) = \frac{1}{1+e^{-x}}\)</td><td>Output in (0,1), probabilistic</td><td>Vanishing gradients, not zero-centered</td></tr>
+      <tr><td><strong>Tanh</strong></td><td>\(\tanh(x)\)</td><td>Zero-centered, output in (−1,1)</td><td>Still vanishing gradients</td></tr>
+      <tr><td><strong>ReLU</strong></td><td>\(\max(0, x)\)</td><td>No vanishing gradient for \(x>0\), fast</td><td>Dead ReLU: neurons stuck at 0</td></tr>
+      <tr><td><strong>Leaky ReLU</strong></td><td>\(\max(\alpha x, x)\), small \(\alpha\)</td><td>Fixes dead ReLU</td><td>\(\alpha\) is a hyperparameter</td></tr>
+      <tr><td><strong>PReLU</strong></td><td>\(\max(\alpha x, x)\), learned \(\alpha\)</td><td>\(\alpha\) learned from data</td><td>Extra parameter</td></tr>
+      <tr><td><strong>ELU</strong></td><td>\(x\) if \(x \ge 0\), else \(\alpha(e^x-1)\)</td><td>Smooth, negative saturation</td><td>Computationally expensive</td></tr>
+      <tr><td><strong>SELU</strong></td><td>Scaled ELU</td><td>Self-normalising</td><td>Requires specific init &amp; architecture</td></tr>
+      <tr><td><strong>GELU</strong></td><td>\(x \cdot \Phi(x)\)</td><td>Smooth, used in Transformers/BERT</td><td>Computationally expensive</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>Dead ReLU problem:</strong> If a neuron's pre-activation is always negative, it outputs 0 and receives zero gradient — it is permanently "dead" and never learns. Caused by large learning rates or poor initialisation. Leaky/PReLU/ELU mitigate this.
+  </div>
+</div>
+
+<!-- 8. INIT & LOSS -->
+<div class="notes-section" id="init">
+  <h2>8. Weight Initialisation &amp; Loss Functions</h2>
+
+  <h3>Weight Initialisation</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Variance</th><th>Best For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Glorot / Xavier</strong></td><td>\(\frac{2}{n_\text{in}+n_\text{out}}\)</td><td>Sigmoid / Tanh</td></tr>
+      <tr><td><strong>He</strong></td><td>\(\frac{2}{n_\text{in}}\)</td><td>ReLU / Leaky ReLU</td></tr>
+      <tr><td><strong>LeCun</strong></td><td>\(\frac{1}{n_\text{in}}\)</td><td>SELU</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Loss Functions</h3>
+  <div class="key-point">
+    <strong>Cross-entropy loss</strong> (standard, binary):
+    \[ L = -\sum_i \left[y_i \log \hat{y}_i + (1-y_i)\log(1-\hat{y}_i)\right] \]
+  </div>
+  <div class="key-point">
+    <strong>Balanced cross-entropy</strong> — adds class weight \(\beta\) to handle class imbalance:
+    \[ L = -\sum_i \left[\beta\, y_i \log \hat{y}_i + (1-\beta)(1-y_i)\log(1-\hat{y}_i)\right] \]
+  </div>
+  <div class="key-point">
+    <strong>Focal loss</strong> — down-weights easy examples, focuses on hard ones:
+    \[ L = -\sum_i (1-\hat{y}_i)^\gamma \log \hat{y}_i \]
+  </div>
+</div>
+
+<!-- 9. GD VARIANTS & OPTIMIZERS -->
+<div class="notes-section" id="gdvariants">
+  <h2>9. Gradient Descent Variants, Optimizers &amp; Learning Rate Scheduling</h2>
+
+  <table>
+    <thead><tr><th>Method</th><th>Batch Size</th><th>Update Frequency</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Batch GD</strong></td><td>All data</td><td>Once per epoch</td><td>Stable but slow; no noise</td></tr>
+      <tr><td><strong>Stochastic GD</strong></td><td>1 sample</td><td>Every sample</td><td>Noisy; can escape local minima</td></tr>
+      <tr><td><strong>Mini-batch GD</strong></td><td>Small batch</td><td>Every mini-batch</td><td>Best of both; standard in practice</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Adam Optimizer</h3>
+  <p>Adam (Adaptive Moment Estimation) combines momentum (1st moment) and RMSProp (2nd moment) for adaptive per-parameter learning rates:</p>
+  <div class="formula-box">
+    \[ m_t = \beta_1 m_{t-1} + (1-\beta_1)g_t \quad \text{(1st moment — velocity)} \]
+    \[ v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2 \quad \text{(2nd moment — variance)} \]
+    \[ w \leftarrow w - \frac{\lambda}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t \quad \text{(bias-corrected update)} \]
+  </div>
+
+  <h3>Learning Rate Scheduling</h3>
+  <p><strong>Cyclical Learning Rates (CLR):</strong> cycle the learning rate between a minimum and maximum bound. Allows escaping local minima and saddle points.</p>
+  <p><strong>One-cycle policy:</strong> one large cycle — warm up LR to maximum, then decay. Typically outperforms fixed LR schedules.</p>
+</div>
+
+<!-- 10. OVERFITTING -->
+<div class="notes-section" id="overfit">
+  <h2>10. Overfitting Prevention</h2>
+  <table>
+    <thead><tr><th>Technique</th><th>Mechanism</th></tr></thead>
+    <tbody>
+      <tr><td><strong>L1 Regularisation (Lasso)</strong></td><td>Add \(\lambda\sum|w_i|\) to loss → sparsity</td></tr>
+      <tr><td><strong>L2 Regularisation (Ridge)</strong></td><td>Add \(\lambda\sum w_i^2\) to loss → small weights</td></tr>
+      <tr><td><strong>Dropout</strong></td><td>Randomly zero out neurons during training (probability \(p\)); forces redundant representations</td></tr>
+      <tr><td><strong>Early Stopping</strong></td><td>Stop training when validation loss stops improving</td></tr>
+      <tr><td><strong>Data Augmentation</strong></td><td>Artificially increase training set diversity</td></tr>
+      <tr><td><strong>Batch Normalisation</strong></td><td>Normalise layer inputs; acts as mild regulariser</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- ═══════════════════ PART 1 MCQ ═══════════════════ -->
+<div class="mcq-section" id="p1mcq">
+  <h2>🧠 Part 1 — Multiple Choice &amp; True/False
+    <span class="score-display" id="p1-score">Score: 0 / 25</span>
+  </h2>
+  <p style="color:#6b7280;font-size:0.9em;">Select an answer for each question, then click <strong>Submit All</strong> to check.</p>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="p1q1">
+    <div class="question-label">Part 1 · Question 1</div>
+    <div class="question-stem">Which of the following best describes the <em>Universal Approximation Theorem</em>?</div>
+    <button class="option-btn" data-q="p1q1" data-opt="A">A) Any neural network can approximate any function, regardless of depth or width</button>
+    <button class="option-btn" data-q="p1q1" data-opt="B">B) An MLP with at least one hidden layer and a non-linear activation can approximate any continuous function to arbitrary precision</button>
+    <button class="option-btn" data-q="p1q1" data-opt="C">C) A single perceptron with enough weights can solve any classification problem</button>
+    <button class="option-btn" data-q="p1q1" data-opt="D">D) A deep network always outperforms a shallow network</button>
+    <div class="feedback-bar" id="p1q1-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="p1q2">
+    <div class="question-label">Part 1 · Question 2</div>
+    <div class="question-stem">The sigmoid activation function \(\sigma(x) = \frac{1}{1+e^{-x}}\) has derivative \(\sigma'(x)\) equal to:</div>
+    <button class="option-btn" data-q="p1q2" data-opt="A">A) \(\sigma(x)\)</button>
+    <button class="option-btn" data-q="p1q2" data-opt="B">B) \(\sigma(x)(1 - \sigma(x))\)</button>
+    <button class="option-btn" data-q="p1q2" data-opt="C">C) \(1 - \sigma(x)^2\)</button>
+    <button class="option-btn" data-q="p1q2" data-opt="D">D) \(e^{-x}/(1+e^{-x})\)</button>
+    <div class="feedback-bar" id="p1q2-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="p1q3">
+    <div class="question-label">Part 1 · Question 3</div>
+    <div class="question-stem">True or False: The XOR problem proved that a single-layer perceptron cannot solve non-linearly separable problems, which contributed to the first AI Winter.</div>
+    <button class="option-btn" data-q="p1q3" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q3" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q3-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="p1q4">
+    <div class="question-label">Part 1 · Question 4</div>
+    <div class="question-stem">The <strong>Dead ReLU</strong> problem occurs when:</div>
+    <button class="option-btn" data-q="p1q4" data-opt="A">A) The ReLU output saturates at 1 for large positive inputs</button>
+    <button class="option-btn" data-q="p1q4" data-opt="B">B) A neuron's pre-activation is permanently negative, causing zero output and zero gradient — the neuron never learns</button>
+    <button class="option-btn" data-q="p1q4" data-opt="C">C) ReLU causes vanishing gradients for all inputs</button>
+    <button class="option-btn" data-q="p1q4" data-opt="D">D) The learning rate is too low to update ReLU weights</button>
+    <div class="feedback-bar" id="p1q4-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="p1q5">
+    <div class="question-label">Part 1 · Question 5</div>
+    <div class="question-stem">He initialisation sets the weight variance to \(\frac{2}{n_\text{in}}\). It is most appropriate for which activation function?</div>
+    <button class="option-btn" data-q="p1q5" data-opt="A">A) Sigmoid</button>
+    <button class="option-btn" data-q="p1q5" data-opt="B">B) Tanh</button>
+    <button class="option-btn" data-q="p1q5" data-opt="C">C) ReLU</button>
+    <button class="option-btn" data-q="p1q5" data-opt="D">D) SELU</button>
+    <div class="feedback-bar" id="p1q5-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="p1q6">
+    <div class="question-label">Part 1 · Question 6</div>
+    <div class="question-stem">In the weight update rule \(w_i \leftarrow w_i - \lambda \frac{\partial L}{\partial w_i}\), a very high learning rate \(\lambda\) leads to:</div>
+    <button class="option-btn" data-q="p1q6" data-opt="A">A) Slow but guaranteed convergence</button>
+    <button class="option-btn" data-q="p1q6" data-opt="B">B) Overfitting</button>
+    <button class="option-btn" data-q="p1q6" data-opt="C">C) Overshooting the minimum; training may diverge</button>
+    <button class="option-btn" data-q="p1q6" data-opt="D">D) Vanishing gradients</button>
+    <div class="feedback-bar" id="p1q6-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="p1q7">
+    <div class="question-label">Part 1 · Question 7</div>
+    <div class="question-stem">Backpropagation computes gradients by applying the chain rule. In a network with many layers of sigmoid activations, the main problem is:</div>
+    <button class="option-btn" data-q="p1q7" data-opt="A">A) Exploding gradients — each layer amplifies the gradient</button>
+    <button class="option-btn" data-q="p1q7" data-opt="B">B) Vanishing gradients — repeated multiplication of values in (0, 0.25] causes the gradient to shrink exponentially</button>
+    <button class="option-btn" data-q="p1q7" data-opt="C">C) The chain rule cannot be applied when activations are non-linear</button>
+    <button class="option-btn" data-q="p1q7" data-opt="D">D) The gradients become undefined at the sigmoid output</button>
+    <div class="feedback-bar" id="p1q7-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="p1q8">
+    <div class="question-label">Part 1 · Question 8</div>
+    <div class="question-stem">Focal loss is designed to address which training problem?</div>
+    <button class="option-btn" data-q="p1q8" data-opt="A">A) Vanishing gradients in deep networks</button>
+    <button class="option-btn" data-q="p1q8" data-opt="B">B) Overfitting to the training set</button>
+    <button class="option-btn" data-q="p1q8" data-opt="C">C) Class imbalance — easy examples dominate the loss, preventing learning of hard examples</button>
+    <button class="option-btn" data-q="p1q8" data-opt="D">D) Exploding gradients</button>
+    <div class="feedback-bar" id="p1q8-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="p1q9">
+    <div class="question-label">Part 1 · Question 9</div>
+    <div class="question-stem">True or False: Stochastic Gradient Descent (SGD) processes all training samples before making a single weight update.</div>
+    <button class="option-btn" data-q="p1q9" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q9" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q9-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="p1q10">
+    <div class="question-label">Part 1 · Question 10</div>
+    <div class="question-stem">The Adam optimizer maintains which two quantities per parameter to adapt learning rates?</div>
+    <button class="option-btn" data-q="p1q10" data-opt="A">A) The L1 and L2 norms of the gradient</button>
+    <button class="option-btn" data-q="p1q10" data-opt="B">B) The first moment (mean of gradients) and the second moment (uncentered variance of gradients)</button>
+    <button class="option-btn" data-q="p1q10" data-opt="C">C) The learning rate and the weight decay term</button>
+    <button class="option-btn" data-q="p1q10" data-opt="D">D) The momentum and the Nesterov correction term</button>
+    <div class="feedback-bar" id="p1q10-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="p1q11">
+    <div class="question-label">Part 1 · Question 11</div>
+    <div class="question-stem">L1 regularisation (Lasso) differs from L2 regularisation (Ridge) in that L1:</div>
+    <button class="option-btn" data-q="p1q11" data-opt="A">A) Tends to produce larger weights overall</button>
+    <button class="option-btn" data-q="p1q11" data-opt="B">B) Tends to produce sparse weight vectors (many weights exactly zero)</button>
+    <button class="option-btn" data-q="p1q11" data-opt="C">C) Adds a quadratic penalty to the loss</button>
+    <button class="option-btn" data-q="p1q11" data-opt="D">D) Cannot be applied to neural networks</button>
+    <div class="feedback-bar" id="p1q11-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="p1q12">
+    <div class="question-label">Part 1 · Question 12</div>
+    <div class="question-stem">Dropout during training works by:</div>
+    <button class="option-btn" data-q="p1q12" data-opt="A">A) Removing all neurons with weight below a threshold permanently</button>
+    <button class="option-btn" data-q="p1q12" data-opt="B">B) Randomly zeroing out a fraction of neurons at each training step, forcing redundant representations</button>
+    <button class="option-btn" data-q="p1q12" data-opt="C">C) Reducing the learning rate for randomly selected weights</button>
+    <button class="option-btn" data-q="p1q12" data-opt="D">D) Adding Gaussian noise to the weights during each forward pass</button>
+    <div class="feedback-bar" id="p1q12-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="p1q13">
+    <div class="question-label">Part 1 · Question 13</div>
+    <div class="question-stem">True or False: The bias term in a perceptron is an extra learnable weight connected to an input fixed at 1, serving a role analogous to the intercept in linear regression.</div>
+    <button class="option-btn" data-q="p1q13" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q13" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q13-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="p1q14">
+    <div class="question-label">Part 1 · Question 14</div>
+    <div class="question-stem">Which activation function is described as "self-normalising" and is paired with LeCun initialisation?</div>
+    <button class="option-btn" data-q="p1q14" data-opt="A">A) ReLU</button>
+    <button class="option-btn" data-q="p1q14" data-opt="B">B) GELU</button>
+    <button class="option-btn" data-q="p1q14" data-opt="C">C) SELU</button>
+    <button class="option-btn" data-q="p1q14" data-opt="D">D) ELU</button>
+    <div class="feedback-bar" id="p1q14-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="p1q15">
+    <div class="question-label">Part 1 · Question 15</div>
+    <div class="question-stem">GELU activation is preferred in modern Transformer architectures (e.g. BERT). What is its key property compared to ReLU?</div>
+    <button class="option-btn" data-q="p1q15" data-opt="A">A) It is computationally cheaper than ReLU</button>
+    <button class="option-btn" data-q="p1q15" data-opt="B">B) It is a smooth, probabilistic gate: \(x \cdot \Phi(x)\) — outputs are smoothly weighted rather than hard-zeroed</button>
+    <button class="option-btn" data-q="p1q15" data-opt="C">C) It eliminates vanishing gradients completely</button>
+    <button class="option-btn" data-q="p1q15" data-opt="D">D) Its derivative is always exactly 1 for positive inputs</button>
+    <div class="feedback-bar" id="p1q15-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="p1q16">
+    <div class="question-label">Part 1 · Question 16</div>
+    <div class="question-stem">In mini-batch gradient descent, which statement is correct?</div>
+    <button class="option-btn" data-q="p1q16" data-opt="A">A) Gradients are computed over the full dataset before each update</button>
+    <button class="option-btn" data-q="p1q16" data-opt="B">B) One weight update is made per individual training sample</button>
+    <button class="option-btn" data-q="p1q16" data-opt="C">C) Weights are updated after each small batch of samples, balancing efficiency and gradient noise</button>
+    <button class="option-btn" data-q="p1q16" data-opt="D">D) The learning rate automatically adapts per parameter</button>
+    <div class="feedback-bar" id="p1q16-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="p1q17">
+    <div class="question-label">Part 1 · Question 17</div>
+    <div class="question-stem">The one-cycle learning rate policy involves:</div>
+    <button class="option-btn" data-q="p1q17" data-opt="A">A) Cycling the LR between min and max many times during training</button>
+    <button class="option-btn" data-q="p1q17" data-opt="B">B) A single large cycle — warming up the LR to a maximum then decaying — typically outperforming fixed schedules</button>
+    <button class="option-btn" data-q="p1q17" data-opt="C">C) Using a different LR for each layer of the network</button>
+    <button class="option-btn" data-q="p1q17" data-opt="D">D) Reducing the LR by half every epoch</button>
+    <div class="feedback-bar" id="p1q17-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="p1q18">
+    <div class="question-label">Part 1 · Question 18</div>
+    <div class="question-stem">True or False: Automatic differentiation in deep learning frameworks (PyTorch, TensorFlow) numerically approximates gradients using finite differences.</div>
+    <button class="option-btn" data-q="p1q18" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q18" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q18-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="p1q19">
+    <div class="question-label">Part 1 · Question 19</div>
+    <div class="question-stem">Glorot (Xavier) initialisation is specifically designed for which activations?</div>
+    <button class="option-btn" data-q="p1q19" data-opt="A">A) ReLU and Leaky ReLU</button>
+    <button class="option-btn" data-q="p1q19" data-opt="B">B) Sigmoid and Tanh</button>
+    <button class="option-btn" data-q="p1q19" data-opt="C">C) SELU</button>
+    <button class="option-btn" data-q="p1q19" data-opt="D">D) GELU</button>
+    <div class="feedback-bar" id="p1q19-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="p1q20">
+    <div class="question-label">Part 1 · Question 20</div>
+    <div class="question-stem">Balanced cross-entropy loss modifies standard cross-entropy by introducing a weight \(\beta\). Its purpose is to:</div>
+    <button class="option-btn" data-q="p1q20" data-opt="A">A) Increase the gradient magnitude for all examples equally</button>
+    <button class="option-btn" data-q="p1q20" data-opt="B">B) Down-weight easy examples so hard examples contribute more to training</button>
+    <button class="option-btn" data-q="p1q20" data-opt="C">C) Weight positive and negative class contributions differently to address class imbalance</button>
+    <button class="option-btn" data-q="p1q20" data-opt="D">D) Add L2 regularisation to the cross-entropy loss</button>
+    <div class="feedback-bar" id="p1q20-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="p1q21">
+    <div class="question-label">Part 1 · Question 21</div>
+    <div class="question-stem">True or False: In practice, wider (more units per layer) networks are always preferred over deeper (more layers) networks, because depth does not improve learning capacity.</div>
+    <button class="option-btn" data-q="p1q21" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q21" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q21-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="p1q22">
+    <div class="question-label">Part 1 · Question 22</div>
+    <div class="question-stem">Early stopping addresses overfitting by:</div>
+    <button class="option-btn" data-q="p1q22" data-opt="A">A) Reducing the number of hidden layers after training</button>
+    <button class="option-btn" data-q="p1q22" data-opt="B">B) Halting training when the validation loss stops improving, before the model overfits the training set</button>
+    <button class="option-btn" data-q="p1q22" data-opt="C">C) Removing neurons that have the highest weight magnitudes</button>
+    <button class="option-btn" data-q="p1q22" data-opt="D">D) Applying a penalty proportional to the absolute value of weights</button>
+    <div class="feedback-bar" id="p1q22-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="p1q23">
+    <div class="question-label">Part 1 · Question 23</div>
+    <div class="question-stem">PReLU (Parametric ReLU) differs from Leaky ReLU in that:</div>
+    <button class="option-btn" data-q="p1q23" data-opt="A">A) PReLU uses \(\alpha = 0\) for all negative inputs</button>
+    <button class="option-btn" data-q="p1q23" data-opt="B">B) PReLU learns the negative slope \(\alpha\) from the data via backpropagation</button>
+    <button class="option-btn" data-q="p1q23" data-opt="C">C) PReLU applies exponential growth for negative inputs</button>
+    <button class="option-btn" data-q="p1q23" data-opt="D">D) PReLU has no negative region at all</button>
+    <div class="feedback-bar" id="p1q23-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="p1q24">
+    <div class="question-label">Part 1 · Question 24</div>
+    <div class="question-stem">True or False: A local minimum for one weight in a neural network is guaranteed to be a local minimum for all weights simultaneously.</div>
+    <button class="option-btn" data-q="p1q24" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p1q24" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p1q24-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="p1q25">
+    <div class="question-label">Part 1 · Question 25</div>
+    <div class="question-stem">The first AI Winter (beginning ~1969) was primarily triggered by:</div>
+    <button class="option-btn" data-q="p1q25" data-opt="A">A) The failure of deep networks to train due to vanishing gradients</button>
+    <button class="option-btn" data-q="p1q25" data-opt="B">B) Minsky and Papert's proof that perceptrons cannot solve non-linearly separable problems like XOR</button>
+    <button class="option-btn" data-q="p1q25" data-opt="C">C) The invention of the SVM, which replaced neural networks</button>
+    <button class="option-btn" data-q="p1q25" data-opt="D">D) Lack of sufficient training data in the 1960s</button>
+    <div class="feedback-bar" id="p1q25-fb" style="display:none"></div>
+  </div>
+
+  <button class="submit-btn" onclick="submitSection('p1', p1Answers, p1Explanations)">Submit All Part 1</button>
+  <button class="reset-btn" onclick="resetSection('p1', 25)">Reset</button>
+</div>
+
+<!-- ═══════════════════ PART 1 SA ═══════════════════ -->
+<div class="sa-section" id="p1sa">
+  <h2>✍️ Part 1 — Short Answer Questions</h2>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P1 · Q1</div>
+    <div class="question-stem">Derive the gradient of the squared loss \(L=(y-\hat{y})^2\) with respect to weight \(w_i\) for a sigmoid perceptron. Show all chain rule steps clearly and explain each factor's meaning.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p1sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="p1sa1">
+      <strong>Full derivation:</strong> Let \(o = \sum_j w_j x_j + b\) (weighted sum), \(\hat{y} = \sigma(o)\) (sigmoid output), \(L = (y-\hat{y})^2\) (squared loss). Applying chain rule:<br><br>
+      \[\frac{\partial L}{\partial w_i} = \frac{\partial L}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial o} \cdot \frac{\partial o}{\partial w_i}\]
+      Step 1: \(\frac{\partial L}{\partial \hat{y}} = -2(y - \hat{y})\) — the error term.<br>
+      Step 2: \(\frac{\partial \hat{y}}{\partial o} = \sigma(o)(1-\sigma(o))\) — sigmoid derivative; maximum is 0.25, causing vanishing gradients in deep nets.<br>
+      Step 3: \(\frac{\partial o}{\partial w_i} = x_i\) — the input value.<br><br>
+      Combined: \(\frac{\partial L}{\partial w_i} = -2(y-\hat{y})\,\sigma(o)(1-\sigma(o))\,x_i\).<br>
+      The factor \(\sigma(o)(1-\sigma(o)) \in (0, 0.25]\) is the problematic term: in multi-layer networks, this gets multiplied many times during backprop, causing exponential shrinkage of the gradient.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P1 · Q2</div>
+    <div class="question-stem">Compare Batch GD, SGD, and Mini-batch GD on: update frequency, gradient noise, memory requirements, and practical suitability. Which is standard in modern deep learning and why?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p1sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="p1sa2">
+      <strong>Batch GD:</strong> Computes exact gradient over all data → one update per epoch. Pro: stable, accurate gradient. Con: computationally expensive per update; cannot process datasets that don't fit in memory; no noise to escape local minima.<br><br>
+      <strong>SGD:</strong> One update per sample using a noisy gradient estimate. Pro: frequent updates; noise can help escape shallow local minima and saddle points. Con: high variance per update; erratic loss curves; inefficient on modern GPU hardware (cannot parallelise).<br><br>
+      <strong>Mini-batch GD:</strong> Updates after each small batch (typically 32–512 samples). Pro: balances gradient accuracy and update frequency; vectorised operations exploit GPU parallelism efficiently; moderate noise provides regularisation benefit. Con: batch size is another hyperparameter.<br><br>
+      <strong>Standard in practice:</strong> Mini-batch GD (usually called SGD in frameworks, misleadingly). Combined with Adam or similar optimizers, it achieves fast, stable convergence on large datasets.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P1 · Q3</div>
+    <div class="question-stem">Explain the vanishing gradient problem in deep sigmoid networks. Describe two activation-function-based solutions and explain why each works.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p1sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="p1sa3">
+      <strong>Problem:</strong> Backpropagation multiplies gradients through each layer via the chain rule. The sigmoid derivative \(\sigma'(o) \in (0, 0.25]\). With \(L\) layers, the gradient at the input layer involves \(\prod_{l=1}^L \sigma'(o_l)\) — at most \(0.25^L\), shrinking exponentially. With 10 layers this is \(\leq 9.5 \times 10^{-7}\); early layers receive almost no learning signal.<br><br>
+      <strong>Solution 1 — ReLU:</strong> \(f(x) = \max(0,x)\); derivative is 1 for \(x > 0\). This breaks the multiplicative shrinkage: gradients flow without attenuation for positive activations. However, dead neurons (stuck at 0) can still kill gradients locally.<br><br>
+      <strong>Solution 2 — Leaky ReLU / PReLU:</strong> Allows a small negative slope (\(\alpha x\) for \(x<0\)), so the gradient is never exactly 0. PReLU additionally learns \(\alpha\), adapting per layer. Both ensure gradients can flow even through neurons that would otherwise be dead.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P1 · Q4</div>
+    <div class="question-stem">Explain why proper weight initialisation is critical for training deep networks. Compare Glorot, He, and LeCun initialisations and explain the reasoning behind each formula.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p1sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="p1sa4">
+      <strong>Why it matters:</strong> If weights are too large, activations and gradients explode. If too small, they vanish. The goal is to maintain activation and gradient variance approximately constant across all layers — so that signals propagate stably forward and gradients propagate stably backward.<br><br>
+      <strong>Glorot/Xavier</strong> \(\text{Var}(w) = \frac{2}{n_\text{in}+n_\text{out}}\): derived by requiring the variance of activations and the variance of gradients to both be preserved. The harmonic mean of fan-in and fan-out balances forward and backward passes. Designed for symmetric activations (sigmoid, tanh).<br><br>
+      <strong>He</strong> \(\text{Var}(w) = \frac{2}{n_\text{in}}\): accounts for the fact that ReLU zeros out half of its inputs on average, effectively halving the variance. Doubling the denominator relative to LeCun compensates — preserving signal variance through ReLU layers.<br><br>
+      <strong>LeCun</strong> \(\text{Var}(w) = \frac{1}{n_\text{in}}\): designed for SELU, which is self-normalising and maintains unit variance when combined with this initialisation. Uses only fan-in because SELU's fixed-point analysis determines the appropriate scale.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P1 · Q5</div>
+    <div class="question-stem">Describe the Adam optimizer. What are its two adaptive components, what problems do they solve over vanilla SGD, and what is the purpose of bias correction?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p1sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="p1sa5">
+      <strong>Adam</strong> (Adaptive Moment Estimation) maintains two exponential moving averages per parameter:<br><br>
+      <strong>1st moment \(m_t = \beta_1 m_{t-1} + (1-\beta_1)g_t\)</strong>: the running mean of gradients (momentum). This smooths noisy gradient estimates, providing consistent direction updates and preventing oscillation — like SGD with momentum.<br><br>
+      <strong>2nd moment \(v_t = \beta_2 v_{t-1} + (1-\beta_2)g_t^2\)</strong>: the running mean of squared gradients (uncentered variance). Dividing by \(\sqrt{v_t}\) gives per-parameter adaptive learning rates — parameters with historically large gradients get smaller updates, preventing overshooting; sparse parameters get larger relative updates.<br><br>
+      <strong>Bias correction</strong>: Both \(m_t\) and \(v_t\) are initialised at 0. In the early steps \(t\), they are biased toward 0 (under-estimate the true moments). The bias-corrected estimates \(\hat{m}_t = m_t/(1-\beta_1^t)\) and \(\hat{v}_t = v_t/(1-\beta_2^t)\) account for this initialisation bias, ensuring updates are appropriately scaled from the very first iteration.<br><br>
+      The final update \(w \leftarrow w - \frac{\lambda}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t\) provides adaptive, momentum-smoothed steps for each parameter independently.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PART 2
+═══════════════════════════════════════════════════════════════ -->
+<div class="part-header">📘 Part 2 — CNNs, ResNet, Batch Norm, Interpretability &amp; Adversarial Attacks</div>
+
+<!-- CNNs -->
+<div class="notes-section" id="cnns">
+  <h2>1. Convolutional Neural Networks (CNNs)</h2>
+  <div class="key-point">
+    A CNN is a series of <strong>convolutional layers</strong> and <strong>pooling layers</strong>, followed by fully connected (dense) layers, and a softmax output layer. For colour images, the input is \(width \times height \times 3\).
+  </div>
+
+  <h3>The Convolutional Layer</h3>
+  <p>The layer learns a set of filters (kernels). For a filter of size \(w_f \times h_f \times d\): at each spatial position, compute a <strong>spatially local weighted sum</strong>. The <strong>same kernel</strong> is reused at every position (parameter/weight sharing). Multiple filters per layer produce an output tensor of depth = number of filters.</p>
+
+  <div class="formula-box">
+    <strong>Output size formula:</strong>
+    \[\text{output size} = \left\lfloor \frac{W - F + 2P}{S} \right\rfloor + 1\]
+    where \(W\) = input size, \(F\) = filter size, \(P\) = padding, \(S\) = stride.
+  </div>
+
+  <h3>Pooling Layer</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Operation</th><th>Use Case</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Max Pooling</strong></td><td>Maximum value in window</td><td>Retains strongest features; most common</td></tr>
+      <tr><td><strong>Average Pooling</strong></td><td>Mean value in window</td><td>Smoother output, retains distribution</td></tr>
+      <tr><td><strong>Global Avg Pooling</strong></td><td>Collapses entire feature map to scalar</td><td>Zero params; alternative to FC layers; any input size</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- RESNET -->
+<div class="notes-section" id="resnet">
+  <h2>2. ResNet &amp; Skip Connections</h2>
+  <p>Even with ReLU, very deep networks suffer vanishing gradients. ResNet introduces <strong>skip connections</strong>:</p>
+  <div class="formula-box">
+    \[\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\]
+  </div>
+  <p>\(\mathcal{F}(\mathbf{x})\) is the learned <strong>residual</strong> (correction); \(\mathbf{x}\) passes through the identity. The gradient includes a "+1" term ensuring direct gradient flow to earlier layers.</p>
+  <div class="key-point">
+    <strong>Layer dropout (ResNet property):</strong> In ordinary networks, removing a layer breaks information flow. In ResNets, individual layers can be dropped without breaking the network — because skip connections provide alternative paths.
+  </div>
+</div>
+
+<!-- BATCH NORM -->
+<div class="notes-section" id="batchnorm">
+  <h2>3. Batch Normalisation</h2>
+  <div class="formula-box">
+    \[\hat{x}_i = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad y_i = \gamma \hat{x}_i + \beta\]
+  </div>
+  <p>Parameters \(\gamma\) (scale) and \(\beta\) (shift) are learnable — allowing the network to undo normalisation if needed.</p>
+  <table>
+    <thead><tr><th>Method</th><th>Normalises Over</th><th>Best For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Batch Norm</strong></td><td>Batch (N) + spatial (H,W), per channel</td><td>Large-batch CNN training</td></tr>
+      <tr><td><strong>Layer Norm</strong></td><td>All channels + spatial, per sample</td><td>Transformers, small/variable batches</td></tr>
+      <tr><td><strong>Instance Norm</strong></td><td>Spatial (H,W) only, per sample per channel</td><td>Style transfer</td></tr>
+      <tr><td><strong>Group Norm</strong></td><td>Groups of channels, per sample</td><td>Object detection, small batches</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- AUGMENTATION -->
+<div class="notes-section" id="augment">
+  <h2>4. Data Augmentation</h2>
+  <div class="key-point">
+    Artificially increase training set size and diversity using label-preserving transformations: flips, rotations, crops, colour jitter, cutouts, etc. A few transformations can double or triple the training set. Key benefit: forces invariance to transformations → prevents overfitting.
+  </div>
+  <p><strong>Test-time augmentation (TTA):</strong> Apply augmentations at inference time and aggregate predictions to stabilise output. Popular libraries: <code>albumentations</code>, <code>imgaug</code>, Keras <code>ImageDataGenerator</code>.</p>
+</div>
+
+<!-- CNN TASKS -->
+<div class="notes-section" id="cnntasks">
+  <h2>5. CNN Tasks, Variants &amp; Vision Transformers</h2>
+  <table>
+    <thead><tr><th>Task</th><th>Output</th><th>Key Architectures</th></tr></thead>
+    <tbody>
+      <tr><td>Image Classification</td><td>Class label</td><td>AlexNet, VGG, ResNet</td></tr>
+      <tr><td>Object Localisation</td><td>Class + bounding box</td><td>RCNN, Fast RCNN, Faster RCNN</td></tr>
+      <tr><td>Object Segmentation</td><td>Class + pixel-level outline</td><td>U-Net, Semantic Seg</td></tr>
+      <tr><td>Multiple Object Detection</td><td>Multiple boxes + classes</td><td>YOLO (IoU loss, grid-based)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>U-Net</h3>
+  <p>Encoder-decoder with skip connections between matching encoder/decoder layers. Uses <strong>pixel shuffling</strong> (sub-pixel convolutions, stride \(1/r\)) for upsampling. Commonly used in medical imaging and segmentation.</p>
+
+  <h3>Vision Transformers (ViT)</h3>
+  <p>Splits image into fixed-size patches → linearly embeds each patch → adds positional embeddings → feeds to standard Transformer encoder. A pure Transformer applied to image patches can match CNN performance on large-scale classification.</p>
+
+  <div class="warning-box">
+    <strong>Texture bias:</strong> ImageNet-trained CNNs are biased toward texture (Gabor-like filters) rather than shape. Increasing shape bias improves accuracy and robustness (Geirhos et al., 2018).
+  </div>
+</div>
+
+<!-- ADVERSARIAL -->
+<div class="notes-section" id="adversarial">
+  <h2>6. Adversarial Attacks</h2>
+  <div class="key-point">
+    <strong>Adversarial examples:</strong> inputs deliberately perturbed (often imperceptibly) to cause a model to misclassify — any ML classifier (not only CNNs) is vulnerable.
+  </div>
+  <p><strong>Ilyas et al. (2019) — "Adversarial Examples Are Not Bugs, They Are Features":</strong> Adversarial perturbations exploit genuine (but non-robust) statistical features of the data distribution — not random quirks. Robustness and accuracy may therefore be in tension.</p>
+  <p>Real-world examples: stop signs with stickers misclassified; panda + small noise → "gibbon" at 99.3% confidence. Active research: adversarial training, certified defences.</p>
+</div>
+
+<!-- INTERPRETABILITY -->
+<div class="notes-section" id="blackbox">
+  <h2>7. Opening the Black Box — CNN Interpretability</h2>
+  <table>
+    <thead><tr><th>Method</th><th>What it reveals</th><th>Key Limitation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Hinton Diagrams</strong></td><td>Weight magnitude (size) and sign (colour)</td><td>Only for simple MLPs</td></tr>
+      <tr><td><strong>Layer Activations</strong></td><td>Feature maps during forward pass; sparsity increases with training</td><td>Not viable for very deep networks</td></tr>
+      <tr><td><strong>Weight Visualisation</strong></td><td>Learned filters (most interpretable at layer 1)</td><td>Deeper layers uninterpretable</td></tr>
+      <tr><td><strong>Maximally Exciting Inputs</strong></td><td>Which training images most activate each neuron</td><td>Constrained to existing data</td></tr>
+      <tr><td><strong>Feature Visualisation</strong></td><td>Synthesised input that maximally excites a filter (SGD on input)</td><td>Needs regularisation to produce interpretable images</td></tr>
+      <tr><td><strong>Activation Atlases</strong></td><td>2D embedding of activation vectors — global concept map</td><td>Expensive; requires millions of activations</td></tr>
+      <tr><td><strong>Image Occlusion</strong></td><td>Which spatial regions affect prediction (heat map)</td><td>Many forward passes; coarse resolution</td></tr>
+      <tr><td><strong>Saliency Maps</strong></td><td>Gradient of class probability w.r.t. pixels</td><td>Noisy; needs smoothing</td></tr>
+      <tr><td><strong>LIME / SHAP</strong></td><td>Attribution per superpixel; theoretically grounded (SHAP)</td><td>LIME unstable; SHAP expensive</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Saliency map formula:</strong> \(\frac{\partial p(y|\mathbf{x})}{\partial \mathbf{x}}\) — pixels with large gradient magnitude have the largest effect on the prediction.
+  </div>
+</div>
+
+
+<!-- ═══════════════════ PART 2 MCQ ═══════════════════ -->
+<div class="mcq-section" id="p2mcq">
+  <h2>🧠 Part 2 — Multiple Choice &amp; True/False
+    <span class="score-display" id="p2-score">Score: 0 / 25</span>
+  </h2>
+  <p style="color:#6b7280;font-size:0.9em;">Select an answer for each question, then click <strong>Submit All</strong> to check.</p>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="p2q1">
+    <div class="question-label">Part 2 · Question 1</div>
+    <div class="question-stem">In a CNN, the primary motivation for using convolutional layers instead of fully connected layers for image data is:</div>
+    <button class="option-btn" data-q="p2q1" data-opt="A">A) Convolutional layers use more parameters, enabling higher capacity</button>
+    <button class="option-btn" data-q="p2q1" data-opt="B">B) Convolutional layers preserve spatial topology and enable parameter sharing</button>
+    <button class="option-btn" data-q="p2q1" data-opt="C">C) Convolutional layers apply global operations across the entire image</button>
+    <button class="option-btn" data-q="p2q1" data-opt="D">D) Convolutional layers eliminate the need for activation functions</button>
+    <div class="feedback-bar" id="p2q1-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="p2q2">
+    <div class="question-label">Part 2 · Question 2</div>
+    <div class="question-stem">A convolutional filter of size \(3 \times 3\) applied to an RGB image (3 channels) has a weight tensor of shape:</div>
+    <button class="option-btn" data-q="p2q2" data-opt="A">A) \(3 \times 3 \times 1\)</button>
+    <button class="option-btn" data-q="p2q2" data-opt="B">B) \(3 \times 3 \times 3\)</button>
+    <button class="option-btn" data-q="p2q2" data-opt="C">C) \(3 \times 3 \times 3 \times 3\)</button>
+    <button class="option-btn" data-q="p2q2" data-opt="D">D) \(9 \times 3\)</button>
+    <div class="feedback-bar" id="p2q2-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="p2q3">
+    <div class="question-label">Part 2 · Question 3</div>
+    <div class="question-stem">An image of size \(32 \times 32\) is convolved with a \(5 \times 5\) filter, padding \(P=0\), stride \(S=1\). What is the output spatial dimension?</div>
+    <button class="option-btn" data-q="p2q3" data-opt="A">A) \(32 \times 32\)</button>
+    <button class="option-btn" data-q="p2q3" data-opt="B">B) \(28 \times 28\)</button>
+    <button class="option-btn" data-q="p2q3" data-opt="C">C) \(27 \times 27\)</button>
+    <button class="option-btn" data-q="p2q3" data-opt="D">D) \(30 \times 30\)</button>
+    <div class="feedback-bar" id="p2q3-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="p2q4">
+    <div class="question-label">Part 2 · Question 4</div>
+    <div class="question-stem">Global average pooling collapses each feature map to a single scalar. Its key advantage as a replacement for fully connected layers is:</div>
+    <button class="option-btn" data-q="p2q4" data-opt="A">A) It has more parameters, increasing model capacity</button>
+    <button class="option-btn" data-q="p2q4" data-opt="B">B) Zero learnable parameters, works with any input image size, prevents overfitting</button>
+    <button class="option-btn" data-q="p2q4" data-opt="C">C) It applies max-pooling with a very large window</button>
+    <button class="option-btn" data-q="p2q4" data-opt="D">D) It normalises activations across the batch dimension</button>
+    <div class="feedback-bar" id="p2q4-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="p2q5">
+    <div class="question-label">Part 2 · Question 5</div>
+    <div class="question-stem">In a ResNet residual block, the output is \(\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\). What does \(\mathcal{F}(\mathbf{x})\) represent?</div>
+    <button class="option-btn" data-q="p2q5" data-opt="A">A) The full target mapping the block is trying to learn</button>
+    <button class="option-btn" data-q="p2q5" data-opt="B">B) The identity transformation applied to the input</button>
+    <button class="option-btn" data-q="p2q5" data-opt="C">C) The residual (correction) on top of the identity</button>
+    <button class="option-btn" data-q="p2q5" data-opt="D">D) The softmax output of the block</button>
+    <div class="feedback-bar" id="p2q5-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="p2q6">
+    <div class="question-label">Part 2 · Question 6</div>
+    <div class="question-stem">True or False: In ordinary feedforward networks, a single hidden layer can be removed without breaking information flow through the network.</div>
+    <button class="option-btn" data-q="p2q6" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p2q6" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p2q6-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="p2q7">
+    <div class="question-label">Part 2 · Question 7</div>
+    <div class="question-stem">In batch normalisation, the learnable parameters \(\gamma\) and \(\beta\) serve to:</div>
+    <button class="option-btn" data-q="p2q7" data-opt="A">A) Control the learning rate</button>
+    <button class="option-btn" data-q="p2q7" data-opt="B">B) Re-scale and re-shift normalised activations, allowing the network to undo normalisation if needed</button>
+    <button class="option-btn" data-q="p2q7" data-opt="C">C) Compute the batch mean and variance</button>
+    <button class="option-btn" data-q="p2q7" data-opt="D">D) Regularise weights via an L2 penalty</button>
+    <div class="feedback-bar" id="p2q7-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="p2q8">
+    <div class="question-label">Part 2 · Question 8</div>
+    <div class="question-stem">Which normalisation method is most appropriate when batch sizes are very small or variable (e.g. in Transformers)?</div>
+    <button class="option-btn" data-q="p2q8" data-opt="A">A) Batch Normalisation</button>
+    <button class="option-btn" data-q="p2q8" data-opt="B">B) Instance Normalisation</button>
+    <button class="option-btn" data-q="p2q8" data-opt="C">C) Layer Normalisation</button>
+    <button class="option-btn" data-q="p2q8" data-opt="D">D) Group Normalisation</button>
+    <div class="feedback-bar" id="p2q8-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="p2q9">
+    <div class="question-label">Part 2 · Question 9</div>
+    <div class="question-stem">Test-time augmentation (TTA) refers to:</div>
+    <button class="option-btn" data-q="p2q9" data-opt="A">A) Augmenting the test labels before evaluation</button>
+    <button class="option-btn" data-q="p2q9" data-opt="B">B) Applying augmentation transformations at prediction time and aggregating predictions to stabilise output</button>
+    <button class="option-btn" data-q="p2q9" data-opt="C">C) Training the model again on the test set</button>
+    <button class="option-btn" data-q="p2q9" data-opt="D">D) Removing augmentations from the test pipeline</button>
+    <div class="feedback-bar" id="p2q9-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="p2q10">
+    <div class="question-label">Part 2 · Question 10</div>
+    <div class="question-stem">The YOLO object detection model uses Intersection over Union (IoU) as its loss metric. IoU is defined as:</div>
+    <button class="option-btn" data-q="p2q10" data-opt="A">A) Area of Union / Area of Intersection</button>
+    <button class="option-btn" data-q="p2q10" data-opt="B">B) Area of Intersection / Area of Union</button>
+    <button class="option-btn" data-q="p2q10" data-opt="C">C) Euclidean distance between bounding box centres</button>
+    <button class="option-btn" data-q="p2q10" data-opt="D">D) Ratio of detected objects to total objects</button>
+    <div class="feedback-bar" id="p2q10-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="p2q11">
+    <div class="question-label">Part 2 · Question 11</div>
+    <div class="question-stem">Vision Transformers (ViT) apply the Transformer architecture to images by:</div>
+    <button class="option-btn" data-q="p2q11" data-opt="A">A) Replacing each pixel with a learned embedding</button>
+    <button class="option-btn" data-q="p2q11" data-opt="B">B) Splitting the image into fixed-size patches and treating linearly embedded patches as token sequences</button>
+    <button class="option-btn" data-q="p2q11" data-opt="C">C) Using attention only in the final layer of a CNN</button>
+    <button class="option-btn" data-q="p2q11" data-opt="D">D) Converting images to 1D signals before processing</button>
+    <div class="feedback-bar" id="p2q11-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="p2q12">
+    <div class="question-label">Part 2 · Question 12</div>
+    <div class="question-stem">True or False: Capsule networks (Hinton) have become the dominant architecture for image classification, replacing CNNs in most practical applications.</div>
+    <button class="option-btn" data-q="p2q12" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p2q12" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p2q12-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="p2q13">
+    <div class="question-label">Part 2 · Question 13</div>
+    <div class="question-stem">Research by Geirhos et al. (2018) found that ImageNet-trained CNNs are primarily biased towards:</div>
+    <button class="option-btn" data-q="p2q13" data-opt="A">A) Shape</button>
+    <button class="option-btn" data-q="p2q13" data-opt="B">B) Colour</button>
+    <button class="option-btn" data-q="p2q13" data-opt="C">C) Texture</button>
+    <button class="option-btn" data-q="p2q13" data-opt="D">D) Object size</button>
+    <div class="feedback-bar" id="p2q13-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="p2q14">
+    <div class="question-label">Part 2 · Question 14</div>
+    <div class="question-stem">An adversarial example is:</div>
+    <button class="option-btn" data-q="p2q14" data-opt="A">A) A training example with a wrong label</button>
+    <button class="option-btn" data-q="p2q14" data-opt="B">B) A deliberately perturbed input designed to cause misclassification, often imperceptibly to humans</button>
+    <button class="option-btn" data-q="p2q14" data-opt="C">C) An example from a different domain used for transfer learning</button>
+    <button class="option-btn" data-q="p2q14" data-opt="D">D) An outlier removed during data preprocessing</button>
+    <div class="feedback-bar" id="p2q14-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="p2q15">
+    <div class="question-label">Part 2 · Question 15</div>
+    <div class="question-stem">In feature visualisation, the optimisation \(\mathbf{x}^* = \arg\max_\mathbf{x} f_k(\mathbf{x})\) aims to:</div>
+    <button class="option-btn" data-q="p2q15" data-opt="A">A) Find a training image that best matches filter \(k\)'s weights</button>
+    <button class="option-btn" data-q="p2q15" data-opt="B">B) Synthesise an input image via gradient ascent that maximally activates filter \(k\)</button>
+    <button class="option-btn" data-q="p2q15" data-opt="C">C) Minimise the loss function with respect to filter \(k\)</button>
+    <button class="option-btn" data-q="p2q15" data-opt="D">D) Find the training image with the lowest activation in filter \(k\)</button>
+    <div class="feedback-bar" id="p2q15-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="p2q16">
+    <div class="question-label">Part 2 · Question 16</div>
+    <div class="question-stem">Image occlusion as an interpretability method works by:</div>
+    <button class="option-btn" data-q="p2q16" data-opt="A">A) Removing pixels with the highest gradient magnitude</button>
+    <button class="option-btn" data-q="p2q16" data-opt="B">B) Systematically masking patches of the image and observing changes in classification probability, visualised as a heat map</button>
+    <button class="option-btn" data-q="p2q16" data-opt="C">C) Inverting the image and comparing predictions</button>
+    <button class="option-btn" data-q="p2q16" data-opt="D">D) Computing the second derivative of the loss with respect to pixels</button>
+    <div class="feedback-bar" id="p2q16-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="p2q17">
+    <div class="question-label">Part 2 · Question 17</div>
+    <div class="question-stem">Saliency maps are computed as:</div>
+    <button class="option-btn" data-q="p2q17" data-opt="A">A) The output of the final softmax layer</button>
+    <button class="option-btn" data-q="p2q17" data-opt="B">B) The gradient of the class probability with respect to input pixels</button>
+    <button class="option-btn" data-q="p2q17" data-opt="C">C) The activation of the first convolutional layer</button>
+    <button class="option-btn" data-q="p2q17" data-opt="D">D) The difference between max-pooled and average-pooled feature maps</button>
+    <div class="feedback-bar" id="p2q17-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="p2q18">
+    <div class="question-label">Part 2 · Question 18</div>
+    <div class="question-stem">True or False: Weight visualisation is most interpretable for filters in the deepest convolutional layers of a CNN, since they capture high-level semantic features.</div>
+    <button class="option-btn" data-q="p2q18" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p2q18" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p2q18-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="p2q19">
+    <div class="question-label">Part 2 · Question 19</div>
+    <div class="question-stem">The "parameter sharing" in CNNs means:</div>
+    <button class="option-btn" data-q="p2q19" data-opt="A">A) Multiple layers share the same bias terms</button>
+    <button class="option-btn" data-q="p2q19" data-opt="B">B) The same filter weights are used at every spatial position in the image</button>
+    <button class="option-btn" data-q="p2q19" data-opt="C">C) Weights are shared between the encoder and decoder</button>
+    <button class="option-btn" data-q="p2q19" data-opt="D">D) All filters in a layer share the same kernel values</button>
+    <div class="feedback-bar" id="p2q19-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="p2q20">
+    <div class="question-label">Part 2 · Question 20</div>
+    <div class="question-stem">The U-Net architecture for object segmentation is characterised by:</div>
+    <button class="option-btn" data-q="p2q20" data-opt="A">A) A purely encoder architecture with global pooling</button>
+    <button class="option-btn" data-q="p2q20" data-opt="B">B) An encoder-decoder design with skip connections between corresponding encoder and decoder layers</button>
+    <button class="option-btn" data-q="p2q20" data-opt="C">C) Multiple parallel convolutional towers merged at the output</button>
+    <button class="option-btn" data-q="p2q20" data-opt="D">D) A transformer encoder replacing all convolutional layers</button>
+    <div class="feedback-bar" id="p2q20-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="p2q21">
+    <div class="question-label">Part 2 · Question 21</div>
+    <div class="question-stem">Skip connections in ResNets help address vanishing gradients primarily because:</div>
+    <button class="option-btn" data-q="p2q21" data-opt="A">A) They increase the learning rate automatically</button>
+    <button class="option-btn" data-q="p2q21" data-opt="B">B) They provide shorter, more direct gradient paths back to earlier layers</button>
+    <button class="option-btn" data-q="p2q21" data-opt="C">C) They remove the need for activation functions</button>
+    <button class="option-btn" data-q="p2q21" data-opt="D">D) They prevent any layer from being updated</button>
+    <div class="feedback-bar" id="p2q21-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="p2q22">
+    <div class="question-label">Part 2 · Question 22</div>
+    <div class="question-stem">Activation atlases (OpenAI) extend feature visualisation by:</div>
+    <button class="option-btn" data-q="p2q22" data-opt="A">A) Applying feature visualisation to every individual neuron in every layer</button>
+    <button class="option-btn" data-q="p2q22" data-opt="B">B) Collecting millions of activation vectors, arranging them in 2D via dimensionality reduction, and applying feature visualisation per grid cell</button>
+    <button class="option-btn" data-q="p2q22" data-opt="C">C) Replacing activation functions with learned atlases</button>
+    <button class="option-btn" data-q="p2q22" data-opt="D">D) Visualising only the final classification layer</button>
+    <div class="feedback-bar" id="p2q22-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="p2q23">
+    <div class="question-label">Part 2 · Question 23</div>
+    <div class="question-stem">According to Ilyas et al. (2019), adversarial examples are:</div>
+    <button class="option-btn" data-q="p2q23" data-opt="A">A) Bugs caused by poor training data quality</button>
+    <button class="option-btn" data-q="p2q23" data-opt="B">B) Features — genuine but non-robust statistical patterns in the data that models exploit</button>
+    <button class="option-btn" data-q="p2q23" data-opt="C">C) Only a problem for CNNs, not for other classifiers</button>
+    <button class="option-btn" data-q="p2q23" data-opt="D">D) Caused by insufficient model capacity</button>
+    <div class="feedback-bar" id="p2q23-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="p2q24">
+    <div class="question-label">Part 2 · Question 24</div>
+    <div class="question-stem">Data augmentation during training primarily helps by:</div>
+    <button class="option-btn" data-q="p2q24" data-opt="A">A) Increasing the model's parameter count</button>
+    <button class="option-btn" data-q="p2q24" data-opt="B">B) Reducing training time per epoch</button>
+    <button class="option-btn" data-q="p2q24" data-opt="C">C) Increasing effective dataset size and preventing overfitting by forcing transformation invariance</button>
+    <button class="option-btn" data-q="p2q24" data-opt="D">D) Improving GPU utilisation</button>
+    <div class="feedback-bar" id="p2q24-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="p2q25">
+    <div class="question-label">Part 2 · Question 25</div>
+    <div class="question-stem">True or False: For ReLU CNNs, activations typically start dense and blobby early in training, then become sparser and more localised as training progresses.</div>
+    <button class="option-btn" data-q="p2q25" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p2q25" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p2q25-fb" style="display:none"></div>
+  </div>
+
+  <button class="submit-btn" onclick="submitSection('p2', p2Answers, p2Explanations)">Submit All Part 2</button>
+  <button class="reset-btn" onclick="resetSection('p2', 25)">Reset</button>
+</div>
+
+<!-- ═══════════════════ PART 2 SA ═══════════════════ -->
+<div class="sa-section" id="p2sa">
+  <h2>✍️ Part 2 — Short Answer Questions</h2>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P2 · Q1</div>
+    <div class="question-stem">Explain how the convolutional operation achieves parameter efficiency compared to a fully connected layer. Discuss local receptive fields, weight sharing, and what a filter "learns."</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p2sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="p2sa1">
+      A fully connected layer connects every pixel to every neuron — for a \(224 \times 224\) RGB image and 1000 neurons, this gives ~150M weights for one layer alone. A convolutional layer instead uses a <strong>local receptive field</strong>: each output value depends only on a small spatial neighbourhood (e.g. \(3\times3\)), encoding the assumption that nearby pixels are more related than distant ones. Crucially, the <strong>same filter weights are reused at every spatial position</strong> (weight sharing) — a \(3\times3\times3\) filter has only 27 weights regardless of image size. The filter learns to detect a specific local pattern (e.g. a horizontal edge) anywhere in the image. Multiple filters per layer allow simultaneous detection of multiple features. This dramatically reduces parameters while encoding <strong>translation invariance</strong>: a learned edge detector works wherever edges appear.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P2 · Q2</div>
+    <div class="question-stem">Describe the vanishing gradient problem and explain specifically how ResNet's skip connections address it. Why is \(\mathbf{y} = \mathcal{F}(\mathbf{x}) + \mathbf{x}\) easier to learn than \(\mathbf{y} = \mathcal{H}(\mathbf{x})\) directly?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p2sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="p2sa2">
+      In deep networks, gradients are propagated through many chain-rule multiplications. When repeatedly multiplied by values less than 1 (e.g. from saturating activations), gradients shrink exponentially — early layers receive almost no learning signal. ReLU partially alleviates this but breaks down in very deep networks (50+ layers). ResNet's skip connections create shortcut paths: \(\frac{\partial \mathcal{L}}{\partial \mathbf{x}} = \frac{\partial \mathcal{L}}{\partial \mathbf{y}} \cdot (1 + \frac{\partial \mathcal{F}}{\partial \mathbf{x}})\). The "+1" ensures a gradient of at least 1 flows back regardless of \(\mathcal{F}\)'s gradient, preventing vanishing. Regarding the residual formulation: if the optimal mapping is close to an identity (the layer should mostly pass its input through), learning \(\mathcal{F}(\mathbf{x}) \approx 0\) (a small residual) is much easier than learning \(\mathcal{H}(\mathbf{x}) \approx \mathbf{x}\) from scratch — the network can start from identity and learn small corrections.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P2 · Q3</div>
+    <div class="question-stem">Compare max pooling, average pooling, and global average pooling. When is each preferred, and what is global average pooling's key advantage as a fully connected layer replacement?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p2sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="p2sa3">
+      All three reduce spatial dimensions while preserving depth. <strong>Max pooling</strong> takes the maximum in each window — retains the strongest feature response, robust to small translations, produces sharp feature maps; most common in classification CNNs. <strong>Average pooling</strong> takes the mean — smoother outputs, retains information about feature distribution; useful when overall presence rather than peak activation matters. <strong>Global average pooling</strong> collapses each entire feature map to a single scalar (its mean), producing a vector of length = number of channels. Key advantages: (1) <em>zero learnable parameters</em> — cannot overfit; (2) <em>architecture-agnostic to input size</em> — always outputs fixed-length vector regardless of input dimensions; (3) natural correspondence between output channels and class scores — more interpretable. Used in GoogLeNet, modern lightweight CNNs, and diffusion model U-Net decoders.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P2 · Q4</div>
+    <div class="question-stem">Explain adversarial examples and discuss why the Ilyas et al. (2019) finding that "adversarial examples are not bugs, they are features" is significant. What are the implications for safety-critical applications?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p2sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="p2sa4">
+      Adversarial examples are inputs with small, often imperceptible perturbations that cause dramatically wrong predictions with high confidence. Ilyas et al. argue these perturbations exploit genuine non-robust statistical features that are predictive in the training distribution but incomprehensible to humans. Models learn these because they are statistically useful, not due to a fixable bug. Significance: (1) adversarial vulnerability is a fundamental property of models trained on natural data, not just a patch-able error; (2) robustness and accuracy may be in tension — robust models must ignore predictive non-robust features; (3) adversarial transferability is explained — independently trained models share these features. For safety-critical applications (autonomous driving, medical imaging): high test accuracy does not guarantee robustness. A stop sign with a sticker could be misclassified; a skin lesion classifier could be fooled by image artifacts. Adversarial training and certified defences are mitigations but remain computationally expensive and imperfect.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P2 · Q5</div>
+    <div class="question-stem">Compare four CNN interpretability methods (weight visualisation, image occlusion, saliency maps, feature visualisation). For each: what it reveals, key limitation, and when to use it.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p2sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="p2sa5">
+      <strong>Weight visualisation:</strong> plots learned filter weights. Most interpretable for the first convolutional layer (acts on raw pixels; weights look like edge detectors). Limitation: completely uninterpretable for deeper layers. Use when: quick sanity check that layer 1 learned sensible features.<br><br>
+      <strong>Image occlusion:</strong> masks image patches and tracks prediction probability changes → heat map. Directly answers "what spatial region is the model looking at?" Limitation: expensive (many forward passes); coarse resolution limited by patch size. Use when: simple, model-agnostic explanation needed for a non-technical audience.<br><br>
+      <strong>Saliency maps:</strong> gradient of class probability w.r.t. input pixels — fast (single backward pass). Shows pixel-level importance. Limitation: gradients can be noisy; often need smoothing (SmoothGrad); can highlight uninformative but high-gradient pixels. Use when: fast pixel-level attribution is needed for research.<br><br>
+      <strong>Feature visualisation (synthesis):</strong> optimises an input via gradient ascent to maximally excite a filter. Reveals what concept each filter "wants to see," independent of the dataset. Limitation: without regularisation, produces noise. Use when: understanding what concept a neuron has learned, independent of training data.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PART 3
+═══════════════════════════════════════════════════════════════ -->
+<div class="part-header">📙 Part 3 — Generative Models: Autoencoders, VAEs, GANs, Diffusion &amp; CLIP</div>
+
+<!-- DEEP DREAM / STYLE -->
+<div class="notes-section" id="deepdream">
+  <h2>1. Deep Dream &amp; Style Transfer</h2>
+  <h3>Deep Dream</h3>
+  <div class="key-point">
+    Deep Dream (Mordvintsev, Olah &amp; Tyka, 2017): uses a pretrained CNN to <strong>find and enhance patterns</strong> in images by performing <strong>gradient ascent on the input pixels</strong> to maximise activations of intermediate CNN layers — creating dream-like, hallucinatory outputs.
+  </div>
+  <p>Start with an input image or random noise → pass through pretrained CNN → identify intermediate layer activations → modify image via gradient ascent to reinforce whatever patterns the network detects. The <strong>octaves technique</strong> repeatedly downscales the image, applies Deep Dream, then merges results upscaled. Key limitation: constrained by what the pretrained network's filters respond to — you cannot freely direct the creative process.</p>
+
+  <h3>Style Transfer</h3>
+  <p>(Gatys, Ecker &amp; Bethge, 2015) — uses featurisation layers of a trained CNN to separate and recombine <em>content</em> of one image with <em>style</em> of another.</p>
+  <div class="key-point">
+    <strong>Mechanism:</strong> The pretrained CNN is <em>frozen</em>. Only the <strong>combination image pixels</strong> are optimised via gradient descent on a combined loss:
+    <ul>
+      <li><strong>Content loss:</strong> high-level feature representation matches the original image</li>
+      <li><strong>Style loss:</strong> Gram matrix (texture statistics) of filter responses matches the style image</li>
+    </ul>
+  </div>
+</div>
+
+<!-- AUTOENCODERS -->
+<div class="notes-section" id="ae">
+  <h2>2. Autoencoders</h2>
+  <div class="key-point">
+    Architecture: Input → Encoder → <strong>Compressed bottleneck</strong> \(\mathbf{z}\) → Decoder → Output (same shape as input). Forces the network to learn a compact, sparse representation.
+  </div>
+
+  <h3>Applications</h3>
+  <table>
+    <thead><tr><th>Use Case</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td>Image denoising</td><td>Train with noisy input → clean output</td></tr>
+      <tr><td>Dimensionality reduction</td><td>Use bottleneck \(\mathbf{z}\) as embedding</td></tr>
+      <tr><td>Generative sampling</td><td>Sample random \(\mathbf{z}\) and decode</td></tr>
+      <tr><td>Anomaly detection</td><td>High reconstruction error flags anomalies; or use \(\mathbf{z}\) as features</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Link to PCA</h3>
+  <p>A linear autoencoder (single layer, linear activations, MSE loss) is equivalent to PCA — both seek the best linear subspace with minimal information loss. Key difference: unlike PCA, linear autoencoders have <strong>no orthogonality constraint</strong> on the basis vectors (many equivalent solutions exist via SGD).</p>
+</div>
+
+<!-- VAEs -->
+<div class="notes-section" id="vae">
+  <h2>3. Variational Autoencoders (VAEs)</h2>
+  <p>Standard AEs encode each input as a single point → irregular latent space with meaningless gaps. VAEs encode as a <strong>distribution</strong>.</p>
+
+  <div class="key-point">
+    <strong>Training:</strong>
+    <ol style="margin:8px 0 0 20px;">
+      <li>Encoder outputs \((\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x)\) of a Gaussian</li>
+      <li>Sample \(\mathbf{z} \sim \mathcal{N}(\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x)\) via reparameterization: \(\mathbf{z} = \boldsymbol{\mu}_x + \boldsymbol{\sigma}_x \odot \boldsymbol{\epsilon}\), \(\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0},\mathbf{I})\)</li>
+      <li>Decode \(\hat{\mathbf{x}} = d(\mathbf{z})\); compute reconstruction error</li>
+      <li>Backpropagate</li>
+    </ol>
+  </div>
+
+  <div class="formula-box">
+    <strong>VAE Loss:</strong>
+    \[\mathcal{L} = \|\mathbf{x} - \hat{\mathbf{x}}\|^2 + \text{KL}\!\left[\mathcal{N}(\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x),\; \mathcal{N}(\mathbf{0}, \mathbf{I})\right]\]
+    Reconstruction term + KL regularisation (enforces continuous, regular latent space)
+  </div>
+
+  <div class="warning-box">
+    <strong>Without KL regularisation:</strong> isolated clusters, meaningless gaps, arbitrary latent points decode to garbage.<br>
+    <strong>With KL regularisation:</strong> distributions overlap, latent space is continuous and smooth — interpolation produces meaningful intermediate outputs.
+  </div>
+</div>
+
+<!-- GANS -->
+<div class="notes-section" id="gans">
+  <h2>4. Generative Adversarial Networks (GANs)</h2>
+  <div class="key-point">
+    <strong>Two-network minimax game:</strong>
+    <ul>
+      <li><strong>Generator G:</strong> noise \(\mathbf{z}\) → fake sample \(G(\mathbf{z})\)</li>
+      <li><strong>Discriminator D:</strong> real or fake input → probability of being real</li>
+    </ul>
+    D maximises \(\log D(\mathbf{x}) + \log(1-D(G(\mathbf{z})))\); G minimises \(\log(1-D(G(\mathbf{z})))\)
+  </div>
+
+  <div class="warning-box">
+    <strong>Mode collapse:</strong> generator learns to produce only a few output types, ignoring the full data distribution. Training instability is a key challenge.
+  </div>
+
+  <h3>CycleGAN</h3>
+  <p>Enables <strong>unpaired image-to-image translation</strong> (A↔B) without matched training pairs. Key innovation: <strong>cycle-consistency loss</strong> — translating A→B→A′ must approximately recover A. Prevents generators from ignoring input content. Applications: Monet↔photos, zebras↔horses, summer↔winter.</p>
+
+  <h3>StyleGAN</h3>
+  <p>Separate <strong>mapping network</strong> \(f: \mathbf{z} \to \mathbf{w}\) and <strong>synthesis network</strong> \(g\). At each resolution level, <strong>AdaIN</strong> (Adaptive Instance Normalisation) injects style from \(\mathbf{w}\). Noise \(\mathbf{B}\) added for stochastic detail. The \(\mathcal{W}\) space is less entangled than \(\mathcal{Z}\) → fine-grained control over generated image attributes.</p>
+</div>
+
+<!-- DIFFUSION -->
+<div class="notes-section" id="diffusion">
+  <h2>5. Diffusion Models</h2>
+  <div class="key-point">
+    <strong>Forward process:</strong> Gradually add Gaussian noise to an image over \(N\) steps until it becomes pure noise.<br>
+    <strong>Reverse process:</strong> Train a noise predictor (U-Net) to predict the noise added at each step → iteratively denoise to generate new images.
+  </div>
+
+  <table>
+    <thead><tr><th>Model</th><th>Key Innovation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>GLIDE (2021, OpenAI)</strong></td><td>First diffusion model for text-conditional image synthesis; outperforms VAEs</td></tr>
+      <tr><td><strong>DALL·E 2 (2022, OpenAI)</strong></td><td>Conditions diffusion on CLIP image embeddings (better diversity than raw text)</td></tr>
+      <tr><td><strong>Stable Diffusion</strong></td><td>Latent diffusion: runs diffusion in compressed latent space of pretrained autoencoder → efficient</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Why U-Net for diffusion denoiser?</strong> Same input/output shape (ideal for noise prediction per pixel); skip connections preserve spatial detail; multi-scale residual structure handles multi-resolution features.
+  </div>
+
+  <div class="warning-box">
+    <strong>Diffusion vs. GANs:</strong> Diffusion avoids mode collapse; stable training. Weakness: many sequential denoising steps at inference (slow). GANs: single forward pass (fast) but unstable training, mode collapse.
+  </div>
+</div>
+
+<!-- CLIP -->
+<div class="notes-section" id="clip">
+  <h2>6. CLIP &amp; Stable Diffusion</h2>
+  <div class="key-point">
+    <strong>CLIP</strong> (Contrastive Language-Image Pre-training): jointly trains an image encoder and text encoder. For matched image-caption pairs, their embeddings are pushed together (similarity → 1); for unmatched pairs, pushed apart. Self-supervised: supervision from naturally occurring image-caption pairs.
+  </div>
+
+  <p>CLIP enables <strong>zero-shot image classification</strong> and serves as the conditioning signal in DALL·E 2 and Stable Diffusion.</p>
+
+  <div class="key-point">
+    <strong>Stable Diffusion:</strong> runs diffusion in the <strong>latent space</strong> of a pretrained autoencoder \(\mathcal{E}, \mathcal{D}\) rather than pixel space. Steps: encode image → compress → run diffusion → decode final latent. Separates compressive learning from generative learning, enabling high-quality generation on consumer hardware. Uses a U-Net denoiser with cross-attention for text/image/semantic-map conditioning.
+  </div>
+</div>
+
+
+<!-- ═══════════════════ PART 3 MCQ ═══════════════════ -->
+<div class="mcq-section" id="p3mcq">
+  <h2>🧠 Part 3 — Multiple Choice &amp; True/False
+    <span class="score-display" id="p3-score">Score: 0 / 25</span>
+  </h2>
+  <p style="color:#6b7280;font-size:0.9em;">Select an answer for each question, then click <strong>Submit All</strong> to check.</p>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="p3q1">
+    <div class="question-label">Part 3 · Question 1</div>
+    <div class="question-stem">Deep Dream modifies an input image by:</div>
+    <button class="option-btn" data-q="p3q1" data-opt="A">A) Training a new CNN from scratch on the image</button>
+    <button class="option-btn" data-q="p3q1" data-opt="B">B) Performing gradient ascent on the image pixels to maximise activations of intermediate CNN layers</button>
+    <button class="option-btn" data-q="p3q1" data-opt="C">C) Applying a learned style from a style image using Gram matrices</button>
+    <button class="option-btn" data-q="p3q1" data-opt="D">D) Sampling a new image from the model's latent space</button>
+    <div class="feedback-bar" id="p3q1-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="p3q2">
+    <div class="question-label">Part 3 · Question 2</div>
+    <div class="question-stem">In neural style transfer, which component is actually optimised during the process?</div>
+    <button class="option-btn" data-q="p3q2" data-opt="A">A) The weights of the pretrained CNN</button>
+    <button class="option-btn" data-q="p3q2" data-opt="B">B) The style image pixels</button>
+    <button class="option-btn" data-q="p3q2" data-opt="C">C) The combination (output) image pixels</button>
+    <button class="option-btn" data-q="p3q2" data-opt="D">D) The encoder weights</button>
+    <div class="feedback-bar" id="p3q2-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="p3q3">
+    <div class="question-label">Part 3 · Question 3</div>
+    <div class="question-stem">An autoencoder trained with a linear encoder, linear decoder, and MSE loss is most closely related to which classical technique?</div>
+    <button class="option-btn" data-q="p3q3" data-opt="A">A) K-means clustering</button>
+    <button class="option-btn" data-q="p3q3" data-opt="B">B) Independent Component Analysis (ICA)</button>
+    <button class="option-btn" data-q="p3q3" data-opt="C">C) Principal Component Analysis (PCA)</button>
+    <button class="option-btn" data-q="p3q3" data-opt="D">D) Linear Discriminant Analysis (LDA)</button>
+    <div class="feedback-bar" id="p3q3-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="p3q4">
+    <div class="question-label">Part 3 · Question 4</div>
+    <div class="question-stem">True or False: A linear autoencoder produces the same basis vectors (principal components) as PCA.</div>
+    <button class="option-btn" data-q="p3q4" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p3q4" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p3q4-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="p3q5">
+    <div class="question-label">Part 3 · Question 5</div>
+    <div class="question-stem">The key difference between a standard autoencoder and a VAE is that in a VAE:</div>
+    <button class="option-btn" data-q="p3q5" data-opt="A">A) The encoder has no parameters</button>
+    <button class="option-btn" data-q="p3q5" data-opt="B">B) The decoder is replaced by a GAN discriminator</button>
+    <button class="option-btn" data-q="p3q5" data-opt="C">C) The input is encoded as a distribution over the latent space, not a single point</button>
+    <button class="option-btn" data-q="p3q5" data-opt="D">D) The latent space is discrete rather than continuous</button>
+    <div class="feedback-bar" id="p3q5-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="p3q6">
+    <div class="question-label">Part 3 · Question 6</div>
+    <div class="question-stem">The VAE loss function is:</div>
+    <button class="option-btn" data-q="p3q6" data-opt="A">A) \(\|\mathbf{x} - \hat{\mathbf{x}}\|^2 - \text{KL}[\mathcal{N}(\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x), \mathcal{N}(\mathbf{0}, \mathbf{I})]\)</button>
+    <button class="option-btn" data-q="p3q6" data-opt="B">B) \(\|\mathbf{x} - \hat{\mathbf{x}}\|^2 + \text{KL}[\mathcal{N}(\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x), \mathcal{N}(\mathbf{0}, \mathbf{I})]\)</button>
+    <button class="option-btn" data-q="p3q6" data-opt="C">C) \(\log D(\mathbf{x}) + \log(1 - D(G(\mathbf{z})))\)</button>
+    <button class="option-btn" data-q="p3q6" data-opt="D">D) \(\text{KL}[\mathcal{N}(\boldsymbol{\mu}_x, \boldsymbol{\sigma}_x), \mathcal{N}(\mathbf{0}, \mathbf{I})]\) only</button>
+    <div class="feedback-bar" id="p3q6-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="p3q7">
+    <div class="question-label">Part 3 · Question 7</div>
+    <div class="question-stem">In a GAN, the discriminator outputs:</div>
+    <button class="option-btn" data-q="p3q7" data-opt="A">A) A generated image</button>
+    <button class="option-btn" data-q="p3q7" data-opt="B">B) A latent vector</button>
+    <button class="option-btn" data-q="p3q7" data-opt="C">C) A probability that the input is real</button>
+    <button class="option-btn" data-q="p3q7" data-opt="D">D) A style embedding</button>
+    <div class="feedback-bar" id="p3q7-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="p3q8">
+    <div class="question-label">Part 3 · Question 8</div>
+    <div class="question-stem">"Mode collapse" in GAN training refers to:</div>
+    <button class="option-btn" data-q="p3q8" data-opt="A">A) The discriminator converging to 50% accuracy</button>
+    <button class="option-btn" data-q="p3q8" data-opt="B">B) The generator learning to produce only a few types of outputs, ignoring data diversity</button>
+    <button class="option-btn" data-q="p3q8" data-opt="C">C) The generator's loss reaching zero</button>
+    <button class="option-btn" data-q="p3q8" data-opt="D">D) Gradient explosion in the discriminator</button>
+    <div class="feedback-bar" id="p3q8-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="p3q9">
+    <div class="question-label">Part 3 · Question 9</div>
+    <div class="question-stem">CycleGAN's cycle-consistency loss enforces that:</div>
+    <button class="option-btn" data-q="p3q9" data-opt="A">A) The discriminator correctly classifies all images</button>
+    <button class="option-btn" data-q="p3q9" data-opt="B">B) Translating an image A→B→A′ recovers approximately the original image A</button>
+    <button class="option-btn" data-q="p3q9" data-opt="C">C) The generator minimises the KL divergence between domains</button>
+    <button class="option-btn" data-q="p3q9" data-opt="D">D) Style and content losses are balanced equally</button>
+    <div class="feedback-bar" id="p3q9-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="p3q10">
+    <div class="question-label">Part 3 · Question 10</div>
+    <div class="question-stem">StyleGAN's mapping network \(f\) transforms \(\mathbf{z} \in \mathcal{Z}\) to \(\mathbf{w} \in \mathcal{W}\). The main benefit of the \(\mathcal{W}\) space is:</div>
+    <button class="option-btn" data-q="p3q10" data-opt="A">A) It reduces the number of parameters in the model</button>
+    <button class="option-btn" data-q="p3q10" data-opt="B">B) It produces a less entangled latent space, enabling finer-grained control over image attributes</button>
+    <button class="option-btn" data-q="p3q10" data-opt="C">C) It replaces the need for a discriminator</button>
+    <button class="option-btn" data-q="p3q10" data-opt="D">D) It allows batch normalisation to be applied more easily</button>
+    <div class="feedback-bar" id="p3q10-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="p3q11">
+    <div class="question-label">Part 3 · Question 11</div>
+    <div class="question-stem">In diffusion models, the forward process involves:</div>
+    <button class="option-btn" data-q="p3q11" data-opt="A">A) Sampling an image from Gaussian noise using a trained denoiser</button>
+    <button class="option-btn" data-q="p3q11" data-opt="B">B) Progressively adding Gaussian noise to an image over N steps until it becomes pure noise</button>
+    <button class="option-btn" data-q="p3q11" data-opt="C">C) Training a discriminator to distinguish real from noisy images</button>
+    <button class="option-btn" data-q="p3q11" data-opt="D">D) Encoding an image into a distribution over latent space</button>
+    <div class="feedback-bar" id="p3q11-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="p3q12">
+    <div class="question-label">Part 3 · Question 12</div>
+    <div class="question-stem">Stable Diffusion achieves efficiency compared to pixel-space diffusion by:</div>
+    <button class="option-btn" data-q="p3q12" data-opt="A">A) Using a smaller training dataset</button>
+    <button class="option-btn" data-q="p3q12" data-opt="B">B) Running the diffusion process in the compressed latent space of a pretrained autoencoder</button>
+    <button class="option-btn" data-q="p3q12" data-opt="C">C) Replacing the U-Net denoiser with a simple linear model</button>
+    <button class="option-btn" data-q="p3q12" data-opt="D">D) Using only 5 denoising steps instead of hundreds</button>
+    <div class="feedback-bar" id="p3q12-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="p3q13">
+    <div class="question-label">Part 3 · Question 13</div>
+    <div class="question-stem">DALL·E 2 improves on GLIDE by conditioning the diffusion process on:</div>
+    <button class="option-btn" data-q="p3q13" data-opt="A">A) Raw text embeddings</button>
+    <button class="option-btn" data-q="p3q13" data-opt="B">B) Random Gaussian noise</button>
+    <button class="option-btn" data-q="p3q13" data-opt="C">C) CLIP image embeddings rather than raw text embeddings</button>
+    <button class="option-btn" data-q="p3q13" data-opt="D">D) Style Gram matrices from the target image</button>
+    <div class="feedback-bar" id="p3q13-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="p3q14">
+    <div class="question-label">Part 3 · Question 14</div>
+    <div class="question-stem">CLIP is trained using:</div>
+    <button class="option-btn" data-q="p3q14" data-opt="A">A) Labelled image classification datasets (e.g. ImageNet)</button>
+    <button class="option-btn" data-q="p3q14" data-opt="B">B) Paired image-caption data with a contrastive objective aligning image and text embeddings</button>
+    <button class="option-btn" data-q="p3q14" data-opt="C">C) Adversarial training between an image encoder and a text encoder</button>
+    <button class="option-btn" data-q="p3q14" data-opt="D">D) A reconstruction loss minimising pixel-level differences</button>
+    <div class="feedback-bar" id="p3q14-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="p3q15">
+    <div class="question-label">Part 3 · Question 15</div>
+    <div class="question-stem">True or False: Diffusion models avoid the mode collapse problem that affects GANs but are typically slower at inference time.</div>
+    <button class="option-btn" data-q="p3q15" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p3q15" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p3q15-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="p3q16">
+    <div class="question-label">Part 3 · Question 16</div>
+    <div class="question-stem">The reparameterization trick in VAEs rewrites the sample as \(\mathbf{z} = \boldsymbol{\mu}_x + \boldsymbol{\sigma}_x \odot \boldsymbol{\epsilon}\), \(\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0},\mathbf{I})\). Why is this necessary?</div>
+    <button class="option-btn" data-q="p3q16" data-opt="A">A) To make the latent space discrete for easier sampling</button>
+    <button class="option-btn" data-q="p3q16" data-opt="B">B) To allow backpropagation through the sampling step by making \(\mathbf{z}\) a deterministic function of learnable parameters</button>
+    <button class="option-btn" data-q="p3q16" data-opt="C">C) To regularise the encoder output towards a uniform distribution</button>
+    <button class="option-btn" data-q="p3q16" data-opt="D">D) To prevent the KL divergence from dominating the loss</button>
+    <div class="feedback-bar" id="p3q16-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="p3q17">
+    <div class="question-label">Part 3 · Question 17</div>
+    <div class="question-stem">Which of the following is NOT a standard use case for autoencoders?</div>
+    <button class="option-btn" data-q="p3q17" data-opt="A">A) Image denoising</button>
+    <button class="option-btn" data-q="p3q17" data-opt="B">B) Anomaly detection via reconstruction error</button>
+    <button class="option-btn" data-q="p3q17" data-opt="C">C) Multi-class supervised classification</button>
+    <button class="option-btn" data-q="p3q17" data-opt="D">D) Dimensionality reduction / embedding generation</button>
+    <div class="feedback-bar" id="p3q17-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="p3q18">
+    <div class="question-label">Part 3 · Question 18</div>
+    <div class="question-stem">The "octaves" technique in Deep Dream involves:</div>
+    <button class="option-btn" data-q="p3q18" data-opt="A">A) Applying the algorithm separately to 8 colour channels</button>
+    <button class="option-btn" data-q="p3q18" data-opt="B">B) Repeatedly downscaling the input, applying Deep Dream at each scale, then merging the results upscaled</button>
+    <button class="option-btn" data-q="p3q18" data-opt="C">C) Running the optimisation for exactly 8 iterations</button>
+    <button class="option-btn" data-q="p3q18" data-opt="D">D) Using 8 different pretrained networks simultaneously</button>
+    <div class="feedback-bar" id="p3q18-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="p3q19">
+    <div class="question-label">Part 3 · Question 19</div>
+    <div class="question-stem">True or False: In a VAE without the KL regularisation term, the latent space may become irregular with isolated clusters and meaningless gaps, making it unsuitable for generative sampling.</div>
+    <button class="option-btn" data-q="p3q19" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p3q19" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p3q19-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="p3q20">
+    <div class="question-label">Part 3 · Question 20</div>
+    <div class="question-stem">Why is U-Net well-suited as the denoiser in diffusion models?</div>
+    <button class="option-btn" data-q="p3q20" data-opt="A">A) It has the most parameters of any architecture, giving highest capacity</button>
+    <button class="option-btn" data-q="p3q20" data-opt="B">B) Same input/output shape (ideal for noise prediction per pixel) + skip connections + multi-scale residual structure</button>
+    <button class="option-btn" data-q="p3q20" data-opt="C">C) It is the fastest architecture for inference, reducing the number of denoising steps needed</button>
+    <button class="option-btn" data-q="p3q20" data-opt="D">D) U-Net was specifically designed for diffusion models</button>
+    <div class="feedback-bar" id="p3q20-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="p3q21">
+    <div class="question-label">Part 3 · Question 21</div>
+    <div class="question-stem">For anomaly detection using autoencoders, which strategy is described in the lecture?</div>
+    <button class="option-btn" data-q="p3q21" data-opt="A">A) Using the decoder weights as anomaly scores</button>
+    <button class="option-btn" data-q="p3q21" data-opt="B">B) Using reconstruction error directly, or using bottleneck embeddings as features in a classifier, or combining with isolation forest</button>
+    <button class="option-btn" data-q="p3q21" data-opt="C">C) Fine-tuning the autoencoder on anomalous examples</button>
+    <button class="option-btn" data-q="p3q21" data-opt="D">D) Using the encoder output as a one-class SVM input only</button>
+    <div class="feedback-bar" id="p3q21-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="p3q22">
+    <div class="question-label">Part 3 · Question 22</div>
+    <div class="question-stem">True or False: CycleGAN requires paired training examples (matched image A with corresponding image B) to perform image-to-image translation.</div>
+    <button class="option-btn" data-q="p3q22" data-opt="A">A) True</button>
+    <button class="option-btn" data-q="p3q22" data-opt="B">B) False</button>
+    <div class="feedback-bar" id="p3q22-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="p3q23">
+    <div class="question-label">Part 3 · Question 23</div>
+    <div class="question-stem">What does Stable Diffusion's "latent diffusion" approach separate into two distinct phases?</div>
+    <button class="option-btn" data-q="p3q23" data-opt="A">A) The forward and reverse diffusion processes</button>
+    <button class="option-btn" data-q="p3q23" data-opt="B">B) The compressive learning phase (autoencoder) and the generative learning phase (diffusion in latent space)</button>
+    <button class="option-btn" data-q="p3q23" data-opt="C">C) The text encoding and image generation phases</button>
+    <button class="option-btn" data-q="p3q23" data-opt="D">D) The discriminator training and generator training phases</button>
+    <div class="feedback-bar" id="p3q23-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="p3q24">
+    <div class="question-label">Part 3 · Question 24</div>
+    <div class="question-stem">Using CLIP image embeddings as conditioning in DALL·E 2 (rather than raw text embeddings as in GLIDE) enables which additional capability?</div>
+    <button class="option-btn" data-q="p3q24" data-opt="A">A) Zero-shot text classification</button>
+    <button class="option-btn" data-q="p3q24" data-opt="B">B) Creating image variations and interpolating between images or captions by manipulating CLIP embeddings</button>
+    <button class="option-btn" data-q="p3q24" data-opt="C">C) Faster inference by reducing denoising steps</button>
+    <button class="option-btn" data-q="p3q24" data-opt="D">D) Eliminating the need for a prior network</button>
+    <div class="feedback-bar" id="p3q24-fb" style="display:none"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="p3q25">
+    <div class="question-label">Part 3 · Question 25</div>
+    <div class="question-stem">Compared to standard autoencoders, VAEs produce images that are typically:</div>
+    <button class="option-btn" data-q="p3q25" data-opt="A">A) Sharper and more photorealistic</button>
+    <button class="option-btn" data-q="p3q25" data-opt="B">B) Blurrier, due to the MSE reconstruction loss averaging over possible outputs</button>
+    <button class="option-btn" data-q="p3q25" data-opt="C">C) Identical in quality but faster to generate</button>
+    <button class="option-btn" data-q="p3q25" data-opt="D">D) Only able to reconstruct the training images exactly</button>
+    <div class="feedback-bar" id="p3q25-fb" style="display:none"></div>
+  </div>
+
+  <button class="submit-btn" onclick="submitSection('p3', p3Answers, p3Explanations)">Submit All Part 3</button>
+  <button class="reset-btn" onclick="resetSection('p3', 25)">Reset</button>
+</div>
+
+<!-- ═══════════════════ PART 3 SA ═══════════════════ -->
+<div class="sa-section" id="p3sa">
+  <h2>✍️ Part 3 — Short Answer Questions</h2>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P3 · Q1</div>
+    <div class="question-stem">Compare Autoencoders, VAEs, and GANs as generative models. What does each optimise, what is the structure of its latent space, and in what scenarios would each be most appropriate?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p3sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="p3sa1">
+      <strong>Autoencoders</strong> minimise reconstruction error \(\|\mathbf{x}-\hat{\mathbf{x}}\|^2\) alone; each input maps to a deterministic point \(\mathbf{z}=e(\mathbf{x})\). The latent space is unregularised and irregular — clusters may be isolated with meaningless gaps, so arbitrary sampling may not decode meaningfully. Best for: compression, denoising, anomaly detection.<br><br>
+      <strong>VAEs</strong> add KL divergence regularisation: encoder outputs a distribution \(\mathcal{N}(\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x)\) forced close to \(\mathcal{N}(\mathbf{0},\mathbf{I})\). This creates a <em>continuous, regular</em> latent space where nearby points decode similarly and arbitrary samples from the prior decode meaningfully. VAEs enable controlled generation and interpolation but produce blurry images (MSE loss). Best for: smooth generative sampling, latent space interpolation, semi-supervised learning.<br><br>
+      <strong>GANs</strong> have no reconstruction loss. The generator learns via adversarial feedback from the discriminator. Can produce the sharpest, most photorealistic images but suffer training instability and mode collapse. Best for: high-fidelity image synthesis when training stability can be managed (StyleGAN, CycleGAN).
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P3 · Q2</div>
+    <div class="question-stem">Explain the reparameterization trick in VAEs and why it is necessary. What problem does it solve and how does it enable end-to-end training via backpropagation?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p3sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="p3sa2">
+      In a VAE, the encoder outputs \((\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x)\) and a latent sample \(\mathbf{z} \sim \mathcal{N}(\boldsymbol{\mu}_x,\boldsymbol{\sigma}_x)\) is drawn. The problem: <strong>sampling is a stochastic operation with no gradient</strong> — backpropagation cannot flow through a random node, so encoder parameters cannot be updated by the reconstruction loss.<br><br>
+      The <strong>reparameterization trick</strong> rewrites the sample as \(\mathbf{z} = \boldsymbol{\mu}_x + \boldsymbol{\sigma}_x \odot \boldsymbol{\epsilon}\), where \(\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0},\mathbf{I})\) is sampled independently of the parameters. Now \(\mathbf{z}\) is a <em>deterministic</em> function of \(\boldsymbol{\mu}_x\) and \(\boldsymbol{\sigma}_x\) (plus a fixed noise draw), so gradients \(\frac{\partial \mathcal{L}}{\partial \boldsymbol{\mu}_x}\) and \(\frac{\partial \mathcal{L}}{\partial \boldsymbol{\sigma}_x}\) can be computed normally. The randomness is "pushed outside" the computational graph. This enables end-to-end training of the full encoder-decoder network with standard backpropagation.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P3 · Q3</div>
+    <div class="question-stem">Explain the cycle-consistency loss in CycleGAN. Why is it necessary, and what problem does it solve that a standard unpaired GAN cannot?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p3sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="p3sa3">
+      Without paired training data, a standard GAN trained to translate A→B has no constraint linking the input to the output: the generator could produce <em>any</em> image that looks like domain B regardless of the input A content. The discriminator only assesses realism — not input-output correspondence.<br><br>
+      CycleGAN's <strong>cycle-consistency loss</strong> imposes: \(G_{A\to B}(G_{B\to A}(\mathbf{x}_B)) \approx \mathbf{x}_B\) and \(G_{B\to A}(G_{A\to B}(\mathbf{x}_A)) \approx \mathbf{x}_A\). The full round trip A→B→A must approximately recover the original. This forces generators to <em>preserve content</em> when translating style — a horse must still look like that specific horse after zebra→horse translation. The loss is typically the L1 distance between the cycled image and the original. This is what makes unsupervised image translation practical without paired examples.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P3 · Q4</div>
+    <div class="question-stem">Describe the forward and reverse processes in diffusion models. Explain how Stable Diffusion extends this framework to operate efficiently, and why U-Net is well-suited as the denoiser.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p3sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="p3sa4">
+      <strong>Forward process:</strong> Gaussian noise is added to image \(\mathbf{x}_0\) across \(N\) steps, producing \(\mathbf{x}_0,\mathbf{x}_1,\ldots,\mathbf{x}_N\) where \(\mathbf{x}_N \approx \mathcal{N}(\mathbf{0},\mathbf{I})\). If steps are small enough, each transition is approximately Gaussian.<br><br>
+      <strong>Reverse process:</strong> A neural network \(\epsilon_\theta\) (noise predictor) is trained to predict the noise \(\epsilon\) added at each step, given \(\mathbf{x}_t\) and \(t\). To generate: sample \(\mathbf{x}_N \sim \mathcal{N}(\mathbf{0},\mathbf{I})\) and apply the denoiser \(N\) times.<br><br>
+      <strong>Stable Diffusion:</strong> Running diffusion on full-resolution pixel space is computationally expensive. Instead, a pretrained autoencoder compresses images into a lower-dimensional latent. Diffusion runs entirely in this latent space; only the final denoised latent is decoded to pixels via \(\mathcal{D}\). This <em>separates compressive learning from generative learning</em> and enables high-quality generation on consumer hardware.<br><br>
+      <strong>U-Net suitability:</strong> (1) same input/output shape — ideal for predicting noise per pixel/latent; (2) skip connections preserve fine spatial details; (3) multi-scale downsampling/upsampling handles features at multiple resolutions; (4) residual blocks facilitate gradient flow in the deep network.
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer P3 · Q5</div>
+    <div class="question-stem">Compare VAEs and GANs across training stability, sample quality, latent space structure, and anomaly detection suitability. Then explain what role diffusion models play in the generative modelling landscape and where they excel over both.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('p3sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="p3sa5">
+      <strong>Training stability:</strong> VAEs train stably via a well-defined ELBO loss. GANs are notoriously unstable — the minimax game is sensitive to hyperparameters; training can oscillate, diverge, or collapse.<br><br>
+      <strong>Sample quality:</strong> GANs generally produce sharper, more photorealistic images. VAEs produce blurrier outputs because MSE reconstruction loss averages over possible outputs rather than committing to one sharp image.<br><br>
+      <strong>Latent space structure:</strong> VAEs have a regularised, continuous latent space (KL divergence) where interpolation is meaningful and sampling from the prior produces valid outputs. GANs have no explicit regularised latent space — interpolation may not be smooth.<br><br>
+      <strong>Anomaly detection:</strong> VAEs are naturally suited — reconstruction error or bottleneck embeddings flag anomalies. GANs have no reconstruction mechanism; anomaly detection requires indirect methods.<br><br>
+      <strong>Diffusion models in the landscape:</strong> Combine stable training (like VAEs) with sample quality rivalling or exceeding the best GANs (like StyleGAN). Avoid mode collapse because the reverse process is trained to denoise across the full distribution. Enable powerful text-to-image conditioning (CLIP, cross-attention in Stable Diffusion). Main limitation: many sequential denoising steps at inference (slow vs. GAN's single forward pass). Stable Diffusion's latent diffusion further democratises this by compressing computation into latent space, enabling consumer-hardware generation.
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script>
+// ─── Answer keys ───────────────────────────────────────────────
+const p1Answers = {
+  p1q1:'B', p1q2:'B', p1q3:'A', p1q4:'B', p1q5:'C',
+  p1q6:'C', p1q7:'B', p1q8:'C', p1q9:'B', p1q10:'B',
+  p1q11:'B', p1q12:'B', p1q13:'A', p1q14:'C', p1q15:'B',
+  p1q16:'C', p1q17:'B', p1q18:'B', p1q19:'B', p1q20:'C',
+  p1q21:'B', p1q22:'B', p1q23:'B', p1q24:'B', p1q25:'B'
+};
+
+const p2Answers = {
+  p2q1:'B', p2q2:'B', p2q3:'B', p2q4:'B', p2q5:'C',
+  p2q6:'B', p2q7:'B', p2q8:'C', p2q9:'B', p2q10:'B',
+  p2q11:'B', p2q12:'B', p2q13:'C', p2q14:'B', p2q15:'B',
+  p2q16:'B', p2q17:'B', p2q18:'B', p2q19:'B', p2q20:'B',
+  p2q21:'B', p2q22:'B', p2q23:'B', p2q24:'C', p2q25:'A'
+};
+
+const p3Answers = {
+  p3q1:'B', p3q2:'C', p3q3:'C', p3q4:'B', p3q5:'C',
+  p3q6:'B', p3q7:'C', p3q8:'B', p3q9:'B', p3q10:'B',
+  p3q11:'B', p3q12:'B', p3q13:'C', p3q14:'B', p3q15:'A',
+  p3q16:'B', p3q17:'C', p3q18:'B', p3q19:'A', p3q20:'B',
+  p3q21:'B', p3q22:'B', p3q23:'B', p3q24:'B', p3q25:'B'
+};
+
+// ─── Explanations ────────────────────────────────────────────
+const p1Explanations = {
+  p1q1:"The UAT states that a single hidden layer MLP with a non-linear activation can approximate any continuous function to arbitrary precision — given sufficient hidden units.",
+  p1q2:"The sigmoid derivative is σ(x)(1−σ(x)), which is at most 0.25 — a key cause of vanishing gradients.",
+  p1q3:"True. Minsky and Papert (1969) proved perceptrons cannot solve XOR (non-linearly separable), triggering the first AI Winter.",
+  p1q4:"Dead ReLU: if a neuron's pre-activation is always ≤ 0, ReLU outputs 0 and the gradient is 0 — the neuron is permanently unable to learn.",
+  p1q5:"He initialisation (variance = 2/n_in) is designed for ReLU, accounting for the fact that ReLU zeroes half its inputs on average.",
+  p1q6:"A learning rate that is too high causes the weight update to overshoot the minimum, potentially causing training to diverge.",
+  p1q7:"Sigmoid derivative ∈ (0, 0.25]. Multiplied across L layers, gradient shrinks as ≤ 0.25^L — exponential vanishing.",
+  p1q8:"Focal loss was designed to down-weight easy examples (which contribute little useful signal) so the model focuses training on hard, misclassified examples.",
+  p1q9:"False. SGD processes one sample at a time, updating weights after each individual sample.",
+  p1q10:"Adam maintains the 1st moment (exponential moving average of gradients — momentum) and the 2nd moment (exponential moving average of squared gradients — adaptive scaling).",
+  p1q11:"L1 adds |w| penalty → solutions at corners of the constraint polytope → many weights become exactly zero (sparsity). L2 adds w² penalty → small but non-zero weights.",
+  p1q12:"Dropout randomly zeroes out neurons (with probability p) at each training step, forcing the network to learn redundant representations and preventing co-adaptation.",
+  p1q13:"True. The bias is fixed at input 1 with a learnable weight — exactly analogous to the intercept β₀ in regression: ŷ = f(Σwᵢxᵢ + b).",
+  p1q14:"SELU (Scaled Exponential Linear Unit) is self-normalising when used with LeCun initialisation — activations converge to zero mean and unit variance across layers.",
+  p1q15:"GELU = x·Φ(x) (CDF of standard normal), providing a smooth probabilistic gate rather than a hard threshold at 0. Used in BERT, GPT, and most modern Transformers.",
+  p1q16:"Mini-batch GD updates weights after each small batch — balancing the gradient accuracy of full-batch GD with the speed and regularisation noise of SGD. Standard in practice.",
+  p1q17:"The one-cycle policy uses a single large LR cycle: warm up to max LR, then decay. Often outperforms both fixed LR and CLR with many cycles.",
+  p1q18:"False. Automatic differentiation computes exact (analytic) gradients by tracking operations in a computational graph and applying the chain rule symbolically — not finite differences.",
+  p1q19:"Glorot/Xavier initialisation (variance = 2/(n_in+n_out)) was derived specifically for symmetric activations like sigmoid and tanh to preserve variance in both forward and backward passes.",
+  p1q20:"Balanced cross-entropy weights the positive and negative class terms differently (by β and 1−β), addressing class imbalance by giving more weight to the underrepresented class.",
+  p1q21:"False. In practice depth (more layers) is preferred over width because deep networks learn hierarchical compositional representations more efficiently.",
+  p1q22:"Early stopping monitors validation loss and stops training when it stops improving — preventing the model from overfitting the training set by learning noise.",
+  p1q23:"PReLU learns the negative slope α via backpropagation, whereas Leaky ReLU uses a fixed, manually set small α (e.g. 0.01).",
+  p1q24:"False. A local minimum for one weight dimension is not necessarily a local minimum for all weights simultaneously — the full loss landscape is multi-dimensional.",
+  p1q25:"The first AI Winter (~1969) was triggered by Minsky and Papert's proof that perceptrons cannot solve non-linearly separable problems like XOR."
+};
+
+const p2Explanations = {
+  p2q1:"The key advantages are spatial locality (local receptive fields) and weight sharing (same filter at every position) — dramatically reducing parameters vs. fully connected layers.",
+  p2q2:"A 3×3 filter on RGB input has depth 3 (one slice per channel): weight tensor shape = 3×3×3 = 27 weights.",
+  p2q3:"Output size = ⌊(32−5+0)/1⌋+1 = 28. Formula: ⌊(W−F+2P)/S⌋+1.",
+  p2q4:"Global average pooling has zero learnable parameters (no overfitting), works with any input image size, and provides a natural correspondence between output channels and class scores.",
+  p2q5:"F(x) is the residual — the correction the block learns on top of the identity. If the optimal mapping is near-identity, learning F(x)≈0 is much easier than learning H(x)≈x from scratch.",
+  p2q6:"False. In ordinary feedforward networks, removing a layer breaks information flow completely. Only in ResNets can layers be dropped due to skip connections.",
+  p2q7:"γ and β are learnable parameters that re-scale and re-shift the normalised activations, allowing the network to undo normalisation if the optimal representation is not zero-mean unit-variance.",
+  p2q8:"Layer norm operates on a single sample (over all channels and spatial dims), making it independent of batch size — ideal for Transformers, RNNs, and variable-batch scenarios.",
+  p2q9:"TTA applies augmentation transformations at inference time and aggregates (e.g. averages) predictions to stabilise output and often improve accuracy.",
+  p2q10:"IoU = Area of Intersection / Area of Union. Ranges from 0 (no overlap) to 1 (perfect match). Used as the bounding box regression loss metric in YOLO.",
+  p2q11:"ViT splits the image into fixed-size patches (e.g. 16×16), linearly embeds each patch + adds positional embeddings, then feeds the sequence to a standard Transformer encoder.",
+  p2q12:"False. Capsule networks were an interesting idea but did not achieve widespread adoption. CNNs and Vision Transformers remain dominant.",
+  p2q13:"Geirhos et al. (2018) showed that ImageNet-trained CNNs are biased toward texture (Gabor-like filters) rather than shape — opposite to human perception.",
+  p2q14:"Adversarial examples are deliberately perturbed inputs that cause misclassification with high confidence, often imperceptibly to humans. Any ML classifier is vulnerable.",
+  p2q15:"Feature visualisation synthesises an input via gradient ascent (maximising filter k's activation) to reveal what concept each filter has learned, independent of the dataset.",
+  p2q16:"Image occlusion: systematically grey out patches → measure probability change → visualise as heat map. Red = important region; blue = less important.",
+  p2q17:"Saliency map = ∂p(y|x)/∂x — the gradient of class probability w.r.t. input pixels. High magnitude pixels have the largest effect on the prediction.",
+  p2q18:"False. Weight visualisation is most interpretable for the first convolutional layer (acts on raw pixels, producing edge/colour detectors). Deeper filter weights are uninterpretable when plotted directly.",
+  p2q19:"Parameter sharing means the same filter weights are reused at every spatial position — enabling translation invariance and massive parameter reduction.",
+  p2q20:"U-Net has an encoder-decoder structure with skip connections between matching encoder and decoder layers, preserving fine spatial detail for precise pixel-level segmentation.",
+  p2q21:"Skip connections provide a +1 identity path in the gradient: ∂L/∂x = ∂L/∂y · (1 + ∂F/∂x). This ensures direct gradient flow to earlier layers, preventing vanishing.",
+  p2q22:"Activation atlases: collect millions of activation vectors from training images → arrange in 2D via dimensionality reduction → apply feature visualisation to average activation per grid cell → global concept map.",
+  p2q23:"Ilyas et al. (2019) argue adversarial examples exploit genuine non-robust statistical features present in the data distribution — not random bugs. Models learn these because they are predictive.",
+  p2q24:"Data augmentation increases effective dataset diversity via label-preserving transformations, forcing the model to learn transformation-invariant features and preventing overfitting.",
+  p2q25:"True. Early in training, ReLU CNN activations are dense and blobby. As training progresses, they become sparser and more localised — reflecting learned, selective feature detectors."
+};
+
+const p3Explanations = {
+  p3q1:"Deep Dream performs gradient ascent on the input pixels to maximise activations of intermediate CNN layers — reinforcing patterns the pretrained network already detects.",
+  p3q2:"In style transfer, the pretrained CNN is frozen. Only the combination (output) image pixels are optimised via gradient descent on the content + style loss.",
+  p3q3:"A linear autoencoder (single layer, linear activations, MSE loss) is equivalent to PCA — both find the best linear subspace to project data onto with minimal reconstruction error.",
+  p3q4:"False. While both span the same optimal subspace, linear autoencoders have no orthogonality constraint — SGD can converge to any basis for that subspace, not necessarily the PCA eigenvectors.",
+  p3q5:"VAEs encode each input as a distribution N(μ_x, σ_x) over the latent space, rather than a single deterministic point — enabling a continuous, regularised latent space.",
+  p3q6:"VAE loss = reconstruction error + KL[N(μ_x,σ_x), N(0,I)]. The KL term regularises the latent space; subtracting it would be wrong (it would encourage divergence from the prior).",
+  p3q7:"The discriminator D takes either a real sample or a generated sample G(z) as input and outputs a probability that the input is real (close to 1) vs. fake (close to 0).",
+  p3q8:"Mode collapse: the generator learns to produce only a few types of outputs that reliably fool the discriminator, ignoring the full diversity of the real data distribution.",
+  p3q9:"Cycle-consistency: A→B→A′ ≈ A and B→A→B′ ≈ B. This forces generators to preserve content when translating between domains, preventing arbitrary translation.",
+  p3q10:"The W space is less entangled than Z — different dimensions of w control different high-level attributes (pose, style, age) more independently, enabling fine-grained control.",
+  p3q11:"The forward process progressively adds Gaussian noise over N steps: x_0 → x_1 → ... → x_N ≈ N(0,I). This is a fixed (non-learned) Markov chain.",
+  p3q12:"Stable Diffusion runs diffusion in the compressed latent space of a pretrained autoencoder (encoder ε, decoder D), making it much more computationally efficient than pixel-space diffusion.",
+  p3q13:"DALL·E 2 builds on GLIDE by conditioning the diffusion process on CLIP image embeddings (generated from text via a prior) rather than raw text embeddings, improving sample diversity.",
+  p3q14:"CLIP trains an image encoder and text encoder jointly using a contrastive objective on naturally occurring image-caption pairs from the internet — a self-supervised approach.",
+  p3q15:"True. Diffusion models train on a well-defined denoising objective across the full data distribution, avoiding mode collapse. However, they require N sequential denoising steps at inference.",
+  p3q16:"Sampling z ~ N(μ,σ) has no gradient. The reparameterization trick rewrites z = μ + σ⊙ε (ε fixed noise) making z a deterministic function of learnable parameters — enabling backpropagation.",
+  p3q17:"Autoencoders are unsupervised — they are not designed for supervised multi-class classification. Their outputs are reconstructions of inputs, not class probabilities.",
+  p3q18:"The octaves technique repeatedly downscales the image, applies Deep Dream at each scale, then merges (upscales and adds) the results — producing richer multi-scale patterns.",
+  p3q19:"True. Without KL regularisation, the encoder can place clusters arbitrarily far apart with meaningless gaps — arbitrary latent points may decode to gibberish, making generative sampling fail.",
+  p3q20:"U-Net has same input/output shape (ideal for noise prediction per pixel/latent), skip connections preserving spatial detail, and multi-scale residual structure for multi-resolution features.",
+  p3q21:"Three approaches: (1) use reconstruction error directly as anomaly score; (2) use bottleneck embeddings as features in a classifier; (3) compare/combine with isolation forest.",
+  p3q22:"False. CycleGAN's key innovation is that it does NOT require paired training examples — it learns translation from unpaired data using cycle-consistency loss.",
+  p3q23:"Stable Diffusion separates (1) the compressive learning phase (autoencoder learning a compact latent) from (2) the generative learning phase (diffusion model learning to generate in latent space).",
+  p3q24:"Using CLIP image embeddings enables creating variations of an input image (encode → decode) and generating interpolations between image or caption pairs by manipulating their embeddings.",
+  p3q25:"VAEs use MSE reconstruction loss, which averages over possible plausible outputs at each pixel — resulting in blurry images. GANs use adversarial feedback, producing sharper results."
+};
+
+// ─── MCQ logic ────────────────────────────────────────────────
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('option-btn') && !e.target.classList.contains('disabled') && !e.target.classList.contains('correct') && !e.target.classList.contains('incorrect') && !e.target.classList.contains('reveal-correct')) {
+    const qid = e.target.dataset.q;
+    const card = document.getElementById(qid);
+    card.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    e.target.classList.add('selected');
+  }
+});
+
+function submitSection(prefix, answers, explanations) {
+  let correct = 0;
+  const total = Object.keys(answers).length;
+  for (let i = 1; i <= total; i++) {
+    const qid = prefix + 'q' + i;
+    const card = document.getElementById(qid);
+    const selected = card.querySelector('.option-btn.selected');
+    const correctAns = answers[qid];
+    const fb = document.getElementById(qid + '-fb');
+    card.querySelectorAll('.option-btn').forEach(btn => {
+      btn.classList.add('disabled');
+      btn.classList.remove('selected');
+      if (btn.dataset.opt === correctAns) {
+        if (selected && selected.dataset.opt === correctAns) {
+          btn.classList.add('correct');
+        } else {
+          btn.classList.add('reveal-correct');
+        }
+      }
+    });
+    if (selected) {
+      if (selected.dataset.opt === correctAns) {
+        correct++;
+        selected.classList.remove('disabled');
+        selected.classList.add('correct');
+        fb.className = 'feedback-bar correct';
+        fb.style.display = 'block';
+        fb.textContent = '✅ Correct! ' + explanations[qid];
+      } else {
+        selected.classList.remove('disabled');
+        selected.classList.add('incorrect');
+        fb.className = 'feedback-bar incorrect';
+        fb.style.display = 'block';
+        fb.textContent = '❌ Incorrect. ' + explanations[qid];
+      }
+    } else {
+      fb.className = 'feedback-bar incorrect';
+      fb.style.display = 'block';
+      fb.textContent = '⚠️ No answer selected. ' + explanations[qid];
+    }
+    if (fb.style.display === 'block') {
+      if (typeof MathJax !== 'undefined') {
+        MathJax.typesetPromise([fb]).catch(err => {});
+      }
+    }
+  }
+  document.getElementById(prefix + '-score').textContent = 'Score: ' + correct + ' / ' + total;
+}
+
+function resetSection(prefix, total) {
+  for (let i = 1; i <= total; i++) {
+    const qid = prefix + 'q' + i;
+    const card = document.getElementById(qid);
+    card.querySelectorAll('.option-btn').forEach(btn => {
+      btn.className = 'option-btn';
+    });
+    const fb = document.getElementById(qid + '-fb');
+    fb.style.display = 'none';
+    fb.textContent = '';
+  }
+  document.getElementById(prefix + '-score').textContent = 'Score: 0 / ' + total;
+}
+
+function toggleAnswer(id) {
+  const panel = document.getElementById(id);
+  const btn = panel.previousElementSibling;
+  if (panel.style.display === 'none' || panel.style.display === '') {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide Answer';
+    if (typeof MathJax !== 'undefined') {
+      MathJax.typesetPromise([panel]).catch(err => {});
+    }
+  } else {
+    panel.style.display = 'none';
+    btn.textContent = 'Reveal Answer';
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 4 — Building ML Pipelines | Modern Data Analytics</title>
+<style>
+/* ── 1. GLOBAL ── */
+body {
+  background-color: #f5f6fa;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+  color: #2c2c3a;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* ── 2. PAGE HEADER ── */
+.page-header {
+  background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 28px 36px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+}
+.page-header h1 {
+  font-size: 1.8em;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin: 0 0 6px 0;
+}
+.page-header .subtitle {
+  font-size: 0.92em;
+  opacity: 0.82;
+  font-weight: 400;
+}
+
+/* ── 3. NAV BAR ── */
+.nav-bar {
+  background-color: #ffffff;
+  border: 1px solid #dde3ef;
+  border-radius: 0;
+  padding: 10px 18px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+.nav-bar a {
+  background-color: #eef2fb;
+  color: #2e6da4;
+  border-radius: 0;
+  padding: 4px 14px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+.nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+.nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+/* ── 4. NOTES SECTION ── */
+.notes-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 28px 36px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+.notes-section h2 {
+  color: #1a3a5c;
+  font-size: 1.25em;
+  font-weight: 700;
+  border-bottom: 2px solid #eef2fb;
+  padding-bottom: 8px;
+  margin-top: 0;
+}
+.notes-section h3 {
+  color: #2e6da4;
+  font-size: 1.05em;
+  font-weight: 700;
+  margin: 22px 0 8px;
+}
+
+/* Content boxes */
+.key-point {
+  background: #eef6ff;
+  border-left: 4px solid #2e6da4;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 18px;
+  margin: 14px 0;
+}
+.example-box {
+  background: #f0f7ee;
+  border-left: 4px solid #4caf50;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 18px;
+  margin: 14px 0;
+}
+.theorem-box {
+  background: #f3f0ff;
+  border-left: 4px solid #7c4dff;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 20px;
+  margin: 16px 0;
+}
+.warning-box {
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 18px;
+  margin: 14px 0;
+}
+.computation-note {
+  background: #fdf3f3;
+  border-left: 4px solid #e57373;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 18px;
+  margin: 14px 0;
+}
+.box-title {
+  font-weight: 700;
+  font-size: 0.82em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.key-point .box-title      { color: #2e6da4; }
+.example-box .box-title    { color: #2e7d32; }
+.theorem-box .box-title    { color: #7c4dff; }
+.warning-box .box-title    { color: #b45309; }
+.computation-note .box-title { color: #c62828; }
+
+/* Step list */
+.step-list { padding-left: 0; list-style: none; counter-reset: steps; margin: 10px 0; }
+.step-list li { counter-increment: steps; display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+.step-list li::before {
+  content: counter(steps);
+  background: #2e6da4; color: #fff;
+  min-width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75em; font-weight: 700;
+  flex-shrink: 0; margin-top: 3px;
+}
+
+/* Bullet list */
+.note-list { list-style: none; padding: 0; margin: 8px 0; }
+.note-list li { padding: 3px 0 3px 18px; position: relative; }
+.note-list li::before { content: '›'; position: absolute; left: 0; color: #2e6da4; font-weight: 700; }
+
+/* Inline code */
+code {
+  background: #f0f4fb;
+  border: 1px solid #d0d8ea;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.88em;
+  color: #c62828;
+}
+
+/* Code block */
+.code-block {
+  background: #f8f9ff;
+  border: 1px solid #c8d4f0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.85em;
+  line-height: 1.7;
+  overflow-x: auto;
+  margin: 12px 0;
+  color: #2c2c3a;
+}
+.code-block .kw  { color: #7c4dff; font-weight: 600; }
+.code-block .fn  { color: #2e6da4; }
+.code-block .st  { color: #2e7d32; }
+.code-block .cm  { color: #999; font-style: italic; }
+.code-block .num { color: #c62828; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; border-radius: 0; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+tbody tr:nth-child(even) { background-color: #f0f4fb; }
+tbody tr:nth-child(odd)  { background-color: #ffffff; }
+tbody tr:hover { background-color: #dce8f8; }
+th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+/* ── 5. MCQ SECTION ── */
+.mcq-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 28px 36px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+.mcq-section > h2 {
+  color: #92400e;
+  font-size: 1.2em;
+  font-weight: 700;
+  border-bottom: 2px solid #fff3cd;
+  padding-bottom: 10px;
+  margin-top: 0;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.score-display {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 20px;
+  padding: 5px 18px;
+  font-weight: 700;
+  color: #856404;
+  display: inline-block;
+  font-size: 0.95em;
+}
+.reset-btn {
+  background: transparent;
+  border: 1.5px solid #ffc107;
+  border-radius: 20px;
+  color: #856404;
+  padding: 5px 16px;
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.reset-btn:hover { background: #ffc107; color: #fff; }
+
+.sub-divider {
+  font-size: 0.8em; font-weight: 700;
+  color: #2e6da4; text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 1px solid #eef2fb;
+  padding-bottom: 4px; margin: 28px 0 14px;
+}
+
+.mcq-card {
+  background: #f9fafb;
+  border: 1px solid #e5e9f2;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+}
+.mcq-card.answered-correct  { border-color: #28a745; }
+.mcq-card.answered-incorrect { border-color: #dc3545; }
+
+.question-label {
+  font-size: 0.8em; font-weight: 700;
+  color: #2e6da4; text-transform: uppercase;
+  letter-spacing: 0.8px; margin-bottom: 6px;
+}
+.question-stem {
+  font-weight: 600; color: #1a1a2e;
+  margin-bottom: 14px; font-size: 1.0em;
+}
+
+.option-btn {
+  display: block; width: 100%;
+  background: #ffffff; border: 1.5px solid #d0d8ea;
+  border-radius: 8px; padding: 10px 16px;
+  margin: 6px 0; text-align: left; cursor: pointer;
+  font-size: 0.95em; color: #2c2c3a;
+  transition: all 0.18s; font-family: inherit;
+}
+.option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+.option-btn.selected       { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+.option-btn.correct        { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+.option-btn.incorrect      { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+.option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+.option-btn:disabled { cursor: default; }
+
+.tf-wrap { display: flex; gap: 10px; }
+.tf-btn {
+  flex: 1; background: #ffffff; border: 1.5px solid #d0d8ea;
+  border-radius: 8px; padding: 10px; text-align: center;
+  font-size: 0.95em; font-weight: 700; cursor: pointer;
+  color: #2c2c3a; transition: all 0.18s; font-family: inherit;
+}
+.tf-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+.tf-btn.correct        { background: #d4edda; border-color: #28a745; color: #155724; }
+.tf-btn.incorrect      { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+.tf-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; opacity: 0.85; }
+.tf-btn:disabled { cursor: default; }
+
+.feedback-bar {
+  border-radius: 6px; padding: 8px 14px; margin-top: 10px;
+  font-size: 0.9em; font-weight: 600; display: none;
+}
+.feedback-bar.show { display: block; }
+.feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* ── 6. SHORT ANSWER ── */
+.sa-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 28px 36px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+}
+.sa-section > h2 {
+  color: #4a148c; font-size: 1.2em; font-weight: 700;
+  border-bottom: 2px solid #f3f0ff; padding-bottom: 8px; margin-top: 0;
+}
+.sa-card {
+  background: #faf9ff; border: 1px solid #e2dcf5;
+  border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+}
+.sa-card .question-label { color: #6f42c1; }
+.sa-card .question-stem  { color: #1a1a2e; font-weight: 600; font-size: 1.0em; margin-bottom: 0; }
+
+.reveal-btn {
+  background: #6f42c1; color: #ffffff; border: none;
+  border-radius: 20px; padding: 7px 22px;
+  font-size: 0.88em; font-weight: 600; cursor: pointer;
+  margin-top: 12px; transition: background 0.2s; font-family: inherit;
+}
+.reveal-btn:hover { background: #5a32a3; }
+
+.answer-panel {
+  background: #f3f0ff; border: 1px solid #d4c8f5;
+  border-radius: 8px; padding: 18px 22px; margin-top: 14px;
+  font-size: 0.95em; line-height: 1.8; display: none;
+}
+.answer-panel.show { display: block; }
+.answer-panel strong { color: #4a148c; }
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Lecture 4 — Building Machine Learning Pipelines</h1>
+  <div class="subtitle">Modern Data Analytics (GOZ39A) &nbsp;·&nbsp; Martial Luyts &nbsp;·&nbsp; Ruben Kerkhofs &nbsp;·&nbsp; Gregory van Kruijsdijk</div>
+</div>
+
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <a href="#sklearn">1. Sklearn</a>
+  <a href="#leakage">2. Data Leakage</a>
+  <a href="#encoders">3. Encoders</a>
+  <a href="#scalers">4. Scalers</a>
+  <a href="#imputers">5. Imputers</a>
+  <a href="#pca">6. PCA</a>
+  <a href="#outliers">7. Outlier Detection</a>
+  <a href="#transformers">8. ColumnTransformer</a>
+  <a href="#pipelines">9. Pipelines</a>
+  <a href="#gridsearch">10. GridSearchCV</a>
+  <a href="#mcq" class="nav-mcq">📝 Quiz (50 Qs)</a>
+  <a href="#sa" class="nav-sa">✏️ Short Answer</a>
+</nav>
+
+<!-- ════════════════ SECTION 1 — SKLEARN ════════════════ -->
+<div id="sklearn" class="notes-section">
+  <h2>1. Scikit-Learn — Overview &amp; Workflow</h2>
+
+  <h3>Why Scikit-Learn?</h3>
+  <ul class="note-list">
+    <li>Simple, consistent API across all estimators</li>
+    <li>Actively developed; wide range of classical ML algorithms</li>
+    <li>NLP support; sample datasets; thorough documentation</li>
+    <li>Not the tool of choice for deep learning — use TensorFlow / PyTorch instead</li>
+  </ul>
+
+  <h3>Data Structures</h3>
+  <table>
+    <thead><tr><th>Object</th><th>Shape</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Feature matrix <strong>X</strong></td><td>(n_samples, n_features)</td><td>One row per observation; all columns numerical</td></tr>
+      <tr><td>Target vector <strong>y</strong></td><td>(n_samples,)</td><td>Labels or values to predict (supervised only)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The 4-Step Recipe</h3>
+  <ol class="step-list">
+    <li><strong>Choose</strong> the estimator class — e.g. <code>from sklearn.naive_bayes import GaussianNB</code></li>
+    <li><strong>Instantiate</strong> with hyperparameters — e.g. <code>model = GaussianNB()</code></li>
+    <li><strong>Fit</strong> on training data — <code>model.fit(X_train, y_train)</code></li>
+    <li><strong>Apply</strong> to test data — <code>y_pred = model.predict(X_test)</code></li>
+  </ol>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Train / Test Split</div>
+    Always split before any preprocessing. <code>train_test_split(X, y, random_state=1)</code> returns X_train, X_test, y_train, y_test. Performance is evaluated on the test set — data the model has never seen during training.
+  </div>
+
+  <div class="computation-note">
+    <div class="box-title">Computation Note — reshape(-1, 1)</div>
+    Sklearn expects a 2-D feature matrix <code>(n_samples, n_features)</code>. A single-feature 1-D array must be reshaped: <code>X = np.array([...]).reshape(-1, 1)</code> converts shape <code>(n,)</code> → <code>(n, 1)</code>.
+  </div>
+
+  <h3>Belgian Phones — Practical Lesson</h3>
+  <div class="example-box">
+    <div class="box-title">Example</div>
+    Annual call data (1950–1973) was corrupted: 1964–1969 stored minutes, not calls. OLS fitted blindly pulled the regression line toward those outliers, producing a useless model. Lessons: (1) understand model assumptions; (2) preprocess data appropriately; (3) always read the documentation.
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning — OLS &amp; Outliers</div>
+    OLS minimises <em>squared</em> residuals. A single large residual grows quadratically and can dominate the entire loss function, even when heavily outnumbered by normal observations.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 2 — DATA LEAKAGE ════════════════ -->
+<div id="leakage" class="notes-section">
+  <h2>2. The Golden Rule — Preventing Data Leakage</h2>
+
+  <div class="warning-box">
+    <div class="box-title">⚠️ Golden Rule</div>
+    <strong>All preprocessors must be fit on training data only.</strong> Fitting on the full dataset lets the preprocessor learn statistics from the test set, inflating performance estimates.
+  </div>
+
+  <h3>Correct Workflow</h3>
+  <ol class="step-list">
+    <li>Split into X_train / X_test <em>before</em> any preprocessing</li>
+    <li>Fit preprocessor on training data only: <code>preprocessor.fit_transform(X_train)</code></li>
+    <li>Apply learned parameters to test data: <code>preprocessor.transform(X_test)</code> — never <code>fit_transform(X_test)</code></li>
+  </ol>
+
+  <h3>Preprocessing Topics Covered</h3>
+  <table>
+    <thead><tr><th>Technique</th><th>Purpose</th><th>Sklearn Class</th></tr></thead>
+    <tbody>
+      <tr><td>Encoders</td><td>Categorical → numerical</td><td><code>OneHotEncoder</code></td></tr>
+      <tr><td>Scalers</td><td>Normalise feature ranges</td><td><code>StandardScaler</code>, <code>RobustScaler</code>, <code>MinMaxScaler</code></td></tr>
+      <tr><td>Imputers</td><td>Fill missing values</td><td><code>SimpleImputer</code></td></tr>
+      <tr><td>Dimensionality reduction</td><td>Reduce feature count</td><td><code>PCA</code></td></tr>
+      <tr><td>Outlier detection</td><td>Flag / remove anomalies</td><td><code>IsolationForest</code>, LOF, etc.</td></tr>
+      <tr><td>Column-wise dispatch</td><td>Different steps per column type</td><td><code>ColumnTransformer</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════ SECTION 3 — ENCODERS ════════════════ -->
+<div id="encoders" class="notes-section">
+  <h2>3. Encoders — Handling Categorical Variables</h2>
+
+  <p>Sklearn's feature matrix must be fully numerical. Categorical features (gender, blood type, nationality, ZIP code) must be encoded first.</p>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — One-Hot Encoding</div>
+    Creates <strong>one binary column per unique category value</strong>. Each row has exactly one 1 among those columns. No false ordinal relationship is implied between categories.
+  </div>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder
+
+enc = <span class="fn">OneHotEncoder</span>(handle_unknown=<span class="st">'ignore'</span>)
+enc.<span class="fn">fit</span>(X_train)                       <span class="cm"># learn categories from training data only</span>
+X_enc = enc.<span class="fn">transform</span>(X_test).<span class="fn">toarray</span>()
+
+enc.<span class="fn">get_feature_names_out</span>()           <span class="cm"># → ['A_a', 'A_b', 'B_a', ...]</span>
+enc.<span class="fn">inverse_transform</span>(X_enc)          <span class="cm"># recover original category labels</span>
+  </div>
+
+  <table>
+    <thead><tr><th>Parameter</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>handle_unknown='ignore'</code></td><td>Unknown test categories → all-zero row (no error)</td></tr>
+      <tr><td><code>handle_unknown='error'</code></td><td>Raises ValueError if test contains unseen category</td></tr>
+      <tr><td><code>drop='first'</code></td><td>Drops one column per feature to reduce multicollinearity</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <div class="box-title">Warning — Curse of Dimensionality</div>
+    A feature with 1 000 unique values creates 1 000 new columns. High-cardinality OHE explodes the feature space, making distance-based algorithms unreliable and models prone to overfitting.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 4 — SCALERS ════════════════ -->
+<div id="scalers" class="notes-section">
+  <h2>4. Scalers — Feature Scaling</h2>
+
+  <p>Models sensitive to feature scale: Ridge, k-NN, SVM, distance-based clustering. Tree-based models (Random Forest, XGBoost) do <em>not</em> require scaling.</p>
+
+  <table>
+    <thead><tr><th>Scaler</th><th>Formula</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td>StandardScaler</td><td>X* = (X − μ) / σ</td><td>Default; roughly normally distributed data</td></tr>
+      <tr><td>MinMaxScaler</td><td>X* = (X − min) / (max − min)</td><td>Bounded data; output in [0, 1]</td></tr>
+      <tr><td>RobustScaler</td><td>X* = (X − median) / IQR</td><td>Data with significant outliers</td></tr>
+      <tr><td>Custom (BaseEstimator)</td><td>User-defined fit/transform</td><td>When built-in scalers don't fit the task</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Why Scale for Distance-Based Models?</div>
+    Euclidean distance = √Σ(xᵢ − xⱼ)². A feature with range [0, 10 000] contributes 10 000× more squared distance than a feature with range [0, 1], regardless of which is more predictive. Scaling removes this bias.
+  </div>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+StS = <span class="fn">StandardScaler</span>()
+X_scaled      = StS.<span class="fn">fit_transform</span>(X_train)   <span class="cm"># fit on train only</span>
+X_test_scaled = StS.<span class="fn">transform</span>(X_test)        <span class="cm"># apply same μ, σ</span>
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning</div>
+    StandardScaler produces zero-mean, unit-variance data for the training set. The distribution shape is only truly standard normal if the input was normal — for non-normal data, the shape is unchanged.
+  </div>
+
+  <h3>Custom Scaler Pattern</h3>
+  <div class="code-block">
+<span class="kw">from</span> sklearn.base <span class="kw">import</span> BaseEstimator
+<span class="kw">import</span> numpy <span class="kw">as</span> np, pandas <span class="kw">as</span> pd
+
+<span class="kw">class</span> <span class="fn">CutOffScaler</span>(BaseEstimator):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, min_cut=<span class="num">0</span>, max_cut=<span class="num">10</span>):
+        self.min_cut = min_cut
+        self.max_cut = max_cut
+    <span class="kw">def</span> <span class="fn">fit</span>(self, X, y=<span class="st">None</span>):
+        <span class="kw">return</span> self
+    <span class="kw">def</span> <span class="fn">transform</span>(self, X, y=<span class="st">None</span>):
+        <span class="kw">return</span> pd.<span class="fn">DataFrame</span>(np.<span class="fn">clip</span>(X.values, self.min_cut, self.max_cut),
+                             columns=X.columns, index=X.index)
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 5 — IMPUTERS ════════════════ -->
+<div id="imputers" class="notes-section">
+  <h2>5. Imputers — Handling Missing Data</h2>
+
+  <p>Most Sklearn models cannot process <code>NaN</code> values. Options: drop via pandas, or impute using Sklearn.</p>
+
+  <table>
+    <thead><tr><th>Parameter</th><th>Options / Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>missing_values</code></td><td><code>np.nan</code>, <code>None</code>, or custom strings like <code>'Missing'</code></td></tr>
+      <tr><td><code>strategy</code></td><td><code>'mean'</code>, <code>'median'</code> (numerical); <code>'most_frequent'</code> (categorical); <code>'constant'</code></td></tr>
+      <tr><td><code>add_indicator</code></td><td>If <code>True</code>, appends a binary flag column marking imputed rows</td></tr>
+    </tbody>
+  </table>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+
+SI_num = <span class="fn">SimpleImputer</span>(missing_values=np.nan,  strategy=<span class="st">'mean'</span>)
+SI_cat = <span class="fn">SimpleImputer</span>(missing_values=<span class="st">None</span>,    strategy=<span class="st">'most_frequent'</span>)
+
+X_num = SI_num.<span class="fn">fit_transform</span>(X_train[[<span class="st">'Age'</span>]])
+X_cat = SI_cat.<span class="fn">fit_transform</span>(X_train[[<span class="st">'Embarked'</span>]])
+  </div>
+
+  <div class="example-box">
+    <div class="box-title">Example — add_indicator</div>
+    In churn prediction, customers who skipped a survey question may have a systematically higher churn rate. <code>add_indicator=True</code> creates an extra binary column letting the model learn from the missingness pattern itself, not just the imputed value.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 6 — PCA ════════════════ -->
+<div id="pca" class="notes-section">
+  <h2>6. PCA — Principal Component Analysis</h2>
+
+  <div class="theorem-box">
+    <div class="box-title">Concept</div>
+    PCA finds orthogonal axes (principal components) that capture maximum variance. Projecting onto the top-k PCs reduces dimensionality while minimising information loss. Components are generally not directly interpretable.
+  </div>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Uninterpretability in ML</div>
+    In statistical reporting PCs need human-readable meaning. In ML, the model has no concept of feature semantics — it only needs predictive signal. If the PCs retain that signal, interpretability is irrelevant.
+  </div>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+StS = <span class="fn">StandardScaler</span>()
+X_scaled = StS.<span class="fn">fit_transform</span>(X_train)    <span class="cm"># always scale FIRST</span>
+
+pca = <span class="fn">PCA</span>()
+pca.<span class="fn">fit</span>(X_scaled)
+pca.explained_variance_ratio_            <span class="cm"># e.g. array([0.969, 0.031])</span>
+
+X_reduced      = pca.<span class="fn">transform</span>(X_scaled)
+X_test_reduced = pca.<span class="fn">transform</span>(StS.<span class="fn">transform</span>(X_test))
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning — Scale Before PCA</div>
+    PCA maximises variance. Without scaling, features with large numeric ranges bias the principal components toward those units, not toward informative directions.
+  </div>
+
+  <h3>Choosing Number of Components</h3>
+  <ul class="note-list">
+    <li>Inspect <code>pca.explained_variance_ratio_</code> — choose k where cumulative ratio reaches ~95%</li>
+    <li>Scree plot: look for the "elbow" where marginal gains drop sharply</li>
+    <li><code>PCA(n_components=0.95)</code> automatically selects enough components to explain 95% of variance</li>
+  </ul>
+</div>
+
+<!-- ════════════════ SECTION 7 — OUTLIER DETECTION ════════════════ -->
+<div id="outliers" class="notes-section">
+  <h2>7. Outlier Detection</h2>
+
+  <table>
+    <thead><tr><th>Method</th><th>Core Idea</th><th>Key Hyperparameter</th></tr></thead>
+    <tbody>
+      <tr><td>IsolationForest</td><td>Ensemble of random trees; anomalies isolated in fewer splits</td><td><code>n_estimators</code>, <code>contamination</code></td></tr>
+      <tr><td>LocalOutlierFactor</td><td>Compares local density of a point to its neighbours</td><td><code>n_neighbors</code></td></tr>
+      <tr><td>One-Class SVM</td><td>Learns a boundary around "normal" data in kernel space</td><td><code>nu</code></td></tr>
+      <tr><td>Robust Covariance</td><td>Fits a resistant Gaussian ellipse; flags external points</td><td><code>contamination</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <div class="box-title">Example — IsolationForest on Belgian Phones</div>
+    <div class="code-block">
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> IsolationForest
+<span class="kw">from</span> sklearn <span class="kw">import</span> linear_model
+
+IsoFo  = <span class="fn">IsolationForest</span>(n_estimators=<span class="num">100</span>, contamination=<span class="st">'auto'</span>)
+labels = IsoFo.<span class="fn">fit_predict</span>(phones.calls.values.reshape(<span class="num">-1</span>,<span class="num">1</span>))
+<span class="cm"># 1 = inlier, -1 = outlier</span>
+
+calls_clean = phones.calls[labels == <span class="num">1</span>]
+year_clean  = phones.year[labels  == <span class="num">1</span>].values.reshape(<span class="num">-1</span>,<span class="num">1</span>)
+OLS = linear_model.<span class="fn">LinearRegression</span>().<span class="fn">fit</span>(year_clean, calls_clean)
+    </div>
+    After removing the 6 anomalous years, the linear fit captured the true underlying trend.
+  </div>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Ensemble Methods</div>
+    IsolationForest builds <code>n_estimators</code> random trees. Anomalies require fewer splits to be isolated; the anomaly score aggregates isolation depths across all trees. More estimators → more stable scores.
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning</div>
+    Outlier detectors must be fit on training data only. Fitting on the full dataset or the test set constitutes data leakage.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 8 — COLUMN TRANSFORMER ════════════════ -->
+<div id="transformers" class="notes-section">
+  <h2>8. ColumnTransformer — Mixed-Type Datasets</h2>
+
+  <p>Dispatches different transformers to different column subsets <strong>in parallel</strong>, then concatenates the outputs into a single numerical matrix.</p>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Element Format</div>
+    Each element: <code>(name, transformer, columns)</code>
+    <ul class="note-list">
+      <li><strong>name</strong> — user-chosen string; referenced in GridSearchCV</li>
+      <li><strong>transformer</strong> — any Sklearn-compatible object, or <code>'drop'</code> / <code>'passthrough'</code></li>
+      <li><strong>columns</strong> — list of column names or integer indices</li>
+    </ul>
+  </div>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> OneHotEncoder, StandardScaler
+
+t = <span class="fn">ColumnTransformer</span>([
+    (<span class="st">'drop_cols'</span>, <span class="st">'drop'</span>,                                   [<span class="st">'PassengerId'</span>, <span class="st">'Name'</span>, <span class="st">'Ticket'</span>, <span class="st">'Cabin'</span>, <span class="st">'Embarked'</span>, <span class="st">'Parch'</span>]),
+    (<span class="st">'OneHot'</span>,    <span class="fn">OneHotEncoder</span>(handle_unknown=<span class="st">'ignore'</span>), [<span class="st">'Sex'</span>, <span class="st">'SibSp'</span>, <span class="st">'Pclass'</span>]),
+    (<span class="st">'Scale'</span>,     <span class="fn">StandardScaler</span>(),                          [<span class="st">'Age'</span>, <span class="st">'Fare'</span>])
+])
+
+X_train_t = t.<span class="fn">fit_transform</span>(X_train)   <span class="cm"># fit + transform on training data</span>
+X_test_t  = t.<span class="fn">transform</span>(X_test)        <span class="cm"># NOT fit_transform — apply learned params</span>
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning — Never fit_transform on Test Data</div>
+    <code>t.fit_transform(X_test)</code> relearns statistics from the test set. Always use <code>t.transform(X_test)</code>.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 9 — PIPELINES ════════════════ -->
+<div id="pipelines" class="notes-section">
+  <h2>9. Pipelines</h2>
+
+  <p>A Pipeline chains multiple Sklearn estimators sequentially into one object. It exposes <code>.fit()</code>, <code>.predict()</code>, and <code>.score()</code> — behaving like any standard Sklearn estimator.</p>
+
+  <h3>Benefits</h3>
+  <ul class="note-list">
+    <li>Eliminates repetitive fit/transform calls — cleaner, less error-prone code</li>
+    <li>Guarantees identical step order for training and test data</li>
+    <li>Single <code>.fit()</code> call propagates through all steps automatically</li>
+    <li>Integrates with GridSearchCV to tune all steps simultaneously</li>
+    <li>Custom <code>BaseEstimator</code> classes plug in directly as steps</li>
+  </ul>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.linear_model  <span class="kw">import</span> Ridge
+
+pipe = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>,     <span class="fn">StandardScaler</span>()),  <span class="cm"># step 1</span>
+    (<span class="st">'reduce_dim'</span>, <span class="fn">PCA</span>()),             <span class="cm"># step 2</span>
+    (<span class="st">'regressor'</span>,  <span class="fn">Ridge</span>())            <span class="cm"># step 3 — final estimator</span>
+])
+
+pipe.<span class="fn">fit</span>(X_train, y_train)         <span class="cm"># fit_transform step 1&2, fit step 3</span>
+preds = pipe.<span class="fn">predict</span>(X_test)     <span class="cm"># transform step 1&2, predict step 3</span>
+pipe.<span class="fn">score</span>(X_test, y_test)        <span class="cm"># R² for regression pipelines</span>
+  </div>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Step Constraints</div>
+    <ul class="note-list">
+      <li>All steps except the last must implement <code>transform()</code></li>
+      <li>The final step must implement <code>predict()</code> for supervised pipelines</li>
+      <li>A <code>ColumnTransformer</code> counts as one step (typically the first)</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <div class="box-title">Example — Without vs. With Pipeline</div>
+    Without pipeline: <code>scaler.fit_transform(X_train)</code> → <code>pca.fit_transform(...)</code> → <code>ridge.fit(...)</code> → <code>scaler.transform(X_test)</code> → <code>pca.transform(...)</code> → <code>ridge.predict(...)</code> — 6 separate calls, easy to make mistakes.<br><br>
+    With pipeline: <code>pipe.fit(X_train, y_train)</code> → <code>pipe.predict(X_test)</code> — 2 calls, identical outcome.
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 10 — GRIDSEARCHCV ════════════════ -->
+<div id="gridsearch" class="notes-section">
+  <h2>10. Hyperparameter Tuning with GridSearchCV</h2>
+
+  <div class="theorem-box">
+    <div class="box-title">Concept — Parameters vs. Hyperparameters</div>
+    <strong>Model parameters</strong> (e.g. Ridge coefficients) are learned automatically during <code>.fit()</code>. <strong>Hyperparameters</strong> (e.g. Ridge's <code>alpha</code>, PCA's <code>n_components</code>) are set by the user before training and are not updated by <code>.fit()</code>. A poor hyperparameter choice degrades performance.
+  </div>
+
+  <h3>GridSearchCV Procedure</h3>
+  <ol class="step-list">
+    <li>Define a grid of candidate hyperparameter values</li>
+    <li>For each combination, perform k-fold CV <em>within the training set</em></li>
+    <li>Select the combination with the best mean CV score</li>
+    <li>Refit on all training data using the best combination</li>
+    <li>Evaluate once on the held-out test set</li>
+  </ol>
+
+  <div class="key-point">
+    <div class="box-title">Key Point — Naming Convention</div>
+    To reference a step's hyperparameter in <code>param_grid</code>: <code>step_name__hyperparameter_name</code> (double underscore). The hyperparameter name must match the estimator's documentation exactly.
+  </div>
+
+  <div class="code-block">
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV
+
+params = {
+    <span class="st">'reduce_dim__n_components'</span>: np.<span class="fn">arange</span>(<span class="num">1</span>, <span class="num">11</span>),        <span class="cm"># 10 values</span>
+    <span class="st">'regressor__alpha'</span>:         <span class="num">2.0</span>**np.<span class="fn">arange</span>(<span class="num">-6</span>, <span class="num">6</span>)  <span class="cm"># 12 values → 120 combos × 5 folds = 600 fits</span>
+}
+
+gs = <span class="fn">GridSearchCV</span>(pipe, param_grid=params, cv=<span class="num">5</span>, verbose=<span class="num">1</span>)
+gs.<span class="fn">fit</span>(X_train, y_train)
+
+gs.<span class="fn">score</span>(X_test, y_test)  <span class="cm"># final evaluation on held-out test set</span>
+gs.best_params_           <span class="cm"># best hyperparameter combination</span>
+gs.best_estimator_        <span class="cm"># the fitted best model object</span>
+  </div>
+
+  <h3>Comparing Entire Steps (Not Just Values)</h3>
+  <div class="code-block">
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, RobustScaler
+
+pipe  = <span class="fn">Pipeline</span>([(<span class="st">'scaler'</span>, []), (<span class="st">'reduce_dim'</span>, <span class="fn">PCA</span>()), (<span class="st">'regressor'</span>, <span class="fn">Ridge</span>())])
+grid  = [{<span class="st">'scaler'</span>: [<span class="fn">StandardScaler</span>(), <span class="fn">RobustScaler</span>()]}]
+gs    = <span class="fn">GridSearchCV</span>(pipe, grid).<span class="fn">fit</span>(X_train, y_train)
+gs.best_params_  <span class="cm"># → {'scaler': RobustScaler()}</span>
+  </div>
+
+  <div class="warning-box">
+    <div class="box-title">Warning — Test Set Must Remain Untouched</div>
+    CV folds are drawn from the training set only. Using the test set to select hyperparameters inflates the final performance estimate and is data leakage. The test set is used exactly once, at the very end.
+  </div>
+</div>
+
+<!-- ════════════════ MCQ SECTION ════════════════ -->
+<div id="mcq" class="mcq-section">
+  <h2>
+    📝 Multiple Choice &amp; True / False Quiz
+    <span class="score-display" id="score-display">Score: 0 / 0</span>
+    <button class="reset-btn" onclick="resetQuiz()">↺ Reset</button>
+  </h2>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ════════════════ SHORT ANSWER SECTION ════════════════ -->
+<div id="sa" class="sa-section">
+  <h2>✏️ Short Answer Questions</h2>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+/* ══════════ QUESTION DATA ══════════ */
+const questions = [
+  /* Sklearn Basics */
+  { section:'Sklearn Basics', type:'mc',
+    q:'Which method adjusts a model\'s internal parameters to patterns in training data?',
+    opts:['.transform()','.predict()','.fit()','.score()'], ans:2,
+    fb:'.fit() learns from training data. .transform() applies a learned transformation. .predict() generates predictions. .score() evaluates performance.'
+  },
+  { section:'Sklearn Basics', type:'mc',
+    q:'In a supervised learning problem, what are the two primary inputs to .fit()?',
+    opts:['The pipeline and the scaler','The feature matrix X and target vector y','Training and test sets together','The hyperparameter grid'],
+    ans:1, fb:'Supervised learning requires labelled data: a feature matrix X (n_samples × n_features) and a target vector y (labels or values to predict).'
+  },
+  { section:'Sklearn Basics', type:'mc',
+    q:'What is the primary purpose of holding out a test set?',
+    opts:['To speed up training','To estimate performance on truly unseen data','To increase the training set size','To automatically tune hyperparameters'],
+    ans:1, fb:'Test data simulates production conditions. A model that overfits the training set will score poorly on the test set — the test set reveals this gap.'
+  },
+  { section:'Sklearn Basics', type:'tf',
+    q:'Scikit-Learn is the preferred Python library for deep learning tasks.',
+    ans:false, fb:'False. Sklearn excels at classical ML. Deep learning is the domain of TensorFlow and PyTorch.'
+  },
+  { section:'Sklearn Basics', type:'mc',
+    q:'Why must a 1-D feature array be reshaped to (-1, 1) before passing to Sklearn estimators?',
+    opts:['It normalises the values','Sklearn requires 2-D arrays of shape (n_samples, n_features)','It prevents data leakage','It converts integers to floats'],
+    ans:1, fb:'Sklearn expects a 2-D feature matrix. A 1-D array of shape (n,) must become (n, 1) via .reshape(-1, 1).'
+  },
+  { section:'Sklearn Basics', type:'mc',
+    q:'Which function returns X_train, X_test, y_train, and y_test in a single call?',
+    opts:['cross_val_score()','GridSearchCV()','train_test_split()','fit_transform()'],
+    ans:2, fb:'train_test_split(X, y) splits both the feature matrix and target vector simultaneously, returning four arrays.'
+  },
+
+  /* Data Leakage */
+  { section:'Data Leakage', type:'tf',
+    q:'Fitting a StandardScaler on the full dataset (train + test) before splitting is acceptable because scaling is just preprocessing.',
+    ans:false, fb:'False. This is data leakage. The scaler learns μ and σ from test observations, inflating performance estimates. Fit on training data only.'
+  },
+  { section:'Data Leakage', type:'mc',
+    q:'Which workflow correctly prevents data leakage during preprocessing?',
+    opts:[
+      'fit_transform on full data → split → model',
+      'split → fit_transform on X_train → transform on X_test → model',
+      'split → fit_transform on both sets → model',
+      'transform on X_train → fit on X_test → model'
+    ], ans:1, fb:'Fit the preprocessor on X_train only, then apply the learned parameters to X_test with .transform().'
+  },
+  { section:'Data Leakage', type:'mc',
+    q:'Where should cross-validation folds be created when using GridSearchCV?',
+    opts:['Across the full dataset','Within the training set only','Within the test set only','Alternating between train and test'],
+    ans:1, fb:'CV folds are drawn from the training set only. The test set is untouched until final evaluation.'
+  },
+
+  /* Encoders */
+  { section:'Encoders', type:'mc',
+    q:'One-Hot Encoding a feature with 200 unique values creates how many new binary columns?',
+    opts:['1','14','100','200'], ans:3, fb:'OHE creates one binary column per unique category. 200 unique values → 200 columns.'
+  },
+  { section:'Encoders', type:'mc',
+    q:'What does handle_unknown="ignore" do in OneHotEncoder?',
+    opts:[
+      'Raises a ValueError for unknown categories',
+      'Drops rows with unknown categories',
+      'Encodes unknown categories as all zeros',
+      'Adds a new column for each unknown category'
+    ], ans:2, fb:'handle_unknown="ignore" fills all OHE columns with 0 for unseen categories, preventing errors at inference time.'
+  },
+  { section:'Encoders', type:'tf',
+    q:'One-Hot Encoding assigns integer codes (0, 1, 2…) to each category, implying an ordinal relationship.',
+    ans:false, fb:'False. That is Label/Ordinal Encoding. OHE creates separate binary columns — no ordinal relationship implied.'
+  },
+  { section:'Encoders', type:'mc',
+    q:'Which method of a fitted OneHotEncoder recovers original categorical labels from an encoded matrix?',
+    opts:['.decode()','.reverse()','.inverse_transform()','.original()'],
+    ans:2, fb:'inverse_transform() maps the encoded binary matrix back to the original category strings.'
+  },
+  { section:'Encoders', type:'mc',
+    q:'The "Curse of Dimensionality" in the context of OHE refers to which problem?',
+    opts:[
+      'OHE significantly slows down the encoder',
+      'High-cardinality features create an extremely high-dimensional sparse feature space',
+      'OHE always causes target leakage',
+      'OHE cannot handle more than 10 categories'
+    ], ans:1, fb:'High-cardinality OHE explodes the feature space. In high dimensions data becomes sparse, and distance metrics lose discriminative power.'
+  },
+
+  /* Scalers */
+  { section:'Scalers', type:'mc',
+    q:'Why must features be scaled before applying k-NN?',
+    opts:[
+      'k-NN cannot process negative values',
+      'Euclidean distance is dominated by features with large numeric ranges',
+      'k-NN requires features that sum to 1',
+      'Scaling reduces training time in k-NN'
+    ], ans:1, fb:'Euclidean distance squares differences. A feature with range [0, 10000] contributes orders of magnitude more than one in [0, 1], regardless of predictive importance.'
+  },
+  { section:'Scalers', type:'mc',
+    q:'After StandardScaler, training data has approximately which properties?',
+    opts:['Mean 1, variance 0','Mean 0, variance 1','Mean 0.5, variance 0.5','Same mean, variance 1'],
+    ans:1, fb:'StandardScaler subtracts mean and divides by std, producing zero-mean, unit-variance data for the training set.'
+  },
+  { section:'Scalers', type:'mc',
+    q:'When should RobustScaler be preferred over StandardScaler?',
+    opts:[
+      'When the data has many features',
+      'When the data contains significant outliers',
+      'When the data is perfectly normally distributed',
+      'When features are already in [0, 1]'
+    ], ans:1, fb:'RobustScaler uses median and IQR instead of mean and std. Both statistics are resistant to outliers, making the scaler more stable in their presence.'
+  },
+  { section:'Scalers', type:'tf',
+    q:'Decision-tree-based models (e.g. Random Forest) require feature scaling to work correctly.',
+    ans:false, fb:'False. Tree models split on thresholds, not distances or dot products. They are invariant to monotonic transformations including scaling.'
+  },
+  { section:'Scalers', type:'mc',
+    q:'To create a custom Sklearn-compatible scaler, your class should inherit from which base class?',
+    opts:['SklearnMixin','TransformerBase','BaseEstimator','CustomTransformer'],
+    ans:2, fb:'Inheriting sklearn.base.BaseEstimator and implementing fit() and transform() makes a class compatible with Pipeline and GridSearchCV.'
+  },
+  { section:'Scalers', type:'mc',
+    q:'MinMaxScaler maps feature values to which interval by default?',
+    opts:['[-1, 1]','[0, 10]','[0, 1]','[-σ, +σ]'],
+    ans:2, fb:'MinMaxScaler: X* = (X − min) / (max − min), mapping the minimum to 0 and the maximum to 1.'
+  },
+
+  /* Imputers */
+  { section:'Imputers', type:'mc',
+    q:'When would you set add_indicator=True in SimpleImputer?',
+    opts:[
+      'To highlight imputed values in red in output',
+      'When the fact that a value is missing carries predictive signal',
+      'To drop rows with missing values',
+      'When using the most_frequent strategy'
+    ], ans:1, fb:'add_indicator=True appends a binary flag column. This is valuable when missingness is informative — e.g. customers who skip a question may churn more.'
+  },
+  { section:'Imputers', type:'mc',
+    q:'Which imputation strategy is most appropriate for a categorical column?',
+    opts:['mean','median','most_frequent','zero'], ans:2,
+    fb:'mean and median require numerical data. most_frequent replaces missing values with the most common category — standard for categorical columns.'
+  },
+  { section:'Imputers', type:'tf',
+    q:'A SimpleImputer should be fit on training data and then applied separately to test data.',
+    ans:true, fb:'True. The imputer learns the fill value from training data during .fit(). The same value is applied to test data via .transform().'
+  },
+
+  /* PCA */
+  { section:'PCA', type:'mc',
+    q:'Why is standardisation recommended before applying PCA?',
+    opts:[
+      'PCA cannot process negative values',
+      'PCA maximises variance, so features with large ranges dominate without scaling',
+      'Standardisation speeds up PCA computation',
+      'PCA requires n_features == n_samples'
+    ], ans:1, fb:'PCA finds axes of maximum variance. Unscaled features with large numeric ranges bias the principal components toward those units, not toward truly informative directions.'
+  },
+  { section:'PCA', type:'mc',
+    q:'What does pca.explained_variance_ratio_ return?',
+    opts:[
+      'Total variance of the original data',
+      'Cumulative variance explained by all components',
+      'Fraction of total variance explained by each principal component',
+      'Eigenvalues of the covariance matrix'
+    ], ans:2, fb:'explained_variance_ratio_ is an array; element i is the proportion of total variance captured by the i-th PC.'
+  },
+  { section:'PCA', type:'tf',
+    q:'The uninterpretability of PCA components is a critical problem for machine learning applications.',
+    ans:false, fb:'False. ML models have no concept of feature semantics. As long as the components retain predictive signal, interpretability is irrelevant to model performance.'
+  },
+  { section:'PCA', type:'mc',
+    q:'If the first PC explains 97% of variance in a 2-feature dataset, the best next step is to:',
+    opts:[
+      'Use all components to avoid any information loss',
+      'Use only the first component and discard the second',
+      'Apply a second round of PCA on the components',
+      'Re-run PCA with a different random_state'
+    ], ans:1, fb:'When one component captures ~97% of variance, the data is nearly 1-dimensional. Keeping only that component dramatically reduces dimensionality with minimal information loss.'
+  },
+
+  /* Outlier Detection */
+  { section:'Outlier Detection', type:'mc',
+    q:'Why is OLS regression heavily influenced by outliers?',
+    opts:[
+      'OLS uses absolute differences, amplifying large errors',
+      'OLS minimises squared residuals, so large errors grow quadratically',
+      'OLS assumes equal leverage for all observations',
+      'OLS only considers the 10 nearest observations'
+    ], ans:1, fb:'OLS minimises Σ(y − ŷ)². Squaring means a single large residual can dominate the entire loss, pulling the fitted line strongly toward that outlier.'
+  },
+  { section:'Outlier Detection', type:'mc',
+    q:'What does the n_estimators hyperparameter control in IsolationForest?',
+    opts:[
+      'The contamination rate',
+      'The number of random decision trees in the ensemble',
+      'The number of features sampled per split',
+      'The maximum tree depth'
+    ], ans:1, fb:'n_estimators is the number of random trees. More trees improve score stability. Anomalies are isolated in fewer splits on average; the score aggregates depths across all trees.'
+  },
+  { section:'Outlier Detection', type:'tf',
+    q:'Outlier detection models should be fit on the full dataset (train + test) for maximum accuracy.',
+    ans:false, fb:'False. Fitting on the full dataset leaks test information. All preprocessors and detectors must be fit on training data only.'
+  },
+
+  /* ColumnTransformer */
+  { section:'ColumnTransformer', type:'mc',
+    q:'Each element in a ColumnTransformer list has which format?',
+    opts:['(transformer, columns)','(name, transformer, columns)','(columns, transformer, hyperparameters)','(name, columns, strategy)'],
+    ans:1, fb:'Three-tuple: (name, transformer_object, list_of_columns). The name is referenced in GridSearchCV using the double-underscore convention.'
+  },
+  { section:'ColumnTransformer', type:'tf',
+    q:'After fitting a ColumnTransformer on training data, you should call .fit_transform(X_test) to preprocess test data.',
+    ans:false, fb:'False. Call .transform(X_test) to apply the already-learned parameters. .fit_transform(X_test) relearns from the test set, causing leakage.'
+  },
+  { section:'ColumnTransformer', type:'mc',
+    q:'To automatically identify categorical columns without listing them manually, which pandas attribute is most useful?',
+    opts:['df.shapes','df.describe()','df.dtypes','df.info()'],
+    ans:2, fb:'df.dtypes returns each column\'s data type. Combined with np.where(df.dtypes == "object"), you can programmatically extract categorical column names.'
+  },
+
+  /* Pipelines */
+  { section:'Pipelines', type:'mc',
+    q:'What constraint applies to all Pipeline steps except the final one?',
+    opts:[
+      'They must implement .fit() and .predict()',
+      'They must implement .fit() and .transform()',
+      'They must be preprocessing steps only — no models',
+      'They must share the same hyperparameters'
+    ], ans:1, fb:'Intermediate steps transform data (fit + transform) and pass it to the next step. Only the final step needs predict().'
+  },
+  { section:'Pipelines', type:'mc',
+    q:'When pipe.fit(X_train, y_train) is called on Pipeline([scaler, pca, ridge]), what happens?',
+    opts:[
+      'All steps fit simultaneously in parallel',
+      'Only Ridge is fit; preprocessing is deferred',
+      'scaler.fit_transform → pca.fit_transform → ridge.fit, sequentially',
+      'Ridge is fit first, then PCA, then scaler'
+    ], ans:2, fb:'Pipelines execute left to right. Each step is fit on the output of the previous one.'
+  },
+  { section:'Pipelines', type:'tf',
+    q:'A Sklearn Pipeline behaves like a standard Sklearn estimator and exposes .fit() and .predict().',
+    ans:true, fb:'True. This is the key design: the pipeline is one composable object with the same interface as any other estimator.'
+  },
+  { section:'Pipelines', type:'mc',
+    q:'What is the main advantage of using a Pipeline over manually calling fit/transform for each step?',
+    opts:[
+      'Pipelines run faster due to parallelism',
+      'Pipelines automatically handle missing values',
+      'Pipelines eliminate repetition, enforce step order, and integrate with GridSearchCV',
+      'Pipelines automatically choose the best model'
+    ], ans:2, fb:'Three benefits: (1) less boilerplate, (2) guaranteed consistent order for train and test, (3) one GridSearchCV call tunes all steps simultaneously.'
+  },
+  { section:'Pipelines', type:'mc',
+    q:'When pipe.predict(X_test) is called on Pipeline([StandardScaler, PCA, Ridge]), what is the execution order?',
+    opts:[
+      'Ridge.predict → PCA.transform → StandardScaler.transform',
+      'StandardScaler.transform → PCA.transform → Ridge.predict',
+      'PCA.transform → StandardScaler.transform → Ridge.predict',
+      'All three run simultaneously'
+    ], ans:1, fb:'Predict executes steps left to right, applying .transform() at each intermediate step (no refitting), then the final step calls .predict().'
+  },
+  { section:'Pipelines', type:'tf',
+    q:'A Pipeline whose final step is PCA (rather than a model) exposes a .predict() method.',
+    ans:false, fb:'False. .predict() requires the final step to implement predict(). If the final step only implements transform() (like PCA), only .transform() is available on the pipeline.'
+  },
+
+  /* GridSearchCV */
+  { section:'GridSearchCV', type:'mc',
+    q:'A pipeline has step named "reduce_dim" using PCA. How is PCA\'s n_components referenced in param_grid?',
+    opts:['"n_components"','"PCA__n_components"','"reduce_dim__n_components"','"reduce_dim_n_components"'],
+    ans:2, fb:'Convention: step_name + double underscore + param_name → "reduce_dim__n_components".'
+  },
+  { section:'GridSearchCV', type:'mc',
+    q:'GridSearchCV with 10 PCA options and 12 Ridge alpha options using 5-fold CV performs how many total model fits?',
+    opts:['22','120','600','60'], ans:2,
+    fb:'10 × 12 = 120 combinations. Each evaluated with 5 CV folds → 600 fits. The best model is also refit once on all training data.'
+  },
+  { section:'GridSearchCV', type:'mc',
+    q:'After GridSearchCV.fit(X_train, y_train), which attribute gives the optimal hyperparameter combination?',
+    opts:['.best_score_','.best_estimator_','.best_params_','.cv_results_'],
+    ans:2, fb:'.best_params_ returns the dict of optimal hyperparameter names and values. .best_estimator_ is the fitted model object.'
+  },
+  { section:'GridSearchCV', type:'tf',
+    q:'Using the test set to select hyperparameters inside GridSearchCV is acceptable as long as you have a separate validation set for final evaluation.',
+    ans:false, fb:'False. The test set must remain untouched during model development. CV within the training set is the correct approach for hyperparameter selection.'
+  },
+  { section:'GridSearchCV', type:'mc',
+    q:'Passing [StandardScaler(), RobustScaler()] as values for a pipeline step in param_grid compares what?',
+    opts:[
+      'Different hyperparameter values of the same scaler',
+      'Entirely different transformer implementations for that pipeline step',
+      'Different datasets for the same scaler',
+      'Different evaluation metrics'
+    ], ans:1, fb:'Passing estimator objects swaps the entire implementation of that step. This lets you compare StandardScaler vs RobustScaler systematically within one GridSearch.'
+  },
+
+  /* Applied Reasoning */
+  { section:'Applied Reasoning', type:'mc',
+    q:'A dataset is 95% "Not Churned" and 5% "Churned". Why is reporting accuracy alone misleading?',
+    opts:[
+      'Accuracy cannot be computed for binary classification',
+      'A model predicting "Not Churned" for every row achieves 95% accuracy without learning anything',
+      'Accuracy requires balanced classes to compute',
+      'Accuracy only applies to regression problems'
+    ], ans:1, fb:'With severe class imbalance, a trivial majority-class predictor achieves high accuracy. Metrics like F1, precision, recall, or AUC-ROC expose this problem.'
+  },
+  { section:'Applied Reasoning', type:'mc',
+    q:'You want to predict house prices using PCA + Ridge. Which pipeline order is correct?',
+    opts:[
+      'Ridge → StandardScaler → PCA',
+      'PCA → StandardScaler → Ridge',
+      'StandardScaler → PCA → Ridge',
+      'PCA → Ridge → StandardScaler'
+    ], ans:2, fb:'Scale first (StandardScaler), then reduce dimensions (PCA), then fit the model (Ridge). PCA is scale-sensitive, so scaling must precede it.'
+  },
+  { section:'Applied Reasoning', type:'mc',
+    q:'In the Titanic example, "Survived" is extracted as y before splitting. Why?',
+    opts:[
+      'Survived must be encoded separately from features',
+      'Including Survived in X gives the model direct access to the answer — target leakage',
+      'ColumnTransformer cannot process the Survived column',
+      'Sklearn cannot handle boolean columns named "Survived"'
+    ], ans:1, fb:'If the target column remained in X, the model could use survival status directly to predict survival — perfectly accurate in training but useless in production.'
+  },
+  { section:'Applied Reasoning', type:'mc',
+    q:'For the Belgian Phones outlier problem, which pipeline best addresses the issue?',
+    opts:[
+      'StandardScaler → LinearRegression',
+      'IsolationForest (filter outliers) → StandardScaler → LinearRegression',
+      'PCA → RidgeRegression',
+      'OneHotEncoder → LinearRegression'
+    ], ans:1, fb:'IsolationForest flags and removes the corrupted 1964–1969 entries. StandardScaler normalises, and LinearRegression then fits the true underlying trend.'
+  },
+  { section:'Applied Reasoning', type:'mc',
+    q:'Which transformation is most appropriate for the "Sex" column in the Titanic dataset?',
+    opts:['StandardScaler','SimpleImputer(strategy="mean")','OneHotEncoder','PCA'],
+    ans:2, fb:'"Sex" is categorical and should be One-Hot Encoded. StandardScaler and PCA require numerical input; mean imputation addresses missing numerical values.'
+  },
+];
+
+const saData = [
+  { q:'Explain why fitting a StandardScaler on the combined train+test dataset constitutes data leakage, and describe the correct procedure.',
+    a:'<strong>Why it\'s leakage:</strong> The scaler learns μ and σ from both train and test observations. When test data is later transformed with these statistics, the scaler already "knows" the test distribution, making performance estimates over-optimistic — the model appears to generalise better than it actually does in true deployment.<br><br><strong>Correct procedure:</strong> (1) Split into X_train / X_test first. (2) Fit the scaler on X_train only: <code>scaler.fit_transform(X_train)</code>. (3) Apply the training-learned parameters to test data: <code>scaler.transform(X_test)</code> — never <code>fit_transform(X_test)</code>.'
+  },
+  { q:'Describe how GridSearchCV uses cross-validation to select hyperparameters. Why must the test set not be involved in this process?',
+    a:'<strong>Procedure:</strong> GridSearchCV iterates over all hyperparameter combinations. For each, the training set is split into k folds; the model trains on k-1 folds and validates on the remaining fold, repeated k times. The mean validation score is recorded. The winning combination is refit on all training data.<br><br><strong>Why exclude the test set:</strong> If the test set is used during selection, the chosen hyperparameters are tuned to the test set\'s specific distribution. The final score then reflects this over-optimism rather than true generalisation. The test set is used exactly once — for the final evaluation.'
+  },
+  { q:'A colleague proposes applying PCA directly to integer-encoded categorical variables (e.g. 0=Male, 1=Female). What is wrong with this, and what is the correct procedure?',
+    a:'<strong>Problem:</strong> Integer codes imply an ordinal relationship that does not exist (is Female > Male?). PCA would treat these as continuous values, finding principal components driven by the arbitrary integer assignment, not genuine variance structure.<br><br><strong>Correct procedure:</strong> (1) Apply One-Hot Encoding to convert categories to binary columns. (2) Standardise all numerical features. (3) Apply PCA to the scaled numerical matrix. In a Pipeline with ColumnTransformer, OHE handles categorical columns and StandardScaler handles numerical ones before PCA.'
+  },
+  { q:'Explain the double-underscore naming convention for hyperparameters in a GridSearchCV param_grid when using a Pipeline.',
+    a:'The convention is <strong>step_name__hyperparameter_name</strong> (two underscores between them). The step name is the string assigned when building the Pipeline. The hyperparameter name must match the estimator\'s documentation exactly.<br><br>Example: Pipeline with ("reduce_dim", PCA()) and ("regressor", Ridge()) → param_grid uses <code>"reduce_dim__n_components"</code> and <code>"regressor__alpha"</code>.<br><br>For nested structures (a Pipeline step containing a ColumnTransformer with sub-steps), the convention extends: <code>"transformer_step__sub_step_name__param_name"</code>.'
+  },
+  { q:'Why is OLS regression heavily influenced by outliers, even when they are vastly outnumbered by normal observations?',
+    a:'OLS minimises the sum of <strong>squared</strong> residuals: Σ(yᵢ − ŷᵢ)². Squaring means a single large residual grows quadratically — a point 10 units away contributes 100 to the loss, while 10 normal points each 1 unit away contribute only 10 total. Even one extreme outlier can dominate the entire objective function, pulling the regression line strongly toward it.<br><br>In the Belgian Phones example, 6 years of corrupted data (minutes instead of calls) overwhelmed 18 years of correct data, making the OLS fit meaningless. This motivates outlier detection (IsolationForest) or robust regression methods when outliers are expected.'
+  },
+  { q:'What is the purpose of add_indicator=True in SimpleImputer, and in what type of problem is it most valuable?',
+    a:'<code>add_indicator=True</code> appends a binary column for each feature that had missing values. The indicator is 1 where the original value was imputed and 0 elsewhere.<br><br>It is most valuable when missingness is <strong>not random (MCAR)</strong> but is related to the target variable. Example: in customer churn prediction, customers who chose not to answer a survey question might have a systematically higher churn rate. Without the indicator, the model only sees the imputed fill value; with it, the model can also learn from the missingness pattern itself, capturing additional predictive signal.'
+  },
+  { q:'Describe step-by-step what happens when pipe.predict(X_test) is called on Pipeline([StandardScaler, PCA, Ridge]).',
+    a:'1. <strong>StandardScaler.transform(X_test)</strong> — the scaler fit on training data applies the stored μ and σ to X_test. No refitting occurs.<br>2. <strong>PCA.transform(scaled result)</strong> — the PCA fit on scaled training data projects X_test onto the learned principal components.<br>3. <strong>Ridge.predict(projected result)</strong> — the Ridge model fit on PCA-transformed training data returns numerical predictions.<br><br>Key point: no step calls .fit() again. Only the transformations learned during pipe.fit(X_train, y_train) are applied, guaranteeing test data is processed identically to training data.'
+  },
+  { q:'Compare ColumnTransformer and Pipeline. What does each do, and how do they complement each other?',
+    a:'<strong>ColumnTransformer</strong> applies different transformers to different column subsets <em>in parallel</em>, then concatenates the outputs. It is designed for mixed-type datasets (numerical + categorical) requiring different preprocessing per column type.<br><br><strong>Pipeline</strong> applies a sequence of steps to the entire dataset <em>in series</em>, each step receiving the output of the previous one.<br><br><strong>Together:</strong> The standard pattern is to embed a ColumnTransformer as the first step of a Pipeline. The ColumnTransformer converts mixed inputs into a uniform numerical matrix; subsequent pipeline steps (PCA, a classifier, etc.) process this matrix sequentially. GridSearchCV can tune all hyperparameters across both components in one search.'
+  },
+  { q:'Why does PCA\'s uninterpretability matter less in machine learning than in statistical analysis?',
+    a:'In statistical analysis, results are presented to stakeholders. Components need interpretable meaning — "PC1 captures income and education" — so domain experts can act on findings.<br><br>In machine learning, the goal is predictive performance, not coefficient interpretation. An ML model (Ridge, SVM, neural network) has no understanding of what features mean; it only learns a mapping from inputs to outputs. As long as the principal components retain the predictive variance from the original features, the transformation is valid regardless of whether a human can interpret the axes. The lecture explicitly states this as a reason PCA is "quite useful for machine learning."'
+  },
+  { q:'Explain the difference between a model parameter and a hyperparameter. Give one concrete example of each from the lecture.',
+    a:'<strong>Model parameters</strong> are learned automatically from training data during .fit(). The fitting algorithm updates them to minimise a loss function. Concrete example from the lecture: the regression coefficients β in Ridge regression — their values are determined by solving the regularised least-squares problem on the training data.<br><br><strong>Hyperparameters</strong> are set by the user before training and remain fixed throughout .fit(). The fitting algorithm cannot optimise them directly. Concrete example: <code>alpha</code> in Ridge regression (regularisation strength) and <code>n_components</code> in PCA. Selecting them requires cross-validation (GridSearchCV), not a closed-form solution.'
+  }
+];
+
+/* ══════════ QUIZ LOGIC ══════════ */
+let answered = 0, correct = 0;
+
+function updateScore() {
+  document.getElementById('score-display').textContent =
+    `Score: ${correct} / ${answered} answered`;
+}
+
+function renderQuiz() {
+  const c = document.getElementById('mcq-container');
+  c.innerHTML = '';
+  answered = 0; correct = 0; updateScore();
+  let lastSec = '';
+
+  questions.forEach((q, idx) => {
+    if (q.section !== lastSec) {
+      lastSec = q.section;
+      const d = document.createElement('div');
+      d.className = 'sub-divider';
+      d.textContent = `── ${q.section}`;
+      c.appendChild(d);
+    }
+
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'question-label';
+    lbl.textContent = `Q${idx + 1} · ${q.type === 'tf' ? 'True / False' : 'Multiple Choice'}`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = q.q;
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+
+    card.appendChild(lbl);
+    card.appendChild(stem);
+
+    if (q.type === 'mc') {
+      const wrap = document.createElement('div');
+      q.opts.forEach((opt, oi) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.onclick = () => answerMC(oi, q.ans, card, wrap, fb, q.fb);
+        wrap.appendChild(btn);
+      });
+      card.appendChild(wrap);
+    } else {
+      const wrap = document.createElement('div');
+      wrap.className = 'tf-wrap';
+      ['True', 'False'].forEach(val => {
+        const btn = document.createElement('button');
+        btn.className = 'tf-btn';
+        btn.textContent = val;
+        btn.onclick = () => answerTF(val === 'True', q.ans, card, wrap, fb, q.fb);
+        wrap.appendChild(btn);
+      });
+      card.appendChild(wrap);
+    }
+
+    card.appendChild(fb);
+    c.appendChild(card);
+  });
+}
+
+function answerMC(chosen, correct_idx, card, wrap, fb, explanation) {
+  if (card.classList.contains('answered-correct') || card.classList.contains('answered-incorrect')) return;
+  const isCorrect = chosen === correct_idx;
+  [...wrap.children].forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correct_idx && i === chosen) btn.classList.add('correct');
+    else if (i === correct_idx) btn.classList.add('reveal-correct');
+    else if (i === chosen) btn.classList.add('incorrect');
+  });
+  finalise(isCorrect, card, fb, explanation);
+}
+
+function answerTF(chosen, correctAns, card, wrap, fb, explanation) {
+  if (card.classList.contains('answered-correct') || card.classList.contains('answered-incorrect')) return;
+  const isCorrect = chosen === correctAns;
+  [...wrap.children].forEach(btn => {
+    btn.disabled = true;
+    const bVal = btn.textContent === 'True';
+    if (bVal === correctAns && bVal === chosen) btn.classList.add('correct');
+    else if (bVal === correctAns) btn.classList.add('reveal-correct');
+    else if (bVal === chosen) btn.classList.add('incorrect');
+  });
+  finalise(isCorrect, card, fb, explanation);
+}
+
+function finalise(isCorrect, card, fb, explanation) {
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+  fb.classList.add('show', isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + explanation;
+  answered++;
+  if (isCorrect) correct++;
+  updateScore();
+}
+
+function resetQuiz() { renderQuiz(); }
+
+/* ══════════ SHORT ANSWER LOGIC ══════════ */
+function renderSA() {
+  const c = document.getElementById('sa-container');
+  saData.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'question-label';
+    lbl.textContent = `Short Answer ${idx + 1}`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = q.q;
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Model Answer';
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = q.a;
+
+    btn.onclick = () => {
+      const showing = panel.classList.toggle('show');
+      btn.textContent = showing ? 'Hide Answer' : 'Reveal Model Answer';
+    };
+
+    card.appendChild(lbl);
+    card.appendChild(stem);
+    card.appendChild(btn);
+    card.appendChild(panel);
+    c.appendChild(card);
+  });
+}
+
+renderQuiz();
+renderSA();
+</script>
+</body>
+</html>

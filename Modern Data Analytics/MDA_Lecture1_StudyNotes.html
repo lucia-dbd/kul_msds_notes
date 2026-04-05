@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Data Analytics – Lecture 1 Study Notes</title>
+<style>
+  /* ── GLOBAL ── */
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 {
+    font-size: 1.8em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 0 0 6px 0;
+  }
+  .page-header .subtitle {
+    font-size: 0.92em;
+    opacity: 0.82;
+    font-weight: 400;
+  }
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq  { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa   { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ── NOTES SECTION ── */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+
+  /* Content boxes */
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .computation-box {
+    background: #fdf3f3;
+    border-left: 4px solid #e57373;
+    padding: 12px 18px;
+    margin: 14px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.92em;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.93em;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* ── MCQ SECTION ── */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; margin-top: 0; }
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+    margin-left: 12px;
+  }
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #2e6da4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mcq-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    font-size: 1.0em;
+  }
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #d0d8ea;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 6px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c2c3a;
+    transition: all 0.18s;
+    font-family: inherit;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct  { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect{ background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-bar {
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback-bar.correct  { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+  .feedback-bar.incorrect{ background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+
+  /* ── SHORT ANSWER SECTION ── */
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #3d1f6e; font-size: 1.2em; margin-top: 0; }
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1;
+    font-size: 0.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .sa-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+    font-size: 1.0em;
+  }
+  .reveal-btn {
+    background: #6f42c1;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 22px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff;
+    border: 1px solid #d4c8f5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+    font-size: 0.95em;
+    line-height: 1.8;
+    display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  /* Reset + action buttons */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .reset-btn {
+    background: #1a3a5c;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 24px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  code {
+    background: #f0f4fb;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #1a3a5c;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Modern Data Analytics — Lecture 1</h1>
+  <div class="subtitle">Python Fundamentals for Data Scientists &nbsp;|&nbsp; KU Leuven &nbsp;·&nbsp; Martial Luyts</div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <a href="#intro">0. Introduction</a>
+  <a href="#python">1.1 Python</a>
+  <a href="#writing">1.2 Writing Code</a>
+  <a href="#colab">1.3 Google Colab</a>
+  <a href="#git">1.4 Git & GitHub</a>
+  <a href="#kaggle">1.5 Kaggle / UCI</a>
+  <a href="#venv">1.6 Virtual Envs</a>
+  <a href="#oop">1.7 OOP</a>
+  <a href="#mcq" class="nav-mcq">MCQ (50 Qs)</a>
+  <a href="#sa" class="nav-sa">Short Answer (10 Qs)</a>
+</div>
+
+<!-- ═══════════════════════ NOTES ═══════════════════════ -->
+
+<!-- 0. INTRODUCTION -->
+<div class="notes-section" id="intro">
+  <h2>0. Introduction</h2>
+
+  <h3>0.1 Course Goals</h3>
+  <div class="key-point">
+    The MDA course equips students with both the <strong>practical skill set</strong> and <strong>theoretical knowledge</strong> to tackle a wide variety of data science tasks, with a focus on machine learning (ML) modeling and the IT infrastructure needed to execute ML projects in practice.
+  </div>
+  <p>Course execution uses <strong>Python 3.12</strong> in both <em>Jupyter Notebook</em> and an <em>IDE</em>. Implementations also leverage the <strong>AWS cloud environment</strong>.</p>
+
+  <h3>0.2 Course Scheme (3 Parts)</h3>
+  <table>
+    <thead><tr><th>Part</th><th>Theme</th><th>Topics</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Python Fundamentals</td><td>Python, OOP, Data Science Packages, Scikit-Learn Pipelines</td></tr>
+      <tr><td>2</td><td>Dashboarding</td><td>Shiny for Python</td></tr>
+      <tr><td>3</td><td>IT Infrastructure</td><td>Analytics Infrastructure, Git, Docker, Cloud Computing, Scalability</td></tr>
+    </tbody>
+  </table>
+
+  <h3>0.3 Evaluation (20 pts total)</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Points</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Group Report</td><td>2 pt</td><td>Per-group submission</td></tr>
+      <tr><td>Group Project</td><td>6 pt</td><td>Oral presentation (in group)</td></tr>
+      <tr><td>Individual Questions</td><td>12 pt</td><td>During project presentation</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">
+    <strong>⚠ Conditional scoring:</strong> The 6-pt group project score is conditional on ≥ 6/12 for individual questions. Below 6/12 → max 4/6; below 3/12 → max 2/6. Missing submission deadlines results in <strong>NA</strong> (Not Attended).
+  </div>
+
+  <h3>Key Deadlines</h3>
+  <table>
+    <thead><tr><th>Date</th><th>Milestone</th></tr></thead>
+    <tbody>
+      <tr><td>03/03</td><td>Group composition</td></tr>
+      <tr><td>24/03</td><td>Project proposal</td></tr>
+      <tr><td>25/05</td><td>Project submission</td></tr>
+    </tbody>
+  </table>
+
+  <h3>0.4 GenAI Policy</h3>
+  <div class="example-box"><strong>✅ Permitted:</strong> Improving language/grammar; correcting/structuring your own code without adding AI-generated functionality.</div>
+  <div class="warning-box"><strong>❌ Not permitted:</strong> Generating complete texts or solutions without critical evaluation; writing substantial new code; submitting AI content as your own original work.</div>
+</div>
+
+<!-- 1.1 PYTHON -->
+<div class="notes-section" id="python">
+  <h2>1.1 Python</h2>
+
+  <div class="key-point">
+    Python is among the most popular programming languages for data scientists, especially when integrating data analysis with web apps or incorporating statistics code into production databases.
+  </div>
+
+  <p>Unlike <strong>R</strong> (traditional statistical computing), Python excels at extended data science tasks like <em>NLP</em>, <em>computer vision</em>, and more.</p>
+
+  <h3>Getting Started: Anaconda</h3>
+  <p>Anaconda is a package manager that bundles Python with 300+ pre-installed packages for mathematics, science, and engineering. It avoids manual installation of individual dependencies.</p>
+  <div class="computation-box">pip install &lt;package-name&gt;  # Install missing packages</div>
+
+  <h3>Key Python Packages for Data Science</h3>
+  <table>
+    <thead><tr><th>Package</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>NumPy / SciPy</td><td>Numerical computing &amp; scientific algorithms</td></tr>
+      <tr><td>Pandas</td><td>Data processing and cleaning</td></tr>
+      <tr><td>Matplotlib</td><td>Static graph production</td></tr>
+      <tr><td>Scikit-Learn</td><td>Machine learning algorithms and pipelines</td></tr>
+      <tr><td>Statsmodels</td><td>Statistical models and unit tests</td></tr>
+      <tr><td>PIL (Pillow)</td><td>Image importing, manipulation, exporting</td></tr>
+      <tr><td>MoviePy</td><td>Video file handling (the video equivalent of Pillow)</td></tr>
+      <tr><td>Requests</td><td>Sending HTTP data</td></tr>
+      <tr><td>Plotly / Shiny</td><td>Interactive plots &amp; dashboards</td></tr>
+      <tr><td>PyTorch</td><td>Tensor operations; deep learning</td></tr>
+      <tr><td>Transformers</td><td>State-of-the-art pre-trained ML models (NLP, CV)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 1.2 WRITING CODE -->
+<div class="notes-section" id="writing">
+  <h2>1.2 Writing Code — IDEs &amp; Notebooks</h2>
+
+  <h3>IDEs (Integrated Development Environments)</h3>
+  <div class="key-point">An IDE integrates a code editor, build/execution/debugging tools, and source control into a single program dedicated to software development.</div>
+
+  <table>
+    <thead><tr><th>IDE</th><th>Key Characteristics</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PyCharm</strong></td><td>Full-featured, dedicated Python IDE; traditional layout with panels and tool windows; Community (free) and Professional editions; Windows / macOS / Linux</td></tr>
+      <tr><td><strong>VS Code</strong></td><td>Lightweight, minimalistic editor; highly customizable via extensions and themes; broader language support</td></tr>
+      <tr><td>Atom / Spyder</td><td>Other popular options; Spyder favored in scientific Python workflows</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Jupyter Notebooks</h3>
+  <div class="key-point">
+    Jupyter is an <strong>open-source web application</strong> for creating documents combining live code (Python and 100+ other languages), equations, visualizations, and narrative text. Notebooks can be shared via email, GitHub, etc.
+  </div>
+  <table>
+    <thead><tr><th>Component</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Menu bar</td><td>Options to manipulate notebook behaviour</td></tr>
+      <tr><td>Toolbar</td><td>Quick icons for most-used operations</td></tr>
+      <tr><td>Cells</td><td><em>Markdown</em> (text/titles) or <em>Code</em> (Python scripts)</td></tr>
+    </tbody>
+  </table>
+  <div class="computation-box">
+    Shift + Enter → Execute cell &amp; move to next<br>
+    Ctrl + Enter  → Execute cell &amp; stay
+  </div>
+
+  <h3>JupyterLab</h3>
+  <p>Next-generation Jupyter UI with modular, tabbed structure — offers an IDE-like experience with multiple notebooks/files open simultaneously.</p>
+
+  <div class="theorem-box"><strong>This course uses:</strong> Jupyter Notebooks and VS Code for executing Python code.</div>
+</div>
+
+<!-- 1.3 GOOGLE COLAB -->
+<div class="notes-section" id="colab">
+  <h2>1.3 Google Colab</h2>
+
+  <div class="key-point">
+    Google Colab is a <strong>free cloud-based platform</strong> by Google providing a Jupyter notebook environment that runs remotely — overcoming the computational limitations of local machines.
+  </div>
+
+  <h3>Key Features</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Free GPU / TPU access</td><td>Useful for training computationally intensive ML models</td></tr>
+      <tr><td>Google Drive integration</td><td>Access large datasets, save work, load pre-trained models directly</td></tr>
+      <tr><td>Zero setup</td><td>No installation required; runs entirely in the browser</td></tr>
+      <tr><td>Runtime options</td><td>CPU, T4 GPU, A100 GPU, L4 GPU, v2-8 TPU, v5e-1 TPU</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Mounting Google Drive in Colab</h3>
+  <div class="computation-box">
+    from google.colab import drive<br>
+    drive.mount('/content/drive')<br>
+    # Verify files<br>
+    !ls /content/drive/My\ Drive/
+  </div>
+  <div class="example-box">
+    <strong>Steps:</strong> Run the mount command → Click the URL in the output → Select your Google account → Grant access → Drive files are now accessible like a local filesystem.
+  </div>
+</div>
+
+<!-- 1.4 GIT & GITHUB -->
+<div class="notes-section" id="git">
+  <h2>1.4 Git, GitHub &amp; Hugging Face</h2>
+
+  <h3>Git</h3>
+  <div class="key-point">
+    Git (created by Linus Torvalds in 2005) is an open-source <strong>distributed version control system</strong> — the complete codebase including full history is mirrored on every developer's machine.
+  </div>
+  <p>Git's key differentiator: <strong>branching model</strong> — independent branches let developers try new ideas, work in parallel, and merge or discard changes without touching others' work.</p>
+
+  <h3>GitHub</h3>
+  <p>GitHub is a <strong>cloud-based database</strong> for hosting Git repositories, enabling remote access by any authorized person from any device, anywhere.</p>
+  <div class="computation-box">git clone https://github.com/user/repo.git</div>
+
+  <table>
+    <thead><tr><th>Concept</th><th>Explanation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>commit</strong></td><td>Snapshot of changes in your local repository</td></tr>
+      <tr><td><strong>push</strong></td><td>Upload local commits to remote (GitHub)</td></tr>
+      <tr><td><strong>pull</strong></td><td>Download remote changes to local</td></tr>
+      <tr><td><strong>branch</strong></td><td>Independent line of development</td></tr>
+      <tr><td><strong>merge</strong></td><td>Combine branch changes into another branch</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Hugging Face</h3>
+  <div class="key-point">
+    Hugging Face is a community platform and library hub for NLP, computer vision, and reinforcement learning — hosting state-of-the-art pre-trained models (BERT, GPT, etc.), datasets, and research papers.
+  </div>
+  <div class="computation-box">
+    from transformers import pipeline<br>
+    classifier = pipeline("text-classification", model="distilbert-base-uncased-finetuned-sst-2-english")<br>
+    classifier("This is a great course")
+  </div>
+</div>
+
+<!-- 1.5 KAGGLE / UCI -->
+<div class="notes-section" id="kaggle">
+  <h2>1.5 Kaggle &amp; UCI Machine Learning Repository</h2>
+
+  <table>
+    <thead><tr><th>Platform</th><th>Description</th><th>Use Cases</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Kaggle</strong> (Google)</td>
+        <td>Data science competition platform and community</td>
+        <td>Publish/find datasets; build models; compete; collaborate</td>
+      </tr>
+      <tr>
+        <td><strong>UCI ML Repository</strong></td>
+        <td>University of California Irvine dataset archive</td>
+        <td>Classification, regression, clustering benchmark datasets</td>
+      </tr>
+      <tr>
+        <td><strong>Hugging Face Datasets</strong></td>
+        <td>Integrated with the Transformers ecosystem</td>
+        <td>NLP, vision, multimodal datasets</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 1.6 VIRTUAL ENVIRONMENTS -->
+<div class="notes-section" id="venv">
+  <h2>1.6 Virtual Environments</h2>
+
+  <div class="key-point">
+    A <strong>virtual environment (venv)</strong> is an isolated Python environment where the interpreter, libraries, and scripts are completely separate from other environments and the system Python — making each project self-contained.
+  </div>
+  <div class="warning-box">
+    <strong>Why you need it:</strong> Installing conflicting package versions for different projects into the global Python installation will break older projects.
+  </div>
+
+  <h3>Setup Steps (virtualenv)</h3>
+  <div class="computation-box">
+    # 1. Install virtualenv<br>
+    pip install virtualenv<br><br>
+    # 2. Create environment<br>
+    python -m venv myenv<br><br>
+    # 3. Activate<br>
+    myenv\Scripts\activate  &nbsp;&nbsp;# Windows<br>
+    source myenv/bin/activate  # macOS/Linux<br><br>
+    # 4. Export dependencies<br>
+    pip freeze > requirements.txt<br><br>
+    # 5. Install from requirements<br>
+    pip install -r requirements.txt<br><br>
+    # 6. Deactivate<br>
+    deactivate
+  </div>
+</div>
+
+<!-- 1.7 OOP -->
+<div class="notes-section" id="oop">
+  <h2>1.7 Object Oriented Programming (OOP)</h2>
+
+  <div class="key-point">
+    OOP is a programming paradigm that organises code using <strong>classes</strong> (blueprints/concepts) and <strong>objects</strong> (instances of classes) to represent real-world entities and their behaviour — enabling modular, maintainable, scalable applications.
+  </div>
+
+  <h3>Core OOP Concepts</h3>
+  <table>
+    <thead><tr><th>Concept</th><th>Description</th><th>Python Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Class</strong></td><td>Blueprint defining attributes and methods</td><td><code>class Dog:</code></td></tr>
+      <tr><td><strong>Object</strong></td><td>Instance of a class</td><td><code>dog1 = Dog("Marcel", 2)</code></td></tr>
+      <tr><td><strong>Attribute</strong></td><td>Data belonging to an object</td><td><code>self.name = name</code></td></tr>
+      <tr><td><strong>Method</strong></td><td>Function belonging to a class</td><td><code>def bark(self):</code></td></tr>
+      <tr><td><code>__init__</code></td><td>Constructor; executes at instantiation</td><td>Assigns initial values</td></tr>
+      <tr><td><code>self</code></td><td>Reference to the current object instance</td><td>Accesses attributes/methods</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Four Pillars of OOP</h3>
+  <table>
+    <thead><tr><th>Pillar</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Encapsulation</strong></td><td>Bundling data and methods; restricting direct access to internals</td></tr>
+      <tr><td><strong>Abstraction</strong></td><td>Hiding complex implementation details; exposing only necessary interface</td></tr>
+      <tr><td><strong>Inheritance</strong></td><td>A child class inherits attributes/methods from a parent class</td></tr>
+      <tr><td><strong>Polymorphism</strong></td><td>Same interface, different underlying implementations</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Scikit-Learn uses OOP:</strong> A <code>LinearRegression</code> object is an instance of a class with methods like <code>.fit(X, y)</code> (training) and <code>.predict(X)</code> (inference). Pandas DataFrames and NumPy arrays are also class instances.
+  </div>
+</div>
+
+<!-- ═══════════════════════ MCQ ═══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>🧠 Multiple Choice &amp; True/False Questions
+    <span class="score-display" id="score-display">Score: 0 / 0</span>
+  </h2>
+  <div class="action-row">
+    <button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button>
+  </div>
+
+  <!-- Questions injected by JS -->
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ═══════════════════════ SHORT ANSWER ═══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>✍️ Short Answer Questions</h2>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+// ─────────────────── MCQ DATA ───────────────────
+const mcqData = [
+  // ── INTRODUCTION & EVAL ──
+  {q:"The MDA course evaluation allocates the most points to which component?", opts:["Group Report (2 pt)","Group Project presentation (6 pt)","Individual oral questions (12 pt)","Lab assignments (10 pt)"], ans:2,
+   feedback:"Individual oral questions carry 12 of the 20 total points — the largest single component."},
+
+  {q:"A student scores 5/12 on individual questions. What is the maximum score they can receive on the group report?", opts:["6/6","4/6","2/6","0/6"], ans:1,
+   feedback:"Between 3/12 and 6/12 (exclusive), the group project score is capped at 4/6."},
+
+  {q:"TRUE or FALSE: Using GenAI to correct grammar and writing style in your submitted work is permitted in this course.", opts:["True","False"], ans:0,
+   feedback:"The course explicitly permits using GenAI to improve language, spelling, grammar, and writing style."},
+
+  {q:"TRUE or FALSE: A student may submit AI-generated code as their own original work, provided they review it first.", opts:["True","False"], ans:1,
+   feedback:"Submitting AI-generated content as solely your own original work is explicitly prohibited, even with review."},
+
+  {q:"Which Python version is used throughout the MDA course?", opts:["Python 3.9","Python 3.10","Python 3.11","Python 3.12"], ans:3,
+   feedback:"The slides specify Python 3.12 is used throughout the course."},
+
+  // ── PYTHON & PACKAGES ──
+  {q:"Which package would you use specifically for building interactive dashboards in Python?", opts:["Matplotlib","PIL","Shiny / Plotly","Statsmodels"], ans:2,
+   feedback:"Plotly and Shiny are designed for interactive plots and dashboards; Matplotlib produces static graphs."},
+
+  {q:"A data scientist needs to fine-tune a pre-trained BERT model for text classification. Which package is most appropriate?", opts:["Scikit-Learn","Statsmodels","Transformers (Hugging Face)","MoviePy"], ans:2,
+   feedback:"The Transformers library by Hugging Face provides access to state-of-the-art pre-trained models like BERT and GPT."},
+
+  {q:"What is the primary advantage of Anaconda over installing Python directly from python.org?", opts:["It provides a faster Python interpreter","It comes pre-bundled with 300+ relevant packages for data science","It only supports Windows","It replaces virtual environments"], ans:1,
+   feedback:"Anaconda is a package manager that pre-installs over 300 packages for mathematics, science, and engineering."},
+
+  {q:"Which package is described as 'to videos what Pillow is to images'?", opts:["Requests","MoviePy","PyTorch","SciPy"], ans:1,
+   feedback:"The slides explicitly describe MoviePy as the video equivalent of PIL/Pillow for image handling."},
+
+  {q:"TRUE or FALSE: Python is primarily used for traditional statistical computing, while R is better suited for NLP and computer vision.", opts:["True","False"], ans:1,
+   feedback:"It is the opposite — R is described as mainly used for traditional statistical computing, while Python excels at extended data science tasks like NLP and computer vision."},
+
+  {q:"A colleague asks you to add a deep learning component to a project. Which package provides tensor operations most useful for deep learning programming?", opts:["Pandas","Scikit-Learn","PyTorch","Statsmodels"], ans:2,
+   feedback:"PyTorch is highlighted for mathematical operations over tensors, particularly useful for deep learning."},
+
+  // ── IDEs & NOTEBOOKS ──
+  {q:"What is the main practical difference between PyCharm and VS Code?", opts:["PyCharm supports more languages","VS Code is only available on macOS","PyCharm has a comprehensive traditional IDE layout; VS Code is lightweight and minimalistic","VS Code cannot run Python"], ans:2,
+   feedback:"The slides state the main difference is the user interface: PyCharm = comprehensive traditional layout; VS Code = lightweight, minimalistic, extensible."},
+
+  {q:"Which keyboard shortcut executes the current Jupyter cell AND stays on the same cell?", opts:["Shift + Enter","Ctrl + Enter","Alt + Enter","Tab + Enter"], ans:1,
+   feedback:"Ctrl+Enter executes and stays. Shift+Enter executes and moves to the next cell."},
+
+  {q:"Jupyter notebooks use which kernel by default to run Python code?", opts:["CPython kernel","RPy kernel","IPython kernel","JuliaKernel"], ans:2,
+   feedback:"The IPython kernel is used to run code in Jupyter notebooks by default."},
+
+  {q:"TRUE or FALSE: JupyterLab can open several notebooks as tabs in the same window, giving it an IDE-like experience.", opts:["True","False"], ans:0,
+   feedback:"JupyterLab has a modular structure where multiple notebooks and files can be opened as tabs — offering an IDE-like experience."},
+
+  {q:"In Jupyter notebook, a 'Markdown' cell is used for:", opts:["Running Python machine learning models","Writing comments, titles, and formatted text","Connecting to cloud GPU resources","Defining virtual environments"], ans:1,
+   feedback:"Cells in Jupyter are either 'Markdown' (comments, titles, formatted text) or 'Code' (Python scripts)."},
+
+  {q:"An IDE integrates which three core toolsets?", opts:["Web browser, database viewer, and email client","Code editor, build/execution/debugging tools, and source control","File explorer, terminal, and PDF reader","Compiler, linker, and assembler only"], ans:1,
+   feedback:"An IDE integrates: a code editor, build/execution/debugging tools, and source control — all within a single program."},
+
+  // ── GOOGLE COLAB ──
+  {q:"What is the primary motivation for using Google Colab over a local Jupyter notebook?", opts:["Google Colab supports more programming languages","Google Colab provides cloud-based GPU/TPU access, overcoming local computational limits","Google Colab has better syntax highlighting","Local Jupyter cannot share notebooks"], ans:1,
+   feedback:"The key motivation is cloud-based computation — especially free GPU and TPU access when significant compute power is needed (e.g., training large ML models)."},
+
+  {q:"After mounting Google Drive in Colab, how are Drive files accessed?", opts:["Via a special Colab API with a complex authentication flow each time","As if they were on the local filesystem (e.g., /content/drive/)","Only through a web browser tab","By downloading them locally first"], ans:1,
+   feedback:"Once mounted, Drive files are accessible like a local filesystem — you can list, read, and write them using standard Linux commands."},
+
+  {q:"Which Colab runtime option would be MOST appropriate for training a large transformer model?", opts:["CPU","T4 GPU","Standard RAM","No runtime is needed"], ans:1,
+   feedback:"GPU runtimes (like T4 GPU) are appropriate for training large neural networks — they offer parallelised matrix operations orders of magnitude faster than CPU."},
+
+  {q:"TRUE or FALSE: Google Colab requires a software installation on your local machine before use.", opts:["True","False"], ans:1,
+   feedback:"One of Colab's key advantages is zero setup — it runs entirely in the browser with no local installation required."},
+
+  // ── GIT & GITHUB ──
+  {q:"What makes Git's branching model distinctive compared to other version control systems?", opts:["Branches in Git are stored in the cloud only","Git branches are inexpensive to create, merge, and delete — enabling parallel independent development","Git only supports a single branch per repository","Branches in Git require a central server"], ans:1,
+   feedback:"Git's branching model is its key differentiator — branches are fast, cheap, and enable independent lines of development without affecting others."},
+
+  {q:"Which command would you use to copy a remote GitHub repository to your local machine?", opts:["git push","git commit","git clone","git merge"], ans:2,
+   feedback:"'git clone <URL>' downloads a complete copy of the remote repository (including history) to your local machine."},
+
+  {q:"TRUE or FALSE: GitHub is a version control system itself.", opts:["True","False"], ans:1,
+   feedback:"Git is the version control system. GitHub is a cloud-based hosting service/database for Git repositories — it does not perform version control on its own."},
+
+  {q:"In a collaborative Git workflow, a developer finishes a feature on a branch. What is the typical next step to integrate it into the main codebase?", opts:["Delete the branch immediately","Create a new repository","Push the branch and open a pull request / merge into main","Commit directly to main without review"], ans:2,
+   feedback:"The standard workflow is: push the feature branch to GitHub, then open a pull request for review, which leads to merging it into the main branch."},
+
+  {q:"Hugging Face primarily specialises in which area of ML?", opts:["Tabular data classification","Time-series forecasting","NLP, computer vision, and reinforcement learning via pre-trained models","Database management"], ans:2,
+   feedback:"Hugging Face is described as a powerhouse for NLP, computer vision, and reinforcement learning, hosting pre-trained models like BERT and GPT."},
+
+  {q:"What does 'distributed' mean in the context of Git as a distributed VCS?", opts:["Git only works on distributed cloud servers","Each developer's machine holds a complete mirror of the codebase including full history","Git files are split across multiple servers automatically","Only one developer can have a copy at a time"], ans:1,
+   feedback:"In a distributed VCS, every developer's computer holds a complete copy of the codebase and its full version history — no single point of failure."},
+
+  // ── KAGGLE / UCI ──
+  {q:"Kaggle is operated under which parent company?", opts:["Amazon","Microsoft","Meta","Google"], ans:3,
+   feedback:"Kaggle is a data science competition platform and online community operated under Google."},
+
+  {q:"A data scientist needs a benchmark dataset for a regression task. Which platform is LEAST suitable?", opts:["Kaggle","UCI Machine Learning Repository","Hugging Face Datasets","PyCharm IDE"], ans:3,
+   feedback:"PyCharm is an IDE for writing code — not a data repository platform. The others all host downloadable datasets."},
+
+  {q:"TRUE or FALSE: The UCI Machine Learning Repository only provides datasets for classification tasks.", opts:["True","False"], ans:1,
+   feedback:"UCI offers datasets for classification, regression, clustering, and other task types."},
+
+  // ── VIRTUAL ENVIRONMENTS ──
+  {q:"What is the root problem that virtual environments solve?", opts:["Slow internet connections when downloading packages","Package version conflicts between different projects sharing the same global Python installation","Lack of GPU support in Python","Incompatibility between Python and Jupyter Notebook"], ans:1,
+   feedback:"If two projects require different versions of the same package, installing both into the global Python environment causes conflicts that break one or both projects."},
+
+  {q:"Which command generates a file listing all current package dependencies for sharing or reproduction?", opts:["pip list --export","pip freeze > requirements.txt","virtualenv save","pip download"], ans:1,
+   feedback:"'pip freeze > requirements.txt' writes the exact installed packages and versions to a requirements file."},
+
+  {q:"TRUE or FALSE: A virtual environment's Python interpreter is shared with the system-level Python installation by default.", opts:["True","False"], ans:1,
+   feedback:"By definition, a virtual environment's interpreter and libraries are isolated from both the system Python and other virtual environments."},
+
+  {q:"After creating a virtual environment called 'myenv' on Windows, how do you activate it?", opts:["source myenv/bin/activate","myenv\\Scripts\\activate","activate myenv","python -m activate myenv"], ans:1,
+   feedback:"On Windows, virtual environments are activated with 'myenv\\Scripts\\activate'. On macOS/Linux, it's 'source myenv/bin/activate'."},
+
+  {q:"Which command installs all packages listed in a requirements file at once?", opts:["pip install requirements.txt","pip install -r requirements.txt","pip load requirements.txt","pip batch-install requirements.txt"], ans:1,
+   feedback:"'pip install -r requirements.txt' reads the file and installs all listed packages in one command."},
+
+  // ── OOP ──
+  {q:"In Python OOP, the __init__ method serves what purpose?", opts:["It is called every time a method is invoked","It is the class destructor, freeing memory","It is the constructor, executing automatically at object creation to assign initial values","It defines class-level (static) attributes only"], ans:2,
+   feedback:"__init__ is Python's constructor — it executes automatically when a new object is instantiated and is used to assign initial attribute values."},
+
+  {q:"What does the 'self' parameter represent in Python class methods?", opts:["A reference to the class itself (not any particular instance)","A reference to the current object instance, enabling access to its attributes and methods","A keyword that makes attributes private","A pointer to the parent class"], ans:1,
+   feedback:"'self' is a reference to the current instance of the class — it allows methods to access and modify the specific object's attributes."},
+
+  {q:"Which OOP principle is demonstrated when a child class inherits attributes and methods from a parent class?", opts:["Encapsulation","Polymorphism","Abstraction","Inheritance"], ans:3,
+   feedback:"Inheritance allows a child class to reuse and extend the attributes and methods of a parent (base) class."},
+
+  {q:"In Scikit-Learn, calling '.fit(X, y)' on a LinearRegression object is an example of:", opts:["Using a class attribute","Calling a class method (OOP)","Importing a module","Defining a virtual environment"], ans:1,
+   feedback:"A LinearRegression object is an instance of a class, and .fit() is a method of that class — a direct application of OOP."},
+
+  {q:"Which OOP principle hides complex internal implementation from the user, exposing only a clean interface?", opts:["Inheritance","Polymorphism","Encapsulation","Abstraction"], ans:3,
+   feedback:"Abstraction hides complex implementation details and exposes only the necessary interface to the user."},
+
+  {q:"TRUE or FALSE: Key data science libraries such as Pandas, NumPy, and Scikit-Learn are built using OOP principles.", opts:["True","False"], ans:0,
+   feedback:"Correct — all three libraries are heavily built on OOP. DataFrames, arrays, and estimators are all class instances with methods."},
+
+  {q:"Which OOP principle allows different classes to implement the same method name with different underlying behaviour?", opts:["Abstraction","Encapsulation","Polymorphism","Inheritance"], ans:2,
+   feedback:"Polymorphism means the same interface (method name) can have different implementations across different classes."},
+
+  // ── APPLIED / SCENARIO ──
+  {q:"You are working on two ML projects: one requires Scikit-Learn 0.24, another requires Scikit-Learn 1.3. What is the best approach?", opts:["Uninstall and reinstall the package for each project","Use two separate virtual environments, each with its own Scikit-Learn version","Use Google Colab only, as it manages packages automatically","Rename the package to avoid conflicts"], ans:1,
+   feedback:"Virtual environments are precisely designed for this — each project gets its own isolated environment with the exact package versions it needs."},
+
+  {q:"A student wants to train a large image classification model but their laptop runs out of RAM. Which tool directly addresses this?", opts:["PyCharm Professional Edition","Jupyter Notebook Extensions","Google Colab with GPU runtime","Git branching"], ans:2,
+   feedback:"Google Colab provides cloud-based GPU/TPU access specifically to overcome local computational limits like insufficient RAM or lack of a dedicated GPU."},
+
+  {q:"TRUE or FALSE: Git and GitHub are the same tool.", opts:["True","False"], ans:1,
+   feedback:"Git is the local version control system; GitHub is a cloud hosting service for Git repositories. They are complementary but distinct tools."},
+
+  {q:"A team of 4 data scientists is working on the same codebase. Which workflow best prevents overwriting each other's work?", opts:["Email updated files to each other after every change","Use Git branches — each developer works on their own branch and merges via pull requests","Store all code in a shared folder on one person's machine","Use Jupyter notebooks exclusively, without any version control"], ans:1,
+   feedback:"Git branching allows each developer to work independently; pull requests enable code review before merging — preventing overwrites and conflicts."},
+
+  {q:"You see the command: 'from transformers import pipeline'. What capability does this import?", opts:["Creates a data cleaning pipeline in Pandas","Enables use of Hugging Face pre-trained models via a high-level API","Sets up a Scikit-Learn machine learning pipeline","Connects Python to a Jupyter kernel"], ans:1,
+   feedback:"The 'pipeline' function from the Transformers library provides a high-level API for using Hugging Face pre-trained models for tasks like text classification, translation, etc."},
+
+  {q:"Which combination of tools is required for a group project to enable code collaboration, version tracking, and code review?", opts:["Anaconda + Matplotlib","Git + GitHub","Pandas + NumPy","Google Colab + PIL"], ans:1,
+   feedback:"Git provides version tracking locally; GitHub enables remote collaboration, sharing, and code review through pull requests and branches."},
+
+  {q:"TRUE or FALSE: Pressing Shift+Enter in Jupyter executes the current cell, shows output, and creates a new cell if the current cell is the last one.", opts:["True","False"], ans:0,
+   feedback:"Correct — Shift+Enter executes, shows output, moves to the next cell, and creates a new one if already on the last cell."},
+
+  {q:"A junior data scientist installs 'pip install airflow' but gets a ModuleNotFoundError. What is the correct solution?", opts:["Reinstall Anaconda","Run the pip install command in the terminal/command window to fetch and install the missing package","Downgrade Python","Switch from PyCharm to VS Code"], ans:1,
+   feedback:"The slide explicitly shows this scenario: the solution is to run 'pip install <package-name>' in the command window to fetch and install missing packages."},
+
+  {q:"Which concept best describes the fact that a Git repository on one developer's computer contains the COMPLETE project history?", opts:["Centralised version control","Distributed version control","Cloud-based deployment","Continuous integration"], ans:1,
+   feedback:"In a distributed VCS like Git, every clone is a full mirror with complete history — unlike centralised systems that store history only on a server."},
+];
+
+// ─────────────────── SA DATA ───────────────────
+const saData = [
+  {q:"Explain the conditional scoring rule for the group project in MDA. Under what circumstances is the group project score capped, and why does this rule exist?",
+   a:"<strong>Rule:</strong> The group project (6 pt) is fully counted only if individual questions score ≥ 6/12. If individual score is 3–5/12, the project score is capped at 4/6; below 3/12, capped at 2/6. <strong>Purpose:</strong> To encourage active participation in teamwork — preventing a student from free-riding on the group without understanding the material."},
+
+  {q:"Compare PyCharm and VS Code as Python development environments. In what scenario might a data scientist prefer each?",
+   a:"<strong>PyCharm:</strong> Full-featured dedicated Python IDE; traditional layout with integrated panels (debugger, profiler, database tools); ideal for large, complex Python-only projects requiring deep IDE integration. <strong>VS Code:</strong> Lightweight, minimalistic, highly extensible via plugins; supports many languages; preferred by developers who want a versatile editor or who frequently switch languages. A data scientist building a large ML pipeline in pure Python might favour PyCharm, while one working across Python, JS, and cloud config files might prefer VS Code."},
+
+  {q:"Explain why Google Colab is preferred over a local Jupyter notebook for training large neural networks. What specific resources does it provide?",
+   a:"Colab overcomes the constraint of limited local computational power by providing free cloud-based <strong>GPU</strong> (T4, A100, L4) and <strong>TPU</strong> access. Neural network training involves massive parallel matrix operations that run orders of magnitude faster on GPUs than on CPU. Colab also integrates with Google Drive for large dataset access without repeated uploads, requires zero local setup, and enables sharing notebooks with collaborators."},
+
+  {q:"Describe the Git workflow for a group project where three developers work on separate features simultaneously. Include the key Git operations used.",
+   a:"<strong>1. Clone:</strong> Each developer clones the shared GitHub repository. <strong>2. Branch:</strong> Each creates their own branch (git branch feature-X; git checkout feature-X). <strong>3. Work:</strong> Changes are staged and committed locally (git add; git commit). <strong>4. Push:</strong> Each pushes their branch to GitHub (git push). <strong>5. Pull Request:</strong> They open a PR for review. <strong>6. Merge:</strong> After approval, branches are merged into main. This avoids overwriting each other's work since branches are independent copies."},
+
+  {q:"What problem does a Python virtual environment solve? Walk through a concrete scenario where NOT using one causes a real issue.",
+   a:"<strong>Problem solved:</strong> Package version conflicts between projects sharing a global Python installation. <strong>Scenario:</strong> Project A was built with Scikit-Learn 0.24; you then install Scikit-Learn 1.3 for Project B into the global environment. Now Project A breaks because API changes between versions cause incompatibilities. <strong>Solution:</strong> Each project gets an isolated virtual environment with its own package versions — changes in one environment never affect another."},
+
+  {q:"Explain the four pillars of OOP and give a concrete data science example for each.",
+   a:"<strong>Encapsulation:</strong> A Pandas DataFrame bundles its data and methods (.head(), .merge()) together; you don't manipulate the internal data structure directly. <strong>Abstraction:</strong> Scikit-Learn's .fit()/.predict() hides the mathematical implementation of algorithms — you call the same interface without knowing the underlying math. <strong>Inheritance:</strong> Scikit-Learn's BaseEstimator class is inherited by all estimators (LinearRegression, RandomForest), sharing common functionality. <strong>Polymorphism:</strong> Many Scikit-Learn estimators implement .fit() and .predict() — you can swap one model for another without changing the calling code."},
+
+  {q:"What is the distinction between Git and GitHub? Why do you need both for collaborative data science projects?",
+   a:"<strong>Git</strong> is the local distributed version control system — it tracks changes, manages branches, and stores complete history on each developer's machine. <strong>GitHub</strong> is a cloud-based hosting service for Git repositories — it serves as the shared remote server. You need <strong>both</strong>: Git handles local tracking and branching; GitHub provides the central point to push/pull changes, review pull requests, and enable any authorised collaborator to access the codebase from any device."},
+
+  {q:"Describe Hugging Face's role in the modern ML ecosystem. How would you use it in a Python project to perform sentiment analysis?",
+   a:"<strong>Role:</strong> Hugging Face is a community hub providing pre-trained models (BERT, GPT, etc.), datasets, and research papers for NLP, computer vision, and RL. It lowers the barrier to using state-of-the-art models. <strong>Usage:</strong> Install the Transformers library (pip install transformers), then: <code>from transformers import pipeline; classifier = pipeline('text-classification', model='distilbert-base-uncased-finetuned-sst-2-english'); result = classifier('Great course!')</code>. This returns a label (POSITIVE/NEGATIVE) and confidence score without training a model from scratch."},
+
+  {q:"The MDA GenAI policy distinguishes between permitted and non-permitted use. Describe two scenarios: one that is clearly permitted and one that is clearly not permitted, and explain the reasoning behind each boundary.",
+   a:"<strong>Permitted — Grammar correction:</strong> Running your written report through ChatGPT to fix grammatical errors and improve sentence clarity is allowed because the ideas and content remain entirely yours — AI only polishes language. <strong>Not permitted — Code generation:</strong> Asking AI to write the entire data processing function for your project and submitting it as your own is prohibited because there is no demonstrable student input; during oral examination you could not defend the code. The policy boundary protects academic integrity and ensures students develop genuine understanding they can defend verbally."},
+
+  {q:"Compare local Jupyter Notebook, JupyterLab, and Google Colab. For each, identify one strength and one limitation.",
+   a:"<strong>Jupyter Notebook:</strong> Simple, widely supported, great for linear narrative code + text workflows. Limitation: runs locally (limited compute), single-file interface. <strong>JupyterLab:</strong> Modular multi-tab interface — more IDE-like, can open multiple notebooks and files. Limitation: still runs locally, so compute is limited. <strong>Google Colab:</strong> Free cloud GPU/TPU access, Google Drive integration, zero setup. Limitation: sessions time out, persistent storage requires Drive mounting, internet dependency, and runtime is shared — not always predictable for large jobs."},
+];
+
+// ─────────────────── RENDER MCQ ───────────────────
+let answered = 0, correct = 0;
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  answered = 0; correct = 0;
+  updateScore();
+
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = 'card-' + idx;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Question ${idx + 1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.dataset.qi = idx;
+      btn.dataset.oi = oi;
+      btn.addEventListener('click', handleAnswer);
+      card.appendChild(btn);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = 'fb-' + idx;
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+}
+
+function handleAnswer(e) {
+  const btn = e.currentTarget;
+  const qi = parseInt(btn.dataset.qi);
+  const oi = parseInt(btn.dataset.oi);
+  const card = document.getElementById('card-' + qi);
+
+  // If already answered, do nothing
+  if (card.dataset.answered === '1') return;
+  card.dataset.answered = '1';
+
+  const buttons = card.querySelectorAll('.option-btn');
+  const isCorrect = oi === mcqData[qi].ans;
+
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === mcqData[qi].ans) b.classList.add('reveal-correct');
+  });
+
+  if (isCorrect) {
+    btn.classList.remove('reveal-correct');
+    btn.classList.add('correct');
+    correct++;
+  } else {
+    btn.classList.add('incorrect');
+    buttons[mcqData[qi].ans].classList.remove('reveal-correct');
+    buttons[mcqData[qi].ans].classList.add('reveal-correct');
+  }
+
+  const fb = document.getElementById('fb-' + qi);
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + mcqData[qi].feedback;
+
+  answered++;
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent =
+    `Score: ${correct} / ${answered} answered`;
+}
+
+function resetAll() {
+  renderMCQ();
+  // Also reset SA panels
+  document.querySelectorAll('.answer-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.reveal-btn').forEach(b => b.textContent = 'Reveal Answer');
+}
+
+// ─────────────────── RENDER SA ───────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer ${idx + 1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+    btn.addEventListener('click', () => {
+      const panel = card.querySelector('.answer-panel');
+      if (panel.style.display === 'block') {
+        panel.style.display = 'none';
+        btn.textContent = 'Reveal Answer';
+      } else {
+        panel.style.display = 'block';
+        btn.textContent = 'Hide Answer';
+      }
+    });
+    card.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    card.appendChild(panel);
+
+    container.appendChild(card);
+  });
+}
+
+// ─────────────────── INIT ───────────────────
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

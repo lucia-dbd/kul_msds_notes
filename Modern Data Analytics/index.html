@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Analytics · KUL MSDS Notes</title>
+  <title>Modern Data Analytics · KUL MSDS Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
@@ -10,7 +10,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #f7f8fc;
+      background: #fdf7fb;
       color: #2d3748;
       min-height: 100vh;
       display: flex;
@@ -21,7 +21,7 @@
     .navbar {
       background: rgba(255,255,255,0.85);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid #e8ecf3;
+      border-bottom: 1px solid #fce7f3;
       padding: 0 40px;
       height: 56px;
       display: flex;
@@ -52,25 +52,25 @@
     .navbar .back-link {
       font-size: 0.83em;
       font-weight: 600;
-      color: #6366f1;
+      color: #ec4899;
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 5px;
       padding: 6px 14px;
       border-radius: 8px;
-      border: 1.5px solid #c7d2fe;
-      background: #eef2ff;
+      border: 1.5px solid #fbcfe8;
+      background: #fdf2f8;
       transition: background 0.18s, border-color 0.18s;
     }
     .navbar .back-link:hover {
-      background: #e0e7ff;
-      border-color: #6366f1;
+      background: #fce7f3;
+      border-color: #ec4899;
     }
 
     /* ── Hero ── */
     .hero {
-      background: linear-gradient(160deg, #ffffff 0%, #eef2ff 55%, #e0e7ff 100%);
+      background: linear-gradient(160deg, #ffffff 0%, #fdf2f8 55%, #fce7f3 100%);
       padding: 72px 24px 64px;
       text-align: center;
       position: relative;
@@ -79,19 +79,19 @@
     .hero::before {
       content: '';
       position: absolute;
-      width: 500px; height: 500px;
+      width: 520px; height: 520px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(99,102,241,0.09) 0%, transparent 70%);
-      top: -140px; left: 50%; transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(236,72,153,0.08) 0%, transparent 70%);
+      top: -150px; left: 50%; transform: translateX(-50%);
       pointer-events: none;
     }
     .hero::after {
       content: '';
       position: absolute;
-      width: 300px; height: 300px;
+      width: 280px; height: 280px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
-      bottom: -80px; right: 10%;
+      background: radial-gradient(circle, rgba(244,114,182,0.07) 0%, transparent 70%);
+      bottom: -70px; right: 8%;
       pointer-events: none;
     }
     .hero-eyebrow {
@@ -99,8 +99,8 @@
       align-items: center;
       gap: 7px;
       background: #fff;
-      border: 1px solid #c7d2fe;
-      color: #6366f1;
+      border: 1px solid #fbcfe8;
+      color: #ec4899;
       font-size: 0.76em;
       font-weight: 600;
       letter-spacing: 0.8px;
@@ -108,9 +108,8 @@
       padding: 5px 14px;
       border-radius: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+      box-shadow: 0 2px 8px rgba(236,72,153,0.09);
     }
-    .hero-eyebrow .icon { font-size: 1em; }
     .hero h1 {
       font-size: 2.6em;
       font-weight: 700;
@@ -121,7 +120,7 @@
     }
     .hero h1 em {
       font-style: normal;
-      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      background: linear-gradient(90deg, #ec4899, #f472b6, #fb7185);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -129,7 +128,7 @@
     .hero p {
       color: #64748b;
       font-size: 0.97em;
-      max-width: 380px;
+      max-width: 420px;
       margin: 0 auto;
       line-height: 1.7;
     }
@@ -151,7 +150,7 @@
     .stat-value {
       font-size: 1.5em;
       font-weight: 700;
-      color: #6366f1;
+      color: #ec4899;
       line-height: 1;
     }
     .stat-label {
@@ -164,7 +163,7 @@
     .stat-divider {
       width: 1px;
       height: 36px;
-      background: #c7d2fe;
+      background: #fbcfe8;
       align-self: center;
     }
 
@@ -186,18 +185,48 @@
       margin-bottom: 16px;
     }
 
-    /* ── Chapter List ── */
-    .chapter-list {
+    /* ── Part Group ── */
+    .part-group {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-bottom: 32px;
+    }
+    .part-group:last-child { margin-bottom: 0; }
+
+    .part-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .part-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+    .badge-part1 { background: #fce7f3; color: #be185d; }
+    .badge-part2 { background: #fef9c3; color: #a16207; }
+    .badge-part3 { background: #dbeafe; color: #1d4ed8; }
+
+    .part-header-line {
+      flex: 1;
+      height: 1px;
+      background: #fce7f3;
     }
 
+    /* ── Session Cards ── */
     .chapter-card {
       background: #fff;
       border-radius: 14px;
-      border: 1.5px solid #e0e7ff;
-      padding: 20px 22px;
+      border: 1.5px solid #fce7f3;
+      padding: 18px 22px;
       text-decoration: none;
       color: inherit;
       display: flex;
@@ -213,7 +242,7 @@
       position: absolute;
       left: 0; top: 0; bottom: 0;
       width: 3px;
-      background: linear-gradient(180deg, #6366f1, #8b5cf6);
+      background: linear-gradient(180deg, #ec4899, #f472b6);
       border-radius: 4px 0 0 4px;
       transform: scaleY(0);
       transform-origin: center;
@@ -221,16 +250,16 @@
     }
     .chapter-card:hover {
       transform: translateX(4px);
-      box-shadow: 0 6px 24px rgba(99,102,241,0.12);
-      border-color: #a5b4fc;
+      box-shadow: 0 6px 24px rgba(236,72,153,0.13);
+      border-color: #f9a8d4;
     }
     .chapter-card:hover::before { transform: scaleY(1); }
 
-    /* Chapter number badge */
+    /* Session number badge */
     .chapter-num {
       width: 44px; height: 44px;
       border-radius: 12px;
-      background: #eef2ff;
+      background: #fdf2f8;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -238,14 +267,12 @@
       transition: background 0.18s;
     }
     .chapter-num span {
-      font-size: 0.72em;
+      font-size: 0.68em;
       font-weight: 800;
-      color: #6366f1;
+      color: #ec4899;
       letter-spacing: -0.5px;
     }
-    .chapter-card:hover .chapter-num {
-      background: #6366f1;
-    }
+    .chapter-card:hover .chapter-num { background: #ec4899; }
     .chapter-card:hover .chapter-num span { color: #fff; }
 
     .chapter-info { flex: 1; }
@@ -254,7 +281,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: #a5b4fc;
+      color: #f9a8d4;
       margin-bottom: 3px;
     }
     .chapter-title {
@@ -264,7 +291,7 @@
       line-height: 1.35;
     }
 
-    /* Topic tags per chapter */
+    /* Topic tags */
     .chapter-tag {
       display: inline-block;
       font-size: 0.7em;
@@ -273,22 +300,25 @@
       border-radius: 20px;
       margin-top: 6px;
     }
-    .tag-supervised  { background: #ede9fe; color: #7c3aed; }
-    .tag-deep        { background: #fce7f3; color: #db2777; }
-    .tag-unsupervised{ background: #d1fae5; color: #059669; }
+    .tag-python      { background: #dbeafe; color: #1d4ed8; }
+    .tag-packages    { background: #d1fae5; color: #065f46; }
+    .tag-algorithms  { background: #fef9c3; color: #a16207; }
+    .tag-ml          { background: #ede9fe; color: #7c3aed; }
+    .tag-dashboard   { background: #fce7f3; color: #be185d; }
+    .tag-infra       { background: #e0f2fe; color: #0369a1; }
 
     .chapter-arrow {
       width: 28px; height: 28px;
       border-radius: 50%;
-      background: #eef2ff;
+      background: #fdf2f8;
       display: flex; align-items: center; justify-content: center;
-      color: #6366f1;
+      color: #ec4899;
       font-size: 0.85em;
       flex-shrink: 0;
       transition: background 0.18s, transform 0.18s;
     }
     .chapter-card:hover .chapter-arrow {
-      background: #6366f1;
+      background: #ec4899;
       color: #fff;
       transform: translateX(2px);
     }
@@ -296,13 +326,13 @@
     /* ── Footer ── */
     footer {
       background: #fff;
-      border-top: 1px solid #e8ecf3;
+      border-top: 1px solid #fce7f3;
       text-align: center;
       padding: 22px;
       font-size: 0.82em;
       color: #94a3b8;
     }
-    footer a { color: #6366f1; text-decoration: none; font-weight: 500; }
+    footer a { color: #ec4899; text-decoration: none; font-weight: 500; }
     footer a:hover { text-decoration: underline; }
 
     @media (max-width: 600px) {
@@ -328,83 +358,115 @@
 
   <!-- Hero -->
   <header class="hero">
-    <div class="hero-eyebrow"><span class="icon">📊</span> Advanced Analytics</div>
+    <div class="hero-eyebrow">🤖 Modern Data Analytics</div>
     <h1>Course <em>Notes</em></h1>
-    <p>Lecture notes and key concepts from Advanced Analytics, covering supervised learning, deep learning, and more.</p>
+    <p>Lecture notes covering Python for data science, machine learning pipelines, dashboarding, and analytics infrastructure.</p>
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-value">5</span>
-        <span class="stat-label">Chapters</span>
+        <span class="stat-value">6</span>
+        <span class="stat-label">Sessions</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
         <span class="stat-value">3</span>
-        <span class="stat-label">Topics</span>
+        <span class="stat-label">Parts</span>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-value">D0S07a</span>
+        <span class="stat-value">G0Z39a</span>
         <span class="stat-label">Course Code</span>
       </div>
     </div>
   </header>
 
-  <!-- Chapters -->
+  <!-- Sessions -->
   <main>
-    <div class="section-label">5 Chapters</div>
-    <div class="chapter-list">
+    <div class="section-label">3 Parts · 6 Sessions</div>
 
-      <a class="chapter-card" href="chapter-1/">
-        <div class="chapter-num"><span>CH1</span></div>
+    <!-- Part 1 -->
+    <div class="part-group">
+      <div class="part-header">
+        <span class="part-header-badge badge-part1">🐍 Part 1 — Python for Data Science</span>
+        <span class="part-header-line"></span>
+      </div>
+
+      <a class="chapter-card" href="part-1-1/">
+        <div class="chapter-num"><span>1-1</span></div>
         <div class="chapter-info">
-          <div class="chapter-label">Chapter 1</div>
-          <div class="chapter-title">Supervised Learning Part I</div>
-          <span class="chapter-tag tag-supervised">Supervised</span>
+          <div class="chapter-label">Part 1 · Session 1</div>
+          <div class="chapter-title">Introduction to Python and Object Oriented Programming</div>
+          <span class="chapter-tag tag-python">Python · OOP</span>
         </div>
         <div class="chapter-arrow">→</div>
       </a>
 
-      <a class="chapter-card" href="chapter-2/">
-        <div class="chapter-num"><span>CH2</span></div>
+      <a class="chapter-card" href="part-1-2/">
+        <div class="chapter-num"><span>1-2</span></div>
         <div class="chapter-info">
-          <div class="chapter-label">Chapter 2</div>
-          <div class="chapter-title">Supervised Learning Part II</div>
-          <span class="chapter-tag tag-supervised">Supervised</span>
+          <div class="chapter-label">Part 1 · Session 2</div>
+          <div class="chapter-title">Data Science Packages in Python</div>
+          <span class="chapter-tag tag-packages">NumPy · Pandas · Matplotlib</span>
         </div>
         <div class="chapter-arrow">→</div>
       </a>
 
-      <a class="chapter-card" href="chapter-3/">
-        <div class="chapter-num"><span>CH3</span></div>
+      <a class="chapter-card" href="part-1-3/">
+        <div class="chapter-num"><span>1-3</span></div>
         <div class="chapter-info">
-          <div class="chapter-label">Chapter 3</div>
-          <div class="chapter-title">Supervised Learning Part III</div>
-          <span class="chapter-tag tag-supervised">Supervised</span>
+          <div class="chapter-label">Part 1 · Session 3</div>
+          <div class="chapter-title">Data Science Algorithms in Python</div>
+          <span class="chapter-tag tag-algorithms">Algorithms</span>
         </div>
         <div class="chapter-arrow">→</div>
       </a>
 
-      <a class="chapter-card" href="chapter-4/">
-        <div class="chapter-num"><span>CH4</span></div>
+      <a class="chapter-card" href="part-1-4/">
+        <div class="chapter-num"><span>1-4</span></div>
         <div class="chapter-info">
-          <div class="chapter-label">Chapter 4</div>
-          <div class="chapter-title">Deep Learning Part I</div>
-          <span class="chapter-tag tag-deep">Deep Learning</span>
+          <div class="chapter-label">Part 1 · Session 4</div>
+          <div class="chapter-title">Building Machine Learning Pipelines</div>
+          <span class="chapter-tag tag-ml">ML Pipelines</span>
         </div>
         <div class="chapter-arrow">→</div>
       </a>
-
-      <a class="chapter-card" href="chapter-5/">
-        <div class="chapter-num"><span>CH5</span></div>
-        <div class="chapter-info">
-          <div class="chapter-label">Chapter 5</div>
-          <div class="chapter-title">Unsupervised Learning</div>
-          <span class="chapter-tag tag-unsupervised">Unsupervised</span>
-        </div>
-        <div class="chapter-arrow">→</div>
-      </a>
-
     </div>
+
+    <!-- Part 2 -->
+    <div class="part-group">
+      <div class="part-header">
+        <span class="part-header-badge badge-part2">📊 Part 2 — Dashboarding</span>
+        <span class="part-header-line"></span>
+      </div>
+
+      <a class="chapter-card" href="part-2-1/">
+        <div class="chapter-num"><span>2-1</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Part 2 · Session 1</div>
+          <div class="chapter-title">Dashboarding in Python</div>
+          <span class="chapter-tag tag-dashboard">Dash · Streamlit</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+    </div>
+
+    <!-- Part 3 -->
+    <div class="part-group">
+      <div class="part-header">
+        <span class="part-header-badge badge-part3">🏗️ Part 3 — Infrastructure</span>
+        <span class="part-header-line"></span>
+      </div>
+
+      <a class="chapter-card" href="part-3-1/">
+        <div class="chapter-num"><span>3-1</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Part 3 · Session 1</div>
+          <div class="chapter-title">MDA Analytics Infrastructure</div>
+          <span class="chapter-tag tag-infra">Infrastructure</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+    </div>
+
   </main>
 
   <footer>

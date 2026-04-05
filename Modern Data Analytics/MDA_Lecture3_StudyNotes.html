@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MDA – Lecture 3 Study Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  /* ===== GLOBAL ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #f5f6fa;
+    font-family: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ===== HEADER ===== */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* ===== NAV ===== */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ===== NOTES SECTION ===== */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin: 18px 0 8px;
+  }
+  .notes-section p { margin-bottom: 12px; }
+
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .computation-note {
+    background: #fdf3f3;
+    border-left: 4px solid #e57373;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+
+  /* formula box */
+  .formula-box {
+    background: #f8f9ff;
+    border: 1px solid #c8d4f0;
+    border-radius: 8px;
+    padding: 14px 20px;
+    margin: 14px 0;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.97em;
+    overflow-x: auto;
+  }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* ===== MCQ ===== */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-bottom: 6px; }
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+  }
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em; font-weight: 700; color: #2e6da4;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+
+  .option-btn {
+    display: block; width: 100%;
+    background: #ffffff; border: 1.5px solid #d0d8ea;
+    border-radius: 8px; padding: 10px 16px; margin: 6px 0;
+    text-align: left; cursor: pointer; font-size: 0.95em;
+    color: #2c2c3a; transition: all 0.18s; font-family: inherit;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct  { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; pointer-events: none; }
+  .option-btn.incorrect{ background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; pointer-events: none; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; pointer-events: none; }
+  .option-btn.disabled { pointer-events: none; }
+
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* ===== SHORT ANSWER ===== */
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section > h2 { color: #4a148c; font-size: 1.2em; border-bottom: 2px solid #e9d8fd; padding-bottom: 8px; margin-bottom: 20px; }
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .sa-card .question-stem  { font-weight: 600; color: #1a1a2e; margin: 6px 0 12px; }
+  .reveal-btn {
+    background: #6f42c1; color: #ffffff; border: none;
+    border-radius: 20px; padding: 7px 22px; font-size: 0.88em;
+    font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff; border: 1px solid #d4c8f5;
+    border-radius: 8px; padding: 18px 22px; margin-top: 14px;
+    font-size: 0.95em; line-height: 1.8; display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  /* reset btn */
+  .reset-btn {
+    background: #1a3a5c; color: #fff; border: none;
+    border-radius: 20px; padding: 9px 28px; font-size: 0.9em;
+    font-weight: 700; cursor: pointer; margin-bottom: 20px; font-family: inherit;
+    transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  /* algo steps */
+  .algo-step {
+    display: flex; gap: 14px; align-items: flex-start; margin-bottom: 10px;
+  }
+  .step-num {
+    background: #2e6da4; color: #fff; border-radius: 50%;
+    min-width: 26px; height: 26px; display: flex; align-items: center;
+    justify-content: center; font-weight: 700; font-size: 0.85em; margin-top: 2px;
+  }
+
+  ul { padding-left: 22px; margin-bottom: 12px; }
+  ul li { margin-bottom: 4px; }
+
+  @media(max-width:600px){
+    .notes-section, .mcq-section, .sa-section { padding: 18px 16px; }
+    .page-header { padding: 20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Modern Data Analytics (GOZ39A) — Lecture 3</h1>
+  <div class="subtitle">Data Science Algorithms in Python · Supervised &amp; Unsupervised Learning · Exam Preparation Notes</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#ml-overview">ML Overview</a>
+  <a href="#regression">Regression</a>
+  <a href="#optimisation">Optimisation</a>
+  <a href="#bias-variance">Bias-Variance</a>
+  <a href="#regularisation">Regularisation</a>
+  <a href="#early-stopping">Early Stopping</a>
+  <a href="#ensemble">Ensemble</a>
+  <a href="#classification">Classification &amp; Trees</a>
+  <a href="#clustering">Clustering</a>
+  <a href="#outlier">Outlier Detection</a>
+  <a href="#pca">PCA</a>
+  <a href="#mcq" class="nav-mcq">MCQ Quiz</a>
+  <a href="#sa" class="nav-sa">Short Answer</a>
+</nav>
+
+<!-- ==================== NOTES ==================== -->
+
+<!-- 1. ML OVERVIEW -->
+<div class="notes-section" id="ml-overview">
+  <h2>1 · Machine Learning — Three Paradigms</h2>
+  <table>
+    <thead><tr><th>Paradigm</th><th>Definition</th><th>Examples in this course</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Supervised Learning</strong></td><td>Outcome variable (target) is present in training data and guides learning.</td><td>Linear regression, Decision trees</td></tr>
+      <tr><td><strong>Unsupervised Learning</strong></td><td>Only input variables observed; no desired output label.</td><td>K-means, Isolation Forest, PCA</td></tr>
+      <tr><td><strong>Reinforcement Learning</strong></td><td>Learning by reward/punishment through trial and error.</td><td><em>Not covered in this course</em></td></tr>
+    </tbody>
+  </table>
+  <div class="key-point">
+    <strong>Key distinction:</strong> Supervised learning <em>requires</em> labelled data. Unsupervised learning discovers structure without labels—but you still must define <em>what kind of pattern</em> you are looking for.
+  </div>
+</div>
+
+<!-- 2. REGRESSION -->
+<div class="notes-section" id="regression">
+  <h2>2 · Supervised Learning — Regression Analysis</h2>
+
+  <h3>2.1 The General Framework</h3>
+  <p>Regression estimates the relationship between a set of <em>covariates</em> (predictors) and a <em>target variable</em> (continuous or categorical):</p>
+  <div class="formula-box">\( Y = g(X_1, \ldots, X_n) + \epsilon \)</div>
+  <p>where \(\epsilon\) is a zero-mean error term. The goal: find the best-performing model from a <strong>chosen candidate set</strong>.</p>
+
+  <h3>2.2 Linear Regression</h3>
+  <div class="formula-box">\( Y = \beta_0 + \sum_{i=1}^{n} \beta_i X_i + \epsilon \)</div>
+  <ul>
+    <li>Each candidate is fully specified by its <strong>n+1 parameters</strong> \(\boldsymbol\beta\).</li>
+    <li>Choose the candidate set based on <strong>data exploration + expert knowledge</strong>.</li>
+    <li>Apply <strong>Occam's Razor</strong>: avoid over-complex models that over-fit training data.</li>
+  </ul>
+
+  <h3>2.3 Prediction &amp; the OLS Loss</h3>
+  <p>Predicted value: \(\hat{Y} = b_0 + \sum_{i=1}^{n} b_i X_i\). The <strong>Ordinary Least Squares (OLS)</strong> loss:</p>
+  <div class="formula-box">\( l(\mathbf{b}) = \sum_{i=1}^{M}[Y_i - \hat{Y}_i]^2 = \sum_{i=1}^{M}\!\left[Y_i - b_0 - \sum_{j=1}^{n} b_j X_j\right]^2 \)</div>
+  <div class="warning-box">
+    OLS minimisation finds the best model <em>(1) from the linear candidate set only</em> and <em>(2) according to the squared-error definition of performance</em>. Different loss functions yield different models.
+  </div>
+
+  <h3>2.4 Types of Regression Models</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Target</th><th>Predictors</th></tr></thead>
+    <tbody>
+      <tr><td>Regular Linear Regression</td><td>Continuous</td><td>At least one continuous</td></tr>
+      <tr><td>ANOVA</td><td>Continuous</td><td>All categorical (t-test: one categorical)</td></tr>
+      <tr><td>Logistic Regression</td><td>Categorical</td><td>At least one continuous</td></tr>
+      <tr><td>Multivariate Regression</td><td>Multiple targets</td><td>Any</td></tr>
+      <tr><td>Time Series Regression</td><td>Time-series variable</td><td>Time-series variables</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.5 Loss Functions Compared</h3>
+  <table>
+    <thead><tr><th>Loss</th><th>Formula</th><th>Pros</th><th>Cons</th></tr></thead>
+    <tbody>
+      <tr><td><strong>MSE</strong></td><td>\(\frac{1}{n}\sum(\hat{Y}_i-Y_i)^2\)</td><td>Smooth, penalises large errors heavily</td><td>Not robust to outliers</td></tr>
+      <tr><td><strong>MAE</strong></td><td>\(\frac{\sum|y_i-x_i|}{n}\)</td><td>Robust to outliers, interpretable</td><td>Not smooth (not differentiable at 0)</td></tr>
+      <tr><td><strong>Huber</strong></td><td>MSE for small errors, MAE for large</td><td>Combines best of both; robust</td><td>Extra hyperparameter \(\delta\)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 3. OPTIMISATION -->
+<div class="notes-section" id="optimisation">
+  <h2>3 · Finding the Best Model — Numerical Optimisation</h2>
+
+  <h3>3.1 Gradient Descent</h3>
+  <p>Iteratively update parameters in the direction of steepest descent:</p>
+  <div class="formula-box">\( b^{(k+1)} = b^{(k)} - \eta \cdot \nabla l(b^{(k)}) \)</div>
+  <p>\(\eta\) = learning rate (step size). The learning rate matters critically:</p>
+  <table>
+    <thead><tr><th>Learning Rate</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Too low</td><td>Many small updates; slow convergence</td></tr>
+      <tr><td>Just right</td><td>Efficient convergence to minimum</td></tr>
+      <tr><td>Too high</td><td>Drastic updates; may diverge</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">
+    <strong>Drawbacks of gradient descent:</strong> risk of getting stuck in <em>local optima</em> or flat <em>plateaus</em>. Mitigations: smart initialisation, adaptive learning rates, grid search.
+  </div>
+
+  <h3>3.2 Newton's Method</h3>
+  <p>Uses second-order (curvature) information. Starting from a Taylor expansion around \(b_0\):</p>
+  <div class="formula-box">\( l(b) \approx l(b_0) + (\Delta b)^T \nabla l(b_0) + \tfrac{1}{2}(\Delta b)^T H(b_0)(\Delta b) \)</div>
+  <p>Minimising this second-order approximation yields the Newton step: \(\Delta b = -H^{-1}\nabla l\)</p>
+  <p>where \(H\) is the <strong>Hessian matrix</strong>. Generalisations include Levenberg-Marquardt, Quasi-Newton methods.</p>
+</div>
+
+<!-- 4. BIAS-VARIANCE -->
+<div class="notes-section" id="bias-variance">
+  <h2>4 · Bias-Variance Trade-Off</h2>
+
+  <h3>4.1 The Core Tension</h3>
+  <p>The candidate space must be <strong>large enough</strong> to contain a good approximation of \(g\), but <strong>not so large</strong> that it starts fitting the noise \(\epsilon\).</p>
+
+  <div class="key-point">
+    <strong>Overfitting (high variance, low bias):</strong> Model memorises training noise. Small changes in training data produce completely different parameters and predictions.<br>
+    <strong>Underfitting (low variance, high bias):</strong> Model is too simple to capture the true relationship.
+  </div>
+
+  <h3>4.2 Why Not Use the Most Flexible Model?</h3>
+  <p>Even though a quadratic set contains all linear models (so the best quadratic ≥ best linear on training data), the quadratic model can <em>overfit</em>. On new data, the linear model may generalise far better.</p>
+
+  <h3>4.3 Dealing with Overfitting</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Mechanism</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Regularisation</td><td>Add penalty to loss</td><td>Shrinks coefficients toward 0</td></tr>
+      <tr><td>Early Stopping</td><td>Stop training when validation error rises</td><td>Prevents fitting noise</td></tr>
+      <tr><td>Ensemble Methods</td><td>Combine multiple models</td><td>Reduces variance (Bagging) or bias (Boosting)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 5. REGULARISATION -->
+<div class="notes-section" id="regularisation">
+  <h2>5 · Regularisation</h2>
+  <p>Regularisation constrains parameter estimates toward zero, effectively performing automatic variable selection.</p>
+
+  <table>
+    <thead><tr><th>Method</th><th>Penalty Term</th><th>Effect on Coefficients</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Ridge (L2)</strong></td><td>\(\lambda\sum_{j=1}^z b_j^2\)</td><td>Shrinks all coefficients; none become exactly zero</td></tr>
+      <tr><td><strong>Lasso (L1)</strong></td><td>\(\lambda\sum_{j=1}^z |b_j|\)</td><td>Can set some coefficients to <em>exactly</em> zero → sparse model</td></tr>
+      <tr><td><strong>Elastic Net</strong></td><td>\(\lambda_1\sum|b_j| + \lambda_2\sum b_k^2\)</td><td>Combines Ridge + Lasso benefits; two hyperparameters</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Ridge vs Lasso:</strong> Lasso performs <em>variable selection</em> by driving some coefficients to zero exactly; Ridge shrinks all coefficients but keeps them nonzero.
+  </div>
+</div>
+
+<!-- 6. EARLY STOPPING -->
+<div class="notes-section" id="early-stopping">
+  <h2>6 · Early Stopping</h2>
+  <p>Never use <em>all</em> data for training. Split data into <strong>training set</strong> and <strong>validation set</strong>. Monitor validation (generalisation) error during training. Stop when it starts increasing.</p>
+
+  <div class="warning-box">
+    <strong>Important:</strong> Once a validation set has been used to decide early stopping, it <em>cannot</em> be used again to estimate generalisation error — it has already influenced the model! This is why one sometimes uses a 3-way split: training / validation / test.
+  </div>
+
+  <div class="computation-note">
+    <strong>Early Stopping vs Post-Pruning:</strong> Early stopping halts <em>before</em> the model is fully grown. Post-pruning (used in decision trees) <em>first</em> grows the tree fully, then removes layers bottom-up based on validation performance.
+  </div>
+</div>
+
+<!-- 7. ENSEMBLE -->
+<div class="notes-section" id="ensemble">
+  <h2>7 · Ensemble Methods</h2>
+
+  <h3>7.1 Bagging (Bootstrap Aggregating)</h3>
+  <div class="algo-step"><div class="step-num">1</div><div>Sample (with replacement) \(m\) datasets of fixed size from training data.</div></div>
+  <div class="algo-step"><div class="step-num">2</div><div>Train one model on each bootstrap sample → \(m\) different models.</div></div>
+  <div class="algo-step"><div class="step-num">3</div><div>Aggregate: majority vote (classification) or average (regression).</div></div>
+
+  <div class="key-point"><strong>Effect:</strong> Decreases variance, not necessarily bias. Can be parallelised easily. An ensemble of decision trees = a <em>forest</em>.</div>
+
+  <h3>7.2 Boosting</h3>
+  <p>Sequentially add models that focus on correcting mistakes of the previous ensemble.</p>
+  <ul>
+    <li><strong>AdaBoost:</strong> Weights misclassified samples higher at each iteration.</li>
+    <li><strong>Gradient Boosting:</strong> Predict the residual error and add it as a correction; closely related to gradient descent.</li>
+  </ul>
+  <div class="key-point"><strong>Effect:</strong> Decreases bias, not necessarily variance. Risk of <em>overboosting</em> → overfitting.</div>
+</div>
+
+<!-- 8. CLASSIFICATION & DECISION TREES -->
+<div class="notes-section" id="classification">
+  <h2>8 · Classification Problems &amp; Decision Trees</h2>
+
+  <h3>8.1 Classification Defined</h3>
+  <div class="formula-box">\( g : \mathcal{D} \to \{c_1, c_2, \ldots, c_k\} : (X_1,\ldots,X_n) \mapsto c_i = g(X_1,\ldots,X_n) \)</div>
+
+  <h3>8.2 Decision Tree Structure</h3>
+  <table>
+    <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Node</td><td>A subset of data at a given level</td></tr>
+      <tr><td>Splitting Decision</td><td>Yes/No question that divides a node into two branches</td></tr>
+      <tr><td>Branch</td><td>Result of a splitting decision (Yes or No path)</td></tr>
+      <tr><td>Leaf Node</td><td>Terminal node; contains the prediction</td></tr>
+      <tr><td>Depth</td><td>Number of levels in the tree</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 Node Impurity Measures</h3>
+  <table>
+    <thead><tr><th>Measure</th><th>Formula</th><th>At purity</th></tr></thead>
+    <tbody>
+      <tr><td>Entropy</td><td>\(H = \sum_k \log_2(P(k)) \cdot \frac{\sum I(k_i=k)}{n}\)</td><td>Most negative value</td></tr>
+      <tr><td>Misclassification Error</td><td>Fraction incorrectly labelled</td><td>0</td></tr>
+      <tr><td>Gini Index</td><td>\(G = \sum_k \frac{\sum I(k_i=k)}{n}\left(1-\frac{\sum I(k_i=k)}{n}\right)\)</td><td>0</td></tr>
+    </tbody>
+  </table>
+  <p>At each step, choose the split that <strong>minimises impurity</strong> in resulting nodes. Stop when sufficient purity is reached.</p>
+
+  <h3>8.4 Strengths vs Weaknesses</h3>
+  <table>
+    <thead><tr><th>Strengths</th><th>Weaknesses</th></tr></thead>
+    <tbody>
+      <tr><td>Minimal preprocessing required</td><td>Very unstable (small data changes → different tree)</td></tr>
+      <tr><td>Handles continuous, discrete, categorical</td><td>Greedy: no global optimum guarantee</td></tr>
+      <tr><td>Transparent, easy to interpret</td><td>Poor at linear relationships</td></tr>
+      <tr><td>Multi-class output possible</td><td><strong>Prone to overfitting</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.5 Post-Pruning</h3>
+  <div class="algo-step"><div class="step-num">1</div><div>Grow tree to maximum depth → heavily overfitted.</div></div>
+  <div class="algo-step"><div class="step-num">2</div><div>Remove bottom layer; evaluate validation performance.</div></div>
+  <div class="algo-step"><div class="step-num">3</div><div>If performance unchanged/better → keep pruned; repeat step 2.</div></div>
+  <div class="algo-step"><div class="step-num">4</div><div>If performance drops → stop.</div></div>
+
+  <h3>8.6 Common Pitfall: Class Imbalance</h3>
+  <div class="warning-box">
+    If 99 % of samples are "healthy", a classifier that always predicts "healthy" achieves 99 % accuracy. This is <em>not</em> useful! Use <strong>Balanced Accuracy</strong> and other class-aware metrics instead.
+  </div>
+</div>
+
+<!-- 9. CLUSTERING -->
+<div class="notes-section" id="clustering">
+  <h2>9 · Unsupervised Learning — Clustering</h2>
+
+  <h3>9.1 K-Means Algorithm</h3>
+  <div class="algo-step"><div class="step-num">1</div><div>Choose \(K\) (number of clusters).</div></div>
+  <div class="algo-step"><div class="step-num">2</div><div>Randomly initialise \(K\) centroids (or use K-means++ for smarter initialisation).</div></div>
+  <div class="algo-step"><div class="step-num">3</div><div>Assign each data point to the nearest centroid (Euclidean by default).</div></div>
+  <div class="algo-step"><div class="step-num">4</div><div>Recompute centroids as the mean of assigned points.</div></div>
+  <div class="algo-step"><div class="step-num">5</div><div>Repeat steps 3–4 until convergence (centroids stop moving).</div></div>
+
+  <h3>9.2 Key Decisions</h3>
+  <table>
+    <thead><tr><th>Decision</th><th>Options / Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Initial centroids</td><td>Random or K-means++ (Sklearn default)</td></tr>
+      <tr><td>Stopping criterion</td><td>Few reassignments, centroids barely move, or sum-of-squared-distances plateau</td></tr>
+      <tr><td>Number of runs</td><td>Run multiple times; final label = most common assignment across runs</td></tr>
+      <tr><td>Distance metric</td><td>Euclidean, Manhattan, Minkowski, Cosine, Hamming, etc.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.3 Disadvantages of K-Means</h3>
+  <ul>
+    <li>Choosing \(K\) is hard.</li>
+    <li>Sensitive to initialisation (may converge to local optima).</li>
+    <li><strong>Curse of dimensionality</strong>: Euclidean distances become meaningless in high dimensions → often combine with PCA.</li>
+    <li>Does not work for categorical data (mean undefined).</li>
+    <li>Sensitive to outliers.</li>
+  </ul>
+
+  <h3>9.4 Probabilistic Clustering</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Key Idea</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Gaussian Mixture Model (GMM)</strong></td><td>Assumes data is generated from a mixture of Gaussians; returns cluster <em>probabilities</em>, not just labels. Uses EM algorithm.</td></tr>
+      <tr><td><strong>Fuzzy C-Means</strong></td><td>Soft clustering alternative to K-means.</td></tr>
+    </tbody>
+  </table>
+  <div class="key-point">GMM Algorithm: (1) random assignment → (2) compute μ, σ per group → (3) compute probability density per cluster → (4) reassign by max probability → (5) recalculate parameters → iterate until stable.</div>
+</div>
+
+<!-- 10. OUTLIER DETECTION -->
+<div class="notes-section" id="outlier">
+  <h2>10 · Unsupervised Learning — Outlier Detection</h2>
+
+  <h3>10.1 Mahalanobis Distance</h3>
+  <div class="formula-box">\( D_M(X) = \sqrt{(X-\mu_X) S_X^{-1} (X-\mu_X)^T} \)</div>
+  <p>Accounts for variable correlations (unlike Euclidean). Requires a <em>robust</em> covariance estimator since the data contains outliers → sklearn uses <strong>Minimum Covariance Determinant (MCD)</strong>.</p>
+  <p><em>MCD key idea:</em> find the subset of "clean" observations whose covariance matrix has the <strong>smallest determinant</strong> (smallest data cloud).</p>
+
+  <h3>10.2 Isolation Forest</h3>
+  <p><strong>Key idea:</strong> outliers are isolated quickly; inliers require many splits to isolate.</p>
+  <div class="algo-step"><div class="step-num">→</div><div>Repeatedly split a randomly chosen feature at a random value. Points isolated near the top of a tree are flagged as anomalies.</div></div>
+
+  <table>
+    <thead><tr><th>Advantages</th></tr></thead>
+    <tbody>
+      <tr><td>Few hyperparameters (just number of trees)</td></tr>
+      <tr><td>Easily parallelisable</td></tr>
+      <tr><td>Handles categorical variables</td></tr>
+      <tr><td>Fast predictions → excellent baseline</td></tr>
+    </tbody>
+  </table>
+
+  <p>Other ML outlier detectors: One-Class SVM, Local Outlier Factor.</p>
+</div>
+
+<!-- 11. PCA -->
+<div class="notes-section" id="pca">
+  <h2>11 · Unsupervised Learning — Dimension Reduction (PCA)</h2>
+
+  <h3>11.1 Motivation</h3>
+  <p>High-dimensional data suffers from: high computational cost, multicollinearity, difficulty visualising. PCA transforms correlated variables into uncorrelated <strong>principal components</strong> that capture maximum variance.</p>
+
+  <h3>11.2 PCA Algorithm</h3>
+  <div class="algo-step"><div class="step-num">1</div><div><strong>Standardise</strong> variables (unit variance) to prevent high-variance variables from dominating.</div></div>
+  <div class="algo-step"><div class="step-num">2</div><div>Compute the <strong>covariance matrix</strong>.</div></div>
+  <div class="algo-step"><div class="step-num">3</div><div>Compute <strong>eigenvalues &amp; eigenvectors</strong> of the covariance matrix.</div></div>
+  <div class="algo-step"><div class="step-num">4</div><div>Select principal components: PC1 = direction of maximum projected variance; PC2 = orthogonal to PC1; etc.</div></div>
+  <div class="algo-step"><div class="step-num">5</div><div><strong>Project</strong> data points onto selected PCs.</div></div>
+  <div class="algo-step"><div class="step-num">6</div><div>Rotate so PCs are the new axes.</div></div>
+  <div class="algo-step"><div class="step-num">7</div><div><strong>Reduce</strong>: drop components with smallest eigenvalues (least variance explained).</div></div>
+
+  <h3>11.3 Explained Variance</h3>
+  <div class="formula-box">\(\text{Explained Variance}_k = \frac{\text{Eigenvalue}_k}{\sum_{i=1}^n \text{Eigenvalue}_i}\)</div>
+
+  <h3>11.4 Interpretation</h3>
+  <p>The <em>loadings</em> (eigenvectors / <code>components_</code> in sklearn) show how original variables contribute to each PC. Label PCs based on which variables load heavily on them.</p>
+
+  <h3>11.5 Drawback</h3>
+  <div class="warning-box">PCA only finds <strong>linear</strong> subspaces. Non-linear alternatives include Kernel PCA, t-SNE, UMAP, and <strong>Sparse Autoencoders</strong> (neural-network-based encoder-decoder that minimises reconstruction loss through a bottleneck).</div>
+</div>
+
+<!-- ==================== MCQ ==================== -->
+<div class="mcq-section" id="mcq">
+  <h2>📝 Multiple Choice &amp; True/False Quiz</h2>
+  <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:8px;">
+    <div class="score-display" id="score-display">Score: 0 / 0</div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ Reset Quiz</button>
+  </div>
+
+  <!-- Q1 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q1 · Regression Framework</div>
+    <div class="question-stem">In the model Y = g(X₁,…,Xn) + ε, what does the error term ε represent?</div>
+    <button class="option-btn" data-option="A">A. The prediction made by the chosen model.</button>
+    <button class="option-btn" data-option="B">B. Random noise with zero mean that cannot be explained by the covariates.</button>
+    <button class="option-btn" data-option="C">C. The penalty term added during regularisation.</button>
+    <button class="option-btn" data-option="D">D. The learning rate in gradient descent.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q2 · OLS Loss</div>
+    <div class="question-stem">Which of the following is a critical implication of minimising the OLS loss function?</div>
+    <button class="option-btn" data-option="A">A. The model found is globally optimal among all possible functions.</button>
+    <button class="option-btn" data-option="B">B. The model is guaranteed not to overfit.</button>
+    <button class="option-btn" data-option="C">C. The best model is chosen only from the prespecified candidate set, not all possible models.</button>
+    <button class="option-btn" data-option="D">D. All regression coefficients become exactly zero.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q3 · Gradient Descent</div>
+    <div class="question-stem">If the learning rate η is too large in gradient descent, what is the most likely outcome?</div>
+    <button class="option-btn" data-option="A">A. The algorithm converges slowly but reliably to the global minimum.</button>
+    <button class="option-btn" data-option="B">B. Updates become too drastic and the algorithm may diverge.</button>
+    <button class="option-btn" data-option="C">C. Regularisation is applied automatically.</button>
+    <button class="option-btn" data-option="D">D. The algorithm becomes equivalent to Newton's method.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q4 · Newton's Method</div>
+    <div class="question-stem">What additional information does Newton's method use compared to gradient descent?</div>
+    <button class="option-btn" data-option="A">A. Second-order (curvature) information via the Hessian matrix.</button>
+    <button class="option-btn" data-option="B">B. The full dataset rather than mini-batches.</button>
+    <button class="option-btn" data-option="C">C. Categorical covariates encoded as dummy variables.</button>
+    <button class="option-btn" data-option="D">D. The L1 regularisation penalty.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q5 · Bias-Variance Trade-Off</div>
+    <div class="question-stem">A model has very low training error but extremely high test error. This is best described as:</div>
+    <button class="option-btn" data-option="A">A. Underfitting — low variance, high bias.</button>
+    <button class="option-btn" data-option="B">B. A correct model with good generalisation.</button>
+    <button class="option-btn" data-option="C">C. Underfitting — high variance, low bias.</button>
+    <button class="option-btn" data-option="D">D. Overfitting — high variance, low bias.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q6 · Lasso vs Ridge</div>
+    <div class="question-stem">What is the key practical difference between Lasso (L1) and Ridge (L2) regularisation?</div>
+    <button class="option-btn" data-option="A">A. Ridge uses an absolute value penalty, Lasso uses a squared penalty.</button>
+    <button class="option-btn" data-option="B">B. Lasso can set some coefficients to exactly zero (variable selection); Ridge only shrinks them.</button>
+    <button class="option-btn" data-option="C">C. Ridge is used only for classification problems.</button>
+    <button class="option-btn" data-option="D">D. Lasso always outperforms Ridge regardless of the data.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q7 · Early Stopping</div>
+    <div class="question-stem">Why is it incorrect to estimate the final generalisation error using the validation set that was used for early stopping?</div>
+    <button class="option-btn" data-option="A">A. Because the validation set is too small.</button>
+    <button class="option-btn" data-option="B">B. Because early stopping always causes underfitting.</button>
+    <button class="option-btn" data-option="C">C. Because the model has already been tuned based on that validation set, making the estimate optimistically biased.</button>
+    <button class="option-btn" data-option="D">D. Because generalisation error is never measurable.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q8 · Bagging</div>
+    <div class="question-stem">Bagging primarily reduces which component of prediction error?</div>
+    <button class="option-btn" data-option="A">A. Variance</button>
+    <button class="option-btn" data-option="B">B. Bias</button>
+    <button class="option-btn" data-option="C">C. Both variance and bias equally</button>
+    <button class="option-btn" data-option="D">D. The irreducible error</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q9 · Boosting</div>
+    <div class="question-stem">In Gradient Boosting, what does each new model in the ensemble specifically try to predict?</div>
+    <button class="option-btn" data-option="A">A. The original target variable from scratch.</button>
+    <button class="option-btn" data-option="B">B. The residual error (mistake) made by the current ensemble.</button>
+    <button class="option-btn" data-option="C">C. The class probability using Gaussian distributions.</button>
+    <button class="option-btn" data-option="D">D. The optimal learning rate for the next iteration.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q10 · Decision Trees</div>
+    <div class="question-stem">Decision trees are called "greedy" algorithms because:</div>
+    <button class="option-btn" data-option="A">A. They consume excessive memory during training.</button>
+    <button class="option-btn" data-option="B">B. They always choose the most complex split possible.</button>
+    <button class="option-btn" data-option="C">C. Each split is chosen to minimise impurity at that step, without considering future splits.</button>
+    <button class="option-btn" data-option="D">D. They require the entire dataset at each node.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q11 · Node Impurity</div>
+    <div class="question-stem">A node contains 8 red and 8 blue observations. Using the Gini Index, what is its impurity?</div>
+    <button class="option-btn" data-option="A">A. 0.00</button>
+    <button class="option-btn" data-option="B">B. 0.25</button>
+    <button class="option-btn" data-option="C">C. 0.75</button>
+    <button class="option-btn" data-option="D">D. 0.50</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q12 · Post-Pruning vs Early Stopping</div>
+    <div class="question-stem">What fundamentally distinguishes post-pruning from early stopping?</div>
+    <button class="option-btn" data-option="A">A. Post-pruning first grows the tree fully, then removes layers; early stopping prevents full growth from the start.</button>
+    <button class="option-btn" data-option="B">B. Early stopping applies only to decision trees; post-pruning applies only to neural networks.</button>
+    <button class="option-btn" data-option="C">C. Post-pruning always results in smaller models than early stopping.</button>
+    <button class="option-btn" data-option="D">D. They are identical in effect but use different computational approaches.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q13 · Class Imbalance</div>
+    <div class="question-stem">A disease classifier achieves 99% accuracy on a dataset where 99% of patients are healthy. What is the most appropriate conclusion?</div>
+    <button class="option-btn" data-option="A">A. The classifier is excellent and ready for deployment.</button>
+    <button class="option-btn" data-option="B">B. The classifier may be trivially predicting "healthy" for everyone and must be evaluated with balanced accuracy.</button>
+    <button class="option-btn" data-option="C">C. The dataset is too large and should be downsampled.</button>
+    <button class="option-btn" data-option="D">D. The model needs more regularisation to reduce its accuracy.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q14 · K-Means Stopping</div>
+    <div class="question-stem">Which of the following is NOT a valid criterion to stop K-means iterations?</div>
+    <button class="option-btn" data-option="A">A. Only a small number of points are reassigned between iterations.</button>
+    <button class="option-btn" data-option="B">B. The sum of squared distances shows no significant decrease.</button>
+    <button class="option-btn" data-option="C">C. The number of iterations exceeds the number of data points.</button>
+    <button class="option-btn" data-option="D">D. The centroids barely move between iterations.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q15 · K-Means Limitations</div>
+    <div class="question-stem">Why is K-means generally not suitable for categorical data?</div>
+    <button class="option-btn" data-option="A">A. Centroids are computed as means, which is undefined for categorical variables.</button>
+    <button class="option-btn" data-option="B">B. Categorical variables always have too many levels.</button>
+    <button class="option-btn" data-option="C">C. The Euclidean distance is maximally informative for categorical data.</button>
+    <button class="option-btn" data-option="D">D. K-means cannot use a stopping criterion with categorical inputs.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q16 · Gaussian Mixture Model</div>
+    <div class="question-stem">What is the main advantage of a Gaussian Mixture Model over K-means?</div>
+    <button class="option-btn" data-option="A">A. It is computationally cheaper.</button>
+    <button class="option-btn" data-option="B">B. It requires fewer parameters.</button>
+    <button class="option-btn" data-option="C">C. It always finds the global optimum.</button>
+    <button class="option-btn" data-option="D">D. It outputs probabilities of cluster membership (soft assignment) rather than hard labels.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q17 · Mahalanobis Distance</div>
+    <div class="question-stem">Why must a robust estimator (e.g. MCD) be used for the covariance matrix in Mahalanobis-based outlier detection?</div>
+    <button class="option-btn" data-option="A">A. Because the standard covariance matrix is always singular.</button>
+    <button class="option-btn" data-option="B">B. Because the dataset contains outliers that distort the standard covariance estimate, making it unreliable for outlier detection.</button>
+    <button class="option-btn" data-option="C">C. Because robust estimators are always faster to compute.</button>
+    <button class="option-btn" data-option="D">D. Because the Mahalanobis distance requires the covariance matrix to be diagonal.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q18 · Isolation Forest</div>
+    <div class="question-stem">In an Isolation Forest, a data point that is isolated at the top level of most trees should be interpreted as:</div>
+    <button class="option-btn" data-option="A">A. A normal inlier, since it appears frequently in the tree structure.</button>
+    <button class="option-btn" data-option="B">B. A data point requiring more features for classification.</button>
+    <button class="option-btn" data-option="C">C. A likely outlier, since it is easy to separate from all other points.</button>
+    <button class="option-btn" data-option="D">D. A centroid of the largest cluster.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q19 · PCA Standardisation</div>
+    <div class="question-stem">Why must variables be standardised before applying PCA?</div>
+    <button class="option-btn" data-option="A">A. To prevent variables with large variance from dominating the principal components.</button>
+    <button class="option-btn" data-option="B">B. Because PCA requires all variables to follow a uniform distribution.</button>
+    <button class="option-btn" data-option="C">C. To ensure all principal components are orthogonal to each other.</button>
+    <button class="option-btn" data-option="D">D. Because gradient descent does not converge on unstandardised data.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q20 · PCA Eigenvalues</div>
+    <div class="question-stem">In PCA, the proportion of total variance explained by the k-th principal component is:</div>
+    <button class="option-btn" data-option="A">A. The k-th eigenvector divided by the sum of all eigenvectors.</button>
+    <button class="option-btn" data-option="B">B. The k-th eigenvalue divided by the sum of all eigenvalues.</button>
+    <button class="option-btn" data-option="C">C. The square root of the k-th eigenvalue.</button>
+    <button class="option-btn" data-option="D">D. The product of the k-th eigenvalue and the k-th loading.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q21 · Loss Function Choice</div>
+    <div class="question-stem">A dataset contains several extreme outliers. Which loss function is most robust for training a regression model?</div>
+    <button class="option-btn" data-option="A">A. MSE</button>
+    <button class="option-btn" data-option="B">B. A custom loss that squares the target variable</button>
+    <button class="option-btn" data-option="C">C. MAE or Huber Loss</button>
+    <button class="option-btn" data-option="D">D. OLS with all data points weighted equally</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q22 · Candidate Model Set</div>
+    <div class="question-stem">Occam's Razor, as applied to regression analysis, suggests that:</div>
+    <button class="option-btn" data-option="A">A. The most flexible model is always preferable as it fits training data best.</button>
+    <button class="option-btn" data-option="B">B. A model with more parameters always generalises better.</button>
+    <button class="option-btn" data-option="C">C. Regularisation should never be used in a well-designed model.</button>
+    <button class="option-btn" data-option="D">D. Among equally performing models, prefer the simpler one; avoid unnecessary complexity.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q23 · Reinforcement Learning</div>
+    <div class="question-stem">True or False: Reinforcement Learning is covered in this course as one of the main algorithms.</div>
+    <button class="option-btn" data-option="A">A. False — it is explicitly mentioned as NOT covered.</button>
+    <button class="option-btn" data-option="B">B. True — it is covered under the unsupervised learning section.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q24 · Elastic Net</div>
+    <div class="question-stem">True or False: Elastic Net combines both L1 and L2 penalty terms, resulting in a model that can both perform variable selection and shrink coefficients smoothly.</div>
+    <button class="option-btn" data-option="A">A. False</button>
+    <button class="option-btn" data-option="B">B. True</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q25 · K-Means++</div>
+    <div class="question-stem">K-means++ initialises centroids by:</div>
+    <button class="option-btn" data-option="A">A. Placing all centroids at the origin.</button>
+    <button class="option-btn" data-option="B">B. Sequentially selecting each centroid with probability proportional to its squared distance from existing centroids.</button>
+    <button class="option-btn" data-option="C">C. Randomly assigning all data points to clusters first, then computing means.</button>
+    <button class="option-btn" data-option="D">D. Using the first K data points in the dataset.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q26 · PCA Limitation</div>
+    <div class="question-stem">True or False: PCA can effectively reduce the dimensionality of data that lies on a non-linear manifold (e.g., a curved surface in 3D).</div>
+    <button class="option-btn" data-option="A">A. True — PCA handles all manifold shapes.</button>
+    <button class="option-btn" data-option="B">B. True, if enough principal components are retained.</button>
+    <button class="option-btn" data-option="C">C. False — PCA only finds linear subspaces; non-linear alternatives (e.g. autoencoders) are needed.</button>
+    <button class="option-btn" data-option="D">D. False — PCA only applies to binary classification problems.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q27 · Forest Ensemble</div>
+    <div class="question-stem">An ensemble of decision trees trained with bagging is called:</div>
+    <button class="option-btn" data-option="A">A. A Random Forest (when features are also sampled randomly).</button>
+    <button class="option-btn" data-option="B">B. A Gradient Boosting machine.</button>
+    <button class="option-btn" data-option="C">C. A Support Vector Machine.</button>
+    <button class="option-btn" data-option="D">D. A Gaussian Mixture Model.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q28 · Curse of Dimensionality</div>
+    <div class="question-stem">The "Curse of Dimensionality" in clustering primarily refers to the fact that:</div>
+    <button class="option-btn" data-option="A">A. More dimensions always mean more clusters are needed.</button>
+    <button class="option-btn" data-option="B">B. Euclidean distances become increasingly uninformative as the number of features grows, making distance-based clustering less effective.</button>
+    <button class="option-btn" data-option="C">C. K-means cannot be parallelised in high-dimensional space.</button>
+    <button class="option-btn" data-option="D">D. The number of cluster iterations grows exponentially with dimensions.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q29 · Supervised vs Unsupervised</div>
+    <div class="question-stem">True or False: In unsupervised learning, you do not need to define what kind of pattern you are looking for.</div>
+    <button class="option-btn" data-option="A">A. True — the algorithm discovers all patterns automatically.</button>
+    <button class="option-btn" data-option="B">B. True — this is the core advantage of unsupervised learning.</button>
+    <button class="option-btn" data-option="C">C. False — you still need to define the type of structure you seek (e.g. clusters, outliers, lower-dimensional representation).</button>
+    <button class="option-btn" data-option="D">D. True — only supervised learning requires such definitions.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q30 · Decision Tree Stability</div>
+    <div class="question-stem">True or False: Decision trees are considered stable classifiers because their structure changes very little when small perturbations are made to the training data.</div>
+    <button class="option-btn" data-option="A">A. True — stability is one of their main advantages.</button>
+    <button class="option-btn" data-option="B">B. True — the greedy algorithm ensures stable splits.</button>
+    <button class="option-btn" data-option="C">C. True, as long as the tree depth is limited.</button>
+    <button class="option-btn" data-option="D">D. False — decision trees are highly unstable; small changes in training data can produce very different trees.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q31 · Logistic Regression</div>
+    <div class="question-stem">Logistic regression is appropriate when:</div>
+    <button class="option-btn" data-option="A">A. The target is categorical and at least one predictor is continuous.</button>
+    <button class="option-btn" data-option="B">B. All predictors and the target are categorical.</button>
+    <button class="option-btn" data-option="C">C. The target is continuous and all predictors are categorical.</button>
+    <button class="option-btn" data-option="D">D. Both target and predictors belong to a time series.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q32 · MCD</div>
+    <div class="question-stem">The Minimum Covariance Determinant (MCD) seeks:</div>
+    <button class="option-btn" data-option="A">A. The subset of observations with the largest covariance matrix determinant.</button>
+    <button class="option-btn" data-option="B">B. The principal component with the smallest eigenvalue.</button>
+    <button class="option-btn" data-option="C">C. A subset of observations (presumed outlier-free) whose empirical covariance matrix has the smallest determinant.</button>
+    <button class="option-btn" data-option="D">D. The cluster centroid with minimum distance to all points.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q33 · Sparse Autoencoder</div>
+    <div class="question-stem">A sparse autoencoder addresses which limitation of standard PCA?</div>
+    <button class="option-btn" data-option="A">A. PCA's inability to handle missing data.</button>
+    <button class="option-btn" data-option="B">B. PCA's restriction to linear dimension reduction; autoencoders can learn non-linear representations.</button>
+    <button class="option-btn" data-option="C">C. PCA's requirement for labelled training data.</button>
+    <button class="option-btn" data-option="D">D. PCA's sensitivity to categorical variables.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q34 · Loss Functions</div>
+    <div class="question-stem">The Huber loss function behaves like MSE for _______ errors and like MAE for _______ errors.</div>
+    <button class="option-btn" data-option="A">A. Large; small</button>
+    <button class="option-btn" data-option="B">B. Negative; positive</button>
+    <button class="option-btn" data-option="C">C. Classification; regression</button>
+    <button class="option-btn" data-option="D">D. Small; large</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q35 · AdaBoost</div>
+    <div class="question-stem">In AdaBoost, how are weights assigned to training samples at each iteration?</div>
+    <button class="option-btn" data-option="A">A. Misclassified samples receive higher weights so subsequent models focus on them.</button>
+    <button class="option-btn" data-option="B">B. All samples receive equal weights regardless of previous errors.</button>
+    <button class="option-btn" data-option="C">C. Samples near cluster centroids receive higher weights.</button>
+    <button class="option-btn" data-option="D">D. Weights are proportional to the distance from the decision boundary.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q36 · PCA Loadings</div>
+    <div class="question-stem">In PCA, the "loadings" (stored as components_ in sklearn) describe:</div>
+    <button class="option-btn" data-option="A">A. The proportion of variance explained by each component.</button>
+    <button class="option-btn" data-option="B">B. The projected coordinates of each data point.</button>
+    <button class="option-btn" data-option="C">C. How much each original variable contributes to each principal component (the eigenvectors).</button>
+    <button class="option-btn" data-option="D">D. The distance between data points and the origin in PCA space.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q37 · Overfitting Causes</div>
+    <div class="question-stem">True or False: Overfitting occurs when a model is too simple to capture the true underlying relationship in the data.</div>
+    <button class="option-btn" data-option="A">A. True</button>
+    <button class="option-btn" data-option="B">B. False — overfitting happens when the model is too complex and fits to noise. Underfitting is when the model is too simple.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q38 · Classification Boundary</div>
+    <div class="question-stem">True or False: When features are continuous, a classification model can sometimes be visualised through its decision boundary in feature space.</div>
+    <button class="option-btn" data-option="A">A. True</button>
+    <button class="option-btn" data-option="B">B. False — decision boundaries only apply to discrete features.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q39 · Gradient Descent Local Optima</div>
+    <div class="question-stem">Which of the following is NOT a common strategy to escape local optima in gradient descent?</div>
+    <button class="option-btn" data-option="A">A. Using adaptive learning rates</button>
+    <button class="option-btn" data-option="B">B. Choosing smart initial parameter values</button>
+    <button class="option-btn" data-option="C">C. Increasing the number of covariates</button>
+    <button class="option-btn" data-option="D">D. Performing a grid search over parameter space</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q40 · MSE Property</div>
+    <div class="question-stem">MSE penalises large errors more heavily than small errors because:</div>
+    <button class="option-btn" data-option="A">A. It applies an absolute value transformation to all errors.</button>
+    <button class="option-btn" data-option="B">B. Errors are squared, so large errors contribute disproportionately to the total loss.</button>
+    <button class="option-btn" data-option="C">C. It only counts errors greater than a threshold δ.</button>
+    <button class="option-btn" data-option="D">D. It normalises errors by the sample size before squaring.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q41 · ANOVA Special Case</div>
+    <div class="question-stem">A t-test is a special case of ANOVA where:</div>
+    <button class="option-btn" data-option="A">A. The target variable is categorical.</button>
+    <button class="option-btn" data-option="B">B. All predictors are continuous.</button>
+    <button class="option-btn" data-option="C">C. There are multiple target variables.</button>
+    <button class="option-btn" data-option="D">D. There is exactly one categorical predictor variable.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q42 · Bagging Parallelism</div>
+    <div class="question-stem">True or False: Bagging can be easily parallelised because each bootstrap model is trained independently.</div>
+    <button class="option-btn" data-option="A">A. True</button>
+    <button class="option-btn" data-option="B">B. False — each model depends on the output of the previous one.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q43 · Boosting vs Bagging</div>
+    <div class="question-stem">A key structural difference between Bagging and Boosting is:</div>
+    <button class="option-btn" data-option="A">A. Bagging requires labelled data; Boosting does not.</button>
+    <button class="option-btn" data-option="B">B. Boosting always uses decision trees; Bagging can only use linear models.</button>
+    <button class="option-btn" data-option="C">C. Bagging trains models independently in parallel; Boosting trains models sequentially, each correcting the previous.</button>
+    <button class="option-btn" data-option="D">D. Bagging reduces bias; Boosting reduces variance.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q44 · K-Means Runs</div>
+    <div class="question-stem">When K-means is run multiple times with different seeds, the final cluster assignment for each data point is typically determined by:</div>
+    <button class="option-btn" data-option="A">A. The run with the highest total within-cluster variance.</button>
+    <button class="option-btn" data-option="B">B. The most common label assigned to each point across all runs (majority vote).</button>
+    <button class="option-btn" data-option="C">C. Averaging the cluster centroids across all runs.</button>
+    <button class="option-btn" data-option="D">D. The last run, since it benefits from the most random seeds.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q45 · PCA + K-Means</div>
+    <div class="question-stem">Why is PCA often applied before K-means clustering?</div>
+    <button class="option-btn" data-option="A">A. Because PCA converts continuous variables to categorical ones needed by K-means.</button>
+    <button class="option-btn" data-option="B">B. Because PCA assigns initial cluster labels for K-means.</button>
+    <button class="option-btn" data-option="C">C. Because K-means requires orthogonal features to converge.</button>
+    <button class="option-btn" data-option="D">D. To reduce dimensionality and alleviate the curse of dimensionality, making Euclidean distance more meaningful.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Q46 · Decision Tree Impurity</div>
+    <div class="question-stem">True or False: A leaf node with Gini Index = 0 represents maximal purity — all samples belong to one class.</div>
+    <button class="option-btn" data-option="A">A. True</button>
+    <button class="option-btn" data-option="B">B. False — Gini = 0 indicates maximum impurity.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Q47 · Overboosting</div>
+    <div class="question-stem">What risk arises from running too many boosting iterations?</div>
+    <button class="option-btn" data-option="A">A. The model becomes too simple and underfits.</button>
+    <button class="option-btn" data-option="B">B. Training time becomes infinitely long.</button>
+    <button class="option-btn" data-option="C">C. The model overfits as it starts capturing noise in the training data.</button>
+    <button class="option-btn" data-option="D">D. All training weights converge to zero.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q48 · Hessian</div>
+    <div class="question-stem">In Newton's optimisation method, what is the Hessian matrix?</div>
+    <button class="option-btn" data-option="A">A. The matrix of first partial derivatives of the loss function.</button>
+    <button class="option-btn" data-option="B">B. The matrix of second partial derivatives of the loss function, capturing curvature information.</button>
+    <button class="option-btn" data-option="C">C. The covariance matrix of the input variables.</button>
+    <button class="option-btn" data-option="D">D. The weight matrix in a neural network layer.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Q49 · GMM vs K-Means</div>
+    <div class="question-stem">True or False: Gaussian Mixture Models and K-means clustering always produce identical cluster assignments when given the same data and number of clusters.</div>
+    <button class="option-btn" data-option="A">A. True — they optimise the same objective.</button>
+    <button class="option-btn" data-option="B">B. True, if the same distance metric is used.</button>
+    <button class="option-btn" data-option="C">C. True when the data is Gaussian.</button>
+    <button class="option-btn" data-option="D">D. False — GMM uses probabilistic assignments based on Gaussian densities; K-means uses hard distance-based assignments.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Q50 · Exam Synthesis</div>
+    <div class="question-stem">A data scientist applies a very deep decision tree with no pruning and observes that training accuracy is 99% but test accuracy is 61%. She then applies bagging with 100 trees. The most likely outcome is:</div>
+    <button class="option-btn" data-option="A">A. Both training and test accuracy decrease, since bagging always reduces model performance.</button>
+    <button class="option-btn" data-option="B">B. Test accuracy improves significantly because bagging averages out the variance from individual overfitted trees, while training accuracy may decrease slightly.</button>
+    <button class="option-btn" data-option="C">C. The result is identical because bagging cannot correct overfitting.</button>
+    <button class="option-btn" data-option="D">D. The model starts underfitting because adding more trees reduces model flexibility.</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ==================== SHORT ANSWER ==================== -->
+<div class="sa-section" id="sa">
+  <h2>🖊 Short Answer Questions</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">SA 1 · Bias-Variance Trade-Off</div>
+    <div class="question-stem">Explain, using the bias-variance trade-off framework, why a more flexible model (e.g. quadratic vs linear) does not always produce better generalisation performance, even though it will always fit the training data at least as well.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      A more flexible model has a larger candidate set, so it will always achieve ≤ training loss compared to a simpler model. However, flexibility comes at the cost of <strong>higher variance</strong>: the model fits not just the true signal \(g\) but also the noise \(\epsilon\). Small changes in training data then produce very different models and wildly different predictions on new data. The simpler model has higher bias (it may miss some aspects of \(g\)) but lower variance — meaning predictions are more stable across datasets. Optimal generalisation occurs at the bias-variance balance: just enough complexity to approximate \(g\) well, but not so much that \(\epsilon\) is modelled. This is why Occam's Razor applies: among models with similar training performance, prefer the simpler one.
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">SA 2 · Loss Function Selection</div>
+    <div class="question-stem">A manufacturing dataset contains sensor readings where most values are normal, but a small proportion of readings are extreme due to sensor malfunctions. Compare MSE and MAE as loss functions for fitting a regression model on this data, and recommend which to use. Justify your answer.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      <strong>MSE</strong> squares each error, meaning extreme outlier readings contribute disproportionately large values to the loss. The model is forced to "explain" those extreme sensor values, which distorts the fitted relationship for the majority of normal readings — the model is not robust to outliers.<br><br>
+      <strong>MAE</strong> treats all errors linearly. Outliers contribute proportionally, not quadratically, so the fitted model is less distorted. MAE is also interpretable (average absolute error in the original units).<br><br>
+      <strong>Recommendation:</strong> Use <strong>MAE or Huber loss</strong>. Huber loss is particularly appealing here: it acts like MSE for small (normal) errors (providing a smooth, well-behaved gradient) and like MAE for large (outlier) errors (providing robustness), controlled by the hyperparameter \(\delta\).
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">SA 3 · Regularisation Mechanism</div>
+    <div class="question-stem">Describe the mathematical mechanism by which Lasso regularisation can set some regression coefficients to exactly zero, while Ridge regularisation cannot. What practical benefit does this give Lasso?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      Both Ridge (L2) and Lasso (L1) add a penalty to the OLS objective. Ridge adds \(\lambda \sum b_j^2\), a smooth, differentiable term whose gradient at zero is zero, so the optimum typically does not reach exactly zero. Lasso adds \(\lambda \sum |b_j|\), which is <em>not differentiable at zero</em> and has a constant gradient (sub-gradient) of ±λ at that point. Geometrically, the L1 penalty ball has "corners" at axis-aligned points; when the OLS ellipsoid touches a corner, the corresponding coefficient is exactly zero.<br><br>
+      <strong>Practical benefit:</strong> Lasso performs automatic <strong>feature selection</strong> — irrelevant predictors get exactly zero coefficients, producing a sparse model that is easier to interpret and potentially more robust in production.
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">SA 4 · Early Stopping Data Split</div>
+    <div class="question-stem">Why is a three-way data split (training / validation / test) sometimes necessary? In what scenario is a two-way split sufficient?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      A <strong>three-way split</strong> is necessary when the validation set is used to make <em>model selection decisions during training</em> — such as early stopping, hyperparameter tuning, or pruning. Once a validation set influences the model, it can no longer provide an unbiased estimate of generalisation error (the model has "seen" it indirectly). A separate, held-out <strong>test set</strong> is then required for final, unbiased evaluation.<br><br>
+      A <strong>two-way split</strong> is sufficient when no decisions are made based on the held-out set during training — i.e., when the model is trained once on the training data and evaluated only once on the test data, with no iterative tuning steps.
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">SA 5 · Bagging vs Boosting</div>
+    <div class="question-stem">Contrast Bagging and Boosting in terms of (a) how models are built, (b) which component of prediction error each primarily reduces, and (c) a practical risk associated with each.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      <strong>(a) Construction:</strong> Bagging trains \(m\) models <em>independently</em> on bootstrap samples (parallelisable); prediction = average or majority vote. Boosting trains models <em>sequentially</em>, where each new model corrects errors of the current ensemble.<br><br>
+      <strong>(b) Error reduction:</strong> Bagging reduces <strong>variance</strong> (averaging independent noisy models cancels out their errors). Boosting reduces <strong>bias</strong> (each iteration targets the residual error, pulling predictions toward the true values).<br><br>
+      <strong>(c) Risks:</strong> Bagging reduces variance but does not necessarily reduce bias — a very biased base learner will produce a biased forest. Boosting risks <strong>overfitting</strong> ("overboosting") if too many iterations are used; each model becomes increasingly tailored to the training data's noise.
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">SA 6 · Decision Tree Impurity</div>
+    <div class="question-stem">A decision tree node contains 14 red and 2 blue observations (16 total). Calculate its Gini Index and Misclassification Error. Then explain why these measures are used as splitting criteria rather than simply maximising the number of correctly classified training samples.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Calculations:</strong><br>
+      p(red) = 14/16 = 0.875; p(blue) = 2/16 = 0.125<br>
+      <strong>Gini:</strong> G = 0.875(1−0.875) + 0.125(1−0.125) = 0.875×0.125 + 0.125×0.875 = 0.109 + 0.109 ≈ <strong>0.22</strong><br>
+      <strong>Misclassification Error:</strong> M = min(14/16, 2/16) = 2/16 = <strong>0.125</strong><br><br>
+      <strong>Why not maximise training accuracy directly?</strong> Greedy maximisation of correct classifications at each step is myopic — a split can give good immediate accuracy but poor downstream splits. Impurity measures like Gini quantify uncertainty across all classes and provide a richer signal that better guides the tree toward pure leaf nodes. Also, simply maximising local accuracy leads to deeper trees and overfitting.
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">SA 7 · K-Means Limitations &amp; Remedies</div>
+    <div class="question-stem">You are asked to cluster a customer dataset with 50 features (mostly numerical). Outline at least three challenges specific to this high-dimensional setting, and propose a practical preprocessing pipeline before applying K-means.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Challenges:</strong><br>
+      1. <strong>Curse of dimensionality:</strong> Euclidean distances lose meaning — all points tend to be roughly equidistant, making cluster separation ambiguous.<br>
+      2. <strong>Scaling:</strong> Features with large ranges dominate the distance metric; variables must be standardised.<br>
+      3. <strong>Multicollinearity:</strong> Many of the 50 features may be correlated, introducing redundancy that inflates certain dimensions.<br>
+      4. <strong>Outlier sensitivity:</strong> K-means centroids are means, dragged by outliers.<br><br>
+      <strong>Practical Pipeline:</strong><br>
+      (i) Exploratory data analysis — identify outliers, missing values, feature distributions.<br>
+      (ii) Standardise all features (zero mean, unit variance).<br>
+      (iii) Apply <strong>PCA</strong> to reduce to a lower-dimensional space retaining, say, 90% of variance — this alleviates the curse of dimensionality and removes multicollinearity.<br>
+      (iv) Run K-means++ multiple times on the PCA scores, choosing K via the elbow method on within-cluster sum of squares.<br>
+      (v) Validate cluster structure qualitatively and with metrics like silhouette score.
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">SA 8 · Gradient Descent vs Newton's Method</div>
+    <div class="question-stem">Compare gradient descent and Newton's method as optimisation algorithms for training a machine learning model. In which scenarios might Newton's method be preferable, and when might it be impractical?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      <strong>Gradient Descent:</strong> Uses only the gradient (first-order information). Computationally cheap per iteration. Requires careful tuning of learning rate. Scales well to large parameter spaces and large datasets (especially mini-batch/stochastic variants).<br><br>
+      <strong>Newton's Method:</strong> Uses the Hessian (second-order information) to account for curvature. Can converge in far fewer iterations because it takes the optimal step size for a quadratic approximation. Produces the update \(\Delta b = -H^{-1}\nabla l\).<br><br>
+      <strong>Preferable:</strong> Small-to-medium parameter spaces, smooth loss surfaces, when fast convergence is critical, and when computing/inverting the Hessian is feasible.<br><br>
+      <strong>Impractical:</strong> Large neural networks with millions of parameters — the Hessian is an \(n \times n\) matrix (n = number of parameters), which is extremely expensive to compute and invert. Quasi-Newton methods (BFGS, L-BFGS) approximate the Hessian to bridge this gap.
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">SA 9 · Isolation Forest Intuition</div>
+    <div class="question-stem">Explain the intuition behind the Isolation Forest algorithm. Why are outliers isolated with fewer splits than inliers? How does the "forest" aspect improve robustness?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Key Points:</strong><br>
+      <strong>Intuition:</strong> The algorithm repeatedly chooses a random feature and a random split value within that feature's range. An <em>outlier</em> is by definition far from the bulk of the data, so a single random split can quickly isolate it — it appears at a very shallow depth in the tree. An <em>inlier</em> is surrounded by many similar points; many splits are required to isolate it, so it appears at greater depth.<br><br>
+      <strong>Forest robustness:</strong> A single tree is stochastic (depends on random feature and split choices). Running many trees (an "isolation forest") and averaging the path lengths across all trees gives a stable, reliable anomaly score. Points consistently isolated early (short average path length across many trees) are flagged as outliers. This ensemble approach reduces the variance of the anomaly score.
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">SA 10 · Synthesis — End-to-End ML Pipeline</div>
+    <div class="question-stem">A company wants to predict whether a customer will churn (leave) based on their usage data. Outline an end-to-end machine learning pipeline using concepts from this lecture, addressing: problem type, candidate model, loss function, overfitting mitigation, and evaluation metric choice.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong><br>
+      <strong>Problem type:</strong> Binary classification (churn = yes/no). A supervised learning problem with a categorical target and continuous/mixed predictors → Logistic regression or Decision Tree (or ensemble thereof).<br><br>
+      <strong>Candidate model:</strong> Start with logistic regression (interpretable, good baseline). Then try a Decision Tree or Random Forest for potentially better accuracy. Motivated by domain knowledge and data exploration.<br><br>
+      <strong>Loss function:</strong> Binary cross-entropy (log-loss) for logistic regression; Gini impurity or entropy for decision trees.<br><br>
+      <strong>Overfitting mitigation:</strong> (i) Regularisation (L2 for logistic regression, post-pruning / max-depth for trees). (ii) Early stopping via validation loss monitoring. (iii) Bagging (Random Forest) to reduce variance from individual trees.<br><br>
+      <strong>Data split:</strong> Training / validation (for tuning) / test (for final unbiased evaluation).<br><br>
+      <strong>Evaluation metric:</strong> Simple accuracy is inappropriate because churn is typically rare (class imbalance). Use <strong>Balanced Accuracy</strong>, F1-score, or ROC-AUC to account for the imbalance and properly reward correct identification of churning customers.
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== MCQ Logic =====
+  let answered = 0, correct = 0;
+
+  document.querySelectorAll('.mcq-card').forEach(card => {
+    const correctOption = card.dataset.correct;
+    const btns = card.querySelectorAll('.option-btn');
+    const feedback = card.querySelector('.feedback-bar');
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (card.dataset.done) return;
+        card.dataset.done = '1';
+        answered++;
+
+        const chosen = btn.dataset.option;
+        btns.forEach(b => {
+          b.classList.add('disabled');
+          if (b.dataset.option === correctOption) {
+            b.classList.add(chosen === correctOption ? 'correct' : 'reveal-correct');
+          }
+        });
+
+        if (chosen === correctOption) {
+          btn.classList.add('correct');
+          feedback.textContent = '✅ Correct!';
+          feedback.className = 'feedback-bar correct';
+          correct++;
+        } else {
+          btn.classList.add('incorrect');
+          feedback.textContent = `❌ Incorrect. The correct answer is ${correctOption}.`;
+          feedback.className = 'feedback-bar incorrect';
+        }
+        feedback.style.display = 'block';
+        updateScore();
+      });
+    });
+  });
+
+  function updateScore() {
+    document.getElementById('score-display').textContent = `Score: ${correct} / ${answered}`;
+  }
+
+  function resetQuiz() {
+    answered = 0; correct = 0;
+    document.querySelectorAll('.mcq-card').forEach(card => {
+      delete card.dataset.done;
+      card.querySelectorAll('.option-btn').forEach(b => {
+        b.className = 'option-btn';
+      });
+      const fb = card.querySelector('.feedback-bar');
+      fb.style.display = 'none';
+      fb.textContent = '';
+      fb.className = 'feedback-bar';
+    });
+    updateScore();
+    document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  }
+
+  // ===== Short Answer Toggle =====
+  function toggleAnswer(btn) {
+    const panel = btn.nextElementSibling;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      btn.textContent = 'Reveal Answer';
+    } else {
+      panel.style.display = 'block';
+      btn.textContent = 'Hide Answer';
+    }
+  }
+</script>
+</body>
+</html>

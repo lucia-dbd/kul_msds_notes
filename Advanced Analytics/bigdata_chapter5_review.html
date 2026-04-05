@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Unsupervised Learning Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    border-radius: 12px;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 { color: #1a3a5c; font-size: 1.25em; font-weight: 700; border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0; }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin-top: 20px; }
+  .key-point    { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box  { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box  { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box  { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .formula-box  { background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px; padding: 14px 20px; margin: 14px 0; text-align: center; font-size: 1.05em; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* MCQ */
+  .mcq-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-top: 0; }
+  .score-display { background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px; padding: 5px 18px; font-weight: 700; color: #856404; display: inline-block; font-size: 0.95em; }
+  .mcq-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .reset-btn-mcq { background: #2e6da4; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .reset-btn-mcq:hover { background: #1a3a5c; }
+  .mcq-card { background: #f9fafb; border: 1px solid #e5e9f2; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .mcq-card .question-label { font-size: 0.8em; font-weight: 700; color: #2e6da4; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .mcq-card .question-stem  { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+  .option-btn { display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea; border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left; cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s; font-family: inherit; }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected       { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct        { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect      { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* Short Answer */
+  .sa-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; border-bottom: 2px solid #e8d5ff; padding-bottom: 8px; margin-top: 0; }
+  .sa-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .sa-card { background: #faf9ff; border: 1px solid #e2dcf5; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .sa-card .question-stem  { font-weight: 600; color: #1a1a2e; margin: 8px 0 14px 0; font-size: 1.0em; }
+  .reveal-btn { background: #6f42c1; color: #ffffff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel { background: #f3f0ff; border: 1px solid #d4c8f5; border-radius: 8px; padding: 18px 22px; margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none; }
+  .answer-panel strong { color: #4a148c; }
+  .reset-btn-sa { background: #6f42c1; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+  .reset-btn-sa:hover { background: #5a32a3; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin-bottom: 4px; }
+  code { background: #eef2fb; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Unsupervised Learning — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#overview">Overview</a>
+  <a href="#hierarchical">Hierarchical Clustering</a>
+  <a href="#partitional">K-Means &amp; Others</a>
+  <a href="#validation">Validation</a>
+  <a href="#dimred">Dimensionality Reduction</a>
+  <a href="#anomaly">Anomaly Detection</a>
+  <a href="#assoc">Association Rules</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa"  class="nav-sa">8 Short Answer</a>
+</div>
+
+<!-- ===================== STUDY NOTES ===================== -->
+
+<div class="notes-section" id="overview">
+  <h2>1. Unsupervised Learning – Overview</h2>
+  <div class="key-point">
+    <strong>Core idea:</strong> No labels or target variable. The goal is to <em>describe, discover, and explain</em> patterns in data without any pre-defined output. Unlike supervised learning, we do not correlate features to a target — but we still need to define what kind of patterns we are looking for.
+  </div>
+  <h3>Contrast with Supervised Learning</h3>
+  <table>
+    <thead><tr><th>Aspect</th><th>Supervised</th><th>Unsupervised</th></tr></thead>
+    <tbody>
+      <tr><td>Labels required?</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Primary goal</td><td>Predictive (future outcomes)</td><td>Descriptive / Exploratory</td></tr>
+      <tr><td>Evaluation</td><td>Accuracy, AUC, RMSE vs. label</td><td>Internal indices, visual inspection, domain judgment</td></tr>
+      <tr><td>Common outputs</td><td>Class predictions, probabilities, values</td><td>Cluster memberships, rules, projections, anomaly scores</td></tr>
+    </tbody>
+  </table>
+  <h3>Main Techniques Covered</h3>
+  <ul>
+    <li><strong>Clustering</strong> — hierarchical, k-means, DBSCAN, EM/GMM, mean-shift</li>
+    <li><strong>Dimensionality reduction</strong> — PCA, t-SNE, UMAP</li>
+    <li><strong>Anomaly detection</strong> — statistical, clustering-based, isolation forest, LOF, (V)AE, CADE</li>
+    <li><strong>Association rules</strong> — Apriori algorithm, support, confidence, lift</li>
+  </ul>
+  <div class="warning-box">⚠ Unsupervised results can serve as input to supervised pipelines: cluster labels and distances used as features, or anomaly scores used as a risk signal.</div>
+</div>
+
+<div class="notes-section" id="hierarchical">
+  <h2>2. Hierarchical Clustering</h2>
+  <div class="key-point">
+    Builds a tree of nested partitions (a <strong>dendrogram</strong>). Two variants: <strong>agglomerative</strong> (bottom-up — start with singletons, iteratively merge) and <strong>divisive</strong> (top-down — start with all data, iteratively split). In practice only agglomerative is implemented: divisive is computationally far more expensive.
+  </div>
+  <p>The dendrogram can be <em>cut</em> at any height to produce any desired number of clusters, and also reveals potential outliers as long isolated branches.</p>
+
+  <h3>Distance Metrics (between two points \(a\) and \(b\))</h3>
+  <div class="formula-box">
+    Euclidean: \(\|a-b\|_2 = \sqrt{\sum_i (a_i - b_i)^2}\) &nbsp;&nbsp;&nbsp;
+    Manhattan: \(\|a-b\|_1 = \sum_i |a_i - b_i|\)<br><br>
+    Maximum: \(\|a-b\|_\infty = \max_i |a_i - b_i|\) &nbsp;&nbsp;&nbsp;
+    Squared Euclidean: \(\|a-b\|_2^2 = \sum_i (a_i - b_i)^2\)
+  </div>
+  <p>A valid metric must satisfy: <strong>symmetry</strong> \(d(a,b)=d(b,a)\), <strong>self-similarity</strong> \(d(a,a)=0\), <strong>positivity</strong> \(d(a,b)\ge 0\), and the <strong>triangular inequality</strong> \(d(a,b)\le d(a,c)+d(c,b)\).</p>
+
+  <h3>Linkage Criteria (between two clusters \(A\) and \(B\))</h3>
+  <table>
+    <thead><tr><th>Linkage</th><th>Formula</th><th>Resulting cluster shape</th></tr></thead>
+    <tbody>
+      <tr><td>Single (minimum)</td><td>\(D(A,B)=\min_{a\in A,b\in B} d(a,b)\)</td><td>Long, skinny — prone to chaining</td></tr>
+      <tr><td>Complete (maximum)</td><td>\(D(A,B)=\max_{a\in A,b\in B} d(a,b)\)</td><td>Tight, compact, roughly equal diameter</td></tr>
+      <tr><td>Average (UPGMA)</td><td>\(D(A,B)=\frac{1}{|A||B|}\sum_{a\in A,b\in B}d(a,b)\)</td><td>Balanced; robust to noise — recommended default</td></tr>
+      <tr><td>Centroid</td><td>\(D(A,B)=d(a_c, b_c)\)</td><td>Robust; needs a centroid concept</td></tr>
+      <tr><td>Ward's</td><td>\(D(A,B)=SSE(AB)-(SSE(A)+SSE(B))\)</td><td>Minimises within-cluster variance; similar to k-means</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Ward's linkage</strong> measures the increase in total within-cluster SSE caused by a merge — analogous to ANOVA. It tends to produce compact spherical clusters and is closely related to the k-means objective.
+  </div>
+
+  <h3>Properties &amp; Practical Notes</h3>
+  <table>
+    <thead><tr><th>Advantage</th><th>Disadvantage</th></tr></thead>
+    <tbody>
+      <tr><td>No need to pre-specify \(k\)</td><td>Not very scalable (\(O(n^2)\) to \(O(n^3)\))</td></tr>
+      <tr><td>Interpretable dendrogram maps to human intuition</td><td>Local optima — merges/splits cannot be undone</td></tr>
+      <tr><td>Outliers visible as long isolated branches</td><td>Sensitive to linkage choice</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ Always normalise features before hierarchical clustering — distance measures are scale-sensitive.</div>
+</div>
+
+<div class="notes-section" id="partitional">
+  <h2>3. Partitional Clustering &amp; Other Methods</h2>
+
+  <h3>3.1 K-Means</h3>
+  <div class="key-point">
+    Places each instance in exactly one of \(k\) clusters. Objective: minimise total SSE.
+  </div>
+  <div class="formula-box">
+    \(\min\; SSE = \sum_{k=1}^{K}\sum_{i=1}^{n_k}\|x_{ki} - \mu_k\|^2\)
+  </div>
+  <p><strong>Algorithm:</strong> (1) Choose \(k\). (2) Initialise \(k\) centroids. (3) Assign each point to nearest centroid. (4) Recompute centroids. (5) Repeat 3–4 until convergence.</p>
+
+  <div class="warning-box">
+    ⚠ <strong>Weaknesses:</strong> requires the mean to be defined (numeric features only); sensitive to outliers; prone to local optima; cannot handle non-convex shapes; \(k\) must be specified in advance; requires feature normalisation.
+  </div>
+
+  <div class="example-box">
+    <strong>Elbow method:</strong> plot SSE vs \(k\). The "elbow" (point of diminishing returns) suggests a suitable \(k\). Python: <code>kneed</code> package. Practical tip: start with a higher \(k\) than intuition suggests and post-process — human intuition about the number of segments is often too low.
+  </div>
+
+  <h3>3.2 K-Means++ Initialisation</h3>
+  <p>Selects initial centroids with probability proportional to \(d(x,c)^2\) (squared distance to the nearest already-chosen centroid). This spreads centroids out, reducing the risk of poor local optima. Most k-means implementations use K-means++ by default.</p>
+
+  <h3>3.3 DBSCAN</h3>
+  <div class="key-point">
+    <strong>Density-Based Spatial Clustering of Applications with Noise.</strong> Groups closely packed points; marks sparse outliers as <em>noise</em>. Does <strong>not</strong> require \(k\); handles non-convex shapes; hierarchical versions (HDBSCAN) exist.
+  </div>
+  <table>
+    <thead><tr><th>Point type</th><th>Definition</th></tr></thead>
+    <tbody>
+      <tr><td>Core</td><td>Has ≥ MinPts neighbours within radius \(\varepsilon\)</td></tr>
+      <tr><td>Border</td><td>Fewer than MinPts neighbours within \(\varepsilon\) but density-reachable from a core point</td></tr>
+      <tr><td>Noise</td><td>Not reachable from any core point — treated as outlier</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 EM-Based Clustering (Gaussian Mixture Models)</h3>
+  <p>Makes <strong>soft (probabilistic)</strong> assignments via alternating E-step (compute cluster membership probabilities) and M-step (re-estimate Gaussian parameters). More flexible than k-means but still requires specifying \(k\) and struggles with non-convex shapes.</p>
+  <div class="formula-box">
+    E-step: \(r_{ik} = P(\text{cluster}=k \mid x_i)\) &nbsp;&nbsp;&nbsp;
+    M-step: update \(\mu_k,\, \Sigma_k,\, \pi_k\) using weighted responsibilities \(r_{ik}\)
+  </div>
+
+  <h3>3.5 Mean-Shift Clustering</h3>
+  <p>Based on Kernel Density Estimation (KDE). Places a kernel (typically Gaussian) on each data point; clusters emerge around density peaks. Does <strong>not</strong> require \(k\); the bandwidth parameter controls the number of clusters found.</p>
+
+  <h3>Clustering Algorithm Comparison</h3>
+  <table>
+    <thead><tr><th>Algorithm</th><th>Requires \(k\)?</th><th>Non-convex shapes?</th><th>Outlier handling</th><th>Soft assignments?</th></tr></thead>
+    <tbody>
+      <tr><td>K-Means</td><td>Yes</td><td>No</td><td>Distorts centroids</td><td>No</td></tr>
+      <tr><td>Hierarchical</td><td>Post-hoc</td><td>Limited</td><td>Visible in dendrogram</td><td>No</td></tr>
+      <tr><td>DBSCAN</td><td>No</td><td>Yes</td><td>Explicit noise label</td><td>No</td></tr>
+      <tr><td>GMM / EM</td><td>Yes</td><td>Limited</td><td>Low responsibility</td><td>Yes</td></tr>
+      <tr><td>Mean-Shift</td><td>No</td><td>Yes</td><td>Sparse regions not peaked</td><td>No</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="validation">
+  <h2>4. Cluster Validation &amp; Domain Knowledge</h2>
+
+  <h3>Internal Validation Indices</h3>
+  <div class="key-point">
+    A good clustering has <strong>high intra-cluster similarity</strong> and <strong>low inter-cluster similarity</strong>. Internal indices quantify this without reference to external labels.
+  </div>
+  <div class="formula-box">
+    Davies-Bouldin Index: \(\displaystyle DBI = \frac{1}{N}\sum_{i=1}^{N} R_i \quad\text{where}\quad R_i = \max_{j\neq i}\frac{S_i + S_j}{D_{ij}}\)
+    <br><br>
+    \(S_i\) = mean intra-cluster distance for cluster \(i\) &nbsp;&nbsp; \(D_{ij}\) = distance between centroids of \(i\) and \(j\)
+    <br><br>
+    <strong>Lower DBI = better clustering.</strong>
+  </div>
+  <p>Other measures: Silhouette coefficient, Calinski-Harabasz index, k-means SSE. Given the descriptive nature of clustering, validation is inherently somewhat subjective.</p>
+
+  <h3>Incorporating Domain Knowledge</h3>
+  <ul>
+    <li><strong>Must-link constraints:</strong> two points must be in the same cluster.</li>
+    <li><strong>Can't-link constraints:</strong> two points must be in different clusters.</li>
+    <li><strong>Warm start:</strong> provide a partial clustering solution as initialisation.</li>
+  </ul>
+  <div class="warning-box">⚠ Too many constraints can make the problem infeasible. Constraints should reflect genuine domain knowledge, not arbitrary preferences.</div>
+
+  <h3>Distance Metrics for Non-Numeric Data</h3>
+  <p>Most metrics above apply to numerical features. For text and categorical data: <strong>Levenshtein distance</strong> (edit distance based on insertions, deletions, substitutions), <strong>Jaccard similarity</strong>, <strong>cosine similarity</strong>, and <strong>Gower distance</strong> (mixed numerical/categorical).</p>
+</div>
+
+<div class="notes-section" id="dimred">
+  <h2>5. Dimensionality Reduction</h2>
+
+  <h3>5.1 PCA — Principal Component Analysis</h3>
+  <div class="key-point">
+    Linear technique. Finds orthogonal directions of maximum variance via eigenvector decomposition of the covariance matrix. Each eigenvalue \(\lambda_j\) represents the variance explained by that component. PCs are uncorrelated by construction.
+  </div>
+  <div class="formula-box">
+    \(PC_j = e_j^\top X = e_{j1}X_1 + e_{j2}X_2 + \cdots + e_{jp}X_p\)
+    <br><br>
+    Eigenvalue \(\lambda_j\) = variance explained by \(PC_j\)
+  </div>
+  <table>
+    <thead><tr><th>Advantage</th><th>Disadvantage</th></tr></thead>
+    <tbody>
+      <tr><td>Powerful data reduction — removes multicollinearity</td><td>Linear only — misses non-linear structure</td></tr>
+      <tr><td>Components are uncorrelated</td><td>Components are hard to interpret</td></tr>
+      <tr><td>Parametric — new points can be projected</td><td>Sensitive to feature scale (normalise first)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 t-SNE — t-Distributed Stochastic Neighbor Embedding</h3>
+  <div class="key-point">
+    Non-linear, manifold-based. Preserves <strong>local structure</strong> (small pairwise distances). Main hyperparameter: <strong>perplexity</strong> (effective neighbourhood size, typical range 5–50). Output is usually 2D or 3D.
+  </div>
+  <p><strong>Step 1 — High-dimensional similarities:</strong></p>
+  <div class="formula-box">
+    \(p_{j|i} = \dfrac{\exp(-\|x_i - x_j\|^2 / 2\sigma_i^2)}{\sum_{k\neq i}\exp(-\|x_i - x_k\|^2 / 2\sigma_i^2)}\)
+    &nbsp;&nbsp;&nbsp;
+    \(p_{ij} = \dfrac{p_{j|i} + p_{i|j}}{2N}\)
+    <br><br>
+    \(\sigma_i\) is set per-point so that the perplexity of \(p_{\cdot|i}\) equals the user-specified value.
+  </div>
+  <p><strong>Step 2 — Low-dimensional similarities</strong> use the <em>Student-t distribution</em> (heavier tails than Gaussian — reduces the crowding problem):</p>
+  <div class="formula-box">
+    \(q_{ij} \propto \left(1 + \|y_i - y_j\|^2\right)^{-1}\)
+    <br><br>
+    Minimise \(\displaystyle KL(P\|Q) = \sum_{i\neq j} p_{ij}\log\frac{p_{ij}}{q_{ij}}\) via gradient descent.
+  </div>
+
+  <div class="warning-box">
+    ⚠ <strong>t-SNE pitfalls:</strong> (1) Cluster <em>size</em> in the 2D plot has no meaning. (2) <em>Distance between clusters</em> has no meaning (only local topology is preserved). (3) Random data can appear structured. (4) Non-parametric — cannot embed unseen test points without retraining. (5) Different perplexity values give very different layouts — always try multiple.
+  </div>
+  <div class="theorem-box">
+    t-SNE is <strong>not a clustering algorithm</strong>. A second step (e.g. k-means on the 2D output) is needed to assign cluster labels — but clustering in the original high-dimensional space is preferable; t-SNE output should only be used for visualisation.
+  </div>
+
+  <h3>5.3 UMAP — Uniform Manifold Approximation and Projection</h3>
+  <div class="key-point">
+    Non-linear, manifold-based, <strong>parametric by default</strong>. Generally better global structure preservation than t-SNE, scales better computationally, supports output dimensions &gt;3, and can incorporate supervised labels in the embedding.
+  </div>
+  <table>
+    <thead><tr><th></th><th>PCA</th><th>t-SNE</th><th>UMAP</th></tr></thead>
+    <tbody>
+      <tr><td>Linear?</td><td>Yes</td><td>No</td><td>No</td></tr>
+      <tr><td>Parametric?</td><td>Yes</td><td>No*</td><td>Yes (default)</td></tr>
+      <tr><td>Global structure</td><td>Good</td><td>Poor</td><td>Better than t-SNE</td></tr>
+      <tr><td>Scales to large data</td><td>Good</td><td>Limited</td><td>Good</td></tr>
+      <tr><td>Embed new points?</td><td>Yes</td><td>No (by default)</td><td>Yes</td></tr>
+      <tr><td>Supervised mode</td><td>No</td><td>No</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+  <p>*Parametric t-SNE exists but is not standard. UMAP should be the default choice when a reusable embedding or downstream model is needed.</p>
+</div>
+
+<div class="notes-section" id="anomaly">
+  <h2>6. Anomaly Detection</h2>
+  <div class="key-point">
+    Identification of instances that <strong>do not conform</strong> to expected patterns. Also called outlier detection or novelty detection. Uses a mix of unsupervised, supervised, and statistical techniques. Applications: fraud, structural defects, medical problems, data errors.
+  </div>
+
+  <h3>Methods Overview</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Core idea</th><th>Best for</th></tr></thead>
+    <tbody>
+      <tr><td>Statistical (box plots, robust covariance)</td><td>Flag points outside expected distribution</td><td>Simple univariate or low-dim cases</td></tr>
+      <tr><td>Clustering-based (DBSCAN noise, small clusters, dendrogram)</td><td>Outliers lie outside or in tiny clusters</td><td>Multivariate, combined with dim. reduction</td></tr>
+      <tr><td>One-class SVM (PU learning)</td><td>Learns boundary around normal class</td><td>When only normal examples are labelled</td></tr>
+      <tr><td>Isolation Forest</td><td>Random splits; anomalies isolated in few steps</td><td>High-dimensional tabular data, fast</td></tr>
+      <tr><td>Local Outlier Factor (LOF)</td><td>Compare local density to k-NN neighbours</td><td>Variable-density clusters</td></tr>
+      <tr><td>(V)AE reconstruction error</td><td>High reconstruction error → anomaly</td><td>Images, time series, high-dim</td></tr>
+      <tr><td>CADE</td><td>Classifier on real vs. uniform synthetic data</td><td>Any classifier; model-agnostic</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Isolation Forest</h3>
+  <p>Based on random forests but splits are chosen <em>completely at random</em> (not entropy-driven). Anomalies require <strong>fewer</strong> splits to isolate (shorter average path length from root to leaf). Normal points are embedded deep in the data and need many splits to separate.</p>
+
+  <h3>Local Outlier Factor (LOF)</h3>
+  <div class="formula-box">
+    \(\text{LOF}_k(x) = \dfrac{\text{mean local reachability density of }k\text{-NN}(x)}{\text{local reachability density of }x}\)
+    <br><br>
+    \(\text{LOF} \gg 1\) → point has substantially lower density than its neighbours → outlier.
+  </div>
+
+  <h3>CADE</h3>
+  <p>Classifier-Adjusted Density Estimation: (1) label original instances \(y=0\), generate uniform synthetic data \(y=1\). (2) Train any classifier. (3) Instances where the model predicts high \(\hat{P}(y=1)\) are flagged as outliers. Works with any classifier that produces probabilities.</p>
+</div>
+
+<div class="notes-section" id="assoc">
+  <h2>7. Association Rules</h2>
+  <div class="key-point">
+    Discovers interesting co-occurrence relations in transactional data. Pioneer: <strong>Apriori algorithm</strong> (Agrawal, 1993). Standard association rules do <strong>not</strong> consider order of items (sequence mining, e.g. GSP, does).
+  </div>
+
+  <h3>Key Measures</h3>
+  <div class="formula-box">
+    \(\text{Support}(X) = \dfrac{|\{t \in T : X \subseteq t\}|}{|T|}\)
+    <br><br>
+    \(\text{Confidence}(X \Rightarrow Y) = \dfrac{\text{Support}(X \cup Y)}{\text{Support}(X)} \approx P(Y|X)\)
+    <br><br>
+    \(\text{Lift}(X \Rightarrow Y) = \dfrac{\text{Support}(X \cup Y)}{\text{Support}(X) \times \text{Support}(Y)}\)
+    <br><br>
+    \(\text{Conviction}(X \Rightarrow Y) = \dfrac{1 - \text{Support}(Y)}{1 - \text{Confidence}(X \Rightarrow Y)}\)
+  </div>
+  <table>
+    <thead><tr><th>Measure</th><th>Interpretation</th><th>Key value</th></tr></thead>
+    <tbody>
+      <tr><td>Support</td><td>How often \(X\cup Y\) appears</td><td>Higher = more frequent</td></tr>
+      <tr><td>Confidence</td><td>Estimate of \(P(Y|X)\)</td><td>Higher = stronger predictor</td></tr>
+      <tr><td>Lift = 1</td><td>X and Y are statistically independent</td><td>Lift &gt; 1 = positive association</td></tr>
+      <tr><td>Conviction</td><td>How often rule makes incorrect prediction by chance</td><td>Higher = less coincidental</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Apriori Algorithm</h3>
+  <div class="key-point">
+    <strong>Anti-monotonicity (downward-closure):</strong> If an itemset is infrequent (below minsup), all its <em>supersets</em> are also infrequent and can be pruned without scanning the database. Equivalently, all <em>subsets</em> of a frequent itemset are frequent.
+  </div>
+  <p><strong>Step 1 — Find all frequent itemsets</strong> using iterative join-and-prune:</p>
+  <ul>
+    <li>Generate candidate \(k\)-itemsets by joining \((k\!-\!1)\)-itemsets that share \(k\!-\!2\) items.</li>
+    <li>Prune candidates whose any \((k\!-\!1)\)-subset was infrequent.</li>
+    <li>Scan database to count surviving candidates; retain those ≥ minsup.</li>
+  </ul>
+  <p><strong>Step 2 — Generate association rules</strong> from each frequent itemset \(I\): for all non-empty subsets \(I_s \subsetneq I\), output rule \(I_s \Rightarrow I \setminus I_s\) if its confidence ≥ minconf.</p>
+
+  <h3>Extensions &amp; Practical Notes</h3>
+  <ul>
+    <li><strong>Categorical &amp; continuous variables:</strong> encode each level as a binary item; bin continuous features before converting.</li>
+    <li><strong>Rare patterns:</strong> set group-based support thresholds (e.g. Rolex purchases genuinely low support but meaningful).</li>
+    <li><strong>Hierarchical items:</strong> allow rules at multiple levels of a taxonomy.</li>
+    <li><strong>Discriminative rules:</strong> restrict the consequent (e.g. only \(\Rightarrow\{\text{default}\}\)) to inject supervision.</li>
+    <li><strong>Sequence mining:</strong> GSP algorithm handles ordered item sequences.</li>
+  </ul>
+  <div class="warning-box">
+    ⚠ <strong>Post-processing is essential</strong>: association rule mining often produces thousands of rules. Filter trivial rules (e.g. spaghetti → spaghetti sauce), perform sensitivity analysis on minsup / minconf, and use visualisation tools (e.g. <code>arulesViz</code> in R). Confidence alone is not always the best metric — check Lift and Conviction too.
+  </div>
+</div>
+
+<!-- ===================== MCQ ===================== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">↺ Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ===================== SHORT ANSWER ===================== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (8)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">↺ Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  // UNSUPERVISED OVERVIEW
+  {q:"Unsupervised learning requires a labelled target variable in order to function.", opts:["True","False"], ans:"False", exp:"Unsupervised learning explicitly has no labels or target variable. The goal is to discover patterns — clustering, associations, anomalies — without any predefined output."},
+  {q:"Which of the following is NOT a primary use case for unsupervised learning?", opts:["A) Customer segmentation","B) Predicting next month's sales from historical data","C) Detecting fraudulent transactions without labelled fraud examples","D) Discovering frequent co-purchased items in a supermarket"], ans:"B", exp:"Predicting sales from historical data is supervised regression — it requires labelled target values. The other options are all descriptive or anomaly-based tasks with no target labels."},
+  {q:"Unsupervised learning results can feed into supervised pipelines. Which is a valid example?", opts:["A) Using cluster labels and centroid distances as features in a decision tree","B) Using the target variable to guide cluster formation","C) Replacing cross-validation with cluster validation","D) Using association rules as the loss function for a neural network"], ans:"A", exp:"Cluster labels and distances from centroids are legitimate engineered features. The other options either use labels (defeating the unsupervised premise) or are nonsensical combinations."},
+
+  // HIERARCHICAL CLUSTERING
+  {q:"In agglomerative hierarchical clustering, the algorithm starts with a single cluster containing all data points and progressively splits it.", opts:["True","False"], ans:"False", exp:"Agglomerative is BOTTOM-UP: it starts with each point as its own singleton cluster and merges pairs iteratively. Divisive is top-down (starts with all data in one cluster and splits)."},
+  {q:"Which linkage criterion uses the minimum pairwise distance between clusters?", opts:["A) Complete linkage","B) Ward's linkage","C) Average linkage","D) Single linkage"], ans:"D", exp:"Single (minimum) linkage defines the distance between two clusters as the distance between their closest pair of points, leading to the chaining effect and elongated clusters."},
+  {q:"Complete linkage hierarchical clustering tends to produce clusters of approximately equal diameter.", opts:["True","False"], ans:"True", exp:"Complete linkage merges based on the maximum pairwise distance. This prevents two clusters from merging until ALL their points are within a certain distance, producing tight, roughly equal-sized clusters."},
+  {q:"Ward's linkage criterion selects the merge that minimises which quantity?", opts:["A) The maximum pairwise distance between two clusters","B) The mean pairwise distance across all cluster pairs","C) The increase in total within-cluster sum of squares (SSE)","D) The KL divergence between cluster Gaussian models"], ans:"C", exp:"Ward's method measures D(A,B) = SSE(AB) − (SSE(A) + SSE(B)). It greedily merges the pair whose union minimises the increase in total within-cluster variance — analogous to ANOVA's error term."},
+  {q:"A valid distance metric must satisfy the triangular inequality: d(a,b) ≤ d(a,c) + d(c,b).", opts:["True","False"], ans:"True", exp:"Along with symmetry d(a,b)=d(b,a), self-similarity d(a,a)=0, and non-negativity d(a,b)≥0, the triangular inequality is a required property of a proper metric."},
+  {q:"Manhattan distance between points a and b in 2D is equal to √((a₁−b₁)² + (a₂−b₂)²).", opts:["True","False"], ans:"False", exp:"That formula describes Euclidean (L2) distance. Manhattan (L1) distance = |a₁−b₁| + |a₂−b₂| — the sum of absolute differences, not the square root of summed squares."},
+  {q:"The primary reason divisive hierarchical clustering is rarely implemented in practice is:", opts:["A) It always produces worse clusters than agglomerative","B) It is computationally far more expensive","C) It cannot produce a dendrogram","D) It requires specifying k in advance"], ans:"B", exp:"Divisive clustering must consider all possible binary partitions at each step — exponential search complexity. Agglomerative considers only O(n²) pair-wise merges per step and is tractable."},
+  {q:"A dendrogram in hierarchical clustering can be used to identify outliers because:", opts:["A) Outliers are always at the root of the dendrogram","B) Outliers appear as points that only join at very high merge distances (long isolated branches)","C) Outliers are removed before the dendrogram is constructed","D) The dendrogram orders points by their distance to the centroid"], ans:"B", exp:"Points that are very dissimilar from all others merge only at the very top of the dendrogram (large height), producing visually long, isolated branches that flag them as potential outliers."},
+  {q:"Which linkage criterion is most prone to producing long, chain-like ('spaghetti') clusters?", opts:["A) Ward's","B) Complete linkage","C) Single linkage","D) Average linkage"], ans:"C", exp:"Single linkage connects clusters through their single closest pair. One 'bridge' point between two groups causes them to merge, creating elongated chains — the chaining effect."},
+
+  // K-MEANS
+  {q:"K-means clustering is guaranteed to find the global optimum of its SSE objective function.", opts:["True","False"], ans:"False", exp:"K-means is a greedy heuristic that converges to a LOCAL optimum. Multiple random restarts or K-means++ initialisation are used to mitigate this, but global optimality is not guaranteed (except in the 1D case)."},
+  {q:"The k-means objective function minimises:", opts:["A) Total between-cluster variance","B) Sum of squared distances from each point to its assigned cluster centroid","C) Maximum pairwise distance within any cluster","D) KL divergence between cluster Gaussians"], ans:"B", exp:"SSE = Σₖ Σᵢ ‖xₖᵢ − μₖ‖². K-means iteratively assigns points to minimise this sum and recomputes centroids to minimise it further."},
+  {q:"K-means++ initialises centroids by selecting them with probability proportional to the squared distance from the nearest already-chosen centroid.", opts:["True","False"], ans:"True", exp:"This biases initialisation toward spread-out centroids — lowering the expected value of the final SSE and reducing the number of iterations needed to converge."},
+  {q:"Which of the following datasets would MOST challenge k-means clustering?", opts:["A) Spherical blobs of equal size and density","B) Clusters of mildly different sizes","C) Clusters arranged in concentric rings","D) Well-separated Gaussian blobs with equal covariance"], ans:"C", exp:"K-means partitions space into convex Voronoi cells. Concentric rings are non-convex shapes that k-means fundamentally cannot separate — centroids would be placed inside the inner ring, incorrectly splitting both rings."},
+  {q:"Feature normalisation is important before applying k-means because:", opts:["A) It makes the algorithm converge faster in all cases","B) Features on different scales bias distance calculations, distorting cluster assignments","C) It guarantees finding the global optimum","D) It eliminates the need to choose k"], ans:"B", exp:"Euclidean distance treats all dimensions equally. A feature in the range 0–10,000 dominates one in 0–1. Standardising or normalising features ensures all features contribute equally to distances."},
+  {q:"In the elbow method for choosing k, the 'elbow' represents the value where:", opts:["A) SSE starts increasing as k grows","B) SSE stops decreasing sharply — adding more clusters gives diminishing returns","C) The Davies-Bouldin Index is maximised","D) All pairwise distances within clusters are equal"], ans:"B", exp:"Beyond the elbow, each additional cluster yields little SSE reduction because the existing clusters are already reasonably tight. The inflection point indicates the optimal balance between compactness and parsimony."},
+  {q:"TRUE or FALSE: K-means can naturally handle categorical features without any preprocessing.", opts:["True","False"], ans:"False", exp:"K-means requires computing cluster means (centroids). Categorical features do not have a natural mean. They must be encoded numerically first, or alternative algorithms (e.g. k-modes) must be used."},
+
+  // DBSCAN & OTHER
+  {q:"DBSCAN requires the user to specify the number of clusters k before running the algorithm.", opts:["True","False"], ans:"False", exp:"DBSCAN automatically determines the number of clusters based on the density parameters ε (neighbourhood radius) and MinPts (minimum neighbour count). This is a key advantage over k-means."},
+  {q:"In DBSCAN, a border point is best defined as a point that:", opts:["A) Has fewer than MinPts neighbours within ε but is density-reachable from a core point","B) Has more than MinPts neighbours within ε","C) Is not reachable from any core point — it is a noise point","D) Forms its own single-point cluster"], ans:"A", exp:"Border points lie on the periphery of a dense cluster — reachable from a core point but not themselves core points. Points completely unreachable from any core point are classified as noise."},
+  {q:"DBSCAN can detect clusters of arbitrary (non-convex) shapes such as crescents or rings.", opts:["True","False"], ans:"True", exp:"DBSCAN grows clusters by density-reachability regardless of geometric shape — it follows the density structure of the data rather than computing distances to a centroid."},
+  {q:"Expectation-Maximisation (EM) clustering makes hard (binary) cluster assignments like k-means.", opts:["True","False"], ans:"False", exp:"EM makes SOFT probabilistic assignments — each instance receives a probability r_ik of belonging to each cluster. K-means makes hard assignments (each point belongs 100% to one cluster)."},
+  {q:"Must-link constraints in constrained clustering specify that two points must be placed in DIFFERENT clusters.", opts:["True","False"], ans:"False", exp:"Must-link means two points MUST be in the SAME cluster. Can't-link means they must be in DIFFERENT clusters. Confusing these is a common error."},
+  {q:"Mean-shift clustering requires the user to specify the number of clusters k.", opts:["True","False"], ans:"False", exp:"Mean-shift does not require k. The number of clusters emerges naturally from the KDE landscape based on the chosen bandwidth — density peaks become cluster centres."},
+
+  // VALIDATION
+  {q:"The Davies-Bouldin Index (DBI): a lower value indicates a better clustering.", opts:["True","False"], ans:"True", exp:"DBI = (1/N)Σ max(Sᵢ+Sⱼ)/Dᵢⱼ. It measures intra-cluster scatter relative to inter-cluster separation. Lower values indicate more compact, well-separated clusters."},
+  {q:"Which statement about cluster validation is correct?", opts:["A) A lower SSE always means a better cluster solution in practice","B) Cluster validation is inherently somewhat subjective due to the descriptive nature of clustering","C) The Davies-Bouldin Index requires ground-truth cluster labels","D) Validation indices always agree with each other"], ans:"B", exp:"Unlike supervised learning where accuracy against labels provides objective evaluation, clustering validity is assessed by internal indices (which may disagree) and domain judgment. SSE alone can be gamed by setting k=n."},
+
+  // DIMENSIONALITY REDUCTION — PCA
+  {q:"PCA finds principal components that maximise which property?", opts:["A) Between-class variance (discrimination)","B) Explained variance (eigenvalue magnitude)","C) Non-linear local similarity to neighbours","D) Reconstruction error of a decoder network"], ans:"B", exp:"PCA orders components by their eigenvalue — each eigenvalue equals the variance in the data explained by that component. PC1 explains the most variance, PC2 the second-most, and so on."},
+  {q:"The principal components produced by PCA are guaranteed to be uncorrelated with each other.", opts:["True","False"], ans:"True", exp:"The eigenvectors of the covariance matrix are orthogonal. This directly means the projections onto different principal components are uncorrelated (zero pairwise covariance)."},
+  {q:"Normalising features before PCA is important because:", opts:["A) PCA cannot handle features with different units","B) PCA is scale-sensitive — features with larger variance will dominate the first components","C) Normalisation guarantees that PCs explain equal variance","D) Normalisation removes the need for eigenvector decomposition"], ans:"B", exp:"PCA finds directions of maximum variance. An unnormalised feature with range 0–10,000 will dominate over one with range 0–1, even if the latter is more informative. Standardisation puts all features on comparable scales."},
+
+  // t-SNE
+  {q:"t-SNE is designed to preserve which type of structure when reducing dimensions?", opts:["A) Global cluster separations (distances between distant groups)","B) Local neighbourhood relationships (small pairwise distances)","C) Linear variance in the data","D) The covariance matrix of the features"], ans:"B", exp:"t-SNE optimises a probability distribution to preserve local neighbourhood similarities. Global distances between distant clusters are not faithfully preserved and should not be interpreted."},
+  {q:"In t-SNE, a Student-t distribution is used in the low-dimensional space (rather than a Gaussian) primarily because:", opts:["A) It is computationally cheaper to evaluate","B) Its heavier tails alleviate the crowding problem, allowing moderate distances to map to larger low-dimensional separations","C) It forces clusters to be spherical in the embedding","D) It is equivalent to PCA in two dimensions"], ans:"B", exp:"In high dimensions, many moderate-distance points fit around a given point. The fat tails of the Student-t distribution push these moderately-close points further apart in 2D, creating cleaner visual separation."},
+  {q:"The perplexity parameter in t-SNE controls:", opts:["A) The number of output dimensions","B) The learning rate of gradient descent optimisation","C) The effective number of nearest neighbours considered when computing pairwise similarities","D) The minimum cluster size in the resulting embedding"], ans:"C", exp:"Perplexity sets the bandwidth σᵢ per data point so that the entropy of the conditional distribution equals log(perplexity). It roughly controls how many neighbours are considered — higher perplexity = wider neighbourhood."},
+  {q:"The size of visual blobs in a t-SNE plot reflects the true size of those clusters in the original high-dimensional space.", opts:["True","False"], ans:"False", exp:"t-SNE only preserves local topology. Cluster sizes in the 2D plot are distorted — a large visual blob and a small one may represent equally sized groups in the original space."},
+  {q:"t-SNE can be directly used to embed previously unseen test points into an existing 2D map without any retraining.", opts:["True","False"], ans:"False", exp:"Standard t-SNE is non-parametric — it learns no explicit function from input to output coordinates. New points cannot be embedded without running the full optimisation again. Parametric t-SNE addresses this limitation."},
+  {q:"Different perplexity values in t-SNE can produce qualitatively very different-looking plots of the same dataset.", opts:["True","False"], ans:"True", exp:"Perplexity strongly influences the balance between local and global structure. Very low perplexity fragments clusters; very high perplexity merges them. Always try multiple perplexity values and look for consistent patterns."},
+  {q:"t-SNE itself is classified as a clustering algorithm.", opts:["True","False"], ans:"False", exp:"t-SNE is a dimensionality reduction / visualisation technique. It does not assign cluster labels. A second step such as k-means or DBSCAN on the output is needed for clustering, though clustering in the original space is preferable."},
+
+  // UMAP
+  {q:"UMAP generally produces better preservation of global structure than t-SNE.", opts:["True","False"], ans:"True", exp:"UMAP preserves both local and global topology more faithfully than t-SNE. Distances between distant clusters in a UMAP plot are more interpretable than in a t-SNE plot."},
+  {q:"UMAP can incorporate supervised class labels during the construction of the mapping.", opts:["True","False"], ans:"True", exp:"Supervised UMAP uses label information to guide the embedding, pulling same-class points together and pushing different-class points apart — useful as a preprocessing step for classification."},
+  {q:"Which of the following is a key practical advantage of UMAP over standard t-SNE for machine learning pipelines?", opts:["A) UMAP always explains more variance than t-SNE","B) UMAP is parametric by default and can embed new test points without retraining","C) UMAP is a linear technique, making it more interpretable","D) UMAP requires no hyperparameter tuning"], ans:"B", exp:"UMAP learns a parametric mapping by default. New data points can be projected into the existing embedding without retraining the full model — critical for production pipelines. t-SNE has no such function."},
+
+  // ANOMALY DETECTION
+  {q:"Isolation Forest detects anomalies by identifying points that require MANY random splits to be isolated in a tree.", opts:["True","False"], ans:"False", exp:"It is the OPPOSITE. Anomalies are isolated quickly (few splits, short path length) because they are sparse and differ from the majority. Normal points are embedded in dense regions and require many splits."},
+  {q:"The Local Outlier Factor (LOF) with LOF >> 1 indicates:", opts:["A) The point is a core member of a dense cluster","B) The point has substantially lower local density than its k nearest neighbours — likely an outlier","C) The point has substantially higher local density than its neighbours","D) The point is a border point in DBSCAN"], ans:"B", exp:"LOF compares a point's local reachability density to that of its neighbours. LOF >> 1 means the point is in a sparser region than its neighbours, characteristic of an outlier."},
+  {q:"Which anomaly detection method trains a classifier on original data (labelled 0) versus synthetically generated uniform data (labelled 1)?", opts:["A) Isolation Forest","B) One-class SVM","C) CADE","D) LOF"], ans:"C", exp:"CADE (Classifier-Adjusted Density Estimation) creates synthetic uniform data, trains any binary classifier, and uses the predicted probability of being synthetic as the anomaly score."},
+  {q:"The reconstruction error of a Variational Autoencoder (VAE) can serve as an anomaly score because:", opts:["A) VAEs are trained to minimise cross-entropy between predicted and actual cluster labels","B) Anomalous instances are poorly reconstructed — the latent space was not shaped to represent them","C) VAEs directly compute the LOF of each input","D) Higher reconstruction error always indicates data from a different domain"], ans:"B", exp:"A VAE trained on normal data learns a latent space that encodes normal patterns. Anomalous inputs do not fit the learned latent structure and are reconstructed poorly, giving higher error."},
+  {q:"Robust covariance is a statistical anomaly detection method that handles multivariate outliers more reliably than simple histograms because:", opts:["A) It uses a non-parametric kernel instead of a Gaussian assumption","B) It estimates the covariance matrix in a way that is less influenced by outliers themselves","C) It detects anomalies by random splitting like isolation forests","D) It converts all features to binary before computing distances"], ans:"B", exp:"The standard covariance matrix can be inflated by outliers. Robust covariance (e.g. Minimum Covariance Determinant) estimates covariance on a subset of the data most consistent with a Gaussian, making it resistant to contamination."},
+
+  // ASSOCIATION RULES
+  {q:"In association rule mining, Confidence(X ⇒ Y) is an estimate of P(X | Y).", opts:["True","False"], ans:"False", exp:"Confidence(X⇒Y) = Support(X∪Y)/Support(X) ≈ P(Y|X) — the probability of seeing Y GIVEN X is present. Not P(X|Y)."},
+  {q:"The Apriori algorithm's anti-monotonicity property states that:", opts:["A) All subsets of a frequent itemset are also frequent","B) All supersets of an infrequent itemset are also infrequent","C) Both A and B — they are equivalent statements","D) Support is monotonically related to confidence"], ans:"C", exp:"The two statements are logically equivalent (contrapositives of each other). Together they define anti-monotonicity: frequent sets have frequent subsets; infrequent sets have infrequent supersets."},
+  {q:"If an itemset {A, B, C} is infrequent, then according to anti-monotonicity:", opts:["A) {A, B, C, D} and {A, B, C, E} can also be pruned without scanning the database","B) {A, B} and {B, C} must also be infrequent","C) Rules derived from {A, B, C} still need to be evaluated","D) {A, B, C} should be expanded to 4-itemsets before pruning"], ans:"A", exp:"Any superset of an infrequent itemset is also infrequent. So {A,B,C,D}, {A,B,C,E}, and any other extension of {A,B,C} can be immediately pruned — we never need to count them in the database."},
+  {q:"A rule with Lift = 1 indicates:", opts:["A) X and Y always occur together","B) X and Y are statistically independent","C) Confidence equals support","D) The rule makes correct predictions 100% of the time"], ans:"B", exp:"Lift = Support(X∪Y) / (Support(X)×Support(Y)). When X and Y are independent, their joint probability equals the product of their marginals, giving Lift = 1."},
+  {q:"A rule {spaghetti} → {spaghetti sauce} has very high confidence. This rule is likely:", opts:["A) An interesting discovery that should be acted upon immediately","B) A trivial rule that would be obvious to any domain expert and adds no new insight","C) A spurious correlation caused by sample size","D) Indicative of a negative association between the items"], ans:"B", exp:"High confidence on obvious combinations is a known limitation of relying solely on confidence. Post-processing and filtering of trivial rules is essential. Visualisation tools like arulesViz help identify genuinely novel patterns."},
+  {q:"Association rule mining inherently considers the temporal order of items within a transaction.", opts:["True","False"], ans:"False", exp:"Standard association rule mining treats transactions as SETS — order is irrelevant. SEQUENCE MINING algorithms (e.g. GSP) explicitly model the temporal order of items."},
+  {q:"For a database with 6 items, the brute-force number of possible non-empty itemsets to evaluate is:", opts:["A) 36","B) 720","C) 63","D) 15"], ans:"C", exp:"The power set of 6 items has 2⁶ = 64 subsets. Excluding the empty set gives 63 candidate itemsets. Anti-monotonicity allows Apriori to avoid evaluating most of these."},
+  {q:"WoE (Weights of Evidence) encoding of a categorical feature for use in logistic regression must be applied AFTER the train/test split because:", opts:["A) WoE values are too large and cause numerical instability","B) WoE is computed using the target variable and computing it on combined data constitutes leakage","C) WoE cannot be computed on small datasets","D) Logistic regression does not accept WoE-encoded features"], ans:"B", exp:"WoE = ln(p_class1 / p_class2) uses the target distribution. If computed on combined train+test data, test-set target information leaks into training features, inflating apparent model performance."}
+];
+
+const saData = [
+  {
+    q: "K-means uses SSE as its objective function, which optimises intra-cluster similarity. However, a low-SSE solution does not always produce the 'best' clustering from a domain perspective. Describe two scenarios where minimising SSE leads to a misleading solution, and discuss what alternative approaches could address each.",
+    a: "<strong>Scenario 1 — Non-convex shapes:</strong> K-means partitions space into convex Voronoi cells. Data arranged in concentric rings or crescent shapes has a low SSE only when k is set very high, yet the clusters discovered have no semantic meaning — they cut across natural group boundaries. The solution: DBSCAN or spectral clustering, which grow regions by density or graph connectivity rather than centroid proximity, naturally discovering non-convex structures.<br><br><strong>Scenario 2 — Clusters of very different sizes or densities:</strong> K-means minimises total SSE across all clusters equally. Large, dense clusters contribute heavily to SSE, so the algorithm tends to over-split them while lumping together small, sparse, but genuinely distinct clusters. A Gaussian Mixture Model (EM) can learn different covariance structures per cluster; DBSCAN handles variable density by adapting to local density rather than global centroids.<br><br><strong>Broader implication:</strong> Internal validation indices (Davies-Bouldin, Silhouette) help compare solutions, but domain knowledge and visual inspection — often via t-SNE or UMAP projections with cluster labels overlaid — are essential to judge whether discovered clusters are meaningful."
+  },
+  {
+    q: "Compare and contrast t-SNE and UMAP as dimensionality reduction techniques. Under what circumstances would you choose one over the other, and what are the key pitfalls a data scientist must be aware of when interpreting the output of each?",
+    a: "<strong>t-SNE:</strong> Non-parametric, non-linear, uses Gaussian kernels in high dimensions and Student-t kernels in low dimensions. Minimises KL(P‖Q) via gradient descent. Excellent at revealing local cluster structure in 2D visualisations. Key pitfall: global distances and cluster sizes are meaningless; different perplexity values give very different layouts; random data can appear structured; cannot embed new points without full recomputation.<br><br><strong>UMAP:</strong> Parametric by default (learns an explicit function), non-linear, manifold-based. Better global topology preservation. Faster and scales to larger datasets. Supports supervised labels. Can embed new points into an existing map. Better suited as a preprocessing step before a downstream classifier.<br><br><strong>Choose t-SNE</strong> when the sole goal is an exploratory 2D visualisation of high-dimensional data (e.g. single-cell RNA-seq) where clear local cluster separation is the priority.<br><br><strong>Choose UMAP</strong> when: (a) a reusable embedding for new data is needed, (b) outputs &gt;3D are required, (c) a more faithful global layout is desired, (d) faster computation on large datasets matters, or (e) supervised guidance is beneficial.<br><br><strong>Shared pitfall:</strong> Neither technique should be used to 'prove' the existence of clusters — any structured appearance must be validated with a formal clustering algorithm applied in the original high-dimensional space."
+  },
+  {
+    q: "Explain the anti-monotonicity (downward-closure) property of the Apriori algorithm. How does it allow efficient pruning of the search space? Illustrate with a concrete example involving at least 4 items.",
+    a: "<strong>Anti-monotonicity principle:</strong> If an itemset S is infrequent (Support(S) < minsup), then ALL supersets of S are also infrequent — because adding items to a transaction set can only maintain or reduce its count across transactions. Equivalently, all subsets of a frequent itemset must be frequent.<br><br><strong>Why this enables pruning:</strong> Rather than scanning the database for all 2|I|−1 candidate itemsets, Apriori builds candidates level-by-level (1-itemsets → 2-itemsets → …) and prunes any candidate whose (k−1)-subset was infrequent, without ever counting it.<br><br><strong>Concrete example (minsup = 50%, 5 transactions):</strong> After the 1-itemset scan we find {beer} is infrequent (appears in only 1/5 = 20% of transactions). We immediately know — without any database scan — that {beer, milk}, {beer, cheese}, {beer, wine}, {beer, milk, cheese}, {beer, milk, cheese, wine} etc. are ALL infrequent. The entire subtree rooted at {beer} is pruned.<br><br><strong>Join-and-prune in practice:</strong> To generate 3-itemset candidates, we join the 2-item frequent sets: {milk, bread} × {bread, cheese} → {milk, bread, cheese}. Before counting, we check all 2-subsets of {milk, bread, cheese}. If {milk, cheese} was infrequent, {milk, bread, cheese} is pruned immediately. This converts an exponential search into a manageable layered procedure."
+  },
+  {
+    q: "A retail analyst uses association rule mining and discovers the rule {nappies} → {beer} with Support = 0.05, Confidence = 0.70, and Lift = 2.3. Interpret each metric and explain what they collectively tell the analyst. Then describe two limitations of relying solely on confidence when selecting rules.",
+    a: "<strong>Support = 0.05:</strong> The combination {nappies, beer} appears in 5% of all transactions. It is not overwhelmingly common, but not negligible in a large store.<br><br><strong>Confidence = 0.70:</strong> Among customers who bought nappies, 70% also bought beer — a strong predictive relationship.<br><br><strong>Lift = 2.3:</strong> Customers who buy nappies are 2.3× more likely to buy beer than a random customer. Since Lift &gt; 1, the association is not due to chance — nappy buyers genuinely over-index on beer purchases.<br><br><strong>Business interpretation:</strong> Placing beer near nappies or cross-promoting them could increase basket size. This is actionable intelligence.<br><br><strong>Limitation 1 — Confidence ignores Y's base rate:</strong> If beer already has a base support of 0.68, a 70% confidence gives Lift ≈ 1.03 — barely above chance. Confidence alone would rate such a rule as strong when it is nearly trivial. Lift and Conviction correct for this.<br><br><strong>Limitation 2 — High confidence from trivially common items:</strong> If spaghetti has support 0.95, then {anything} → {spaghetti} will have naturally high confidence regardless of the antecedent. This produces many uninformative rules. Post-processing with Lift thresholds and domain filtering is essential to surface genuinely interesting patterns."
+  },
+  {
+    q: "Discuss the trade-offs between hierarchical and k-means clustering. For what real-world scenarios would you prefer each, and what preprocessing is essential before applying either?",
+    a: "<strong>Hierarchical clustering advantages:</strong> No need to pre-specify k; produces an interpretable dendrogram; hierarchical structure maps naturally to taxonomies (phylogenies, document topic trees); outliers visible as isolated branches.<br><br><strong>Hierarchical disadvantages:</strong> O(n²) or O(n³) complexity — not scalable to very large datasets; local optima (merges cannot be undone); choice of linkage strongly influences results.<br><br><strong>K-Means advantages:</strong> Efficient O(nkt) where t = iterations; simple to implement; scales well; cluster centroids are interpretable as 'archetypes' (e.g. average customer profile per segment).<br><br><strong>K-Means disadvantages:</strong> Must pre-specify k; assumes convex clusters; sensitive to outliers and initialisation; cannot discover non-convex shapes.<br><br><strong>Prefer hierarchical when:</strong> dataset is small to medium; k is unknown and a full hierarchy is meaningful (biology, information retrieval); interpretability of the nesting structure is required.<br><br><strong>Prefer k-means when:</strong> dataset is large; k is approximately known (or discoverable via elbow method); clusters are expected to be roughly spherical (customer segments, document categories); speed and scalability matter.<br><br><strong>Essential preprocessing:</strong> (1) Feature normalisation/standardisation — both methods use distance measures that are scale-sensitive. (2) Missing value handling. (3) Appropriate distance metric for data type (Gower distance for mixed numerical/categorical). (4) For k-means specifically: outlier treatment, as outliers inflate SSE and skew centroid positions."
+  },
+  {
+    q: "Explain how anomaly detection differs from supervised binary classification, and describe three methodologically distinct anomaly detection approaches from the lecture — including a real-world scenario where each is most appropriate.",
+    a: "<strong>Key difference from supervised classification:</strong> Anomalous examples are typically rare or absent from training data. We cannot train a balanced binary classifier. Instead, we model 'normal' behaviour and flag deviations. Labels (if any) are often available only for the normal class (PU learning context). Even if labels existed, the extreme imbalance would make standard classifiers unreliable.<br><br><strong>Approach 1 — Isolation Forest:</strong> Builds trees with completely random splits; anomalies are isolated in fewer splits (shorter path length). Very fast; no distance computations. <em>Best for:</em> Real-time fraud detection in banking transactions where labelled fraud data is scarce but normal transaction data is abundant, and low-latency scoring is required.<br><br><strong>Approach 2 — DBSCAN noise detection:</strong> Points that are not reachable from any core point are labelled noise — i.e. anomalies. Handles non-linear boundaries; adapts to local density. <em>Best for:</em> Network intrusion detection where normal traffic forms dense, clustered behaviour patterns and attacks manifest as isolated, unusual traffic signatures.<br><br><strong>Approach 3 — VAE reconstruction error:</strong> Train a Variational Autoencoder exclusively on normal examples; at inference, anomalies produce high reconstruction error because the learned latent space was not shaped to represent them. <em>Best for:</em> Manufacturing quality control using sensor time-series or image data — normal product signatures are well-defined but defects can take unexpected, unpredictable forms."
+  },
+  {
+    q: "The lecture warns that 'clustering on the output of t-SNE must be done carefully.' Explain the theoretical reasons why applying k-means to a t-SNE 2D embedding can yield misleading results, and describe a more defensible analysis pipeline that combines both t-SNE and clustering.",
+    a: "<strong>Why naive t-SNE + k-means is problematic:</strong><br><br>(1) <strong>Non-linear distance distortion:</strong> t-SNE non-linearly warps distances. Two points close in the 2D plot may be far apart in the original space, and vice versa. K-means on 2D coordinates optimises Euclidean proximity in the already-distorted space.<br><br>(2) <strong>Global distances are meaningless:</strong> t-SNE only preserves local topology. Cluster separations visible in 2D may not reflect true separations in high-dimensional space — two visually distinct blobs may substantially overlap in the original space.<br><br>(3) <strong>Perplexity-dependent structure:</strong> The visual appearance of 'clusters' strongly depends on perplexity. K-means applied to one perplexity setting would yield entirely different labels than the same analysis at another setting.<br><br>(4) <strong>Crowding artefacts:</strong> t-SNE artificially spreads points apart to reduce crowding. This can fragment a single true cluster or merge two distinct ones, producing misleading visual boundaries.<br><br><strong>Defensible pipeline:</strong><br>(1) Run the primary clustering algorithm (k-means, DBSCAN, or hierarchical) in the ORIGINAL high-dimensional feature space after normalisation.<br>(2) Assign cluster labels from step 1.<br>(3) Apply t-SNE or UMAP to the original data for VISUALISATION ONLY — colour the 2D points by the high-dimensional cluster labels.<br>(4) If clusters appear well-separated across multiple perplexity values, this provides supporting visual evidence (not proof). Substantial overlap should prompt re-examination of the clustering choices.<br>(5) Validate clusters using DBI, Silhouette, or business metrics — never using visual appearance in the t-SNE plot alone."
+  },
+  {
+    q: "Compare the four main linkage criteria (single, complete, average, Ward's) from both a theoretical and practical perspective. How does each interact with the geometry of the data, and what guidance would you give a practitioner choosing among them?",
+    a: "<strong>Single linkage (minimum):</strong> Merges based on the closest pair. Theoretically sensitive to a single 'bridge' between clusters — one short inter-cluster connection pulls entire groups together. <em>Effect:</em> Chaining — elongated, spaghetti-like clusters. <em>Use when:</em> data genuinely has elongated or irregularly shaped clusters, or the goal is to find connected components in graph-like data.<br><br><strong>Complete linkage (maximum):</strong> Merges based on the most distant pair. Forces all points in two clusters to be within a certain distance before merging. <em>Effect:</em> Tight, compact, roughly equal-diameter clusters; no chaining; resistant to outliers. <em>Use when:</em> you want compact, well-separated clusters of similar size; avoid when clusters differ greatly in size.<br><br><strong>Average linkage (UPGMA):</strong> Mean of all pairwise distances. A balanced compromise — less sensitive to outliers than single (no chaining), less biased toward equal sizes than complete. <em>Effect:</em> Generally robust; recommended as a default when cluster geometry is unknown.<br><br><strong>Ward's linkage:</strong> Minimises the increase in total within-cluster SSE upon merging. Closely related to the k-means objective. <em>Effect:</em> Tends to produce spherical, compact, similarly-sized clusters — a hierarchical version of k-means. <em>Use when:</em> clusters are expected to be roughly spherical and you want a result conceptually consistent with k-means.<br><br><strong>Practitioner guidance:</strong> (1) Start with average or Ward's when cluster shape is unknown. (2) Visualise dendrograms from at least two linkages and compare. (3) If outliers are present, avoid single linkage — prefer complete or Ward's. (4) If clusters are known to be elongated or non-convex, consider single linkage or switch entirely to DBSCAN."
+  }
+];
+
+// ─────────────────────────────────────────────────
+// RENDER MCQ
+// ─────────────────────────────────────────────────
+let mcqState = {};
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-card-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Question ${idx+1} of ${mcqData.length}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.dataset.idx = idx;
+      btn.dataset.oi = oi;
+      btn.onclick = () => handleMCQ(idx, oi, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = `fb-${idx}`;
+    fb.style.display = 'none';
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+  updateScore();
+}
+
+function handleMCQ(idx, oi, btn, card, item) {
+  if (mcqState[idx] !== undefined) return;
+  mcqState[idx] = oi;
+
+  const opts = card.querySelectorAll('.option-btn');
+  opts.forEach(b => b.disabled = true);
+
+  const selectedLabel = item.opts[oi];
+  const correctLabel  = item.ans;
+
+  const correctIdx = item.opts.findIndex(o => {
+    if (item.opts.length === 2) return o === correctLabel;
+    return o.startsWith(correctLabel + ')');
+  });
+
+  const isCorrect = item.opts.length === 2
+    ? selectedLabel === correctLabel
+    : selectedLabel.startsWith(correctLabel + ')');
+
+  opts[oi].className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect && correctIdx >= 0) opts[correctIdx].className = 'option-btn reveal-correct';
+
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+
+  updateScore();
+}
+
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const sel = item.opts[mcqState[idx]];
+    const ok  = item.opts.length === 2 ? sel === item.ans : sel.startsWith(item.ans + ')');
+    if (ok) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+
+function resetMCQ() {
+  mcqState = {};
+  renderMCQ();
+}
+
+// ─────────────────────────────────────────────────
+// RENDER SA
+// ─────────────────────────────────────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer ${idx+1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    panel.style.display = 'none';
+
+    btn.onclick = () => {
+      const visible = panel.style.display !== 'none';
+      panel.style.display = visible ? 'none' : 'block';
+      btn.textContent = visible ? 'Reveal Answer' : 'Hide Answer';
+      if (!visible && window.MathJax) MathJax.typesetPromise([panel]);
+    };
+
+    card.appendChild(btn);
+    card.appendChild(panel);
+    container.appendChild(card);
+  });
+}
+
+function resetSA() { renderSA(); }
+
+// Init
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

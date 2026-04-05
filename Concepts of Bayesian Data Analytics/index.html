@@ -1,13 +1,415 @@
-<!DOCTYPE html><html><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;"><title>Concepts of Bayesian Data Analytics</title></head>
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bayesian Data Analytics · KUL MSDS Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f7fc;
+      color: #2d3748;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #ede9fe;
+      padding: 0 40px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .navbar .logo {
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #1e293b;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .navbar .logo .pill {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      font-size: 0.72em;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .navbar .back-link {
+      font-size: 0.83em;
+      font-weight: 600;
+      color: #8b5cf6;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #ddd6fe;
+      background: #f5f3ff;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .navbar .back-link:hover {
+      background: #ede9fe;
+      border-color: #8b5cf6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #ffffff 0%, #f5f3ff 55%, #ede9fe 100%);
+      padding: 72px 24px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 520px; height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.09) 0%, transparent 70%);
+      top: -150px; left: 50%; transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%);
+      bottom: -70px; right: 8%;
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fff;
+      border: 1px solid #ddd6fe;
+      color: #8b5cf6;
+      font-size: 0.76em;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(139,92,246,0.09);
+    }
+    .hero h1 {
+      font-size: 2.6em;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #8b5cf6, #a78bfa, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: #64748b;
+      font-size: 0.97em;
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #8b5cf6;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75em;
+      color: #94a3b8;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .stat-divider {
+      width: 1px;
+      height: 36px;
+      background: #ddd6fe;
+      align-self: center;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 52px 24px 72px;
+    }
+
+    .section-label {
+      font-size: 0.78em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    /* ── Chapter List ── */
+    .chapter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chapter-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1.5px solid #ede9fe;
+      padding: 20px 22px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+    .chapter-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, #8b5cf6, #c084fc);
+      border-radius: 4px 0 0 4px;
+      transform: scaleY(0);
+      transform-origin: center;
+      transition: transform 0.22s ease;
+    }
+    .chapter-card:hover {
+      transform: translateX(4px);
+      box-shadow: 0 6px 24px rgba(139,92,246,0.13);
+      border-color: #c4b5fd;
+    }
+    .chapter-card:hover::before { transform: scaleY(1); }
+
+    /* Chapter number badge */
+    .chapter-num {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: #f5f3ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.18s;
+    }
+    .chapter-num span {
+      font-size: 0.72em;
+      font-weight: 800;
+      color: #8b5cf6;
+      letter-spacing: -0.5px;
+    }
+    .chapter-card:hover .chapter-num { background: #8b5cf6; }
+    .chapter-card:hover .chapter-num span { color: #fff; }
+
+    .chapter-info { flex: 1; }
+    .chapter-label {
+      font-size: 0.72em;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #c4b5fd;
+      margin-bottom: 3px;
+    }
+    .chapter-title {
+      font-size: 0.96em;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.35;
+    }
+
+    /* Topic tags */
+    .chapter-tag {
+      display: inline-block;
+      font-size: 0.7em;
+      font-weight: 600;
+      padding: 2px 9px;
+      border-radius: 20px;
+      margin-top: 6px;
+    }
+    .tag-foundations  { background: #fef9c3; color: #a16207; }
+    .tag-posterior    { background: #dbeafe; color: #1d4ed8; }
+    .tag-inference    { background: #f5f3ff; color: #7c3aed; }
+    .tag-multipar     { background: #fce7f3; color: #be185d; }
+    .tag-mcmc         { background: #d1fae5; color: #065f46; }
+
+    .chapter-arrow {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #f5f3ff;
+      display: flex; align-items: center; justify-content: center;
+      color: #8b5cf6;
+      font-size: 0.85em;
+      flex-shrink: 0;
+      transition: background 0.18s, transform 0.18s;
+    }
+    .chapter-card:hover .chapter-arrow {
+      background: #8b5cf6;
+      color: #fff;
+      transform: translateX(2px);
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: #fff;
+      border-top: 1px solid #ede9fe;
+      text-align: center;
+      padding: 22px;
+      font-size: 0.82em;
+      color: #94a3b8;
+    }
+    footer a { color: #8b5cf6; text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.85em; }
+      .navbar { padding: 0 16px; }
+      .navbar .back-link span { display: none; }
+      main { padding: 32px 16px 52px; }
+      .stats-bar { gap: 20px; }
+      .stat-divider { display: none; }
+    }
+  </style>
+</head>
 <body>
-  <h1>Concepts of Bayesian Data Analytics</h1>
-  <ul>
-    <li><a href="Bayesian chp1 notes+exercises.html">Chapter 1 Modes of statistical inference</a></li>
-    <li><a href="Bayesian chp2 notes+exercises.html">Chapter 2 Bayes theorem: computing the posterior distribution</a></li>
-    <li><a href="Bayesian chp3 notes+exercises.html">Chapter 3 Introduction to Bayesian inference</a></li>
-    <li><a href="Bayesian chp4 notes+exercises.html">Chapter 4 More than one parameter</a></li>
-  </ul>
-  <a href="../index.html">← Back to Homepage</a>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="logo" href="../index.html">
+      KUL MSDS Notes
+      <span class="pill">My Notes</span>
+    </a>
+    <a class="back-link" href="../index.html">← <span>Back to Homepage</span></a>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-eyebrow">🎲 Bayesian Data Analytics</div>
+    <h1>Course <em>Notes</em></h1>
+    <p>Lecture notes covering Bayesian reasoning, posterior computation, and Markov Chain Monte Carlo methods.</p>
+    <div class="stats-bar">
+      <div class="stat-item">
+        <span class="stat-value">5</span>
+        <span class="stat-label">Chapters</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">4</span>
+        <span class="stat-label">Topics</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">G0B74a</span>
+        <span class="stat-label">Course Code</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Chapters -->
+  <main>
+    <div class="section-label">5 Chapters</div>
+    <div class="chapter-list">
+
+      <a class="chapter-card" href="chapter-1/">
+        <div class="chapter-num"><span>CH1</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Chapter 1</div>
+          <div class="chapter-title">Modes of Statistical Inference</div>
+          <span class="chapter-tag tag-foundations">Foundations</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="chapter-2/">
+        <div class="chapter-num"><span>CH2</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Chapter 2</div>
+          <div class="chapter-title">Bayes Theorem: Computing the Posterior Distribution</div>
+          <span class="chapter-tag tag-posterior">Posterior</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="chapter-3/">
+        <div class="chapter-num"><span>CH3</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Chapter 3</div>
+          <div class="chapter-title">Introduction to Bayesian Inference</div>
+          <span class="chapter-tag tag-inference">Inference</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="chapter-4/">
+        <div class="chapter-num"><span>CH4</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Chapter 4</div>
+          <div class="chapter-title">More Than One Parameter</div>
+          <span class="chapter-tag tag-multipar">Multi-Parameter</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="chapter-5/">
+        <div class="chapter-num"><span>CH5</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Chapter 5</div>
+          <div class="chapter-title">MCMC</div>
+          <span class="chapter-tag tag-mcmc">Markov Chain Monte Carlo</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>
+    KUL MSDS Notes &nbsp;·&nbsp; Hosted on <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
+  </footer>
+
 
 
 </body></html>
