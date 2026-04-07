@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 7 – Code Repositories | Modern Data Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* Header */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* Nav */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+
+  /* Notes Section */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin-top: 22px;
+    margin-bottom: 6px;
+  }
+
+  .key-point { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .computation-note { background: #fdf3f3; border-left: 4px solid #e57373; padding: 12px 18px; margin: 14px 0; }
+  .formula-box { background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px; padding: 12px 18px; margin: 14px 0; font-family: 'Courier New', monospace; font-size: 0.95em; }
+
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd) { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* MCQ Section */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; margin-top: 0; }
+  .score-display {
+    background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px;
+    padding: 5px 18px; font-weight: 700; color: #856404;
+    display: inline-block; font-size: 0.95em; margin-bottom: 18px;
+  }
+  .mcq-card {
+    background: #f9fafb; border: 1px solid #e5e9f2;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em; font-weight: 700; color: #2e6da4;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+
+  .option-btn {
+    display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea;
+    border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left;
+    cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; pointer-events: none; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; pointer-events: none; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; pointer-events: none; }
+  .option-btn.locked { pointer-events: none; }
+
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* SA Section */
+  .sa-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #3b1d6e; font-size: 1.2em; margin-top: 0; }
+  .sa-card {
+    background: #faf9ff; border: 1px solid #e2dcf5;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1; font-size: 0.8em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin: 8px 0 12px 0; }
+
+  .reveal-btn {
+    background: #6f42c1; color: #ffffff; border: none; border-radius: 20px;
+    padding: 7px 22px; font-size: 0.88em; font-weight: 600;
+    cursor: pointer; margin-top: 12px; transition: background 0.2s;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff; border: 1px solid #d4c8f5;
+    border-radius: 8px; padding: 18px 22px;
+    margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  /* Reset button */
+  .reset-btn {
+    background: #1a3a5c; color: #fff; border: none;
+    border-radius: 20px; padding: 9px 26px;
+    font-size: 0.92em; font-weight: 700; cursor: pointer;
+    margin-bottom: 18px; transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  code { background: #eef2fb; border-radius: 4px; padding: 1px 6px; font-size: 0.92em; color: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <h1>Lecture 7 – Code Repositories</h1>
+  <div class="subtitle">Modern Data Analytics (GOZ39A) &nbsp;|&nbsp; GitHub + Hugging Face &nbsp;|&nbsp; Exam Review Notes</div>
+</div>
+
+<!-- ── NAV ── -->
+<div class="nav-bar">
+  <a href="#version-control">Version Control</a>
+  <a href="#using-git">Using Git</a>
+  <a href="#undoing">Undoing Changes</a>
+  <a href="#branches">Branches</a>
+  <a href="#extras">Extras</a>
+  <a href="#huggingface">Hugging Face</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STUDY NOTES
+══════════════════════════════════════════ -->
+
+<!-- 1. Version Control -->
+<div class="notes-section" id="version-control">
+  <h2>1. Version Control</h2>
+
+  <div class="key-point">
+    <strong>What is Version Control?</strong> A system that tracks changes made to files over time, allowing users to keep a full history, enable collaborative editing without overwrites, and revert to prior states.
+  </div>
+
+  <h3>The Problem Without It</h3>
+  <p>In a team project, each member working on their own <code>.zip</code> copy leads to:
+    <ul>
+      <li>Manual merging of changes — error-prone at line-by-line level</li>
+      <li>Divergent virtual environments (mismatched package versions)</li>
+      <li>Massive duplicate storage across thousands of versions</li>
+      <li>Inability to cleanly revert to a stable state</li>
+    </ul>
+  </p>
+
+  <div class="theorem-box">
+    <strong>Key insight:</strong> Version Control Systems (VCS) do <em>not</em> store a full copy of the repo for every change — they store only the <em>diffs</em> (changes). For the user the result is equivalent, but storage is far more efficient.
+  </div>
+
+  <h3>Local vs Remote Repository</h3>
+  <table>
+    <thead><tr><th>Term</th><th>Definition</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Remote repo</strong></td><td>Project hosted on the internet</td><td>GitHub, GitLab, Bitbucket</td></tr>
+      <tr><td><strong>Local repo</strong></td><td>Project copy on your machine, with hidden <code>.git</code> folder</td><td>~/Documents/myproject</td></tr>
+      <tr><td><strong>Working directory</strong></td><td>Actual files you edit — distinct from the local repo until staged+committed</td><td>Any unsaved/uncommitted change</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    The <code>.git</code> folder is hidden by default. On Windows, enable hidden items; on Mac use <code>Cmd+Shift+.</code>
+  </div>
+</div>
+
+<!-- 2. Using Git -->
+<div class="notes-section" id="using-git">
+  <h2>2. Using Git(hub) — Core Workflow</h2>
+
+  <h3>Starting a Repository</h3>
+  <table>
+    <thead><tr><th>Approach</th><th>Command</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td>Clone from remote</td><td><code>git clone &lt;url.git&gt;</code></td><td>Remote repo already exists</td></tr>
+      <tr><td>Init locally</td><td><code>git init</code></td><td>Start tracking an existing local folder</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Keeping Local Repo Up-to-Date (Remote → Local)</h3>
+  <div class="formula-box">
+    git fetch origin main &nbsp;→&nbsp; downloads remote history (read-only view)<br>
+    git diff origin/main &nbsp;&nbsp;→&nbsp; inspect differences<br>
+    git merge &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp; apply changes to local<br>
+    <strong>git pull</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→&nbsp; fetch + merge in one step
+  </div>
+
+  <div class="warning-box">
+    <strong>origin</strong> is the shorthand alias for the URL of the remote repository from which you originally cloned.
+  </div>
+
+  <h3>The Photo Album Analogy (Local → Remote)</h3>
+  <div class="example-box">
+    Think of <code>.git</code> as a photo album. Git does not record in real-time — you decide when to "take a photo":
+    <ol>
+      <li><strong>Staging</strong> — choose which files to include: <code>git add &lt;file&gt;</code> or <code>git add .</code></li>
+      <li><strong>Committing</strong> — take the snapshot: <code>git commit -m "Descriptive message"</code></li>
+      <li><strong>Pushing</strong> — add it to the remote album: <code>git push origin main</code></li>
+    </ol>
+  </div>
+
+  <div class="key-point">
+    Changes in your <strong>working directory</strong> are NOT in your local repo until you <code>add</code> and <code>commit</code>. Git only tracks files that have been staged or already exist in the repository.
+  </div>
+
+  <h3>Command Summary Table</h3>
+  <table>
+    <thead><tr><th>Command</th><th>Direction</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>git clone</code></td><td>Remote → Local</td><td>Copy entire remote repo locally</td></tr>
+      <tr><td><code>git fetch</code></td><td>Remote → Local</td><td>Download remote history; does not modify files</td></tr>
+      <tr><td><code>git pull</code></td><td>Remote → Local</td><td>fetch + merge</td></tr>
+      <tr><td><code>git add</code></td><td>Working dir → Staging</td><td>Stage specific or all changes</td></tr>
+      <tr><td><code>git commit</code></td><td>Staging → Local repo</td><td>Create a snapshot with a message</td></tr>
+      <tr><td><code>git push</code></td><td>Local → Remote</td><td>Publish committed changes</td></tr>
+      <tr><td><code>git status</code></td><td>—</td><td>Show unstaged/staged/untracked changes</td></tr>
+      <tr><td><code>git log --oneline</code></td><td>—</td><td>List commits with short identifiers (HEADs)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 3. Undoing Changes -->
+<div class="notes-section" id="undoing">
+  <h2>3. Undoing Changes</h2>
+
+  <table>
+    <thead><tr><th>Situation</th><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Uncommitted change in working dir</td><td><code>git restore &lt;file&gt;</code> or <code>git checkout &lt;file&gt;</code></td><td>Reverts file to last committed state</td></tr>
+      <tr><td>Undo last commit (not pushed)</td><td><code>git reset --soft HEAD~</code></td><td>Undoes commit, keeps changes <em>staged</em></td></tr>
+      <tr><td>Roll back to older commit (not pushed)</td><td><code>git reset &lt;HEAD&gt;</code></td><td>Unstages all post-commit changes (keeps in working dir)</td></tr>
+      <tr><td>Roll back completely (wipe)</td><td><code>git reset --hard &lt;HEAD&gt;</code></td><td>Discards all changes after target commit</td></tr>
+      <tr><td>Undo a pushed commit safely</td><td><code>git revert</code></td><td>Creates a new commit that undoes the target commit</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>--soft vs --mixed vs --hard:</strong>
+    <ul>
+      <li><code>--soft</code>: moves HEAD, leaves changes staged</li>
+      <li><code>--mixed</code> (default): moves HEAD, unstages changes (left in working dir)</li>
+      <li><code>--hard</code>: moves HEAD, discards all changes entirely</li>
+    </ul>
+  </div>
+
+  <div class="warning-box">
+    Git only tracks changes in files that have been staged or are already in the repository. Untracked new files are invisible to Git unless you <code>git add</code> them first.
+  </div>
+</div>
+
+<!-- 4. Branches -->
+<div class="notes-section" id="branches">
+  <h2>4. Branches</h2>
+
+  <div class="key-point">
+    Branches are independent copies of the repository where changes don't affect other branches. They are essential for writing experimental or potentially unstable code without endangering the production (<code>main</code>) branch.
+  </div>
+
+  <h3>Why Branches?</h3>
+  <p>Common production setup: <strong>main/master</strong> → <strong>testing</strong> → <strong>dev</strong>. If a bug fix is applied directly to main and turns out to be wrong, it can crash production. Branches isolate risk.</p>
+
+  <div class="warning-box">
+    Reverting a bad push is not enough if other collaborators have already <code>git pull</code>ed the broken code. Branches prevent this entirely.
+  </div>
+
+  <h3>Branch Commands</h3>
+  <div class="formula-box">
+    git branch &lt;name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ create branch<br>
+    git checkout &lt;name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ switch to branch<br>
+    git checkout -b &lt;name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ create + switch<br>
+    git push origin &lt;name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ publish branch to remote<br>
+    git merge &lt;branch_WU&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ merge updates into current branch<br>
+    git branch -d &lt;name&gt; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ delete branch locally
+  </div>
+
+  <div class="computation-note">
+    <strong>Workflow rule:</strong> Always create the branch BEFORE making changes. Make changes AFTER switching to the new branch, or the edits will land on the wrong branch.
+  </div>
+
+  <h3>Merge Conflicts</h3>
+  <p>Conflicts occur when two branches modify the <strong>same line</strong> in a file, or one branch edits a file the other branch deleted. Git cannot auto-resolve these — human decision is required:</p>
+  <div class="formula-box">
+    # Keep a file in conflict:<br>
+    git add &lt;file&gt;<br><br>
+    # Remove a file in conflict:<br>
+    git rm &lt;file&gt;
+  </div>
+
+  <h3>Forking vs Branching vs Cloning</h3>
+  <table>
+    <thead><tr><th>Operation</th><th>Ownership</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Clone</strong></td><td>Same repo</td><td>Get a local copy of a repo you have access to</td></tr>
+      <tr><td><strong>Branch</strong></td><td>Same repo</td><td>Isolated development within the same project</td></tr>
+      <tr><td><strong>Fork</strong></td><td>Your copy, disconnected</td><td>Contribute to a public repo you don't own; propose fixes via pull request</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Git Stash</h3>
+  <div class="key-point">
+    <code>git stash</code> saves all uncommitted tracked changes and resets your working directory, without committing. Useful when you realize you're on the wrong branch or need to switch context mid-work.<br><br>
+    <code>git stash pop</code> — re-applies the stashed changes.
+  </div>
+</div>
+
+<!-- 5. Extras -->
+<div class="notes-section" id="extras">
+  <h2>5. Important Extras</h2>
+
+  <h3>requirements.txt</h3>
+  <div class="example-box">
+    Ensures all collaborators use the same Python package versions.
+    <br><code>pip freeze &gt; requirements.txt</code> (or <code>pip list --format=freeze &gt; requirements.txt</code> for cleaner output)
+    <br>Always keep it updated and committed. Git <strong>hooks</strong> can be used to automatically abort a commit if the file is outdated.
+  </div>
+
+  <h3>.gitignore</h3>
+  <div class="key-point">
+    A file containing rules that tell Git which files/folders to ignore (not track). Common exclusions: <code>.log</code>, <code>.temp</code>, files with passwords/API keys, large binary files, virtual environment folders. The <code>.gitignore</code> file itself <em>is</em> tracked — it contains rules, not the ignored content.
+  </div>
+
+  <h3>GitHub Pages</h3>
+  <p>A special GitHub repository feature that serves HTML/CSS/JS as a hosted website. Useful for portfolios, documentation, and simple tools.</p>
+
+  <h3>Pull Requests (PR)</h3>
+  <p>After forking a repo and fixing a bug, you can submit a <strong>pull request</strong> to notify the original repo owner to review and merge your fix. Many organizations also use PRs as a formal review gate for branch merges.</p>
+
+  <div class="warning-box">
+    <strong>Security warning:</strong> Never blindly clone/fork/install GitHub repos, especially low-traffic packages. Malicious actors have embedded trojan horses in repos. Always check stars, issues, and update history.
+  </div>
+</div>
+
+<!-- 6. Hugging Face -->
+<div class="notes-section" id="huggingface">
+  <h2>6. Hugging Face 🤗</h2>
+
+  <div class="key-point">
+    Hugging Face is the central platform for open-source ML. It hosts <strong>900,000+ datasets</strong> and <strong>2,700,000+ models</strong>, along with documentation, playgrounds (Spaces), and a simple Python API (<code>transformers</code>).
+  </div>
+
+  <h3>Model Card</h3>
+  <p>Each model on Hugging Face has a Model Card (a README-style document) that typically contains:</p>
+  <ul>
+    <li>Performance benchmarks</li>
+    <li>Number of parameters (≈ model size)</li>
+    <li>Training information (data, method)</li>
+    <li>Known biases and limitations</li>
+  </ul>
+
+  <h3>The Pipeline API</h3>
+  <div class="theorem-box">
+    The <code>pipeline()</code> function from the <code>transformers</code> library encapsulates all preprocessing, model inference, and post-processing steps. You specify only the task and optionally the model — the API handles everything else.
+  </div>
+
+  <div class="formula-box">
+    from transformers import pipeline<br><br>
+    # Sentiment Analysis<br>
+    classifier = pipeline("sentiment-analysis")<br>
+    classifier("I love this course!")<br><br>
+    # Translation (Dutch → English)<br>
+    translator = pipeline("translation", model="Helsinki-NLP/opus-mt-nl-en")<br>
+    translator("Hallo, ik ben Thomas.")
+  </div>
+
+  <h3>Pipeline Task Types</h3>
+  <table>
+    <thead><tr><th>Task</th><th>Description</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Sentiment Analysis</td><td>Classify text as POSITIVE/NEGATIVE</td><td>Product reviews, social media</td></tr>
+      <tr><td>Translation</td><td>Convert between languages</td><td>opus-mt-nl-en (Dutch → English)</td></tr>
+      <tr><td>Zero-Shot Classification</td><td>Predict user-defined labels not in training data</td><td>Classify text into custom categories</td></tr>
+      <tr><td>Named Entity Recognition (NER)</td><td>Tag tokens as person, org, location, date, etc.</td><td>Extract entities from documents</td></tr>
+      <tr><td>Question Answering</td><td>Extract answer from a given context passage</td><td>Document Q&A</td></tr>
+      <tr><td>Summarization</td><td>Condense text to shorter form</td><td>Preprocessing or standalone summarizer</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    Models are downloaded to your local machine (stored in <code>.cache</code>). Always verify you have sufficient disk space before downloading. Large Language Models (LLMs) can be several gigabytes. Models are only downloaded once.
+  </div>
+
+  <div class="key-point">
+    <strong>Zero-Shot Classification</strong> is a form of transfer learning where the model predicts labels it has never seen during training. This makes it extremely flexible but potentially less accurate than a fine-tuned classifier.
+  </div>
+
+  <h3>Files & Versions Tab</h3>
+  <p>Each model on Hugging Face has a Git-based repository (Files & Versions tab). This allows you to inspect model weights, config files, and the full version history — the same infrastructure as GitHub.</p>
+
+  <h3>Beyond the Pipeline: Ollama</h3>
+  <p>For Large Language Models specifically, <strong>Ollama</strong> allows you to run LLMs locally from your terminal or Python code. LLMs handle more complex reasoning but are larger in size.</p>
+
+  <div class="example-box">
+    <strong>Combining tools:</strong> Hugging Face models + LangChain + custom pipelines = powerful end-to-end NLP systems. This is the current industry direction for production ML applications.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     MCQ SECTION
+══════════════════════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>📝 Multiple Choice &amp; True/False Questions (50)</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">🔄 Reset All Answers</button>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SHORT ANSWER SECTION
+══════════════════════════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>✍️ Short Answer Questions (10)</h2>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+// ─── MCQ DATA ───────────────────────────────────────────────────────────────
+const questions = [
+  // Version Control fundamentals
+  {
+    type: "mcq", label: "Q1",
+    stem: "Which of the following best explains WHY version control systems are storage-efficient despite tracking every change?",
+    options: ["They compress each file individually.", "They store only the differences (diffs) between versions, not full copies.", "They delete older versions automatically after a set period.", "They offload storage to the cloud provider."],
+    answer: 1,
+    explanation: "VCS store diffs — the changes between states — not full repo snapshots for each commit."
+  },
+  {
+    type: "mcq", label: "Q2",
+    stem: "A team of five works on the same project by emailing .zip files. Which problem does this approach NOT directly cause?",
+    options: ["Difficult manual merging of parallel changes.", "Risk of overwriting a colleague's work.", "Inability to revert to a previous stable version.", "Higher computational cost of running the code."],
+    answer: 3,
+    explanation: "The .zip workflow causes merge difficulties, overwrite risk, and revert problems — but it does not inherently make the code slower to run."
+  },
+  {
+    type: "tf", label: "Q3",
+    stem: "True or False: 'origin' in Git refers to the branch you are currently working on.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "'origin' is shorthand for the URL of the remote repository the project was cloned from, NOT the current branch."
+  },
+  {
+    type: "mcq", label: "Q4",
+    stem: "What is the correct order of operations to publish a local file change to a remote GitHub repository?",
+    options: ["push → commit → add", "add → push → commit", "add → commit → push", "commit → add → push"],
+    answer: 2,
+    explanation: "The workflow is: stage with git add, snapshot with git commit, publish with git push."
+  },
+  {
+    type: "tf", label: "Q5",
+    stem: "True or False: After editing a file on your local machine and saving it, the change is automatically included in your local Git repository.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "Saves go to the working directory. They are only included in the local repo after git add (staging) and git commit."
+  },
+  {
+    type: "mcq", label: "Q6",
+    stem: "What does 'git fetch origin main' do, compared to 'git pull'?",
+    options: ["They are identical commands.", "git fetch downloads history without modifying local files; git pull also merges the changes.", "git fetch merges changes immediately; git pull only downloads.", "git fetch works only for branches; git pull works only for main."],
+    answer: 1,
+    explanation: "git fetch lets you see what changed remotely without touching local files. git pull = fetch + merge."
+  },
+  {
+    type: "mcq", label: "Q7",
+    stem: "Which command lets you see all changes in your working directory that have NOT yet been committed?",
+    options: ["git log --oneline", "git diff origin/main", "git status", "git show HEAD"],
+    answer: 2,
+    explanation: "git status shows untracked, unstaged, and staged-but-uncommitted changes."
+  },
+  {
+    type: "tf", label: "Q8",
+    stem: "True or False: Git was originally developed by Linus Torvalds because he was unhappy with the existing free version control alternatives.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. Torvalds created Git in April 2005 for Linux kernel development, dissatisfied with available free tools."
+  },
+  {
+    type: "mcq", label: "Q9",
+    stem: "Which statement about the .git folder is correct?",
+    options: ["It stores the full working copy of every file for every commit.", "It contains only the most recent snapshot of the repository.", "It efficiently records changes and is hidden by default in the file system.", "It is only created when you push to a remote repository."],
+    answer: 2,
+    explanation: ".git is hidden and records diffs/history. It is created locally by git init or git clone."
+  },
+  {
+    type: "mcq", label: "Q10",
+    stem: "A colleague pushes broken code to the main branch before anyone else pulls. What is the BEST practice that would have prevented others from receiving broken code?",
+    options: ["Use git revert immediately after the push.", "Use a branch and submit a pull request for review before merging into main.", "Delete the remote repository and start over.", "Compress and email the fixed version."],
+    answer: 1,
+    explanation: "Branches isolate experimental work. Broken code on a feature branch never touches main until intentionally merged after review."
+  },
+
+  // Undoing changes
+  {
+    type: "mcq", label: "Q11",
+    stem: "You accidentally deleted a paragraph in a file but haven't staged or committed yet. Which command restores it?",
+    options: ["git reset --hard HEAD", "git restore <filename>", "git revert HEAD", "git stash pop"],
+    answer: 1,
+    explanation: "git restore <file> reverts an unstaged change to the last committed state. git reset --hard would affect all uncommitted changes."
+  },
+  {
+    type: "mcq", label: "Q12",
+    stem: "What is the key difference between 'git reset --soft HEAD~' and 'git reset --hard HEAD~'?",
+    options: ["--soft deletes the commit and the changes; --hard keeps the changes staged.", "--soft undoes the commit but keeps changes staged; --hard undoes the commit AND discards the changes.", "--soft resets the remote repo; --hard resets only local.", "There is no difference."],
+    answer: 1,
+    explanation: "--soft undoes the commit, leaving changes staged for re-committing. --hard wipes the changes entirely."
+  },
+  {
+    type: "tf", label: "Q13",
+    stem: "True or False: 'git revert' is safer than 'git reset' for undoing pushed commits because it creates a new commit rather than rewriting history.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. Rewriting history with reset on pushed commits causes conflicts for collaborators who already pulled. git revert adds a new undo commit safely."
+  },
+  {
+    type: "mcq", label: "Q14",
+    stem: "You use 'git log --oneline' and want to return the repository to an earlier commit identified as 'a3f8d12'. Which command achieves this while leaving the undone changes in your working directory?",
+    options: ["git reset --hard a3f8d12", "git reset --mixed a3f8d12", "git restore a3f8d12", "git revert a3f8d12"],
+    answer: 1,
+    explanation: "--mixed (default) resets HEAD to the target commit, unstages all post-commit changes, but keeps them in the working directory."
+  },
+  {
+    type: "tf", label: "Q15",
+    stem: "True or False: Git tracks ALL files in a directory automatically as soon as you run 'git init'.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "Git only tracks files that have been explicitly staged with git add. New files are 'untracked' until added."
+  },
+
+  // Branches
+  {
+    type: "mcq", label: "Q16",
+    stem: "Why should you create a new branch BEFORE making code changes, rather than making changes and then creating a branch?",
+    options: ["Git will reject the commit if you branch after changing.", "Changes made before branching will be applied to the original branch, defeating the purpose of isolation.", "You can only commit on newly created branches.", "Branching after changes deletes the working directory."],
+    answer: 1,
+    explanation: "Changes made on main before switching to a new branch remain on main. Branch first, then code."
+  },
+  {
+    type: "mcq", label: "Q17",
+    stem: "Pipa wants to work on the remote branch 'OptimizedPrime'. She currently has a local 'main' branch. What should she do FIRST?",
+    options: ["git pull origin OptimizedPrime", "git fetch, then git checkout OptimizedPrime", "git merge OptimizedPrime", "git push origin OptimizedPrime"],
+    answer: 1,
+    explanation: "git fetch downloads the remote branch history. Then git checkout OptimizedPrime switches to it locally."
+  },
+  {
+    type: "tf", label: "Q18",
+    stem: "True or False: After merging branch B into main, branch B is automatically deleted.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "Merging does not delete the source branch. You must explicitly run 'git branch -d <name>' to delete it."
+  },
+  {
+    type: "mcq", label: "Q19",
+    stem: "A merge conflict occurs because Toby deleted README.md on main, while you edited it on your branch. What does resolving this conflict ultimately require?",
+    options: ["Automatically; Git always picks the newer version.", "A human decision about whether to keep or discard the file, followed by git add or git rm.", "Re-cloning the repository from scratch.", "Reverting all commits on your branch."],
+    answer: 1,
+    explanation: "Conflicts require human intervention. Use git add to keep or git rm to remove the conflicting file."
+  },
+  {
+    type: "mcq", label: "Q20",
+    stem: "Which command switches to an existing branch named 'feature-x'?",
+    options: ["git branch feature-x", "git merge feature-x", "git checkout feature-x", "git stash feature-x"],
+    answer: 2,
+    explanation: "git checkout <branch> switches the working tree to an existing branch."
+  },
+
+  // Git stash
+  {
+    type: "mcq", label: "Q21",
+    stem: "You realize mid-development that you've been working on the main branch instead of a feature branch. You have uncommitted changes. What is the correct use of git stash?",
+    options: ["git stash, git checkout feature-branch, git stash pop", "git commit, git checkout feature-branch, git stash", "git push, git stash, git checkout feature-branch", "git stash pop, git checkout feature-branch, git stash"],
+    answer: 0,
+    explanation: "Stash saves the uncommitted changes, allowing a safe branch switch, then pop re-applies them on the correct branch."
+  },
+  {
+    type: "tf", label: "Q22",
+    stem: "True or False: git stash saves uncommitted AND untracked (never-staged) changes automatically.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "By default, git stash only saves tracked (previously staged or committed) uncommitted changes. Untracked new files require 'git stash -u' to include them."
+  },
+
+  // Extras
+  {
+    type: "mcq", label: "Q23",
+    stem: "What is the purpose of a .gitignore file?",
+    options: ["It stores a list of collaborators who should be ignored.", "It defines rules for which files Git should NOT track.", "It records all previous commits that were reverted.", "It disables git push for specified branches."],
+    answer: 1,
+    explanation: ".gitignore contains patterns (rules) for files Git should exclude from tracking, e.g. secrets, logs, and temp files."
+  },
+  {
+    type: "tf", label: "Q24",
+    stem: "True or False: The .gitignore file itself should be included in the Git repository (tracked and committed).",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. .gitignore contains the rules, not the ignored files themselves. It should be tracked so all collaborators share the same exclusion rules."
+  },
+  {
+    type: "mcq", label: "Q25",
+    stem: "A Git hook that aborts a commit when requirements.txt is outdated is an example of which type of automation?",
+    options: ["A pre-push hook", "A pre-commit hook", "A post-merge hook", "A pre-fetch hook"],
+    answer: 1,
+    explanation: "A pre-commit hook runs before the commit is finalized, making it the right place to validate requirements.txt."
+  },
+  {
+    type: "mcq", label: "Q26",
+    stem: "Which tool can help you find the exact commit that INTRODUCED a bug when you know a good version and a bad version?",
+    options: ["git stash", "git bisect", "git revert", "git diff"],
+    answer: 1,
+    explanation: "git bisect performs a binary search through commits to pinpoint when a bug was introduced."
+  },
+  {
+    type: "tf", label: "Q27",
+    stem: "True or False: Forking a repository on GitHub creates a copy that is completely disconnected from the original for push purposes, but can still propose changes via pull requests.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. A fork is your own disconnected copy. You cannot push to the original, but you can submit a pull request to propose your changes."
+  },
+
+  // Hugging Face
+  {
+    type: "mcq", label: "Q28",
+    stem: "What does the Hugging Face pipeline() function abstract away from the user?",
+    options: ["The need to have a GPU.", "All preprocessing, model inference, and post-processing steps.", "Downloading the dataset only.", "Network requests to the Hugging Face API."],
+    answer: 1,
+    explanation: "pipeline() wraps the full ML workflow: tokenization, model forward pass, and decoding into a single function call."
+  },
+  {
+    type: "mcq", label: "Q29",
+    stem: "A model on Hugging Face achieves 95% accuracy on its benchmark. You want to know whether it was trained on data similar to your use case. Where do you look first?",
+    options: ["The Files and Versions tab.", "The Spaces tab.", "The Model Card.", "The Community discussions tab."],
+    answer: 2,
+    explanation: "The Model Card contains training data info, benchmarks, parameter counts, and known biases."
+  },
+  {
+    type: "tf", label: "Q30",
+    stem: "True or False: Hugging Face models are downloaded every time you call the pipeline function.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "Models are downloaded only once and cached in the hidden .cache folder. Subsequent calls reuse the cached files."
+  },
+  {
+    type: "mcq", label: "Q31",
+    stem: "Zero-Shot Classification differs from standard classification primarily because:",
+    options: ["It requires no training data whatsoever.", "It can predict labels that were never seen during the model's training.", "It classifies images rather than text.", "It only works on binary classification problems."],
+    answer: 1,
+    explanation: "Zero-shot models generalize via transfer learning and can assign user-defined labels not present in training data."
+  },
+  {
+    type: "mcq", label: "Q32",
+    stem: "Which Hugging Face pipeline task would you use to automatically find mentions of people, organizations, and dates in a document?",
+    options: ["Sentiment Analysis", "Summarization", "Named Entity Recognition (NER)", "Zero-Shot Classification"],
+    answer: 2,
+    explanation: "NER (token classification) tags tokens in text with entity types like Person, Organization, Location, and Date."
+  },
+  {
+    type: "tf", label: "Q33",
+    stem: "True or False: The Files and Versions tab on a Hugging Face model page uses Git as its underlying version control system.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. Hugging Face model repositories are Git repositories, allowing the same version history functionality."
+  },
+  {
+    type: "mcq", label: "Q34",
+    stem: "What is an important practical consideration before loading a large language model from Hugging Face locally?",
+    options: ["Checking whether Python 2 is installed.", "Ensuring sufficient disk space on your machine.", "Disabling your internet connection first.", "Creating a new GitHub repository to store the model."],
+    answer: 1,
+    explanation: "Large models can be several gigabytes. Always check available disk space before downloading. Google Colab is an alternative."
+  },
+  {
+    type: "mcq", label: "Q35",
+    stem: "Summarization in Hugging Face pipelines can produce output in two ways. Which pair correctly describes these two output types?",
+    options: ["Extractive (selects original sentences) and Abstractive (generates new text)", "Supervised and Unsupervised summarization", "Single-document and Multi-document summarization", "Lossy and Lossless summarization"],
+    answer: 0,
+    explanation: "Extractive summarization selects original phrases; abstractive summarization generates novel text that captures the meaning."
+  },
+
+  // Deeper conceptual / applied
+  {
+    type: "mcq", label: "Q36",
+    stem: "Your team uses 'git pull origin feature-x' while on the main branch. What unintended consequence may occur?",
+    options: ["The remote branch feature-x is deleted.", "The main branch is merged with feature-x instead of switching to it.", "The local .git file is corrupted.", "Nothing; git pull is always safe."],
+    answer: 1,
+    explanation: "git pull on main will merge the remote feature-x INTO main, potentially introducing unreviewed experimental code."
+  },
+  {
+    type: "mcq", label: "Q37",
+    stem: "Which requirement file generation command is recommended when pip freeze produces messy path references?",
+    options: ["pip install --freeze > requirements.txt", "pip list --format=freeze > requirements.txt", "pip show > requirements.txt", "pip check > requirements.txt"],
+    answer: 1,
+    explanation: "pip list --format=freeze produces cleaner output without local path references."
+  },
+  {
+    type: "tf", label: "Q38",
+    stem: "True or False: A Question Answering pipeline on Hugging Face generates answers from its own parametric knowledge, not from a provided context.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "The extractive QA pipeline retrieves answers from a user-supplied context document. It does not hallucinate answers from training memory."
+  },
+  {
+    type: "mcq", label: "Q39",
+    stem: "Two developers simultaneously edit line 42 of the same Python file on separate branches and both push to their respective remote branches. A merge conflict will occur when:",
+    options: ["Either branch is fetched.", "One branch is cloned from the other.", "The two branches are merged.", "git status is run."],
+    answer: 2,
+    explanation: "Conflicts are detected and reported at merge time, not at push or fetch time."
+  },
+  {
+    type: "mcq", label: "Q40",
+    stem: "Which analogy from the lecture BEST describes the relationship between staging and committing?",
+    options: ["Staging is writing a diary entry; committing is tearing the page out.", "Staging is preparing subjects for a photograph; committing is taking the actual photo and adding it to the album.", "Staging uploads to the remote; committing saves locally.", "Staging creates a branch; committing merges it."],
+    answer: 1,
+    explanation: "The photo album analogy: staging = preparing the shot, committing = taking the photo and filing it in the album (.git)."
+  },
+  {
+    type: "tf", label: "Q41",
+    stem: "True or False: GitHub and Git are synonymous — GitHub is simply the official name of Git.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "Git is the version control system; GitHub is one of many remote repository managers (others: GitLab, Bitbucket). You can use Git without GitHub."
+  },
+  {
+    type: "mcq", label: "Q42",
+    stem: "You have pushed optimized code to the branch 'OptimizedPrime'. A colleague in a different timezone finds and fixes a bug, then pushes the fix to the same remote branch. What command do you run to incorporate their fix into your local copy of 'OptimizedPrime'?",
+    options: ["git push origin OptimizedPrime", "git pull origin OptimizedPrime", "git merge OptimizedPrime", "git fetch && git stash pop"],
+    answer: 1,
+    explanation: "git pull origin OptimizedPrime while on that branch fetches and merges the remote updates."
+  },
+  {
+    type: "tf", label: "Q43",
+    stem: "True or False: Named Entity Recognition (NER) is specifically listed in the lecture as an example task NOT required for the exam, even though the pipeline API itself IS exam material.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "The slides explicitly state that questions like 'What is Named Entity Recognition' will NOT be asked; only the pipeline API usage is examinable."
+  },
+  {
+    type: "mcq", label: "Q44",
+    stem: "What is the primary advantage of using merge requests (pull requests) in a company workflow when merging branches into main?",
+    options: ["They automatically resolve all merge conflicts.", "They enforce a human review step before unstable code reaches production.", "They compress the branch before merging to save space.", "They permanently delete the source branch after merging."],
+    answer: 1,
+    explanation: "Merge/pull requests gate merges behind a review process, preventing untested code from entering the main/production branch."
+  },
+  {
+    type: "mcq", label: "Q45",
+    stem: "Which Hugging Face concept is most analogous to a GitHub README for a code repository?",
+    options: ["The Spaces playground.", "The Model Card.", "The Files and Versions tab.", "The 'Use This Model' button."],
+    answer: 1,
+    explanation: "The Model Card is the README-equivalent for HF models: it describes the model, training, benchmarks, and biases."
+  },
+  {
+    type: "tf", label: "Q46",
+    stem: "True or False: 'git diff origin/main' shows the difference between your local repository and the remote main branch AFTER you have run git fetch.",
+    options: ["True", "False"],
+    answer: 0,
+    explanation: "Correct. git fetch downloads the remote history, and git diff origin/main then compares local vs. remote."
+  },
+  {
+    type: "mcq", label: "Q47",
+    stem: "Which of the following would you NOT typically include in a .gitignore file?",
+    options: ["Files containing API keys or passwords", "Temporary log files (.log)", "The requirements.txt file", "Large compiled binary files"],
+    answer: 2,
+    explanation: "requirements.txt should be tracked and shared so all collaborators have the same package versions. The others are good candidates for .gitignore."
+  },
+  {
+    type: "mcq", label: "Q48",
+    stem: "An open-source ML model on Hugging Face has 340M parameters. What does this number most directly indicate?",
+    options: ["The number of training examples used.", "The approximate size/capacity of the model, affecting memory and disk requirements.", "The number of supported languages.", "The number of tasks the model was trained on."],
+    answer: 1,
+    explanation: "Parameter count approximates model size. More parameters generally means larger file size and more RAM/VRAM needed."
+  },
+  {
+    type: "mcq", label: "Q49",
+    stem: "Cookiecutter is mentioned in the lecture as a Git tool. What problem does it solve?",
+    options: ["It visualizes the branch structure graphically.", "It automates initial project folder structure and template setup.", "It bisects commits to find bugs.", "It handles merge conflicts automatically."],
+    answer: 1,
+    explanation: "Cookiecutter is a templating tool that automates the initial project design and folder structure."
+  },
+  {
+    type: "tf", label: "Q50",
+    stem: "True or False: When you fork a public GitHub repository, you can push your changes directly to the original repository without the owner's approval.",
+    options: ["True", "False"],
+    answer: 1,
+    explanation: "A fork is your own disconnected copy. To affect the original repository, you must submit a pull request that the owner reviews and approves."
+  }
+];
+
+// ─── SHORT ANSWER DATA ───────────────────────────────────────────────────────
+const shortAnswers = [
+  {
+    label: "SA1",
+    stem: "Explain why it is insufficient to simply 'git revert' a bad pushed commit when working in a team. Under what scenario does reverting still fail to protect collaborators, and how do branches solve this problem structurally?",
+    answer: "<strong>Problem with revert alone:</strong> If a bad commit is pushed to main and a collaborator pulls before you run git revert, they already have the broken code locally. Their subsequent push may re-introduce the bug, or they have to manage broken code on their machine. <strong>Structural fix with branches:</strong> By keeping experimental code on a feature branch rather than main, broken code never reaches main until it passes review (via a merge/pull request). Other collaborators' 'main' is always clean. The broken code is isolated to the branch, which can simply be deleted or corrected without any history-rewriting or conflict for others."
+  },
+  {
+    label: "SA2",
+    stem: "A data science team member reports that after running 'git pull origin OptimizedPrime' while on the main branch, unexpected changes appeared in main. What happened, and what is the correct workflow to inspect and incorporate another branch's changes without unintentionally modifying main?",
+    answer: "<strong>What happened:</strong> 'git pull origin OptimizedPrime' while on main performs a fetch+merge of OptimizedPrime INTO main. This is not switching to the branch — it merges the remote branch into the current (main) branch, introducing the other branch's commits. <strong>Correct workflow:</strong> (1) git fetch to download all remote histories. (2) git checkout OptimizedPrime to switch to the branch locally (creates a tracking branch). (3) Inspect, test, or work on the branch. (4) Only run git merge OptimizedPrime (while on main) if you intentionally want to merge those changes after review. Always confirm which branch you are on before pulling."
+  },
+  {
+    label: "SA3",
+    stem: "Describe the full three-area model of Git (working directory, staging area, local repository) and explain how each of 'git add', 'git commit', and 'git push' transitions content between these areas and to the remote.",
+    answer: "<strong>Three areas:</strong> (1) <em>Working directory</em> — the actual files you see and edit. (2) <em>Staging area (index)</em> — a preparation zone where you select which changes to include in the next commit. (3) <em>Local repository (.git)</em> — the stored history of commits on your machine. <strong>Commands:</strong> <em>git add</em> moves selected changes from working directory → staging area. <em>git commit</em> takes a permanent snapshot of the staging area → local repository with a message and identifier (HEAD). <em>git push</em> uploads committed snapshots from local repository → remote repository. Without git add, changes stay only in the working directory and Git is unaware of them for commit purposes."
+  },
+  {
+    label: "SA4",
+    stem: "Compare the use cases for 'git reset --soft HEAD~', 'git reset --mixed HEAD~', and 'git reset --hard HEAD~'. Provide a concrete scenario for each where one would be preferred over the others.",
+    answer: "<strong>--soft HEAD~:</strong> Undoes the last commit, keeps changes <em>staged</em>. Use case: You committed prematurely (forgot to add one file). Soft reset lets you add the missing file and re-commit without losing any work. <strong>--mixed HEAD~ (default):</strong> Undoes the last commit, keeps changes in the working directory but <em>unstages</em> them. Use case: You committed with a bad message and want to re-examine and selectively re-stage changes before re-committing. <strong>--hard HEAD~:</strong> Undoes the commit AND discards all changes entirely. Use case: You committed an experiment that you now know is completely wrong and want a clean slate, as if the commit never happened. Dangerous — data is lost."
+  },
+  {
+    label: "SA5",
+    stem: "A colleague suggests that because .gitignore files contain rules for ignoring files, the .gitignore file itself should also be ignored and not committed. Evaluate this argument and explain the correct approach.",
+    answer: "<strong>The argument is wrong.</strong> .gitignore contains rules (patterns), not the sensitive files themselves. Tracking .gitignore in the repository is essential so that all collaborators automatically apply the same exclusion rules without individually configuring their own Git setups. If .gitignore were ignored, each team member would need to manually recreate the rules locally, leading to inconsistency — e.g., one member accidentally committing API keys that others have excluded. The correct approach: commit .gitignore, ensuring everyone shares the same gitignore configuration. The sensitive files pointed to by .gitignore are what must be kept out of the repo."
+  },
+  {
+    label: "SA6",
+    stem: "Explain the difference between Forking and Branching in GitHub. When would an open-source contributor use forking rather than branching, and what is the mechanism for proposing their changes back to the original project?",
+    answer: "<strong>Branching:</strong> Creates an isolated line of development within the SAME repository. You need write access. Used internally within a team's project. <strong>Forking:</strong> Creates a complete, independent copy of the repository under your own GitHub account. No write access to the original is needed. Used when contributing to a project you don't own. <strong>Contribution mechanism:</strong> Fork → make changes on your fork → submit a Pull Request to the original repository. The original owner reviews the PR and decides whether to merge your changes. This is how the majority of open-source contributions work — it allows contribution without granting broad write access to the original codebase."
+  },
+  {
+    label: "SA7",
+    stem: "Why is Zero-Shot Classification considered a form of transfer learning? Describe a practical business scenario where Zero-Shot Classification would be more advantageous than training a supervised classifier from scratch.",
+    answer: "<strong>Transfer learning aspect:</strong> Zero-shot models are pre-trained on massive datasets and learn general language representations. At inference time, they 'transfer' this general knowledge to new tasks by understanding the semantics of user-supplied labels, even if those exact labels were absent during training. <strong>Practical scenario:</strong> A legal firm wants to classify incoming contracts into categories like 'IP clause', 'Arbitration clause', 'Force Majeure clause'. Collecting thousands of labeled legal contracts to train a supervised classifier is expensive and slow. A zero-shot model can classify documents immediately using these label names as inputs, with no labeled training data. As business needs evolve and new clause types emerge, labels can be added instantly without retraining."
+  },
+  {
+    label: "SA8",
+    stem: "A merge conflict arises when merging two branches. Walk through the conceptual process of resolving a conflict where both branches modified the same function in a Python file, explaining what Git presents to you and what actions you take.",
+    answer: "<strong>What Git presents:</strong> Git marks the conflicting section in the file with conflict markers: '<<<<<<< HEAD' shows the current branch's version, '=======' separates, and '>>>>>>> branch_name' shows the incoming branch's version. <strong>Resolution process:</strong> (1) Open the conflicting file in an editor. (2) Read both versions of the function carefully. (3) Decide which version to keep, or write a combined version incorporating both changes. (4) Remove all conflict markers (<<<<, ====, >>>>) from the file. (5) Save the file. (6) Run git add <file> to mark the conflict as resolved. (7) Run git commit to finalize the merge. Good commit messages explaining the resolution help future collaborators understand what was decided and why."
+  },
+  {
+    label: "SA9",
+    stem: "Explain how the requirements.txt file connects version control practices to reproducibility in data science projects. What can go wrong if it is not maintained, and what automation technique does the lecture suggest to enforce its maintenance?",
+    answer: "<strong>Connection to reproducibility:</strong> A data science project depends on specific library versions (e.g., scikit-learn 1.2.0, pandas 2.0). requirements.txt captures the exact versions, so any collaborator can run 'pip install -r requirements.txt' and get an identical Python environment. Without it, collaborators may use different package versions, leading to subtle bugs, different model behavior, or outright import errors. <strong>What goes wrong:</strong> A teammate installs a newer version of a library that has breaking API changes; code works on one machine but fails on another. <strong>Automation:</strong> Git hooks, specifically a pre-commit hook, can be written to abort the commit if it detects that requirements.txt is not up-to-date with the current installed packages. This enforces discipline without relying on manual memory."
+  },
+  {
+    label: "SA10",
+    stem: "The lecture describes Hugging Face as enabling the 'democratization of ML'. Critically evaluate this claim: what features of Hugging Face support this, and what are the remaining barriers that might limit access for less-resourced users or organizations?",
+    answer: "<strong>Supports democratization:</strong> (1) Free access to 900,000+ datasets and 2.7M+ models. (2) Standardized pipeline API reduces the ML engineering expertise needed to deploy models. (3) Model Cards provide transparency on capabilities, biases, and training. (4) Spaces allow testing without installation. (5) Open-source models eliminate licensing fees. <strong>Remaining barriers:</strong> (1) <em>Compute:</em> Large models (billions of parameters) require GPUs with large VRAM — expensive hardware unavailable to individuals or small organizations. (2) <em>Disk space:</em> Models can be tens of gigabytes; not viable on standard laptops. (3) <em>Expertise:</em> Selecting the right model, understanding benchmarks, and avoiding bias still require domain knowledge. (4) <em>Language bias:</em> Most high-quality models are English-centric; low-resource language users are underserved. (5) <em>Data quality:</em> Using models effectively still requires quality data for fine-tuning or evaluation."
+  }
+];
+
+// ─── RENDER MCQ ──────────────────────────────────────────────────────────────
+let totalAnswered = 0;
+let totalCorrect = 0;
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  totalAnswered = 0; totalCorrect = 0;
+  updateScore();
+
+  questions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `card-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `${q.label} — ${q.type === 'tf' ? 'True / False' : 'Multiple Choice'}`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = q.stem;
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.id = `opts-${idx}`;
+
+    q.options.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = `${String.fromCharCode(65 + oi)}. ${opt}`;
+      btn.onclick = () => handleAnswer(idx, oi, btn);
+      optionsDiv.appendChild(btn);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback-bar';
+    feedback.id = `fb-${idx}`;
+    feedback.style.display = 'none';
+
+    card.appendChild(label);
+    card.appendChild(stem);
+    card.appendChild(optionsDiv);
+    card.appendChild(feedback);
+    container.appendChild(card);
+  });
+}
+
+function handleAnswer(qIdx, chosenIdx, btn) {
+  const q = questions[qIdx];
+  const optContainer = document.getElementById(`opts-${qIdx}`);
+  const buttons = optContainer.querySelectorAll('.option-btn');
+  const fb = document.getElementById(`fb-${qIdx}`);
+
+  // Lock all buttons
+  buttons.forEach(b => b.classList.add('locked'));
+
+  const isCorrect = chosenIdx === q.answer;
+  totalAnswered++;
+  if (isCorrect) {
+    totalCorrect++;
+    btn.classList.add('correct');
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ Correct! ${q.explanation}`;
+  } else {
+    btn.classList.add('incorrect');
+    buttons[q.answer].classList.add('reveal-correct');
+    fb.className = 'feedback-bar incorrect';
+    fb.innerHTML = `❌ Incorrect. ${q.explanation}`;
+  }
+  fb.style.display = 'block';
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('score-display').textContent = `Score: ${totalCorrect} / ${totalAnswered}`;
+}
+
+function resetAll() {
+  renderMCQ();
+}
+
+// ─── RENDER SA ───────────────────────────────────────────────────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  shortAnswers.forEach((sa, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'question-label';
+    lbl.textContent = sa.label + ' — Short Answer';
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = sa.stem;
+
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-btn';
+    revealBtn.textContent = '👁 Reveal Model Answer';
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = sa.answer;
+
+    revealBtn.onclick = () => {
+      if (panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'block';
+        revealBtn.textContent = '🙈 Hide Answer';
+      } else {
+        panel.style.display = 'none';
+        revealBtn.textContent = '👁 Reveal Model Answer';
+      }
+    };
+
+    card.appendChild(lbl);
+    card.appendChild(stem);
+    card.appendChild(revealBtn);
+    card.appendChild(panel);
+    container.appendChild(card);
+  });
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>
