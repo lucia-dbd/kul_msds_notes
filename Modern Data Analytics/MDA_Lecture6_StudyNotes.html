@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Data Analytics – Lecture 6 | Analytics Infrastructure</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #f5f6fa;
+    font-family: 'IBM Plex Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* ── Nav Bar ── */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ── Notes Section ── */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 18px;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin: 20px 0 8px 0;
+  }
+  .notes-section p { margin-bottom: 12px; }
+
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .formula-box {
+    background: #f8f9ff;
+    border: 1px solid #c8d4f0;
+    padding: 14px 20px;
+    margin: 14px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95em;
+    text-align: center;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd) { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: #f0f4fb;
+    padding: 1px 6px;
+    font-size: 0.88em;
+    border-radius: 3px;
+    color: #1a3a5c;
+  }
+
+  /* ── MCQ Section ── */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; }
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+  }
+
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #2e6da4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mcq-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    font-size: 1.0em;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #d0d8ea;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 6px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c2c3a;
+    transition: all 0.18s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-bar {
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+  .feedback-bar.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* ── Short Answer Section ── */
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; font-weight: 700; margin-bottom: 20px; }
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1;
+    font-size: 0.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .sa-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 12px;
+  }
+  .reveal-btn {
+    background: #6f42c1;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 22px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.2s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff;
+    border: 1px solid #d4c8f5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+    font-size: 0.95em;
+    line-height: 1.8;
+    display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  /* ── Reset / Actions ── */
+  .action-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .reset-btn {
+    background: #1a3a5c;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 24px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<div class="page-header">
+  <h1>Modern Data Analytics — Lecture 6</h1>
+  <div class="subtitle">Key Components of an Analytics Infrastructure &nbsp;·&nbsp; KU Leuven &nbsp;·&nbsp; Exam Preparation Notes</div>
+</div>
+
+<!-- ═══════════════════════════ NAV BAR ═══════════════════════════ -->
+<div class="nav-bar">
+  <a href="#intro">Introduction</a>
+  <a href="#pipelines">Data Pipelines</a>
+  <a href="#dags">DAGs &amp; Optimization</a>
+  <a href="#orchestration">Orchestration</a>
+  <a href="#ml">ML Development</a>
+  <a href="#mlflow">MLflow</a>
+  <a href="#serving">Serving</a>
+  <a href="#agentic">Agentic AI</a>
+  <a href="#mcq" class="nav-mcq">MCQ (50 Qs)</a>
+  <a href="#sa" class="nav-sa">Short Answer (10 Qs)</a>
+</div>
+
+<!-- ═══════════════════════════ NOTES ═══════════════════════════ -->
+
+<!-- 1. INTRODUCTION -->
+<div class="notes-section" id="intro">
+  <h2>1 · Introduction — Infrastructure for Data Science</h2>
+  <p>This lecture is Part III of the Modern Data Analytics course. The goal is to understand the <strong>infrastructure</strong> needed to move from raw data all the way to actionable insights, focusing on <em>structure and principles</em> rather than individual tools.</p>
+
+  <div class="key-point">
+    <strong>Conceptual Model — four pillars of a Data &amp; Analytics System:</strong>
+    <ul>
+      <li><strong>Collection</strong> — APIs, databases, raw files, web scraping</li>
+      <li><strong>Storage</strong> — structured (SQL tables) and unstructured (S3, blob) data</li>
+      <li><strong>Processing</strong> — transformation, aggregation, modelling</li>
+      <li><strong>Serving</strong> — APIs, MCPs, dashboards</li>
+    </ul>
+    Machine Learning projects additionally need: data/model versioning &amp; monitoring, experiment tracking, and model deployment.
+  </div>
+
+  <h3>Educational vs. Production Context</h3>
+  <p>In academic projects, pipelines typically live inside a single notebook with no monitoring, clean code focus, and data &amp; modelling logic interleaved. Production environments are radically different:</p>
+  <table>
+    <thead><tr><th>Dimension</th><th>Educational (Notebook)</th><th>Production (Industry)</th></tr></thead>
+    <tbody>
+      <tr><td>Structure</td><td>Single notebook</td><td>Modular scripts / services</td></tr>
+      <tr><td>Monitoring</td><td>None</td><td>Lineage, reproducibility</td></tr>
+      <tr><td>Automation</td><td>Manual runs</td><td>Scheduled orchestration</td></tr>
+      <tr><td>Versioning</td><td>Rarely</td><td>Essential (code, data, model)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Jupyter Notebooks in Production</strong> — While you <em>can</em> build infrastructure around notebooks (see Netflix's Papermill approach), there are significant issues: hidden state, poor version control, difficult testing, and no built-in dependency management.
+  </div>
+</div>
+
+<!-- 2. DATA PIPELINES -->
+<div class="notes-section" id="pipelines">
+  <h2>2 · Data Pipelines</h2>
+  <p>A <strong>data pipeline</strong> is a collection of transformations \((v_1, v_2, \ldots, v_n)\) applied to data, where the output of one stage feeds the next.</p>
+
+  <div class="theorem-box">
+    <strong>Definition — Data Pipeline:</strong><br>
+    A sequence of processing steps where each step produces output consumed by subsequent steps. Pipelines are formally represented as <strong>Directed Acyclic Graphs (DAGs)</strong>.
+  </div>
+
+  <h3>DAG Representation</h3>
+  <ul>
+    <li><strong>Vertices (nodes)</strong> — modular components that perform a data transformation</li>
+    <li><strong>Edges</strong> — dependencies across transformations (v produces output consumed by u)</li>
+    <li><strong>Acyclicity</strong> — no circular dependencies; execution has a guaranteed topological order</li>
+  </ul>
+
+  <div class="example-box">
+    <strong>✦ Concrete Example (Air Quality Predictor):</strong><br>
+    Monitor Locations → Weather API &amp; Air Quality API → Preprocess &amp; Combine → Load to Database
+    <br><br>
+    A second sub-pipeline: Retrain Predictive Model → Evaluate Model → Deploy (MLflow) / Add experiment trace (MLflow)
+  </div>
+</div>
+
+<!-- 3. DAG OPTIMIZATION -->
+<div class="notes-section" id="dags">
+  <h2>3 · DAG Optimization Techniques</h2>
+  <p>Given graph \(G = (V, E)\) with \(\mathcal{T}_v\) = execution time of task \(v\), and path length \(L(P) = \sum_{i=1}^{k} \tau(v_i)\):</p>
+
+  <h3>Q1 — Minimum Pipeline Runtime → Critical Path Analysis</h3>
+  <div class="formula-box">
+    \[ L^* = \max_{P \in \text{paths}} L(P) \]
+  </div>
+  <div class="key-point">
+    The critical path is the <strong>longest path</strong> through the DAG. No amount of parallelisation can beat it — it is a hard lower bound on total runtime.
+  </div>
+
+  <h3>Q2 — Parallelisable Tasks → Anti-Chain Analysis</h3>
+  <div class="theorem-box">
+    <strong>Partial Order:</strong> \(u \prec v \iff\) there is a directed path from \(u\) to \(v\).<br>
+    <strong>Anti-chain:</strong> A subset of vertices where no two nodes are related by \(\prec\) — i.e., they have no dependency on each other and can run in parallel.
+  </div>
+  <p>The <strong>size of the largest anti-chain</strong> gives an upper-bound on the number of workers needed to achieve maximum parallelism (Dilworth's theorem).</p>
+
+  <div class="example-box">
+    <strong>✦ Example (5-node DAG \(V = \{v_1,\ldots,v_5\}\)):</strong><br>
+    With \(v_1 \prec v_2, v_3, v_4, v_5\); \(v_2 \prec v_4, v_5\); \(v_3 \prec v_4, v_5\); \(v_4 \prec v_5\),
+    the only anti-chain is \(\{v_2, v_3\}\) → at most 2 tasks can run concurrently.
+  </div>
+
+  <h3>Q3 — Minimal Dependencies → Transitive Reduction</h3>
+  <p>Transitive reduction gives the minimal dependency graph \(G'\) that preserves all execution constraints:</p>
+  <div class="formula-box">
+    \[ u \prec v \text{ in } G \iff u \prec v \text{ in } G' \]
+  </div>
+  <p>What remains is the minimal structure from which we can derive <strong>data contracts</strong> — the explicit input/output agreements between tasks.</p>
+
+  <table>
+    <thead><tr><th>Question</th><th>Analysis</th><th>Answers</th></tr></thead>
+    <tbody>
+      <tr><td>Minimum runtime?</td><td>Critical Path Analysis</td><td>\(L^* = \max_{P} L(P)\)</td></tr>
+      <tr><td>Max parallelism?</td><td>Anti-Chain Analysis</td><td>Size of largest anti-chain</td></tr>
+      <tr><td>Minimal dependencies?</td><td>Transitive Reduction</td><td>\(G'\) preserving all \(\prec\)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 4. ORCHESTRATION -->
+<div class="notes-section" id="orchestration">
+  <h2>4 · Pipeline Orchestration</h2>
+  <p><strong>Orchestration</strong> refers to <em>what order</em> and <em>at what times</em> data pipelines should be run. It is the gap between a collection of processing scripts and a reliable production data system.</p>
+
+  <div class="key-point">
+    <strong>What orchestrators provide:</strong>
+    <ul>
+      <li>Explicit dependencies through DAG definition</li>
+      <li>Automatic scheduling and execution</li>
+      <li>Retries on failure</li>
+      <li>Visibility on process executions (monitoring &amp; logs)</li>
+    </ul>
+    <strong>Critical distinction:</strong> Orchestrators do NOT process data themselves — they coordinate when and in what order data-processing tasks run.
+  </div>
+
+  <h3>Apache Airflow</h3>
+  <p>The most popular pipeline orchestrator. It natively implements DAGs, dependencies, and scheduling. A DAG in Airflow is defined as a Python function decorated with <code>@dag</code>, and individual tasks are Python functions decorated with <code>@task</code>.</p>
+
+  <div class="example-box">
+    <strong>✦ Airflow DAG Structure:</strong><br>
+    <code>@dag(schedule='@daily', start_date=datetime(2026,1,1), catchup=False)</code><br>
+    Tasks are defined inside using <code>@task</code>, and dependencies are expressed by passing outputs as inputs between function calls.
+  </div>
+
+  <p>Airflow's UI provides: past runs &amp; failures, manual triggering, execution time charts, logs, SLA monitoring, and links to data assets.</p>
+
+  <h3>Alternatives to Airflow</h3>
+  <p>Prefect, Dagster, AWS Step Functions, Argo, Luigi — each with trade-offs in complexity, cloud integration, and observability.</p>
+
+  <h3>What can tasks be?</h3>
+  <p>Python functions, SQL commands, DBT scripts, bash commands, external triggers (emails, notifications), human-in-the-loop verification steps, and more.</p>
+</div>
+
+<!-- 5. ML DEVELOPMENT -->
+<div class="notes-section" id="ml">
+  <h2>5 · Model Development &amp; MLOps</h2>
+  <p>Building a model (experimentation) and deploying it (production) require fundamentally different mindsets:</p>
+
+  <table>
+    <thead><tr><th>Phase</th><th>Primary Concern</th><th>Key Metrics</th></tr></thead>
+    <tbody>
+      <tr><td>Development</td><td>Experimentation — try many things</td><td>Model performance, iteration speed</td></tr>
+      <tr><td>Production</td><td>Consistency &amp; auditability</td><td>Reliability, reproducibility, latency</td></tr>
+    </tbody>
+  </table>
+
+  <h3>MLOps Stack</h3>
+  <p>The ML process is still a pipeline (Raw Data → Preprocessing → Training → Candidate Model → Deployment), but requires additional infrastructure: experiment tracking, model versioning, deployment pipelines, and prediction monitoring.</p>
+
+  <div class="key-point">
+    <strong>For each experiment run, you must track:</strong>
+    <ul>
+      <li>Which code version was used</li>
+      <li>What data was used</li>
+      <li>What hyperparameters were set</li>
+      <li>Which algorithm was applied</li>
+      <li>Any metadata (random seeds, execution times)</li>
+    </ul>
+    All of this must be linked to evaluation metrics to enable reproducibility.
+  </div>
+</div>
+
+<!-- 6. MLFLOW -->
+<div class="notes-section" id="mlflow">
+  <h2>6 · MLflow — Experiment Tracking &amp; Model Registry</h2>
+  <p><strong>MLflow</strong> is an open-source tool for end-to-end ML project management. It has two key components:</p>
+
+  <h3>6.1 Tracking Server</h3>
+  <p>Logs parameters, metrics, artifacts, and metadata for every experiment run. Using <code>mlflow.sklearn.autolog()</code>, Scikit-learn experiments are tracked automatically. The UI lets you compare runs across experiments via visualisations (parallel coordinates, scatter, box plots).</p>
+
+  <div class="example-box">
+    <strong>✦ Python integration:</strong><br>
+    <code>import mlflow</code><br>
+    <code>mlflow.sklearn.autolog()</code><br>
+    <code>with mlflow.start_run():</code><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<code>model.fit(X_train, y_train)</code>
+  </div>
+
+  <h3>6.2 Model Registry</h3>
+  <p>Once experimentation is complete, the model registry tracks versions and deployments. The <strong>champion alias</strong> marks the model version currently serving in production. Models are pickled by default.</p>
+
+  <div class="warning-box">
+    <strong>⚠ Pickle Security Note:</strong> MLflow pickles models by default. Pickle files can execute arbitrary code upon loading — always validate the provenance of model artifacts before loading in production.
+  </div>
+
+  <h3>6.3 Model Deployment via MLflow</h3>
+  <p>MLflow also supports deployment: <code>mlflow deployments</code> wraps the model in a Docker container and can target Databricks Model Serving, Amazon SageMaker, Azure ML, Kubernetes clusters, or local Flask/batch inference.</p>
+</div>
+
+<!-- 7. SERVING -->
+<div class="notes-section" id="serving">
+  <h2>7 · Serving — Making Data &amp; Models Available</h2>
+  <p>After pipelines are reliable and models are versioned, the next challenge is <em>how</em> to expose them to end users without giving raw database access.</p>
+
+  <div class="key-point">
+    <strong>What we do NOT want in production:</strong>
+    <ul>
+      <li>Unrestricted direct access to Python objects or database tables</li>
+      <li>Users knowing internal storage details or model characteristics</li>
+    </ul>
+  </div>
+
+  <h3>Service Layer Pattern</h3>
+  <p>A dedicated <strong>service layer</strong> (typically a REST API) sits between the internal data/models and consumers. The data engineering team builds and maintains this layer; business stakeholders and external systems consume data and predictions through it.</p>
+
+  <div class="example-box">
+    <strong>✦ Minimal FastAPI Example:</strong><br>
+    <code>from fastapi import FastAPI</code><br>
+    <code>app = FastAPI()</code><br>
+    <code>@app.get("/data")</code><br>
+    <code>def get_data(): return {"data": "Hello, World!"}</code>
+  </div>
+
+  <p>The service layer has direct access to internal data and models. Users get granular access-management policies — they only see what they're authorised to see.</p>
+</div>
+
+<!-- 8. AGENTIC AI -->
+<div class="notes-section" id="agentic">
+  <h2>8 · Serving in the Age of Agentic AI</h2>
+  <p>Increasingly, organisations expose data and models not just to human consumers via REST APIs, but to AI agents via <strong>MCP (Model Context Protocol) servers</strong>.</p>
+
+  <div class="key-point">
+    <strong>MCP Architecture:</strong>
+    <ul>
+      <li><strong>MCP Hosts</strong> — AI assistants or IDEs that initiate connections</li>
+      <li><strong>MCP Clients</strong> — connectors within the host that maintain 1:1 connections with servers</li>
+      <li><strong>MCP Servers</strong> — services that provide context and capabilities through the standardised protocol</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <strong>✦ MCP Server Creation (Python):</strong><br>
+    <code>@tool("get_list_of_locations", "Returns a list of locations with bike tracking points...")</code><br>
+    <code>async def get_list_of_locations(args): ...</code><br>
+    <code>mcp_server = create_sdk_mcp_server(name="example_mcp", tools=[get_list_of_locations])</code>
+  </div>
+
+  <p>MCP servers share the same general structure as REST APIs, but add a <strong>readable natural-language description</strong> of each endpoint so that AI agents can understand what the tool does and when to call it.</p>
+
+  <div class="key-point">
+    <strong>Key insight:</strong> If an organisation already has a well-structured data system with REST APIs, exposing it via MCP for agentic AI consumption is straightforward — the same data contracts and service patterns apply.
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MCQ SECTION ═══════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>🎯 Multiple Choice &amp; True/False — 50 Questions</h2>
+
+  <div class="action-bar">
+    <div class="score-display" id="mcq-score">Score: 0 / 0</div>
+    <button class="reset-btn" onclick="resetMCQ()">↺ Reset All Answers</button>
+  </div>
+
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ═══════════════════════════ SHORT ANSWER SECTION ═══════════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>✍️ Short Answer — 10 Questions</h2>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+// ═══════════════ MCQ DATA ═══════════════
+const mcqData = [
+  // --- Conceptual Model ---
+  {
+    q: "In the conceptual model of a Data & Analytics System, which component is responsible for exposing data and models to end users?",
+    opts: ["Collection", "Storage", "Processing", "Serving"],
+    ans: 3,
+    type: "mc"
+  },
+  {
+    q: "True or False: The focus of Part III of this course is on individual tools rather than the structural principles of analytics systems.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "Which of the following is NOT listed as a 'Collection' method in the conceptual model?",
+    opts: ["APIs", "Web scraping", "Databases", "Dashboarding"],
+    ans: 3,
+    type: "mc"
+  },
+  {
+    q: "True or False: In production ML environments, consistency and auditability are more important than rapid experimentation.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  // --- Notebooks vs Production ---
+  {
+    q: "Which of the following best describes why Jupyter notebooks are problematic in production data systems?",
+    opts: [
+      "They cannot execute Python code",
+      "They have hidden state, poor version control, and no dependency management",
+      "They are too slow for data processing",
+      "They cannot connect to external APIs"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: It is impossible to build a production analytics infrastructure using Jupyter notebooks.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "Which company's architecture (shown in the slides) demonstrated a notebook-based production pipeline using Papermill?",
+    opts: ["Google", "Netflix", "Uber", "Amazon"],
+    ans: 1,
+    type: "mc"
+  },
+  // --- Data Pipelines & DAGs ---
+  {
+    q: "A data pipeline is formally represented as which type of graph structure?",
+    opts: [
+      "Undirected cyclic graph",
+      "Directed cyclic graph",
+      "Directed Acyclic Graph (DAG)",
+      "Complete bipartite graph"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "In a DAG representing a data pipeline, what do the EDGES represent?",
+    opts: [
+      "Individual data transformations",
+      "Dependencies between transformations",
+      "Execution times of tasks",
+      "Data storage locations"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: In a DAG-based data pipeline, a task can depend on its own output (circular dependency).",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  // --- Critical Path ---
+  {
+    q: "The critical path of a pipeline DAG is defined as:",
+    opts: [
+      "The shortest path from source to sink",
+      "The path with the fewest number of tasks",
+      "The path with the maximum total execution time",
+      "Any path that visits all vertices"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "True or False: By adding more parallel workers, you can always reduce pipeline runtime below the critical path length.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "In the DAG optimisation framework, what does L(P) represent?",
+    opts: [
+      "The number of vertices in path P",
+      "The sum of execution times of tasks in path P",
+      "The memory consumed by path P",
+      "The number of edges in path P"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "Critical path analysis answers which design question?",
+    opts: [
+      "Which tasks can run in parallel?",
+      "What is the minimum number of workers needed?",
+      "What is the shortest possible total pipeline runtime?",
+      "How can we minimise the number of dependencies?"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  // --- Anti-chains ---
+  {
+    q: "In the context of DAG optimisation, an anti-chain is:",
+    opts: [
+      "The longest path in the DAG",
+      "A set of vertices where no two have a directed path between them",
+      "A cycle in the graph",
+      "A set of tasks that all depend on the same predecessor"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "In the 5-node example DAG (v1→v2,v3,v4,v5; v2→v4,v5; v3→v4,v5; v4→v5), what is the largest anti-chain?",
+    opts: ["{v1}", "{v2, v3}", "{v4, v5}", "{v1, v2, v3}"],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: The size of the largest anti-chain gives a lower bound on the minimum pipeline runtime.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "The maximum number of tasks that can be parallelised at any point corresponds to:",
+    opts: [
+      "The number of vertices minus the critical path length",
+      "The number of edges in the DAG",
+      "The size of the largest anti-chain",
+      "The number of source nodes"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  // --- Transitive Reduction ---
+  {
+    q: "Transitive reduction of a DAG produces:",
+    opts: [
+      "A graph with the maximum number of edges preserving connectivity",
+      "The minimal dependency graph that preserves all execution constraints",
+      "A graph where every path has equal length",
+      "A complete graph over the same vertex set"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: After transitive reduction, two tasks u and v are still ordered (u ≺ v) in G' if and only if they were ordered in G.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  {
+    q: "From the minimal dependency graph (transitive reduction), engineers can deduce:",
+    opts: ["Data contracts between tasks", "The critical path", "The number of workers needed", "The scheduling frequency"],
+    ans: 0,
+    type: "mc"
+  },
+  // --- Orchestration ---
+  {
+    q: "Orchestration in data systems refers to:",
+    opts: [
+      "Processing and transforming data",
+      "Storing raw data in a data lake",
+      "Determining the order and timing of pipeline runs",
+      "Deploying machine learning models"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "True or False: Pipeline orchestrators like Apache Airflow directly process and transform the data in each pipeline task.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "Which of the following is NOT a feature provided by pipeline orchestrators?",
+    opts: [
+      "Automatic scheduling and execution",
+      "Retries on failure",
+      "Feature engineering and model training",
+      "Visibility on process executions"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "In Apache Airflow, a task is defined using which Python decorator?",
+    opts: ["@pipeline", "@task", "@step", "@operator"],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: In Airflow, dependencies between tasks are expressed through the order in which @task functions are called, using outputs as inputs.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  {
+    q: "Which of the following is an alternative to Apache Airflow for pipeline orchestration?",
+    opts: ["MLflow", "FastAPI", "Dagster", "MLOps"],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "True or False: Human-in-the-loop verification can be a valid task type within an orchestrated data pipeline.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  // --- ML Development ---
+  {
+    q: "Which statement best captures the key difference between ML development and ML production?",
+    opts: [
+      "Development uses Python; production uses Java",
+      "Development prioritises experimentation; production prioritises consistency and auditability",
+      "Production models are always more accurate than development models",
+      "Development pipelines use DAGs; production pipelines do not"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "Which of the following does NOT need to be tracked for each ML experiment run?",
+    opts: [
+      "Which code version was used",
+      "What data was used",
+      "The developer's name and employee ID",
+      "What hyperparameters were set"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "True or False: Orchestrators have no role to play once an ML system is in production.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  // --- MLflow ---
+  {
+    q: "MLflow consists of two key components. Which of the following correctly identifies them?",
+    opts: [
+      "Feature store and prediction engine",
+      "Tracking server and model registry",
+      "Data pipeline and serving API",
+      "Experiment notebook and deployment cluster"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: Using mlflow.sklearn.autolog(), a data scientist must manually log each metric and parameter after training.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "In MLflow's model registry, what does the 'champion' alias indicate?",
+    opts: [
+      "The model with the highest training accuracy",
+      "The model version currently deployed in production",
+      "The first model ever registered",
+      "The model awaiting code review"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "By default, MLflow serialises (saves) models using which Python mechanism?",
+    opts: ["JSON serialisation", "ONNX format", "Pickle", "HDF5"],
+    ans: 2,
+    type: "mc"
+  },
+  {
+    q: "True or False: MLflow can deploy models to cloud providers like Amazon SageMaker and Azure Machine Learning.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  {
+    q: "Which of the following describes the tracking server's primary purpose?",
+    opts: [
+      "Serving predictions to end users via REST API",
+      "Logging and comparing parameters, metrics, and artefacts across experiment runs",
+      "Scheduling the retraining of models",
+      "Storing raw training datasets"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  // --- Serving ---
+  {
+    q: "In a production serving architecture, what is the main role of the 'service layer'?",
+    opts: [
+      "To store all training data",
+      "To provide a controlled interface between internal data/models and consumers",
+      "To retrain models automatically",
+      "To replace the data warehouse"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: Best practice is to give business stakeholders direct SQL access to the production database tables.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "The service layer in a production system is typically implemented as:",
+    opts: ["A Jupyter notebook", "A REST API", "A CSV file share", "A raw database view"],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: A service layer requires users to know the internal storage format or model architecture.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "In educational projects, how is data typically shared (in contrast to production)?",
+    opts: [
+      "Via REST APIs with OAuth authentication",
+      "Through MLflow model registry with versioning",
+      "As pickled models, raw files, or training notebooks",
+      "Via MCP servers"
+    ],
+    ans: 2,
+    type: "mc"
+  },
+  // --- Agentic AI / MCP ---
+  {
+    q: "MCP stands for:",
+    opts: [
+      "Machine Control Protocol",
+      "Model Context Protocol",
+      "Managed Compute Pipeline",
+      "Modular Component Platform"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: MCP servers follow a completely different architectural pattern from REST APIs.",
+    opts: ["True", "False"],
+    ans: 1,
+    type: "tf"
+  },
+  {
+    q: "What extra requirement does an MCP tool definition have compared to a plain REST endpoint?",
+    opts: [
+      "It must use GraphQL instead of JSON",
+      "It must include a human/AI-readable natural language description of what the tool does",
+      "It must return data in XML format",
+      "It must require OAuth 2.0 authentication"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "Which of the following is classified as an 'MCP Host'?",
+    opts: [
+      "A database server",
+      "An AI assistant or IDE that initiates connections",
+      "A data pipeline orchestrator",
+      "A model registry"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: An organisation with a well-structured REST API data system would find it straightforward to add MCP server support for AI agents.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  // --- Integrative / Deeper ---
+  {
+    q: "A pipeline has tasks with execution times: v1=5s, v2=3s, v3=4s, v4=2s. Paths: P1=(v1,v2,v4), P2=(v1,v3,v4). What is the critical path length?",
+    opts: ["10s", "11s", "9s", "12s"],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "If the largest anti-chain in a pipeline DAG has 4 elements, this means:",
+    opts: [
+      "You need at least 4 machines to run the pipeline at all",
+      "At most 4 tasks can be run in parallel at peak concurrency",
+      "The critical path has exactly 4 tasks",
+      "The pipeline has exactly 4 stages"
+    ],
+    ans: 1,
+    type: "mc"
+  },
+  {
+    q: "True or False: Data contracts can be derived from the transitive reduction of a pipeline's DAG.",
+    opts: ["True", "False"],
+    ans: 0,
+    type: "tf"
+  },
+  {
+    q: "Which combination of tools would be appropriate for a complete, production-grade ML pipeline at a company?",
+    opts: [
+      "Jupyter notebook + CSV files",
+      "Apache Airflow (orchestration) + MLflow (experiment tracking + registry) + FastAPI (serving)",
+      "Excel + Google Drive",
+      "cron jobs + pickle files + email reports"
+    ],
+    ans: 1,
+    type: "mc"
+  }
+];
+
+// ═══════════════ SHORT ANSWER DATA ═══════════════
+const saData = [
+  {
+    q: "Explain why the critical path is a hard lower bound on pipeline runtime, even with unlimited computational resources. What does this imply for optimisation strategy?",
+    a: "<strong>Answer:</strong> The critical path represents a chain of tasks where each depends on the previous one — they cannot be parallelised. Even with infinite machines, these tasks must execute sequentially. The critical path length is therefore the theoretical minimum runtime. This implies that to meaningfully speed up a pipeline, engineers must focus on reducing the execution times of tasks <em>on</em> the critical path (e.g., optimising the slowest transformations), not on tasks outside it — additional parallelism of non-critical tasks yields no benefit beyond a certain point."
+  },
+  {
+    q: "A colleague argues: 'We should just give our data analysts direct access to the production PostgreSQL database — it's simpler than building an API.' What are the key risks of this approach, and how does the service layer pattern mitigate them?",
+    a: "<strong>Answer:</strong> Direct DB access risks include: schema coupling (analysts break if tables are restructured), security (no row-level or column-level access control), performance (ad-hoc queries can overwhelm the production DB), and auditability (hard to track who accessed what). The service layer mitigates these by: (1) decoupling the internal schema from the public interface, (2) enforcing granular access policies, (3) allowing rate limiting and caching, and (4) providing a stable contract that can evolve independently of the storage backend."
+  },
+  {
+    q: "Compare and contrast the roles of Apache Airflow and MLflow in a modern data analytics infrastructure. Could they be used together? How?",
+    a: "<strong>Answer:</strong> Airflow is a pipeline <em>orchestrator</em> — it schedules and coordinates when tasks run, manages dependencies, handles retries, and provides execution visibility. It does not process data itself. MLflow is an <em>experiment tracking and model management</em> tool — it logs parameters/metrics per run and manages model versions in a registry. They are complementary: Airflow can orchestrate automated model retraining pipelines where each run triggers MLflow logging (via <code>mlflow.start_run()</code>) and model registration. Airflow handles the 'when', MLflow handles the 'what was done and what came out'."
+  },
+  {
+    q: "What is the difference between an anti-chain and a critical path in a pipeline DAG? Which one informs resource provisioning and which one informs runtime estimation?",
+    a: "<strong>Answer:</strong> The <strong>critical path</strong> is the longest path through the DAG (maximum total execution time). It informs <em>runtime estimation</em> — the minimum time for the full pipeline to complete. An <strong>anti-chain</strong> is a set of vertices with no directed path between any two — they are mutually independent. The size of the largest anti-chain informs <em>resource provisioning</em> — it gives an upper bound on the number of parallel workers needed to achieve maximum performance. In practice: reduce critical path tasks to improve speed; size your worker pool to match the largest anti-chain."
+  },
+  {
+    q: "Why does MLflow store models using pickle by default, and what are the security implications of loading pickled models from untrusted sources?",
+    a: "<strong>Answer:</strong> Pickle is used because it can serialise arbitrary Python objects (including custom model classes, preprocessing pipelines, etc.) without requiring a standardised format. However, pickle files can contain arbitrary executable code — when deserialized, they can execute any Python code. Loading a pickled model from an untrusted source is equivalent to running arbitrary code. In production, this means: (1) always verify model artefact provenance via the MLflow registry and CI/CD pipelines, (2) consider using framework-specific formats (ONNX, TorchScript) for cross-platform deployment with reduced attack surface."
+  },
+  {
+    q: "Explain the concept of transitive reduction in the context of data pipelines. What practical problem does it solve, and what is a 'data contract'?",
+    a: "<strong>Answer:</strong> Transitive reduction removes redundant edges from a DAG while preserving all ordering relationships: if u ≺ v can be inferred through intermediate nodes, the direct u→v edge is removed. In practice, it solves the problem of <em>over-specification of dependencies</em> — having too many explicit wires between tasks makes the pipeline brittle and hard to maintain. After reduction, each edge represents a <em>direct</em> and necessary dependency. A <strong>data contract</strong> is the explicit specification of what data a task produces and what a downstream task expects — derived from these direct edges. It formalises the interface between tasks, enabling independent development and testing."
+  },
+  {
+    q: "Describe how MCP servers extend the serving concept from REST APIs. What specific additional element is required, and why is it needed for AI agents but not for human developers?",
+    a: "<strong>Answer:</strong> MCP servers have the same structure as REST APIs — they expose endpoints that accept inputs and return outputs. The key addition is a <strong>natural language description</strong> of each tool/endpoint that explains what it does, what it returns, and when it should be called. Human developers can read documentation and infer purpose from endpoint names; AI agents (LLMs) rely on these descriptions to decide which tool to invoke for a given goal. Without descriptive metadata, the AI cannot select the right tool autonomously. This makes MCP essentially 'REST API + tool documentation embedded in the interface definition'."
+  },
+  {
+    q: "What is the difference between experiment tracking and model versioning in MLflow, and why are both necessary for production ML systems?",
+    a: "<strong>Answer:</strong> <strong>Experiment tracking</strong> (Tracking Server) records the full history of all training runs — every parameter combination, metric, dataset version, and artefact — during the experimentation phase. It answers 'what did we try, and how did each attempt perform?'. <strong>Model versioning</strong> (Model Registry) manages the lifecycle of approved candidate models — staging, production ('champion'), and archived versions — during and after deployment. It answers 'what is in production, who put it there, and what is the rollback option?'. Both are necessary: tracking drives experimentation decisions; versioning ensures production reliability, auditability, and controlled rollout of new models."
+  },
+  {
+    q: "An Airflow DAG with `catchup=False` is set to run `@daily` starting 2026-01-01. The system is initialised on 2026-04-06. How many historical runs will Airflow attempt to execute, and what does this reveal about the trade-off in the `catchup` parameter?",
+    a: "<strong>Answer:</strong> With <code>catchup=False</code>, Airflow will execute <strong>0 historical (backfill) runs</strong> — it will only schedule future runs from that point forward. If <code>catchup=True</code> were set, Airflow would attempt to run all missed daily intervals from 2026-01-01 to 2026-04-06 (~95 runs). The trade-off: catchup=True ensures historical data completeness (useful for pipelines ingesting time-partitioned data); catchup=False avoids overwhelming the system with backlogs when deploying a new DAG that shouldn't reprocess history (useful for real-time monitoring or live model retraining pipelines)."
+  },
+  {
+    q: "Why is automation and maintainability more important than raw model accuracy in production ML systems? Give a concrete scenario where this trade-off matters.",
+    a: "<strong>Answer:</strong> In production, a model that is 2% less accurate but can be reliably retrained, versioned, monitored, and rolled back is more valuable than a marginally more accurate model that requires manual intervention to update. <strong>Concrete scenario:</strong> A fraud detection model trained in January begins drifting by March due to changing fraud patterns. A maintainable system (with Airflow-scheduled retraining + MLflow tracking + champion alias for deployment) can automatically detect drift, retrain on fresh data, validate metrics, and promote a new champion model — all without downtime. A notebook-based approach requires a data scientist to manually run the notebook, eyeball the results, and manually update whatever is serving predictions — introducing delay and risk of human error."
+  }
+];
+
+// ═══════════════ RENDER MCQ ═══════════════
+let answered = 0;
+let correct = 0;
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  answered = 0; correct = 0;
+  updateScore();
+
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = item.type === 'tf' ? `True / False · Q${idx+1}` : `Multiple Choice · Q${idx+1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.setAttribute('data-q', idx);
+      btn.setAttribute('data-o', oi);
+      btn.onclick = () => handleAnswer(idx, oi, item.ans, btn, card);
+      card.appendChild(btn);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback-bar';
+    feedback.id = `fb-${idx}`;
+    feedback.style.display = 'none';
+    card.appendChild(feedback);
+
+    container.appendChild(card);
+  });
+}
+
+function handleAnswer(qIdx, chosen, correct_idx, btn, card) {
+  const btns = card.querySelectorAll('.option-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    const oi = parseInt(b.getAttribute('data-o'));
+    if (oi === correct_idx) b.classList.add('reveal-correct');
+  });
+
+  const fb = document.getElementById(`fb-${qIdx}`);
+  fb.style.display = 'block';
+
+  if (chosen === correct_idx) {
+    btn.classList.remove('reveal-correct');
+    btn.classList.add('correct');
+    fb.className = 'feedback-bar correct';
+    fb.textContent = '✅ Correct!';
+    correct++;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback-bar incorrect';
+    fb.textContent = `❌ Incorrect. The correct answer is: "${mcqData[qIdx].opts[correct_idx]}"`;
+  }
+  answered++;
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${answered} answered`;
+}
+
+function resetMCQ() {
+  renderMCQ();
+}
+
+// ═══════════════ RENDER SHORT ANSWER ═══════════════
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer · Q${idx+1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+
+    btn.onclick = () => {
+      if (panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'block';
+        btn.textContent = 'Hide Answer';
+      } else {
+        panel.style.display = 'none';
+        btn.textContent = 'Reveal Answer';
+      }
+    };
+
+    card.appendChild(btn);
+    card.appendChild(panel);
+    container.appendChild(card);
+  });
+}
+
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

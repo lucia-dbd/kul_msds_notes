@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 5 — Dashboarding with Shiny for Python</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 {
+    font-size: 1.8em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin: 0 0 6px 0;
+  }
+  .page-header .subtitle {
+    font-size: 0.92em;
+    opacity: 0.82;
+    font-weight: 400;
+  }
+
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #1a3a5c;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin-top: 20px;
+  }
+
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .computation-note {
+    background: #fdf3f3;
+    border-left: 4px solid #e57373;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+
+  code {
+    background: #f0f4fb;
+    border: 1px solid #c8d4f0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #1a3a5c;
+  }
+  pre {
+    background: #f8f9ff;
+    border: 1px solid #c8d4f0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    line-height: 1.6;
+    color: #1a3a5c;
+    margin: 14px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.93em;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd) { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; font-weight: 700; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-top: 0; }
+
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+    margin-bottom: 16px;
+  }
+
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #2e6da4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mcq-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    font-size: 1.0em;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #d0d8ea;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 6px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c2c3a;
+    transition: all 0.18s;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-bar {
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+  .feedback-bar.correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; font-weight: 700; border-bottom: 2px solid #f3f0ff; padding-bottom: 8px; margin-top: 0; }
+
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1;
+    font-size: 0.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 12px; }
+
+  .reveal-btn {
+    background: #6f42c1;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 22px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.2s;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+
+  .answer-panel {
+    background: #f3f0ff;
+    border: 1px solid #d4c8f5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+    font-size: 0.95em;
+    line-height: 1.8;
+    display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  .reset-btn {
+    background: #1a3a5c;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 9px 28px;
+    font-size: 0.93em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  .progress-bar-wrap {
+    background: #e2e8f4;
+    border-radius: 10px;
+    height: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: #2e6da4;
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Lecture 5 — Dashboarding with Shiny for Python</h1>
+  <div class="subtitle">Modern Data Analytics · Exam Preparation Notes · Catholic University of Leuven</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#intro">1. Introduction</a>
+  <a href="#architecture">2. Architecture</a>
+  <a href="#ui">3. UI Framework</a>
+  <a href="#reactive">4. Reactivity</a>
+  <a href="#dynamic">5. Dynamic UI</a>
+  <a href="#interactive">6. Interactive Outputs</a>
+  <a href="#dashboards">7. Dashboards</a>
+  <a href="#mcq" class="nav-mcq">MCQ (50)</a>
+  <a href="#sa" class="nav-sa">Short Answer (10)</a>
+</div>
+
+<!-- ── SECTION 1 ── -->
+<div class="notes-section" id="intro">
+  <h2>1. Introduction &amp; Motivation</h2>
+  <p>Shiny for Python is an open-source Python package that creates <strong>interactive web applications</strong> directly from your Python analyses — without requiring HTML, CSS, or JavaScript knowledge. It originated from <strong>R Shiny (2012)</strong> and was ported to Python in <strong>2022</strong>.</p>
+
+  <div class="key-point">
+    <strong>Core idea:</strong> "Move the water surface downwards" — expose the full depth of your analysis to an audience interactively, rather than showing only a static surface.
+  </div>
+
+  <h3>Deployment options</h3>
+  <table>
+    <thead><tr><th>Option</th><th>Description</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Cloud hosting</strong></td><td>Shinyapps.io or Hugging Face Spaces</td><td>No own server needed; public/shared apps</td></tr>
+      <tr><td><strong>Self-hosted (on-premise)</strong></td><td>Shiny Server (open source) or Posit Connect (enterprise)</td><td>Must run inside network/VPC</td></tr>
+      <tr><td><strong>Static / ShinyLive</strong></td><td>Runs Python logic in the browser via WebAssembly</td><td>No server at all; free hosting; infinitely scalable</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>ShinyLive ≠ full Shiny:</strong> Only apps that can run entirely client-side qualify. Heavy server-side dependencies may not work.
+  </div>
+</div>
+
+<!-- ── SECTION 2 ── -->
+<div class="notes-section" id="architecture">
+  <h2>2. App Architecture</h2>
+  <p>Every Shiny app has three components defined in <code>app.py</code>:</p>
+
+  <div class="theorem-box">
+    <strong>Template structure:</strong>
+    <pre>from shiny import App, ui, render
+
+app_ui = ui.page_fluid()          # UI object
+
+def server(input, output, session):
+    pass                          # Server logic
+
+app = App(ui=app_ui, server=server)  # Combines both</pre>
+  </div>
+
+  <table>
+    <thead><tr><th>Component</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>ui</code></td><td>Nested Python functions that assemble an HTML user interface</td></tr>
+      <tr><td><code>server</code></td><td>Function with instructions to build/rebuild Python objects displayed in the UI</td></tr>
+      <tr><td><code>App</code></td><td>Combines ui and server into a functioning application</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    A Shiny app is a web page (<strong>UI</strong>) connected to a live Python session (<strong>Server</strong>). User interactions in the UI trigger Python code on the server, which updates the UI in return.
+  </div>
+
+  <h3>Running an app</h3>
+  <p>Two methods: VS Code with the Shiny extension (recommended — supports Debug Mode with breakpoints), or the command line: <code>shiny run --reload --launch-browser app_dir/app.py</code></p>
+
+  <div class="example-box">
+    <strong>Minimal working example:</strong>
+    <pre>app_ui = ui.page_fluid(
+    ui.input_numeric("n", "Sample size", 25),
+    ui.output_plot("hist")
+)
+
+def server(input, output, session):
+    @render.plot
+    def hist():
+        data = np.random.randn(input.n())
+        fig, ax = plt.subplots()
+        ax.hist(data, bins=10)
+        return fig</pre>
+  </div>
+</div>
+
+<!-- ── SECTION 3 ── -->
+<div class="notes-section" id="ui">
+  <h2>3. UI Framework — Inputs, Outputs &amp; Layout</h2>
+
+  <h3>Input widgets</h3>
+  <p>Input values are <strong>reactive</strong>. They are declared with <code>ui.input_&lt;type&gt;()</code> and accessed in the server with <code>input.&lt;inputId&gt;()</code>.</p>
+  <table>
+    <thead><tr><th>Function</th><th>Widget type</th></tr></thead>
+    <tbody>
+      <tr><td><code>ui.input_numeric()</code></td><td>Numeric spinner</td></tr>
+      <tr><td><code>ui.input_slider()</code></td><td>Slider (single or range)</td></tr>
+      <tr><td><code>ui.input_text()</code> / <code>input_text_area()</code></td><td>Text box</td></tr>
+      <tr><td><code>ui.input_select()</code> / <code>input_selectize()</code></td><td>Dropdown</td></tr>
+      <tr><td><code>ui.input_radio_buttons()</code></td><td>Radio buttons</td></tr>
+      <tr><td><code>ui.input_checkbox()</code> / <code>input_checkbox_group()</code></td><td>Checkboxes</td></tr>
+      <tr><td><code>ui.input_date()</code> / <code>input_date_range()</code></td><td>Date picker</td></tr>
+      <tr><td><code>ui.input_action_button()</code></td><td>Clickable button</td></tr>
+      <tr><td><code>ui.input_file()</code></td><td>File upload</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Output functions</h3>
+  <p><code>ui.output_&lt;type&gt;()</code> in the UI and <code>@render.&lt;type&gt;</code> in the server always work as a matched pair.</p>
+  <table>
+    <thead><tr><th>UI function</th><th>Server decorator</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td><code>ui.output_plot()</code></td><td><code>@render.plot</code></td><td>Matplotlib / Seaborn figure</td></tr>
+      <tr><td><code>ui.output_data_frame()</code></td><td><code>@render.data_frame</code></td><td>Interactive data table</td></tr>
+      <tr><td><code>ui.output_text()</code></td><td><code>@render.text</code></td><td>Plain text</td></tr>
+      <tr><td><code>ui.output_ui()</code></td><td><code>@render.ui</code></td><td>Dynamic HTML/UI elements</td></tr>
+      <tr><td><code>output_widget()</code></td><td><code>@render_widget</code></td><td>ipywidgets (e.g., Plotly)</td></tr>
+      <tr><td><code>ui.download_button()</code></td><td><code>@render.download</code></td><td>File download</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Layout &amp; panels</h3>
+  <p>Panels group elements; layout functions organize panels.</p>
+  <div class="key-point">
+    Common layout pattern: <code>ui.page_fluid(ui.layout_sidebar(ui.sidebar(...), ui.output_plot(...)))</code>
+  </div>
+  <p>Navigation: <code>ui.navset_tab()</code>, <code>ui.navset_pill_list()</code>, <code>ui.page_navbar()</code> — all use <code>ui.nav_panel()</code> children.</p>
+
+  <h3>HTML customization</h3>
+  <p>The app UI is an HTML document. Shiny provides helpers: <code>ui.HTML()</code>, <code>ui.div()</code>, <code>ui.span()</code>, <code>ui.h2()</code>, and <code>ui.tags.video()</code> for less common tags. CSS and JS files go in the <code>www/</code> subdirectory and are linked via <code>ui.HTMLDependency()</code>.</p>
+</div>
+
+<!-- ── SECTION 4 ── -->
+<div class="notes-section" id="reactive">
+  <h2>4. Reactivity</h2>
+  <p>Reactivity is the mechanism that keeps outputs synchronized with inputs automatically.</p>
+
+  <h3>Core reactive functions</h3>
+  <table>
+    <thead><tr><th>Function</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>@render.*</code></td><td>Render reactive output (plot, text, table, etc.)</td></tr>
+      <tr><td><code>@reactive.Calc</code></td><td>Create a cached reactive expression reusable in multiple render blocks</td></tr>
+      <tr><td><code>@reactive.Effect</code> / <code>@reactive.event()</code></td><td>Perform side effects; react only on specific event</td></tr>
+      <tr><td><code>reactive.Value()</code></td><td>Create a mutable reactive value</td></tr>
+      <tr><td><code>reactive.isolate()</code></td><td>Read a reactive value without registering a dependency (partial reactivity)</td></tr>
+      <tr><td><code>reactive.invalidate_later()</code></td><td>Schedule periodic updates</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>@reactive.Calc — key properties:</strong>
+    <ul>
+      <li><strong>Caching</strong>: computed once and reused across multiple render blocks → avoids redundant computation.</li>
+      <li><strong>Invalidation</strong>: automatically re-evaluated when any upstream input changes.</li>
+      <li>Use it when the same reactive expression is consumed by two or more <code>@render.*</code> functions.</li>
+    </ul>
+  </div>
+
+  <div class="key-point">
+    <strong>Partial reactivity pattern (App 7):</strong> Wrap inputs in <code>reactive.isolate()</code> inside a <code>@reactive.Calc</code> that also calls <code>input.update()</code>. The output only reacts to the action button click, not to every slider movement.
+  </div>
+
+  <div class="example-box">
+    <strong>Partial reactivity example:</strong>
+    <pre>@reactive.calc
+def histogram_params():
+    input.update()               # react to button click
+    with reactive.isolate():
+        bins  = input.bin()      # isolated — no dependency
+        color = input.colour()
+    return bins, color</pre>
+  </div>
+
+  <div class="warning-box">
+    <strong>Common mistake:</strong> Calling <code>input.x()</code> directly inside a render block registers a dependency. To read without dependency, always wrap in <code>reactive.isolate()</code>.
+  </div>
+</div>
+
+<!-- ── SECTION 5 ── -->
+<div class="notes-section" id="dynamic">
+  <h2>5. Dynamic User Interface</h2>
+  <p>Dynamic UIs allow sidebar inputs to change based on other inputs. The server generates HTML and sends it to the client via <code>@render.ui</code>, displayed with <code>ui.output_ui()</code>. Each update completely replaces the previous component.</p>
+
+  <div class="example-box">
+    <strong>Pattern (App 8 — dataset-dependent variable selectors):</strong>
+    <pre>def get_variable_choices():
+    return list(datasets[input.data1()].columns)
+
+@render.ui
+def vx():
+    return ui.input_select("variable_x", "Select X", get_variable_choices())
+
+# In UI:
+# ui.output_ui("vx")</pre>
+  </div>
+
+  <div class="key-point">
+    Dynamic UI is appropriate when: the choices in one input depend on the value of another input (e.g., column names depend on the selected dataset).
+  </div>
+</div>
+
+<!-- ── SECTION 6 ── -->
+<div class="notes-section" id="interactive">
+  <h2>6. Interactive Outputs with ipywidgets</h2>
+  <p>Static outputs (matplotlib plots, plain tables) can be replaced with interactive widgets via the <strong>shinywidgets</strong> package.</p>
+
+  <table>
+    <thead><tr><th>Category</th><th>Notable packages</th></tr></thead>
+    <tbody>
+      <tr><td>Interactive plots</td><td>plotly, altair, bokeh</td></tr>
+      <tr><td>Maps</td><td>pydeck, ipyleaflet</td></tr>
+      <tr><td>Tables/grids</td><td>ipydatagrid, ipysheet</td></tr>
+      <tr><td>3D visualizations</td><td>ipyvolume, pythreejs</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Integration pattern:</strong>
+    <ol>
+      <li>Install: <code>pip install shinywidgets</code></li>
+      <li>Replace <code>ui.output_plot("id")</code> with <code>output_widget("id")</code> in the UI</li>
+      <li>Replace <code>@render.plot</code> with <code>@render_widget</code> in the server</li>
+      <li>Return a widget object (e.g., a Plotly figure) from the function</li>
+    </ol>
+  </div>
+
+  <div class="warning-box">
+    <strong>Note:</strong> <code>@render_widget</code> and <code>output_widget()</code> must be imported from <code>shinywidgets</code>, not from <code>shiny</code>.
+  </div>
+</div>
+
+<!-- ── SECTION 7 ── -->
+<div class="notes-section" id="dashboards">
+  <h2>7. Extension to Dashboards</h2>
+  <p>The built-in Shiny UI is functional but minimal. More polished dashboards can be built by:</p>
+  <ul>
+    <li>Adding custom HTML/CSS/JavaScript (flexible but time-consuming)</li>
+    <li>Using pre-defined dashboard templates from <code>shiny.posit.co/templates</code> and <code>shiny.posit.co/py/gallery/</code></li>
+  </ul>
+
+  <div class="key-point">
+    Dashboard components like value boxes, metric cards, and responsive grid layouts are available through Shiny's component library and community extensions.
+  </div>
+
+  <h3>Key design considerations</h3>
+  <ul>
+    <li>Use <code>ui.layout_columns()</code> for side-by-side elements within a panel</li>
+    <li>Combine <code>ui.navset_tab()</code> with multiple <code>ui.nav_panel()</code> blocks for multi-tab dashboards</li>
+    <li>Use <code>ui.download_button()</code> + <code>@render.download</code> for export functionality</li>
+    <li>ShinyLive enables zero-cost static hosting for appropriate apps</li>
+  </ul>
+</div>
+
+<!-- ── MCQ SECTION ── -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+  <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+    <button class="reset-btn" onclick="resetAll()">Reset all answers</button>
+    <span class="score-display" id="score-display">Score: 0 / 0 answered</span>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ── SHORT ANSWER SECTION ── -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer Questions (10)</h2>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  {q:"Shiny for Python was first released in:", opts:["2012","2018","2022","2024"], ans:2, explanation:"R Shiny launched in 2012; the Python port arrived in 2022."},
+  {q:"Which component of a Shiny app is responsible for executing Python logic in response to user input?", opts:["ui","server","App","render"], ans:1, explanation:"The server function contains all reactive logic."},
+  {q:"True or False: A Shiny app's UI is ultimately rendered as an HTML document.", opts:["True","False"], ans:0, explanation:"ui.page_fluid() and related functions generate HTML markup."},
+  {q:"Which deployment option allows a Shiny app to run entirely in the user's browser without a Python server?", opts:["Shinyapps.io","ShinyLive","Posit Connect","Shiny Server"], ans:1, explanation:"ShinyLive uses WebAssembly to run Python logic client-side."},
+  {q:"To access the current value of an input with id 'n' in the server function, you write:", opts:["input['n']","input.n","input.n()","input.get('n')"], ans:2, explanation:"Input values are accessed as reactive callables: input.n()"},
+  {q:"True or False: ui.output_plot() and @render.plot are interchangeable with any output/render combination.", opts:["True","False"], ans:1, explanation:"Each output type must be paired with its matching render decorator."},
+  {q:"Which layout function creates a sidebar panel on the left and a main content area on the right?", opts:["ui.layout_columns()","ui.layout_sidebar()","ui.panel_well()","ui.navset_tab()"], ans:1, explanation:"ui.layout_sidebar() is the standard sidebar-main layout."},
+  {q:"The @reactive.Calc decorator is most useful when:", opts:["You want to delay output rendering","A reactive expression is consumed by multiple render blocks","You need to perform a side effect","You want to remove reactivity from an expression"], ans:1, explanation:"@reactive.Calc caches the result so multiple render blocks can reuse it without recomputing."},
+  {q:"True or False: reactive.isolate() prevents a reactive function from re-running when the isolated input changes.", opts:["True","False"], ans:0, explanation:"Inside reactive.isolate(), reading a value does not register a dependency."},
+  {q:"In the partial reactivity pattern, which combination is correct?", opts:["@reactive.Calc + input directly","@reactive.Calc + reactive.isolate() + action button","@render.plot + reactive.isolate()","@reactive.Effect + input directly"], ans:1, explanation:"The action button drives invalidation; isolate() prevents slider changes from triggering updates."},
+  {q:"Which function places a dynamic UI component generated in the server into the UI page?", opts:["ui.output_plot()","ui.output_ui()","ui.output_html()","ui.output_text()"], ans:1, explanation:"ui.output_ui() displays whatever @render.ui returns."},
+  {q:"True or False: ShinyLive apps can use any Python package, including those requiring compiled C extensions.", opts:["True","False"], ans:1, explanation:"WebAssembly (Pyodide) supports only packages with compatible builds; many native extensions are not available."},
+  {q:"The shinywidgets package is required to integrate which type of outputs?", opts:["Matplotlib plots","Static HTML","ipywidgets (e.g., Plotly figures)","Data frames"], ans:2, explanation:"shinywidgets bridges Shiny's reactivity with the ipywidgets ecosystem."},
+  {q:"Which decorator replaces @render.plot when displaying a Plotly interactive chart?", opts:["@render.widget","@render_widget","@reactive.widget","@render.interactive"], ans:1, explanation:"@render_widget from shinywidgets is the correct decorator."},
+  {q:"True or False: ui.sidebar() accepts a position argument to place the sidebar on the right.", opts:["True","False"], ans:0, explanation:"position='right' moves the sidebar to the right side."},
+  {q:"Which file structure is correct for a Shiny app?", opts:["app.py inside any directory","A directory named after the app containing app.py (+ optional www/ etc.)","app.R inside a .shiny folder","main.py with app = App(...)"], ans:1, explanation:"Each app lives in its own directory with app.py; static assets go in www/."},
+  {q:"True or False: @render.data_frame and @render.table produce identical outputs.", opts:["True","False"], ans:1, explanation:"@render.data_frame produces an interactive filterable table; @render.table produces a static HTML table."},
+  {q:"The ui.navset_tab() function creates navigation using:", opts:["Sidebar links","Horizontal tabs","Vertical pill list","A dropdown navbar"], ans:1, explanation:"navset_tab() renders clickable horizontal tabs at the top."},
+  {q:"Which reactive function should you use if you want code to run as a side effect (e.g., write a log file) when an input changes?", opts:["@reactive.Calc","@reactive.Effect","@render.text","reactive.Value()"], ans:1, explanation:"@reactive.Effect is designed for side effects that don't produce output."},
+  {q:"True or False: In Shiny for Python, ui.HTML() can be used to inject raw HTML strings into the UI.", opts:["True","False"], ans:0, explanation:"ui.HTML() passes the string directly to the browser as raw HTML."},
+  {q:"What does the '--reload' flag do when running a Shiny app from the command line?", opts:["Opens the app in a new browser tab","Restarts the Python process when files change","Clears the browser cache","Enables debug breakpoints"], ans:1, explanation:"--reload watches for file changes and automatically restarts the server."},
+  {q:"True or False: Dynamic UI generated with @render.ui fully replaces the previous UI component on each update.", opts:["True","False"], ans:0, explanation:"Each time the server sends a new UI component, it replaces the previous one entirely."},
+  {q:"Which input type returns a tuple (low, high) when configured as a range slider?", opts:["ui.input_numeric()","ui.input_slider() with value=(low, high)","ui.input_date_range()","ui.input_select() with multiple=True"], ans:1, explanation:"Setting value=(low, high) in ui.input_slider() creates a range slider; the server receives a tuple."},
+  {q:"When using @render.download, what does the decorated function return?", opts:["A file path string","A tuple of (filename, write_function)","A bytes object","A file-like object"], ans:1, explanation:"The function returns (filename, write_file) where write_file accepts a file handle."},
+  {q:"True or False: ui.layout_columns() can be used to place input widgets side by side inside a sidebar.", opts:["True","False"], ans:0, explanation:"ui.layout_columns() creates a responsive column grid that works inside any panel."},
+  {q:"What is the primary advantage of @reactive.Calc over repeating the same computation inside multiple @render.* functions?", opts:["It makes the code asynchronous","It caches the value and avoids redundant recomputation","It prevents user inputs from triggering updates","It converts Python objects to HTML automatically"], ans:1, explanation:"Caching means the computation runs once; all consumers receive the same cached result."},
+  {q:"True or False: Shiny for Python requires JavaScript knowledge to build a working interactive app.", opts:["True","False"], ans:1, explanation:"JavaScript is optional — Shiny abstracts it away, though it can be added for customization."},
+  {q:"In App 8 (dynamic UI), the variable selector inputs are populated by calling:", opts:["A hardcoded list of column names","A function that reads columns from the currently selected dataset","A fixed dictionary passed to ui.input_select()","An external API endpoint"], ans:1, explanation:"get_variable_choices() reads datasets[input.data1()].columns dynamically."},
+  {q:"Which of the following best describes the relationship between the UI and server in a Shiny app?", opts:["UI runs on the browser; server runs Python on a computer (or WebAssembly)","Both UI and server run entirely in JavaScript","UI and server share the same Python process","Server runs on the browser; UI runs on the server"], ans:0, explanation:"The UI is an HTML page; the server is a live Python session (or WebAssembly in ShinyLive)."},
+  {q:"True or False: output_widget() from shinywidgets must replace ui.output_plot() when displaying a Plotly chart.", opts:["True","False"], ans:0, explanation:"output_widget() is the correct UI-side counterpart of @render_widget."},
+  {q:"Which argument to ui.input_radio_buttons() sets a default selection on page load?", opts:["default=","value=","selected=","initial="], ans:2, explanation:"The 'selected' parameter sets the initially chosen option."},
+  {q:"True or False: A Shiny app must have exactly one sidebar panel.", opts:["True","False"], ans:1, explanation:"Apps can have zero, one, or multiple sidebars, or use entirely different layout patterns."},
+  {q:"Which panel function creates a visually grouped container (grey well) for inputs?", opts:["ui.panel_main()","ui.panel_well()","ui.panel_title()","ui.panel_sidebar()"], ans:1, explanation:"ui.panel_well() wraps content in a rounded, shaded box."},
+  {q:"In the context of reactive programming, what does 'invalidation' mean?", opts:["The input has been removed from the UI","A reactive expression's cached value is marked stale and must be recomputed","The server session has ended","A render function has thrown an exception"], ans:1, explanation:"Invalidation signals that cached values are no longer valid and dependents must re-execute."},
+  {q:"True or False: ui.nav_panel() can contain both text outputs and plot outputs simultaneously.", opts:["True","False"], ans:0, explanation:"Nav panels can hold any combination of UI elements."},
+  {q:"Which Shiny module is used to include CSS and JavaScript dependencies in an app?", opts:["ui.include_css()","ui.HTMLDependency()","ui.add_style()","ui.inject_js()"], ans:1, explanation:"ui.HTMLDependency() manages external CSS/JS file inclusion with version control."},
+  {q:"True or False: reactive.Value() behaves like a Python variable — changes do not propagate to dependent outputs automatically.", opts:["True","False"], ans:1, explanation:"reactive.Value() is reactive; changing it via rv.set() invalidates all dependents."},
+  {q:"Which method would you call on a ui tag object to add an inline CSS style?", opts:[".add_class()","add_style()","x.add_style('color:red;')","x.style('color:red')"], ans:2, explanation:"add_style() is a method on Shiny tag objects that appends inline CSS."},
+  {q:"In the step-by-step approach, what is added in Step 4 of App 2 that makes the boxplot actually appear on screen?", opts:["The server @render.plot decorator","ui.output_plot('box') in the UI","The numpy import","ui.sidebar() with the input"], ans:1, explanation:"Without ui.output_plot() in the UI, the rendered figure has no place to render."},
+  {q:"True or False: Plotly figures used inside Shiny via shinywidgets support pan, zoom, and hover tooltips natively.", opts:["True","False"], ans:0, explanation:"Plotly is an interactive widget; all its built-in interactions work in the browser."},
+  {q:"What is the correct import statement to get render_widget in Shiny for Python?", opts:["from shiny import render_widget","from shinywidgets import render_widget, output_widget","import shinywidgets as sw","from shiny.widgets import render_widget"], ans:1, explanation:"shinywidgets is a separate package and must be imported explicitly."},
+  {q:"True or False: ui.page_navbar() automatically shows the app title in a navigation bar at the top.", opts:["True","False"], ans:0, explanation:"ui.page_navbar() accepts a title= argument that appears in the navbar."},
+  {q:"Which of the following correctly accesses the lower bound of a range slider named 'petal_length'?", opts:["input.petal_length()[0]","input.petal_length.min","input.petal_length[0]","input.petal_length().low"], ans:0, explanation:"A range slider returns a tuple; index 0 is the lower bound."},
+  {q:"True or False: Shiny apps can be run using only VS Code — no terminal or command line is needed.", opts:["True","False"], ans:1, explanation:"The command-line method (shiny run) is also valid and does not require VS Code."},
+  {q:"In the reactive graph, what role does @reactive.Effect serve compared to @reactive.Calc?", opts:["Effect caches a value; Calc performs side effects","Calc caches a value; Effect performs side effects without returning output","Both are identical","Effect is only for UI updates; Calc is for server logic"], ans:1, explanation:"@reactive.Calc produces a reusable cached value; @reactive.Effect triggers side effects like printing or writing files."},
+  {q:"True or False: Each call to @render.ui on the server completely replaces — not appends to — the previous UI component.", opts:["True","False"], ans:0, explanation:"Dynamic UI replacement is total; the old component is discarded."},
+  {q:"Which function call adds a Download button to the UI?", opts:["ui.action_button('dl','Download')","ui.download_button('id','Label')","ui.output_download('id')","ui.button('download','id')"], ans:1, explanation:"ui.download_button() is the dedicated download widget; it pairs with @render.download."},
+  {q:"True or False: It is possible to use both cloud hosting (Shinyapps.io) and on-premise hosting for the same app, deploying to each independently.", opts:["True","False"], ans:0, explanation:"The same app.py can be deployed to multiple targets; hosting is infrastructure, not code."},
+  {q:"In the reactive flow diagram, which function 'creates your own reactive values' that can be set manually?", opts:["reactive.isolate()","reactive.Value()","@reactive.Calc","@reactive.Effect"], ans:1, explanation:"reactive.Value() creates an object whose value can be set explicitly with rv.set(x)."},
+  {q:"True or False: The function ui.layout_sidebar() always places the sidebar on the left by default.", opts:["True","False"], ans:0, explanation:"By default the sidebar appears on the left; position='right' moves it."}
+];
+
+const saData = [
+  {q:"Explain the difference between @reactive.Calc and @render.plot in terms of caching and dependency tracking. When would you choose one over the other?",
+   a:"<strong>@render.plot</strong> re-executes its function body every time any reactive value it reads changes, producing a new plot. It cannot be reused — if two plots need the same computed dataset, the computation runs twice. <strong>@reactive.Calc</strong> wraps an expression and caches its result; dependents read the cached value instead of recomputing. It also tracks dependencies, so it invalidates and recomputes when upstream inputs change. Choose <code>@render.plot</code> for straightforward single-use rendering. Choose <code>@reactive.Calc</code> when (1) the same expensive computation feeds multiple outputs, or (2) you want to modularize reactive logic for clarity."},
+  {q:"Describe the partial reactivity pattern using reactive.isolate() and an action button. Why is this pattern useful?",
+   a:"Without isolation, every slider movement immediately triggers a plot redraw — expensive for large datasets. The partial reactivity pattern adds an action button and wraps the slider reads inside <code>reactive.isolate()</code>: <code>with reactive.isolate(): bins = input.bin()</code>. The outer <code>@reactive.Calc</code> takes a dependency on <code>input.update()</code> (the button), not on the sliders. Therefore the output only refreshes when the user explicitly clicks 'Update'. This improves performance and UX when changes should be batched."},
+  {q:"Compare the three Shiny deployment options (cloud, on-premise, ShinyLive) and give a concrete scenario where each is the best choice.",
+   a:"<strong>Cloud (Shinyapps.io / Hugging Face):</strong> best for public-facing apps with no strict data governance — e.g., a conference demo of a data visualization. No server setup needed. <strong>On-premise (Shiny Server / Posit Connect):</strong> required when data must stay inside a corporate network or VPC — e.g., a hospital analytics dashboard with patient data. <strong>ShinyLive:</strong> ideal when you want zero hosting cost and the app logic is simple — e.g., a teaching tool or portfolio app where all data is bundled. Limitation: cannot use packages that require a Python server."},
+  {q:"Explain how dynamic UI works in Shiny for Python. What problem does it solve that static UI cannot?",
+   a:"Static UI elements are defined once at startup and their structure cannot change at runtime. Dynamic UI solves the problem of inputs whose choices depend on other inputs. The server generates a new UI element inside <code>@render.ui</code> and returns a Shiny tag (e.g., <code>ui.input_select(..., choices)</code>). The UI side uses <code>ui.output_ui('id')</code> to display whatever the server sends. Every update completely replaces the previous component. Example use case: selecting a dataset changes which column names appear in variable selector dropdowns."},
+  {q:"A colleague complains that their Shiny app recalculates the same filtered dataset in three separate @render.* functions, making the app slow. Diagnose the problem and propose a solution with code.",
+   a:"The root cause is redundant reactive computation — three render functions each independently re-filter the dataset when inputs change. The fix is to extract the shared computation into a <code>@reactive.Calc</code> function: <pre>@reactive.Calc\ndef filtered_data():\n    return df[df['col'] >= input.threshold()]\n\n@render.plot\ndef my_plot():\n    data = filtered_data()  # uses cached value\n    ...\n\n@render.data_frame\ndef my_table():\n    return filtered_data()  # same cache hit</pre> Now the filter runs once per input change and all three consumers reuse the result."},
+  {q:"Describe the UI-server communication cycle in Shiny. What triggers a re-render?",
+   a:"At startup, Shiny sends the UI HTML to the browser and establishes a WebSocket connection to the Python server (or WebAssembly). When the user interacts (e.g., moves a slider), the browser sends the new input value to the server over WebSocket. The server's reactive graph detects that downstream expressions depending on that input are now invalid. It re-evaluates invalidated <code>@render.*</code> functions in dependency order, sends the new output (HTML, image bytes, JSON) back over WebSocket, and the browser updates the relevant DOM element. No full page reload occurs."},
+  {q:"When would you use output_widget() + @render_widget instead of ui.output_plot() + @render.plot? Describe a practical scenario and any required installation.",
+   a:"Use <code>output_widget()</code> + <code>@render_widget</code> when you need browser-side interactivity inside the plot — hover tooltips, zoom/pan, click events, or animated transitions. A practical scenario: an exploratory analysis dashboard where users hover over scatter points to see observation labels. Installation: <code>pip install shinywidgets</code>. The server returns a Plotly (or other ipywidget) figure object, and shinywidgets handles serialization. Static Matplotlib suffices for publication-quality figures where interactivity is not needed."},
+  {q:"Explain the difference between ui.navset_tab(), ui.navset_pill_list(), and ui.page_navbar(). When would you choose each?",
+   a:"All three use <code>ui.nav_panel()</code> children to create multi-panel navigation. <strong>ui.navset_tab()</strong>: horizontal tabs inline within the page content area — good for sub-sections of a single page. <strong>ui.navset_pill_list()</strong>: vertical pill navigation on the left — useful for dashboards with many sections where horizontal space is limited. <strong>ui.page_navbar()</strong>: full-page navbar at the top (like a website header) — best for top-level navigation between major app sections. Choose based on the number of panels and whether navigation should feel like website-level or sub-section-level."},
+  {q:"Suppose you are building a Shiny app where users can select a dataset, filter rows, and then download the filtered result as CSV. Outline the key Shiny components needed and their interactions.",
+   a:"Components needed: (1) <code>ui.input_select('dataset', ...)</code> to choose the dataset; (2) <code>ui.input_slider('threshold', ...)</code> for filtering; (3) <code>ui.download_button('dl', 'Download CSV')</code>; (4) <code>ui.output_data_frame('preview')</code> to show a preview. Server: a <code>@reactive.Calc</code> returns the filtered dataframe; <code>@render.data_frame</code> feeds the preview table; <code>@render.download</code> returns a <code>(filename, write_file)</code> tuple where <code>write_file</code> calls <code>filtered_df().to_csv(file)</code>. The components interact via shared reactive dependencies on the @reactive.Calc."},
+  {q:"What is the role of the www/ subdirectory in a Shiny app project? How do you link external CSS and JavaScript files from it?",
+   a:"The <code>www/</code> subdirectory is the static file server for the app. Files placed here (CSS, JS, images, fonts) are served directly by the web server and accessible to the browser. To link them, create a <code>ui.HTMLDependency()</code> object specifying <code>source={'subdir': 'www'}</code>, <code>stylesheet=[{'href': 'my-ui.css'}]</code>, and <code>script=[{'src': 'my-ui.js'}]</code>. This object is included inside a <code>ui.TagList()</code> returned from a UI function. The dependency system handles version tracking and prevents duplicate inclusion."}
+];
+
+function buildMCQ() {
+  const container = document.getElementById('mcq-container');
+  mcqData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = 'mcq-' + i;
+    const isTrue = item.opts.length === 2;
+    const label = isTrue ? 'True / False' : 'Question ' + (i + 1);
+    card.innerHTML = `<div class="question-label">${label}</div>
+      <div class="question-stem">${i + 1}. ${item.q}</div>
+      <div class="options">
+        ${item.opts.map((o, j) => `<button class="option-btn" onclick="choose(${i},${j})" data-idx="${j}">${o}</button>`).join('')}
+      </div>
+      <div class="feedback-bar" id="fb-${i}" style="display:none"></div>`;
+    container.appendChild(card);
+  });
+}
+
+function choose(qIdx, optIdx) {
+  const card = document.getElementById('mcq-' + qIdx);
+  const btns = card.querySelectorAll('.option-btn');
+  if (btns[0].disabled) return;
+  btns.forEach(b => b.disabled = true);
+  const correct = mcqData[qIdx].ans;
+  btns[optIdx].classList.add(optIdx === correct ? 'correct' : 'incorrect');
+  if (optIdx !== correct) btns[correct].classList.add('reveal-correct');
+  const fb = document.getElementById('fb-' + qIdx);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (optIdx === correct ? 'correct' : 'incorrect');
+  fb.textContent = (optIdx === correct ? '✓ Correct. ' : '✗ Incorrect. ') + mcqData[qIdx].explanation;
+  updateScore();
+}
+
+function updateScore() {
+  let answered = 0, correct = 0;
+  mcqData.forEach((_, i) => {
+    const card = document.getElementById('mcq-' + i);
+    const btns = card.querySelectorAll('.option-btn');
+    if (btns[0].disabled) {
+      answered++;
+      if (card.querySelector('.option-btn.correct')) correct++;
+    }
+  });
+  document.getElementById('score-display').textContent = `Score: ${correct} / ${answered} answered`;
+  document.getElementById('progress-bar').style.width = (answered / mcqData.length * 100) + '%';
+}
+
+function resetAll() {
+  mcqData.forEach((_, i) => {
+    const card = document.getElementById('mcq-' + i);
+    const btns = card.querySelectorAll('.option-btn');
+    btns.forEach(b => { b.disabled = false; b.className = 'option-btn'; });
+    const fb = document.getElementById('fb-' + i);
+    fb.style.display = 'none';
+    fb.textContent = '';
+    fb.className = 'feedback-bar';
+  });
+  document.getElementById('score-display').textContent = 'Score: 0 / 0 answered';
+  document.getElementById('progress-bar').style.width = '0%';
+}
+
+function buildSA() {
+  const container = document.getElementById('sa-container');
+  saData.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+    card.innerHTML = `<div class="question-label">Short answer ${i + 1}</div>
+      <div class="question-stem">${item.q}</div>
+      <button class="reveal-btn" onclick="revealSA(${i}, this)">Show model answer</button>
+      <div class="answer-panel" id="sa-ans-${i}"><strong>Model Answer:</strong><br>${item.a}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function revealSA(idx, btn) {
+  const panel = document.getElementById('sa-ans-' + idx);
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.textContent = 'Show model answer';
+  } else {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide model answer';
+  }
+}
+
+buildMCQ();
+buildSA();
+</script>
+</body>
+</html>
