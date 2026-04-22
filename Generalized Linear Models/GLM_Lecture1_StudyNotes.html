@@ -1,93 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statistical Inference I — Exam Review Notes</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- MathJax for LaTeX rendering -->
+<title>Statistical Inference I – Lecture 1 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@400;600&amp;family=Nunito+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
 <script>
-MathJax = {
-  tex: { inlineMath: [['$','$'], ['\\(','\\)']] },
-  svg: { fontCache: 'global' }
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() {
+        console.log('MathJax is ready');
+      });
+    }
+  }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async=""></script>
 <style>
-  :root {
-    --bg: #f5f6fa;
-    --card: #ffffff;
-    --navy: #1a3a5c;
-    --blue: #2e6da4;
-    --light-blue: #eef2fb;
-    --blue-mid: #dce8f8;
-    --green: #4caf50;
-    --green-dark: #28a745;
-    --green-bg: #d4edda;
-    --green-text: #155724;
-    --green-border: #c3e6cb;
-    --purple: #6f42c1;
-    --purple-bg: #f3f0ff;
-    --red: #dc3545;
-    --red-bg: #f8d7da;
-    --red-text: #721c24;
-    --red-border: #f5c6cb;
-    --amber: #ffc107;
-    --amber-bg: #fff8e1;
-    --amber-text: #856404;
-    --amber-score: #fff3cd;
-    --formula-bg: #f8f9ff;
-    --formula-border: #c8d4f0;
-    --text: #2c2c3a;
-    --text-dark: #1a1a2e;
-    --border: #e2e8f4;
-    --shadow: 0 2px 10px rgba(0,0,0,0.07);
-    --font-body: 'DM Sans', sans-serif;
-    --font-serif: 'Source Serif 4', serif;
-    --font-mono: 'JetBrains Mono', monospace;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ── Global ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background-color: var(--bg);
-    font-family: var(--font-body);
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     font-size: 15px;
     line-height: 1.75;
-    color: var(--text);
+    color: #2c2c3a;
     max-width: 960px;
     margin: 0 auto;
     padding: 24px 16px 60px;
   }
 
-  /* ===== HEADER ===== */
+  /* ── Page Header ── */
   .page-header {
-    background: linear-gradient(135deg, var(--navy), var(--blue));
-    color: #fff;
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
     border-radius: 14px;
     padding: 28px 36px;
     margin-bottom: 24px;
     box-shadow: 0 4px 18px rgba(30,80,140,0.18);
   }
-  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 6px; font-family: var(--font-serif); }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
   .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
-  .page-header .badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 20px;
-    padding: 3px 14px;
-    font-size: 0.78em;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
 
-  /* ===== NAV BAR ===== */
+  /* ── Nav Bar ── */
   .nav-bar {
-    background-color: var(--card);
+    background-color: #ffffff;
     border: 1px solid #dde3ef;
     padding: 10px 18px;
     margin-bottom: 28px;
@@ -95,1434 +59,800 @@ MathJax = {
     flex-wrap: wrap;
     gap: 8px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.06);
-    border-radius: 10px;
   }
   .nav-bar a {
-    background-color: var(--light-blue);
-    color: var(--blue);
+    background-color: #eef2fb;
+    color: #2e6da4;
     border-radius: 20px;
     padding: 4px 14px;
     font-size: 0.85em;
     font-weight: 600;
     text-decoration: none;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s;
   }
-  .nav-bar a:hover { background-color: var(--blue); color: #fff; }
-  .nav-bar a.nav-mcq { background-color: var(--amber-score); color: var(--amber-text); }
-  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
 
-  /* ===== NOTES SECTION ===== */
+  /* ── Notes Section ── */
   .notes-section {
-    background-color: var(--card);
+    background-color: #ffffff;
     border-radius: 12px;
     padding: 28px 36px;
     margin-bottom: 28px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
   }
   .notes-section h2 {
-    color: var(--navy);
+    color: #1a3a5c;
     font-size: 1.25em;
     font-weight: 700;
-    border-bottom: 2px solid var(--light-blue);
+    border-bottom: 2px solid #eef2fb;
     padding-bottom: 8px;
     margin-top: 0;
-    margin-bottom: 18px;
-    font-family: var(--font-serif);
+    margin-bottom: 16px;
+    font-family: 'Crimson Pro', Georgia, serif;
   }
   .notes-section h3 {
-    color: var(--blue);
+    color: #2e6da4;
     font-size: 1.05em;
-    font-weight: 600;
-    margin: 20px 0 8px;
-  }
-  .notes-section p { margin-bottom: 10px; }
-  .notes-section ul, .notes-section ol { padding-left: 22px; margin-bottom: 12px; }
-  .notes-section li { margin-bottom: 4px; }
-
-  /* Boxes */
-  .key-point {
-    background: var(--light-blue);
-    border-left: 4px solid var(--blue);
-    padding: 12px 18px;
-    margin: 14px 0;
-    border-radius: 0 6px 6px 0;
-  }
-  .key-point strong { color: var(--navy); }
-
-  .example-box {
-    background: #f0f7ee;
-    border-left: 4px solid var(--green);
-    padding: 12px 18px;
-    margin: 14px 0;
-    border-radius: 0 6px 6px 0;
-  }
-  .example-box .ex-label { font-size: 0.78em; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-
-  .theorem-box {
-    background: var(--purple-bg);
-    border-left: 4px solid var(--purple);
-    padding: 14px 20px;
-    margin: 16px 0;
-    border-radius: 0 6px 6px 0;
-  }
-  .theorem-box .thm-label { font-size: 0.78em; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-
-  .warning-box {
-    background: var(--amber-bg);
-    border-left: 4px solid var(--amber);
-    padding: 12px 18px;
-    margin: 14px 0;
-    border-radius: 0 6px 6px 0;
-  }
-  .warning-box .warn-label { font-size: 0.78em; font-weight: 700; color: #e65c00; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
-
-  .formula-box {
-    background: var(--formula-bg);
-    border: 1px solid var(--formula-border);
-    padding: 14px 18px;
-    margin: 14px 0;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 1.05em;
-    overflow-x: auto;
-  }
-
-  /* Tables */
-  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); border-radius: 8px; overflow: hidden; }
-  thead tr { background-color: var(--blue); color: #fff; font-weight: 600; text-align: left; }
-  tbody tr:nth-child(even) { background-color: #f0f4fb; }
-  tbody tr:nth-child(odd) { background-color: #fff; }
-  tbody tr:hover { background-color: var(--blue-mid); }
-  th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
-
-  /* ===== MCQ SECTION ===== */
-  .mcq-section {
-    background-color: var(--card);
-    border-radius: 12px;
-    padding: 28px 36px;
-    margin-bottom: 28px;
-    box-shadow: var(--shadow);
-  }
-  .mcq-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-    border-bottom: 2px solid var(--amber-score);
-    padding-bottom: 12px;
-  }
-  .mcq-section-header h2 { color: #92400e; font-size: 1.2em; margin: 0; font-family: var(--font-serif); }
-  .score-display {
-    background: var(--amber-score);
-    border: 1px solid var(--amber);
-    border-radius: 20px;
-    padding: 5px 18px;
     font-weight: 700;
-    color: var(--amber-text);
-    font-size: 0.95em;
+    margin: 20px 0 8px;
   }
 
-  .mcq-card {
-    background: #f9fafb;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
-    transition: box-shadow 0.2s;
-  }
-  .mcq-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
-  .question-label { font-size: 0.8em; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
-  .question-stem { font-weight: 600; color: var(--text-dark); margin-bottom: 14px; font-size: 1.0em; line-height: 1.6; }
-  .question-stem .math-inline { font-family: var(--font-mono); font-size: 0.9em; }
+  /* ── Content Boxes ── */
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; font-family:'JetBrains Mono', monospace; font-size:0.97em; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
 
-  /* Options */
-  .option-btn {
-    display: block;
-    width: 100%;
-    background: #fff;
-    border: 1.5px solid #d0d8ea;
-    border-radius: 8px;
-    padding: 10px 16px;
-    margin: 6px 0;
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.95em;
-    color: var(--text);
-    transition: all 0.18s;
-    font-family: var(--font-body);
-    line-height: 1.5;
-  }
-  .option-btn:hover:not(:disabled) { background: var(--light-blue); border-color: var(--blue); }
-  .option-btn.selected { background: var(--blue-mid); border-color: var(--blue); color: var(--navy); font-weight: 600; }
-  .option-btn.correct { background: var(--green-bg); border-color: var(--green-dark); color: var(--green-text); font-weight: 700; }
-  .option-btn.incorrect { background: var(--red-bg); border-color: var(--red); color: var(--red-text); font-weight: 600; }
-  .option-btn.reveal-correct { background: var(--green-bg); border-color: var(--green-dark); color: var(--green-text); font-weight: 700; opacity: 0.85; }
-  .option-btn:disabled { cursor: default; }
+  /* ── Tables ── */
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
 
-  .feedback-bar {
-    border-radius: 6px;
-    padding: 8px 14px;
-    margin-top: 10px;
-    font-size: 0.9em;
-    font-weight: 600;
-  }
-  .feedback-bar.correct { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
-  .feedback-bar.incorrect { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-border); }
-
-  /* ===== SHORT ANSWER SECTION ===== */
-  .sa-section {
-    background-color: var(--card);
+  /* ── MCQ Section ── */
+  .mcq-section {
+    background-color: #ffffff;
     border-radius: 12px;
     padding: 28px 36px;
     margin-bottom: 28px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
   }
-  .sa-section-header {
-    border-bottom: 2px solid #d1ecf1;
-    padding-bottom: 12px;
-    margin-bottom: 20px;
+  .mcq-section > h2 {
+    color: #92400e;
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-family: 'Crimson Pro', Georgia, serif;
   }
-  .sa-section-header h2 { color: #0c5460; font-size: 1.2em; margin: 0; font-family: var(--font-serif); }
+  .score-display {
+    background:#fff3cd;
+    border:1px solid #ffc107;
+    border-radius:20px;
+    padding:5px 18px;
+    font-weight:700;
+    color:#856404;
+    display:inline-block;
+    font-size:0.95em;
+    margin-bottom:20px;
+  }
+  .mcq-card {
+    background:#f9fafb;
+    border:1px solid #e5e9f2;
+    border-radius:10px;
+    padding:20px 24px;
+    margin-bottom:20px;
+  }
+  .mcq-card .question-label {
+    font-size:0.8em; font-weight:700; color:#2e6da4;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .mcq-card .question-stem {
+    font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em;
+  }
+  .option-btn {
+    display:block; width:100%; background:#ffffff;
+    border:1.5px solid #d0d8ea; border-radius:8px;
+    padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.selected  { background:#dce8f8; border-color:#2e6da4; color:#1a3a5c; font-weight:600; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
 
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+
+  /* ── Short Answer Section ── */
+  .sa-section {
+    background-color:#ffffff;
+    border-radius:12px;
+    padding:28px 36px;
+    margin-bottom:28px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section > h2 {
+    color:#4a148c;
+    font-size:1.2em;
+    font-weight:700;
+    margin-bottom:20px;
+    font-family:'Crimson Pro', Georgia, serif;
+  }
   .sa-card {
-    background: #faf9ff;
-    border: 1px solid #e2dcf5;
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
+    background:#faf9ff;
+    border:1px solid #e2dcf5;
+    border-radius:10px;
+    padding:20px 24px;
+    margin-bottom:20px;
   }
-  .sa-card .question-label { color: var(--purple); }
-  .sa-card .question-stem { font-weight: 600; color: var(--text-dark); margin-bottom: 12px; font-size: 1.0em; line-height: 1.6; }
-
+  .sa-card .question-label {
+    color:#6f42c1; font-size:0.8em; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .sa-card .question-stem {
+    font-weight:600; color:#1a1a2e; margin-bottom:12px;
+  }
   .reveal-btn {
-    background: var(--purple);
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 7px 22px;
-    font-size: 0.88em;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 12px;
-    transition: background 0.2s;
-    font-family: var(--font-body);
+    background:#6f42c1; color:#ffffff; border:none;
+    border-radius:20px; padding:7px 22px; font-size:0.88em;
+    font-weight:600; cursor:pointer; margin-top:12px;
+    transition:background 0.2s; font-family:inherit;
   }
-  .reveal-btn:hover { background: #5a32a3; }
+  .reveal-btn:hover { background:#5a32a3; }
   .answer-panel {
-    background: var(--purple-bg);
-    border: 1px solid #d4c8f5;
-    border-radius: 8px;
-    padding: 18px 22px;
-    margin-top: 14px;
-    font-size: 0.95em;
-    line-height: 1.8;
-    display: none;
+    background:#f3f0ff; border:1px solid #d4c8f5;
+    border-radius:8px; padding:18px 22px; margin-top:14px;
+    font-size:0.95em; line-height:1.8; display:none;
   }
-  .answer-panel.visible { display: block; }
-  .answer-panel strong { color: #4a148c; }
+  .answer-panel strong { color:#4a148c; }
 
-  /* ===== RESET BUTTON ===== */
-  .reset-bar {
-    text-align: center;
-    margin: 20px 0 8px;
-  }
+  /* ── Reset Button ── */
   .reset-btn {
-    background: var(--navy);
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    padding: 9px 28px;
-    font-size: 0.9em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-family: var(--font-body);
+    background:#1a3a5c; color:#fff; border:none; border-radius:20px;
+    padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer;
+    margin-bottom:20px; transition:background 0.2s; font-family:inherit;
   }
-  .reset-btn:hover { background: var(--blue); }
+  .reset-btn:hover { background:#2e6da4; }
 
-  /* ===== CODE BLOCKS ===== */
-  code {
-    font-family: var(--font-mono);
-    background: #eef2fb;
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 0.88em;
-    color: var(--navy);
-  }
-
-  /* ===== DEFINITION LIST ===== */
-  .def-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2px 16px; margin: 12px 0; }
-  .def-term { font-weight: 700; color: var(--navy); padding: 6px 0; border-bottom: 1px solid var(--border); }
-  .def-desc { padding: 6px 0; border-bottom: 1px solid var(--border); }
-
-  /* ===== PROGRESS ===== */
-  .progress-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
-  .progress-bar-wrap { flex: 1; height: 8px; background: #dde3ef; border-radius: 4px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--green-dark), var(--blue)); border-radius: 4px; transition: width 0.4s; }
-  .progress-label { font-size: 0.82em; color: var(--amber-text); font-weight: 700; white-space: nowrap; }
-
-  @media (max-width: 640px) {
-    .notes-section, .mcq-section, .sa-section { padding: 18px 16px; }
-    .page-header { padding: 20px 18px; }
-    .def-grid { grid-template-columns: 1fr; }
+  /* ── Responsive ── */
+  @media(max-width:600px){
+    .notes-section, .mcq-section, .sa-section { padding:18px 14px; }
+    .page-header { padding:20px 18px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
-<header class="page-header">
-  <div class="badge">Lecture 1</div>
-  <h1>Statistical Inference I</h1>
-  <p class="subtitle">Exam Review Notes &mdash; Ariel Alonso Abad &bull; Catholic University of Leuven &bull; Generalized Linear Models</p>
-</header>
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<div class="page-header">
+  <h1>Statistical Inference I — Lecture 1</h1>
+  <div class="subtitle">Generalized Linear Models · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
 
-<!-- ===== NAVIGATION ===== -->
+<!-- ═══════════════════ NAV ═══════════════════ -->
 <nav class="nav-bar">
-  <a href="#randomness">Randomness & Distributions</a>
-  <a href="#inferential">Inferential Statistics</a>
-  <a href="#point-estimation">Point Estimation</a>
-  <a href="#clt">CLT & Delta Method</a>
+  <a href="#randomness">Randomness</a>
+  <a href="#distributions">Distributions</a>
+  <a href="#inferential">Inferential Stats</a>
+  <a href="#frequentist">Frequentist</a>
+  <a href="#pointest">Point Estimation</a>
+  <a href="#bias">Bias &amp; Consistency</a>
+  <a href="#clt">CLT &amp; Delta</a>
   <a href="#ci">Confidence Intervals</a>
-  <a href="#likelihood">Likelihood & MLE</a>
-  <a href="#tests">Hypothesis Testing</a>
-  <a href="#holy-trinity">Holy Trinity</a>
-  <a href="#misspec">Misspecification</a>
-  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#likelihood">Likelihood &amp; MLE</a>
+  <a href="#crb">Cramér-Rao</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
   <a href="#sa" class="nav-sa">10 Short Answer</a>
 </nav>
 
-<!-- ========================================================
-     SECTION 1: RANDOMNESS & DISTRIBUTIONS
-     ======================================================== -->
-<section class="notes-section" id="randomness">
-  <h2>1. Randomness &amp; Probability Distributions</h2>
+<!-- ═══════════════════ NOTES ═══════════════════ -->
 
-  <p><strong>Randomness</strong> is defined as the occurrence of events for which no final cause is found. It appears in physics (quantum mechanics), biology (evolution), psychology (synchronicity), and mathematics/statistics.</p>
-
-  <h3>From Frequency to Probability Distributions</h3>
-  <p>A histogram of measurements has class widths. As the number of observations grows indefinitely, the class width can be made arbitrarily small, and in the limit a smooth <em>probability density curve</em> arises.</p>
-
-  <h3>Key Distributions</h3>
-
+<!-- 1. Randomness -->
+<div class="notes-section" id="randomness">
+  <h2>1. Randomness</h2>
   <div class="key-point">
-    <strong>Normal Distribution</strong> $\mathcal{N}(\mu, \sigma^2)$: Two parameters, symmetric, Mode = Median = Mean.<br>
-    $$f(x) = \frac{e^{-\frac{(x-\mu)^2}{2\sigma^2}}}{\sigma\sqrt{2\pi}}$$
-    68% of data within $\pm 1\sigma$; 95% within $\pm 2\sigma$; 99.7% within $\pm 3\sigma$.
+    <strong>Definition:</strong> Randomness refers to the occurrence of events for which no deterministic cause can be identified. It arises across many scientific fields: quantum mechanics (physics), the theory of evolution (biology), synchronicity (psychology), and of course statistics and mathematics.
   </div>
+  <p>The concept motivates the entire framework of probability and statistical inference. When outcomes are inherently unpredictable, we need a rigorous mathematical language to describe and quantify uncertainty.</p>
+</div>
 
-  <p>Many real-world measurements follow the normal distribution (body length, IQ, temperature), explained ultimately by the <strong>Central Limit Theorem</strong>.</p>
+<!-- 2. Probability Distributions -->
+<div class="notes-section" id="distributions">
+  <h2>2. Probability Distributions</h2>
+  <p>As the number of observations increases indefinitely and the class width of a histogram shrinks toward zero, the histogram converges to a smooth probability density curve. Key distributions encountered in this course:</p>
 
-  <h3>Other Important Distributions</h3>
   <table>
     <thead><tr><th>Distribution</th><th>Key Parameters</th><th>Key Properties</th></tr></thead>
     <tbody>
-      <tr><td>Student's $t$</td><td>degrees of freedom $\nu$</td><td>Heavier tails than normal; $\to \mathcal{N}$ as $\nu\to\infty$</td></tr>
-      <tr><td>Chi-Squared $\chi^2$</td><td>$\nu$</td><td>Sum of squared standard normals</td></tr>
-      <tr><td>$F$-distribution</td><td>$\nu_1, \nu_2$</td><td>Ratio of two $\chi^2$ variables</td></tr>
-      <tr><td>Poisson $\mathcal{P}(\lambda)$</td><td>$\lambda > 0$</td><td>$E(y)=\text{Var}(y)=\lambda$; counts of rare events</td></tr>
-      <tr><td>Bernoulli $\text{Bern}(\pi)$</td><td>$\pi\in[0,1]$</td><td>$E(y)=\pi$, $\text{Var}(y)=\pi(1-\pi)$</td></tr>
-      <tr><td>Binomial $\text{Bin}(n,\pi)$</td><td>$n, \pi$</td><td>$E(y)=n\pi$, $\text{Var}(y)=n\pi(1-\pi)$</td></tr>
+      <tr><td><strong>Normal</strong> \(\mathcal{N}(\mu,\sigma^2)\)</td><td>\(\mu\) (mean), \(\sigma\) (SD)</td><td>Symmetric; Mode = Median = Mean; bell-shaped</td></tr>
+      <tr><td><strong>Student's t</strong></td><td>\(\nu\) (df)</td><td>Heavier tails than Normal; used for small samples</td></tr>
+      <tr><td><strong>Chi-squared</strong> \(\chi^2_\nu\)</td><td>\(\nu\) (df)</td><td>Sum of squared standard normals; right-skewed</td></tr>
+      <tr><td><strong>F</strong></td><td>\(\nu_1, \nu_2\) (df)</td><td>Ratio of chi-squareds; used in ANOVA/regression tests</td></tr>
+      <tr><td><strong>Poisson</strong> \(P(\lambda)\)</td><td>\(\lambda\) (rate)</td><td>\(E(y)=\operatorname{Var}(y)=\lambda\); counts of rare events</td></tr>
+      <tr><td><strong>Bernoulli</strong> / <strong>Binomial</strong></td><td>\(\pi\), \(n\)</td><td>Binary outcomes; sum of i.i.d. Bernoullis \(\sim \operatorname{Bin}(n,\pi)\)</td></tr>
     </tbody>
   </table>
-</section>
 
-<!-- ========================================================
-     SECTION 2: INFERENTIAL STATISTICS
-     ======================================================== -->
-<section class="notes-section" id="inferential">
-  <h2>2. Inferential Statistics &amp; Approaches</h2>
-
-  <p><strong>Inferential statistics</strong> makes quantitative statements about population characteristics from a sample, because examining entire populations is often impossible.</p>
-
-  <h3>The Frequentist Approach</h3>
-  <div class="key-point">
-    Any experiment can be seen as one of an infinite sequence of repetitions. Unknown parameters are treated as <strong>fixed but unknown constants</strong> — not random variables. Inference requires that correct conclusions are drawn with high probability across this notional set of repetitions.
-  </div>
-
-  <h3>Standard Notation</h3>
-  <p>We write $\mathbf{y} = (y_1, \ldots, y_n)^T$ for the data vector. The $y_i$ have distribution $p(y \mid \theta)$ and are assumed conditionally independent given $\theta$:</p>
-  <div class="formula-box">
-    $$p(\mathbf{y} \mid \theta) = \prod_{i=1}^{n} p(y_i \mid \theta)$$
-  </div>
-</section>
-
-<!-- ========================================================
-     SECTION 3: POINT ESTIMATION
-     ======================================================== -->
-<section class="notes-section" id="point-estimation">
-  <h2>3. Point Estimation</h2>
-
-  <p>A <strong>point estimator</strong> $\hat{\theta}(\mathbf{y})$ is a single-value "best guess" of the unknown parameter $\theta$. It has a <em>sampling distribution</em> inherited from the distribution of $\mathbf{y}$.</p>
-
-  <h3>Mean Squared Error (MSE)</h3>
-  <div class="formula-box">
-    $$\text{MSE}[\hat{\theta}] = E_\theta[(\hat{\theta}-\theta)^2] = \text{Var}_\theta[\hat{\theta}] + \text{bias}[\hat{\theta}]^2$$
-  </div>
-  <p>A good estimator concentrates its sampling distribution near the true $\theta$.</p>
-
-  <h3>Bias</h3>
-  <div class="key-point">
-    <strong>Bias:</strong> $\text{bias}[\hat{\theta}] = E_\theta[\hat{\theta}] - \theta$. An estimator is <em>unbiased</em> when bias $= 0$.
+  <div class="theorem-box">
+    <strong>Normal Distribution PDF:</strong>
+    \[f(x) = \frac{1}{\sigma\sqrt{2\pi}}\exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\]
+    <br>The 68–95–99.7 rule: approximately 68%, 95%, and 99.7% of data falls within 1, 2, and 3 standard deviations of the mean.
   </div>
 
   <div class="example-box">
-    <div class="ex-label">Example — Sample Mean &amp; Sample Variance</div>
-    For i.i.d. data: $\bar{y} = \frac{1}{n}\sum y_i$ is unbiased for $\mu$.
-    But $S^2 = \frac{1}{n}\sum(y_i - \bar{y})^2$ satisfies $E[S^2] = \frac{n-1}{n}\sigma^2 < \sigma^2$ — it is <strong>biased</strong>.
+    <strong>IQ Example (Stanford-Binet, \(\mu=100, \sigma=15\)):</strong><br>
+    \(P(97 \le IQ \le 115) = 0.421\) → High school bracket<br>
+    \(P(115 \le IQ \le 125) = 0.111\) → University bracket<br>
+    \(P(IQ \ge 125) = 0.048\) → PhD bracket<br>
+    \(P(IQ \ge 160) \approx 0.00003\) → Exceptional genius level
+  </div>
+</div>
+
+<!-- 3. Inferential Statistics -->
+<div class="notes-section" id="inferential">
+  <h2>3. Inferential Statistics</h2>
+  <div class="key-point">
+    Inferential statistics makes <em>quantitative statements about a population</em> based on a <em>sample</em>. Since examining an entire population is often impossible, we draw samples and use them to make decisions or draw conclusions about population parameters.
+  </div>
+  <p>The fundamental challenge: the sample is observed; the population parameter \(\theta\) is unknown. Statistical inference provides the tools to learn about \(\theta\) from the data.</p>
+</div>
+
+<!-- 4. Frequentist Approach -->
+<div class="notes-section" id="frequentist">
+  <h2>4. The Frequentist Approach</h2>
+  <div class="key-point">
+    The <strong>frequentist paradigm</strong> interprets probability as the long-run relative frequency of an event over an infinite sequence of identical, independent repetitions of an experiment.
+  </div>
+  <ul style="margin-left:20px; margin-top:8px;">
+    <li><strong>Unknown parameters</strong> are treated as fixed (non-random) but unknown constants.</li>
+    <li><strong>Correct conclusions</strong> should be reached with a specified high probability across the notional sequence of repetitions.</li>
+    <li>Contrasts with the Bayesian paradigm, where parameters are treated as random variables with prior distributions.</li>
+  </ul>
+
+  <h3>Notation</h3>
+  <p>We use \(\mathbf{y} = (y_1, \ldots, y_n)^T\) for the sample. Each \(y_i\) has distribution/density \(p(y \mid \theta)\). Assuming conditional independence:</p>
+  <div class="formula-box">\[p(\mathbf{y} \mid \theta) = \prod_{i=1}^n p(y_i \mid \theta)\]</div>
+  <p>The goal is to <em>draw inference about \(\theta\)</em>.</p>
+</div>
+
+<!-- 5. Point Estimation -->
+<div class="notes-section" id="pointest">
+  <h2>5. Point Estimation</h2>
+  <div class="key-point">
+    A <strong>point estimator</strong> \(\hat{\theta}(\mathbf{y})\) is a function of the sample data used to produce a single best guess for the unknown parameter \(\theta\). Formally, it is a random variable (because it depends on the random sample \(\mathbf{y}\)).
   </div>
 
+  <h3>Mean Squared Error (MSE)</h3>
+  <p>A key criterion for evaluating estimators:</p>
+  <div class="formula-box">
+    \[\operatorname{MSE}\!\left[\hat{\theta}(\mathbf{y})\right] = E_{\mathbf{y}\mid\theta}\!\left[(\hat{\theta}(\mathbf{y})-\theta)^2\right] = \operatorname{Var}_{\mathbf{y}\mid\theta}\!\left[\hat{\theta}(\mathbf{y})\right] + \operatorname{bias}\!\left[\hat{\theta}(\mathbf{y})\right]^2\]
+  </div>
+  <p>A good estimator has its sampling distribution concentrated close to the true \(\theta\), i.e., small MSE.</p>
+
   <div class="warning-box">
-    <div class="warn-label">⚠ Warning</div>
-    Unbiasedness is a debatable property. A biased estimator can have a <em>smaller MSE</em> than an unbiased one if its variance is sufficiently reduced. Example: the biased $S^2$ (divisor $n$) is consistent and has lower MSE in some situations.
+    <strong>⚠ Bias–Variance Trade-off:</strong> MSE decomposes into variance and squared bias. Minimising only bias can increase variance, and vice versa. A biased estimator can have <em>lower MSE</em> than an unbiased one!
+  </div>
+</div>
+
+<!-- 6. Bias & Consistency -->
+<div class="notes-section" id="bias">
+  <h2>6. Bias and Consistency</h2>
+
+  <div class="theorem-box">
+    <strong>Bias:</strong>
+    \[\operatorname{bias}\!\left[\hat{\theta}(\mathbf{y})\right] = E_{\mathbf{y}\mid\theta}\!\left[\hat{\theta}(\mathbf{y})\right] - \theta\]
+    An estimator is <em>unbiased</em> when \(\operatorname{bias} = 0\).
+  </div>
+
+  <h3>Sample Mean &amp; Sample Variance</h3>
+  <p>For i.i.d. data with \(\mu = E(y)\) and \(\sigma^2 = \operatorname{Var}(y)\):</p>
+  <div class="formula-box">
+    \[\bar{y} = \frac{1}{n}\sum_{i=1}^n y_i \quad\Rightarrow\quad E(\bar{y}) = \mu \quad \text{(unbiased)}\]
+    \[S^2 = \frac{1}{n}\sum_{i=1}^n (y_i - \bar{y})^2 \quad\Rightarrow\quad E(S^2) = \frac{n-1}{n}\sigma^2 &lt; \sigma^2 \quad \text{(biased)}\]
+  </div>
+
+  <div class="key-point">
+    The unbiased estimator of \(\sigma^2\) uses denominator \(n-1\): \(\hat{S}^2 = \frac{1}{n-1}\sum(y_i-\bar{y})^2\).
   </div>
 
   <h3>Consistency</h3>
   <div class="theorem-box">
-    <div class="thm-label">Definition</div>
-    $\hat{\theta}_n$ is <strong>consistent</strong> for $\theta$ if $\lim_{n\to\infty} P(|\hat{\theta}_n - \theta| > \varepsilon) \to 0$ for any $\varepsilon > 0$.<br>
-    <strong>Law of Large Numbers:</strong> $\bar{y}_n \xrightarrow{p} \mu$ for i.i.d. data.
+    <strong>Definition:</strong> \(\hat{\theta}_n\) is consistent for \(\theta\) if
+    \[\lim_{n\to\infty} P\!\left(|\hat{\theta}_n - \theta| &gt; \varepsilon\right) \to 0 \quad \forall\, \varepsilon &gt; 0\]
+    i.e., it converges in probability to the true parameter as \(n \to \infty\).
+    <br><br>
+    <strong>Law of Large Numbers:</strong> The sample mean \(\bar{y}_n\) is consistent for \(\mu\).
   </div>
 
-  <h3>Bias vs. Consistency — Important Distinctions</h3>
   <table>
-    <thead><tr><th>Estimator</th><th>Unbiased?</th><th>Consistent?</th><th>Notes</th></tr></thead>
+    <thead><tr><th>Property</th><th>Unbiased?</th><th>Consistent?</th><th>Example</th></tr></thead>
     <tbody>
-      <tr><td>$\hat{\mu} = y_1$ (first obs.)</td><td>Yes</td><td>No</td><td>Never uses additional data</td></tr>
-      <tr><td>$S^2 = \frac{1}{n}\sum(y_i-\bar{y})^2$</td><td>No (asymptotically yes)</td><td>Yes</td><td>Bias $\to 0$ as $n\to\infty$</td></tr>
+      <tr><td>Unbiased &amp; consistent</td><td>✓</td><td>✓</td><td>\(\bar{y}_n\) for \(\mu\)</td></tr>
+      <tr><td>Unbiased, NOT consistent</td><td>✓</td><td>✗</td><td>\(\hat{\mu} = y_1\) (ignores all other data)</td></tr>
+      <tr><td>Biased but consistent</td><td>✗</td><td>✓</td><td>\(S^2 = \frac{1}{n}\sum(y_i-\bar{y})^2\) (bias → 0)</td></tr>
     </tbody>
   </table>
 
-  <div class="warning-box">
-    <div class="warn-label">⚠ Pathological Example</div>
-    For Poisson $\lambda$, the only unbiased estimator of $e^{-2\lambda}$ is $(-1)^y$ — which can be negative and is useless in practice. This illustrates that unbiasedness is not always a sensible criterion.
+  <div class="computation-note">
+    <strong>Poisson Pathology:</strong> To estimate \(\theta = e^{-2\lambda}\) from a single observation, the only unbiased estimator is \(\hat{\theta}(y) = (-1)^y\), which takes values \(+1\) or \(-1\) — clearly not a valid probability! This demonstrates that unbiasedness can be a pathological property.
   </div>
-</section>
+</div>
 
-<!-- ========================================================
-     SECTION 4: CLT & DELTA METHOD
-     ======================================================== -->
-<section class="notes-section" id="clt">
-  <h2>4. Central Limit Theorem &amp; Delta Method</h2>
+<!-- 7. CLT & Delta Method -->
+<div class="notes-section" id="clt">
+  <h2>7. Central Limit Theorem &amp; Delta Method</h2>
 
   <div class="theorem-box">
-    <div class="thm-label">Central Limit Theorem (Univariate)</div>
-    If $y_1, \ldots, y_n$ are i.i.d. with mean $\mu$ and variance $\sigma^2$, then:
-    $$\sqrt{n}(\bar{y}_n - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2), \quad \text{equivalently} \quad \bar{y}_n \xrightarrow{d} \mathcal{N}\!\left(\mu, \frac{\sigma^2}{n}\right)$$
+    <strong>CLT (Univariate):</strong> If \(y_1, \ldots, y_n\) are i.i.d. with \(E(y)=\mu\) and \(\operatorname{Var}(y)=\sigma^2\), then:
+    \[\sqrt{n}(\bar{y}_n - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2)\]
+    Equivalently: \(\bar{y}_n \xrightarrow{d} \mathcal{N}(\mu, \sigma^2/n)\) as \(n \to \infty\).
+    <br><br>
+    <strong>CLT (Multivariate):</strong> For i.i.d. vectors with mean \(\boldsymbol{\mu}\) and covariance \(\boldsymbol{\Sigma}\):
+    \[\sqrt{n}(\bar{\mathbf{y}}_n - \boldsymbol{\mu}) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \boldsymbol{\Sigma})\]
   </div>
 
-  <div class="theorem-box">
-    <div class="thm-label">Central Limit Theorem (Multivariate)</div>
-    If $\mathbf{y}_1,\ldots,\mathbf{y}_n$ are i.i.d. vectors with mean $\boldsymbol{\mu}$ and covariance $\Sigma$:
-    $$\sqrt{n}(\bar{\mathbf{y}}_n - \boldsymbol{\mu}) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \Sigma)$$
-  </div>
+  <p><strong>Why is the world normal?</strong> Many real-world measurements (height, IQ, temperature) are the sum of many small, independent effects. The CLT guarantees these averages are approximately normal.</p>
 
-  <p><strong>Why is the world normal?</strong> Observable traits (e.g., body length) are the sum of many independent small effects (genetic, economic, …). By the CLT, their sum converges to a normal distribution.</p>
-
-  <h3>Delta Method</h3>
   <div class="theorem-box">
-    <div class="thm-label">Delta Method</div>
-    Let $\sqrt{n}(\mathbf{y}_n - \boldsymbol{\mu}) \xrightarrow{d} \mathbf{z}$ and $\psi: \mathbb{R}^p \to \mathbb{R}^k$ differentiable with Jacobian $\mathbf{J}(\mathbf{y})$. Then:
-    $$\sqrt{n}[\psi(\mathbf{y}_n) - \psi(\boldsymbol{\mu})] \xrightarrow{d} \mathbf{J}(\boldsymbol{\mu})\mathbf{z}$$
-    If $\mathbf{z} \sim \mathcal{N}_p(\mathbf{0}, \Sigma)$:
-    $$\sqrt{n}[\psi(\mathbf{y}_n) - \psi(\boldsymbol{\mu})] \xrightarrow{d} \mathcal{N}_k\!\left(\mathbf{0},\ \mathbf{J}(\boldsymbol{\mu})\,\Sigma\,\mathbf{J}(\boldsymbol{\mu})^T\right)$$
+    <strong>Delta Method:</strong> Let \(\mathbf{y}_n\) be a sequence with \(E(\mathbf{y}_n) = \boldsymbol{\mu}\) and \(\sqrt{n}(\mathbf{y}_n - \boldsymbol{\mu}) \to_d \mathbf{z}\). For a smooth transformation \(\boldsymbol{\psi}: \mathbb{R}^p \to \mathbb{R}^k\) with Jacobian \(\mathbf{J}(\mathbf{y}) = \partial\boldsymbol{\psi}/\partial\mathbf{y}\):
+    \[\sqrt{n}\!\left[\boldsymbol{\psi}(\mathbf{y}_n) - \boldsymbol{\psi}(\boldsymbol{\mu})\right] \xrightarrow{d} \mathbf{J}(\boldsymbol{\mu})\,\mathbf{z}\]
+    If \(\mathbf{z} \sim \mathcal{N}_p(\mathbf{0}, \boldsymbol{\Sigma})\), then the limit is \(\mathcal{N}_k\!\left(\mathbf{0},\, \mathbf{J}(\boldsymbol{\mu})\,\boldsymbol{\Sigma}\,\mathbf{J}(\boldsymbol{\mu})^T\right)\).
   </div>
 
   <div class="example-box">
-    <div class="ex-label">Example — Titanic Survival Odds</div>
-    With $\hat{\pi} \sim \mathcal{N}(\pi, \pi(1-\pi)/n)$, define $g(x) = \ln\frac{x}{1-x}$ (log-odds). By the Delta Method:
-    $$\ln(\hat{\Theta}_{\text{survival}}) \sim \mathcal{N}\!\left(\ln\Theta_{\text{survival}},\; \frac{1}{\pi(1-\pi)n}\right)$$
-    Note: no unbiased estimator of the log-odds exists.
+    <strong>Titanic Survival Odds Example:</strong> Let \(\hat{\pi}\) be the estimated survival probability. Then by CLT: \(\hat{\pi} \sim \mathcal{N}(\pi, \pi(1-\pi)/n)\). The log-odds \(g(x) = \ln(x/(1-x))\) has derivative \(g'(x) = 1/(x(1-x))\). By the Delta Method:
+    \[\ln(\hat{\Theta}_{survival}) \sim \mathcal{N}\!\left(\ln(\Theta_{survival}),\; \frac{1}{\pi(1-\pi)n}\right)\]
+    Note: No unbiased estimator for the log-odds exists.
   </div>
 
-  <h3>Normal Approximation to the Binomial</h3>
-  <p>For $y \sim \text{Bin}(n, \pi)$ with large $n$: $y \approx \mathcal{N}(n\pi,\, n\pi(1-\pi))$.</p>
-</section>
+  <h3>Normal Approximation to Binomial</h3>
+  <p>If \(y \sim \operatorname{Bin}(n, \pi)\) and \(n\) is large: \(y \approx \mathcal{N}(n\pi,\; n\pi(1-\pi))\).</p>
+</div>
 
-<!-- ========================================================
-     SECTION 5: CONFIDENCE INTERVALS
-     ======================================================== -->
-<section class="notes-section" id="ci">
-  <h2>5. Confidence Intervals</h2>
-
-  <p>A <strong>confidence interval</strong> is a stochastic interval $[u(\mathbf{y}), v(\mathbf{y})]$ designed to include the true parameter $\theta$ with a specified probability $1-\alpha$.</p>
-
-  <div class="formula-box">
-    $$P(\theta \in [u(\mathbf{y}), v(\mathbf{y})]) = 1 - \alpha$$
-  </div>
+<!-- 8. Confidence Intervals -->
+<div class="notes-section" id="ci">
+  <h2>8. Confidence Intervals</h2>
 
   <div class="key-point">
-    <strong>Coverage probability:</strong> $1-\alpha$ is the long-run fraction of intervals (over repeated sampling) that contain $\theta$. For any particular realized interval, $\theta$ either is or isn't inside it — there is no probability for a fixed interval.<br><br>
-    <strong>95% CI for $\mu$:</strong>
-    $$\text{CI}_{0.95} = \left(\bar{X} - T_{0.975,n-1}\frac{S}{\sqrt{n}},\; \bar{X} + T_{0.975,n-1}\frac{S}{\sqrt{n}}\right)$$
+    A <strong>confidence interval</strong> (CI) is a stochastic interval \([u(\mathbf{y}),\, v(\mathbf{y})]\) designed to contain the true parameter \(\theta\) with pre-specified probability \(1-\alpha\):
+    \[P\!\left(\theta \in [u(\mathbf{y}),\, v(\mathbf{y})]\right) = 1 - \alpha\]
+    The probability \(1-\alpha\) is the <strong>coverage probability</strong>; classically \(\alpha = 0.05\).
+  </div>
+
+  <h3>CI for the Mean</h3>
+  <div class="formula-box">
+    \[CI_{1-\alpha} = \left(\bar{X} - T_{1-\alpha/2,\,n-1}\frac{S}{\sqrt{n}},\quad \bar{X} + T_{1-\alpha/2,\,n-1}\frac{S}{\sqrt{n}}\right)\]
   </div>
 
   <div class="warning-box">
-    <div class="warn-label">⚠ Common Misconception</div>
-    A 95% CI does <em>not</em> mean there is a 95% chance $\theta$ lies in the computed interval. The interval is random; $\theta$ is fixed. The correct statement: "95% of all such intervals constructed from repeated sampling will contain $\theta$."
+    <strong>⚠ Common Misconception:</strong> The 95% CI does NOT mean "there is a 95% probability that \(\theta\) is in this specific interval." Once the data are observed, \(\theta\) either is or is not in the interval. The 95% refers to the long-run proportion of such intervals that would contain \(\theta\) over repeated sampling.
   </div>
 
-  <p>Many 95% CIs are only <em>asymptotically</em> correct. For small samples, their actual coverage should be verified by simulation.</p>
-</section>
+  <ul style="margin-left:20px; margin-top:8px;">
+    <li>Wider CI → higher confidence level (e.g., 99% vs 95%)</li>
+    <li>Narrower CI → larger sample size \(n\)</li>
+    <li>Many 95% CIs are valid only asymptotically; small-sample validity should be checked via simulation</li>
+  </ul>
+</div>
 
-<!-- ========================================================
-     SECTION 6: LIKELIHOOD & MLE
-     ======================================================== -->
-<section class="notes-section" id="likelihood">
-  <h2>6. Likelihood &amp; Maximum Likelihood Estimation</h2>
+<!-- 9. Likelihood & MLE -->
+<div class="notes-section" id="likelihood">
+  <h2>9. Likelihood and Maximum Likelihood Estimation</h2>
 
-  <h3>The Likelihood Function</h3>
-  <p>Given data $\mathbf{y}$, the <strong>likelihood</strong> $L(\theta \mid \mathbf{y}) = p(\mathbf{y} \mid \theta)$ is the joint density viewed as a function of $\theta$. For i.i.d. data:</p>
-  <div class="formula-box">
-    $$L(\theta \mid \mathbf{y}) = \prod_{i=1}^n p(y_i \mid \theta), \qquad \ell(\theta \mid \mathbf{y}) = \sum_{i=1}^n \log p(y_i \mid \theta)$$
-  </div>
-  <p>The likelihood plays a central role in all statistical paradigms: Bayesian, frequentist, likelihood, and information-theoretic (AIC).</p>
-
-  <h3>MLE</h3>
   <div class="key-point">
-    The <strong>Maximum Likelihood Estimator (MLE)</strong> $\hat{\theta}$ maximises $L(\theta \mid \mathbf{y})$, equivalently the log-likelihood $\ell(\theta \mid \mathbf{y})$. Intuitively: choose parameter values that give the observed data the highest probability.
+    The <strong>likelihood function</strong> \(L(\boldsymbol{\theta} \mid \mathbf{y}) = p(\mathbf{y} \mid \boldsymbol{\theta})\) is the joint probability (density) of the observed data, viewed as a function of the parameters. For i.i.d. data:
+    \[L(\boldsymbol{\theta} \mid \mathbf{y}) = \prod_{i=1}^n p(y_i \mid \boldsymbol{\theta})\]
   </div>
+
+  <h3>Log-likelihood &amp; MLE</h3>
+  <p>Working with the log-likelihood \(\ell(\boldsymbol{\theta} \mid \mathbf{y}) = \log L(\boldsymbol{\theta} \mid \mathbf{y}) = \sum_{i=1}^n \log p(y_i \mid \boldsymbol{\theta})\) is mathematically more tractable. The <strong>MLE</strong> \(\hat{\boldsymbol{\theta}}\) maximises \(L\) (equivalently, \(\ell\)).</p>
 
   <h3>Score Function &amp; Hessian</h3>
   <div class="formula-box">
-    $$\mathbf{S}(\theta) = \frac{\partial \ell(\theta)}{\partial \theta}, \qquad \mathbf{H}(\theta) = \frac{\partial^2 \ell(\theta)}{\partial \theta \partial \theta^T}$$
+    \[\mathbf{S}(\boldsymbol{\theta}) = \frac{\partial \ell(\boldsymbol{\theta})}{\partial \boldsymbol{\theta}} \quad \text{(Score function; gradient of log-likelihood)}\]
+    \[\mathbf{H}(\boldsymbol{\theta}) = \frac{\partial^2 \ell(\boldsymbol{\theta})}{\partial\boldsymbol{\theta}\partial\boldsymbol{\theta}^T} \quad \text{(Hessian; matrix of second derivatives)}\]
   </div>
-  <p>The MLE solves $\mathbf{S}(\hat{\theta}) = \mathbf{0}$. Key properties of the score at the true $\theta_0$: $E[\mathbf{S}(\theta_0)] = 0$ and $\text{Var}[\mathbf{S}(\theta_0)] = \mathbf{I}(\theta_0)$.</p>
+  <p>The MLE solves the <em>score equation</em>: \(\mathbf{S}(\hat{\boldsymbol{\theta}}) = \mathbf{0}\).</p>
 
   <h3>Fisher Information</h3>
-  <div class="formula-box">
-    $$\mathbf{I}(\theta) = -E[\mathbf{H}(\theta)] = n\,\mathbf{I}_1(\theta), \qquad \mathbf{I}_1(\theta) = -E\!\left[\frac{\partial^2}{\partial\theta\partial\theta^T}\log p(y\mid\theta)\right]$$
+  <div class="theorem-box">
+    \[\mathbf{I}(\boldsymbol{\theta}) \equiv \mathbf{I}_n(\boldsymbol{\theta}) = -E\!\left[\mathbf{H}(\boldsymbol{\theta})\right]\]
+    For i.i.d. data: \(\mathbf{I}(\boldsymbol{\theta}) = n\,\mathbf{I}_1(\boldsymbol{\theta})\), where \(\mathbf{I}_1(\boldsymbol{\theta})\) is the information from one observation.
+    <br><br>
+    <strong>Information Matrix Equality (IME):</strong> \(E\!\left[\mathbf{s}(\boldsymbol{\theta}_0)^T \mathbf{s}(\boldsymbol{\theta}_0)\right] = \mathbf{I}_1(\boldsymbol{\theta}_0)\)
+    <br>Hence: \(\operatorname{Var}[\mathbf{S}(\boldsymbol{\theta}_0)] = \mathbf{I}(\boldsymbol{\theta}_0)\)
   </div>
 
-  <p><strong>Information Matrix Equality (IME):</strong> Under regularity, $E[\mathbf{s}(\theta_0)^T\mathbf{s}(\theta_0)] = \mathbf{I}_1(\theta_0)$, so $\text{Var}[\mathbf{S}(\theta_0)] = \mathbf{I}(\theta_0)$.</p>
-
-  <h3>Three Estimators of $\mathbf{I}(\theta_0)$</h3>
+  <h3>Three Estimators of Fisher Information</h3>
   <table>
     <thead><tr><th>Estimator</th><th>Formula</th><th>Name</th></tr></thead>
     <tbody>
-      <tr><td>$\hat{\mathbf{I}}_1(\hat\theta)$</td><td>$-\mathbf{H}(\hat\theta)$</td><td>Observed information</td></tr>
-      <tr><td>$\hat{\mathbf{I}}_2(\hat\theta)$</td><td>$\sum_i \mathbf{s}_i(\hat\theta)^T\mathbf{s}_i(\hat\theta)$</td><td>Outer product of scores</td></tr>
-      <tr><td>$\hat{\mathbf{I}}_3(\hat\theta)$</td><td>$\mathbf{I}(\hat\theta)$</td><td>Expected information at MLE</td></tr>
+      <tr><td>\(\hat{\mathbf{I}}_1(\hat{\boldsymbol{\theta}})\)</td><td>\(-\mathbf{H}(\hat{\boldsymbol{\theta}})\)</td><td>Observed information matrix</td></tr>
+      <tr><td>\(\hat{\mathbf{I}}_2(\hat{\boldsymbol{\theta}})\)</td><td>\(\sum_i \mathbf{s}_i(\hat{\boldsymbol{\theta}})^T \mathbf{s}_i(\hat{\boldsymbol{\theta}})\)</td><td>Outer product of scores</td></tr>
+      <tr><td>\(\hat{\mathbf{I}}_3(\hat{\boldsymbol{\theta}})\)</td><td>\(\mathbf{I}(\hat{\boldsymbol{\theta}})\)</td><td>Expected information at MLE</td></tr>
     </tbody>
   </table>
 
-  <h3>Cramér–Rao Bound</h3>
+  <h3>Asymptotic Properties of the MLE</h3>
   <div class="theorem-box">
-    <div class="thm-label">Cramér–Rao Bound</div>
-    For any unbiased estimator $T(\mathbf{y})$ of $\psi(\theta)$:
-    $$\text{cov}[T(\mathbf{y})] \geq \mathbf{J}(\theta)\,\mathbf{I}(\theta)^{-1}\,\mathbf{J}(\theta)^T$$
-    For $\psi(\theta)=\theta$: $\text{cov}[\hat\theta] \geq \mathbf{I}(\theta)^{-1}$. An estimator achieving this bound is <strong>(fully) efficient</strong> and is the minimum variance unbiased (MVU) estimator.
-  </div>
-
-  <h3>Asymptotic Properties of MLE</h3>
-  <div class="key-point">
-    Under regularity conditions:
-    <ul>
-      <li><strong>Consistency:</strong> $\hat\theta_{\text{mle}} \xrightarrow{p} \theta_0$</li>
-      <li><strong>Asymptotic Normality &amp; Efficiency:</strong> $\sqrt{n}(\hat\theta_{\text{mle}} - \theta_0) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \mathbf{I}_1(\theta_0)^{-1})$</li>
-      <li><strong>Equivariance:</strong> If $\hat\theta_{\text{mle}}$ is the MLE of $\theta$, then $\psi(\hat\theta_{\text{mle}})$ is the MLE of $\psi(\theta)$ for any 1-to-1 $\psi$.</li>
+    Under regularity conditions, the MLE satisfies:
+    <ul style="margin-top:8px; margin-left:20px;">
+      <li><strong>Consistency:</strong> \(\hat{\boldsymbol{\theta}}_{\mathrm{mle}} \xrightarrow{p} \boldsymbol{\theta}_0\)</li>
+      <li><strong>Asymptotic Normality:</strong> \(\sqrt{n}(\hat{\boldsymbol{\theta}}_{\mathrm{mle}} - \boldsymbol{\theta}_0) \xrightarrow{d} \mathcal{N}(\mathbf{0},\, \mathbf{I}_1(\boldsymbol{\theta}_0)^{-1})\)</li>
+      <li><strong>Efficiency:</strong> Achieves the Cramér-Rao bound asymptotically (asymptotically unbiased)</li>
+      <li><strong>Equivariance:</strong> For 1-to-1 \(\psi = \psi(\boldsymbol{\theta})\): \(\hat{\psi}_{\mathrm{mle}} = \psi(\hat{\boldsymbol{\theta}}_{\mathrm{mle}})\)</li>
     </ul>
+    \[\therefore\quad \hat{\boldsymbol{\theta}}_{\mathrm{mle}} \approx \mathcal{N}\!\left(\boldsymbol{\theta}_0,\; \mathbf{I}(\boldsymbol{\theta}_0)^{-1}\right) \text{ for large } n\]
   </div>
-
-  <h3>Newton–Raphson Algorithm</h3>
-  <p>Iterative method to solve $\mathbf{S}(\theta)=\mathbf{0}$:</p>
-  <div class="formula-box">
-    $$\theta^{k+1} \approx \theta^k - \mathbf{H}(\theta^k)^{-1}\mathbf{S}(\theta^k)$$
-  </div>
-  <p><strong>Fisher's scoring</strong> replaces $-\mathbf{H}(\theta^k)$ with its expectation $\mathbf{I}(\theta^k)$. Convergence is quadratic but can fail at stationary points, with poor initial estimates, or when the Hessian overshoots.</p>
-</section>
-
-<!-- ========================================================
-     SECTION 7: HYPOTHESIS TESTING
-     ======================================================== -->
-<section class="notes-section" id="tests">
-  <h2>7. Hypothesis Testing</h2>
-
-  <h3>Framework</h3>
-  <p>A <strong>hypothesis</strong> is a statement about a population parameter. We test a <strong>null hypothesis</strong> $H_0$ against an <strong>alternative</strong> $H_1$.</p>
-
-  <table>
-    <thead><tr><th></th><th>$H_0$ Rejected</th><th>$H_0$ Not Rejected</th></tr></thead>
-    <tbody>
-      <tr><td><strong>$H_0$ true</strong></td><td style="color:var(--red);font-weight:700">Type I Error ($\alpha$)</td><td>Correct</td></tr>
-      <tr><td><strong>$H_0$ false</strong></td><td>Correct (Power $\beta$)</td><td style="color:var(--red);font-weight:700">Type II Error ($1-\beta$)</td></tr>
-    </tbody>
-  </table>
-
-  <div class="key-point">
-    <strong>Size (significance level):</strong> $\alpha = P(\text{reject}\,H_0 \mid H_0\text{ true})$<br>
-    <strong>Power:</strong> $\beta(\theta) = P(\text{reject}\,H_0 \mid \theta \in H_1)$<br>
-    <strong>Consistency of a test:</strong> $\lim_{n\to\infty}\beta_n(\theta) = 1$ for all $\theta \in H_1$.
-  </div>
-
-  <h3>Three Approaches</h3>
-  <table>
-    <thead><tr><th>Approach</th><th>Tool</th><th>Key Feature</th></tr></thead>
-    <tbody>
-      <tr><td>Neyman–Pearson</td><td>Critical region</td><td>Pre-data; controls Type I error; defines power</td></tr>
-      <tr><td>Significance testing</td><td>$p$-value</td><td>Post-data; compatibility of data with $H_0$</td></tr>
-      <tr><td>Confidence intervals</td><td>CI</td><td>Reject $H_0: \theta=\theta_0$ iff $\theta_0 \notin \text{CI}_{1-\alpha}$</td></tr>
-    </tbody>
-  </table>
-
-  <h3>The $t$-test (Gosset / "Student")</h3>
-  <p>For $X_1,\ldots,X_n \sim \mathcal{N}(\mu, \sigma^2)$ with unknown $\sigma$:</p>
-  <div class="formula-box">
-    $$t = \frac{\bar{X} - \mu_0}{S/\sqrt{n}} \sim t_{n-1} \text{ under } H_0$$
-  </div>
-  <p><strong>Assumptions:</strong> data normally distributed OR $n > 25$; observations are independent.</p>
-  <p><strong>Two-sided critical region:</strong> $W = \{\mathbf{y}: |t(\mathbf{y})| > c\}$ where $c = T_{1-\alpha/2, n-1}$.</p>
 
   <div class="warning-box">
-    <div class="warn-label">⚠ Statistical vs Practical Significance</div>
-    A statistically significant result says nothing about practical importance. Also: formulate the hypothesis in terms of $H_0$; use two-sided tests unless the effect can only go in one direction.
+    <strong>⚠ MLEs for finite samples:</strong> MLEs have no optimal finite-sample properties. Other estimators may outperform the MLE in small samples. Their attractive properties (consistency, efficiency, normality) are all asymptotic.
   </div>
 
-  <h3>Uniformly Most Powerful (UMP) Tests</h3>
+  <h3>Regularity Conditions</h3>
+  <ul style="margin-left:20px;">
+    <li>Identifiability: different \(\boldsymbol{\theta}\) → different distributions</li>
+    <li>Range of data cannot depend on unknown parameters</li>
+    <li>True parameter must lie in the interior of the parameter space</li>
+    <li>Number of parameters must not grow too fast with \(n\)</li>
+  </ul>
+
+  <h3>Newton-Raphson Algorithm</h3>
+  <div class="formula-box">
+    \[\boldsymbol{\theta}^{k+1} \approx \boldsymbol{\theta}^k - \mathbf{H}(\boldsymbol{\theta}^k)^{-1}\,\mathbf{S}(\boldsymbol{\theta}^k)\]
+  </div>
+  <p>Convergence is <em>quadratic</em> near the root. Failure modes include: singular Hessian, poor initial estimate, overshooting in poorly-behaved likelihood surfaces. <strong>Fisher's scoring</strong> replaces \(-\mathbf{H}\) with its expected value \(\mathbf{I}(\boldsymbol{\theta})\).</p>
+
+  <div class="example-box">
+    <strong>Surgery Example (Binomial):</strong> Surgeon operates \(n=12\) patients with \(y=9\) successes.<br>
+    Log-likelihood: \(\ell(\pi \mid 9) = \log\binom{12}{9} + 9\log\pi + 3\log(1-\pi)\)<br>
+    Score equation: \(\frac{d\ell}{d\pi} = \frac{y}{\pi} - \frac{n-y}{1-\pi} = 0 \Rightarrow \hat{\pi} = y/n = 0.75\)<br>
+    Fisher info: \(I(\pi) = n/[\pi(1-\pi)]\)<br>
+    Asymptotic 95% CI for \(\pi\): \([0.51,\; 0.99]\)
+  </div>
+</div>
+
+<!-- 10. Cramér-Rao -->
+<div class="notes-section" id="crb">
+  <h2>10. Cramér-Rao Bound</h2>
+
   <div class="theorem-box">
-    <div class="thm-label">Neyman–Pearson Lemma</div>
-    For simple $H_0: \theta=\theta_0$ vs $H_1: \theta=\theta_1$, the UMP test has rejection region:
-    $$W = \left\{\mathbf{y}: \frac{L(\theta_0\mid\mathbf{y})}{L(\theta_1\mid\mathbf{y})} < c\right\}$$
-    UMP tests do not always exist for composite alternatives.
-  </div>
-</section>
-
-<!-- ========================================================
-     SECTION 8: THE HOLY TRINITY
-     ======================================================== -->
-<section class="notes-section" id="holy-trinity">
-  <h2>8. The Holy Trinity of Tests</h2>
-
-  <p>Three large-sample tests based on the likelihood — all asymptotically equivalent under $H_0$.</p>
-
-  <h3>Likelihood Ratio Test (LRT)</h3>
-  <div class="formula-box">
-    $$d = -2\left[\ell(\hat\theta_0 \mid \mathbf{y}) - \ell(\hat\theta \mid \mathbf{y})\right] \xrightarrow{d} \chi^2(df)$$
-    $df = $ (# params full model) $-$ (# params null model)
+    <strong>Cramér-Rao Bound (CRB):</strong> For any unbiased estimator \(\mathbf{T}(\mathbf{y})\) of \(\boldsymbol{\psi}(\boldsymbol{\theta})\):
+    \[\operatorname{cov}\!\left[\mathbf{T}(\mathbf{y})\right] \ge \mathbf{J}(\boldsymbol{\theta})\,\mathbf{I}(\boldsymbol{\theta})^{-1}\,\mathbf{J}(\boldsymbol{\theta})^T\]
+    where \(\mathbf{J}(\boldsymbol{\theta}) = \partial\boldsymbol{\psi}/\partial\boldsymbol{\theta}\) is the Jacobian. For the simple case \(\psi(\theta) = \theta\):
+    \[\operatorname{Var}\!\left[\hat{\theta}(\mathbf{y})\right] \ge \mathbf{I}(\boldsymbol{\theta})^{-1}\]
   </div>
 
-  <h3>Wald Test</h3>
-  <div class="formula-box">
-    Simple: $w = (\hat\theta - \theta_0)^T\mathbf{I}(\hat\theta)(\hat\theta - \theta_0) \xrightarrow{d} \chi^2(df)$<br><br>
-    Composite: $w = (\hat\theta_2 - \theta_{20})^T [\mathbf{I}^{\theta_2\theta_2}(\hat\theta)]^{-1}(\hat\theta_2 - \theta_{20})$
-  </div>
-
-  <h3>Score Test (Rao / Lagrange Multiplier)</h3>
-  <div class="formula-box">
-    $$s = \mathbf{S}(\hat\theta_0)^T\,\mathbf{I}(\hat\theta_0)^{-1}\,\mathbf{S}(\hat\theta_0) \xrightarrow{d} \chi^2(df)$$
-  </div>
-
-  <h3>Invariance Properties</h3>
-  <table>
-    <thead><tr><th>Test</th><th>Invariant to equivalent formulations of $H_0$?</th><th>Invariant to 1-1 variable transforms?</th></tr></thead>
-    <tbody>
-      <tr><td>LRT</td><td style="color:var(--green-dark);font-weight:700">Yes (always)</td><td style="color:var(--green-dark);font-weight:700">Yes (always)</td></tr>
-      <tr><td>Score</td><td style="color:var(--green-dark);font-weight:700">Yes (always)</td><td>Yes (if $\hat{\mathbf{I}} = \hat{\mathbf{I}}_2$ or $\hat{\mathbf{I}}_3$)</td></tr>
-      <tr><td>Wald</td><td style="color:var(--red);font-weight:700">No</td><td style="color:var(--red);font-weight:700">Not in general</td></tr>
-    </tbody>
-  </table>
+  <ul style="margin-left:20px; margin-top:8px;">
+    <li>An estimator attaining the CRB is called <strong>fully efficient</strong> (= Minimum Variance Unbiased, MVU)</li>
+    <li>The CRB is a lower bound — no unbiased estimator can have lower variance</li>
+    <li>In some problems, <strong>no unbiased estimator achieves the bound</strong></li>
+    <li>The MLE achieves the CRB <em>asymptotically</em></li>
+  </ul>
 
   <div class="warning-box">
-    <div class="warn-label">⚠ Wald Test Lack of Invariance</div>
-    Testing $H_0: \theta=0$ can yield $p \approx 8\times10^{-24}$ with the Wald test, but reparametrising as $\xi = \theta^{25}$ (same hypothesis!) gives $p = 0.69$. This is a fundamental flaw of the Wald test.
+    <strong>⚠ Key Insight:</strong> The CRB establishes a fundamental limit on precision for <em>unbiased</em> estimators. If you insist on unbiasedness, you cannot do better than this bound. But allowing bias (as the MLE does for finite samples) might give better MSE.
   </div>
+</div>
 
-  <h3>Confidence Intervals from Tests (Univariate)</h3>
-  <p>For a scalar $\theta$, a $100(1-\alpha)\%$ CI consists of all $\theta_0$ for which $H_0:\theta=\theta_0$ would <em>not</em> be rejected at level $\alpha$. This duality connects tests to CIs.</p>
+<!-- ═══════════════════ MCQ ═══════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>📝 Multiple Choice &amp; True/False Questions (50)</h2>
+  <div class="score-display" id="scoreDisplay">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button>
 
-  <h3>Binomial Proportion — Three CIs</h3>
-  <table>
-    <thead><tr><th>Method</th><th>Interval</th><th>Notes</th></tr></thead>
-    <tbody>
-      <tr><td>Wald</td><td>$\hat\pi \pm z_{1-\alpha/2}\sqrt{\hat\pi(1-\hat\pi)/n}$</td><td>Can include invalid probabilities; not transformation-invariant</td></tr>
-      <tr><td>Wilson (Score)</td><td>Invert score statistic</td><td>Better coverage, always in $[0,1]$</td></tr>
-      <tr><td>Likelihood (LRT)</td><td>$\{\pi: \ell(\pi) \geq \ell(\hat\pi) - 1.92\}$</td><td>Transformation-invariant; always valid</td></tr>
-    </tbody>
-  </table>
-</section>
+  <!-- Questions injected by JS -->
+  <div id="mcqContainer"></div>
+</div>
 
-<!-- ========================================================
-     SECTION 9: INFERENCE UNDER MISSPECIFICATION
-     ======================================================== -->
-<section class="notes-section" id="misspec">
-  <h2>9. Inference Under Misspecification</h2>
-
-  <p>If the assumed model $p(y\mid\mathbf{x},\theta)$ differs from the true DGP $g(y\mid\mathbf{z},\gamma_0)$, the MLE converges not to $\theta_0$ but to:</p>
-
-  <div class="formula-box">
-    $$\theta^* = \arg\min_\theta \; I(f:g,\theta) = E_g\!\left[\log\frac{g(y\mid\mathbf{z},\gamma_0)}{p(y\mid\mathbf{x},\theta)}\right]$$
-  </div>
-
-  <p>This is the <strong>Kullback–Leibler Information Criterion (KLIC)</strong>. The MLE converges to the pseudo-true value $\theta^*$.</p>
-
-  <h3>Sandwich Variance</h3>
-  <div class="formula-box">
-    $$\sqrt{n}(\hat\theta_{\text{mle}} - \theta^*) \xrightarrow{d} \mathcal{N}[\mathbf{0},\, \mathbf{C}(\theta^*)]$$
-    $$\mathbf{C}(\theta^*) = \mathbf{A}^{-1}(\theta^*)\,\mathbf{B}(\theta^*)\,\mathbf{A}^{-1}(\theta^*)$$
-  </div>
-  <p>where $\mathbf{A}(\theta) = E[\partial^2 \log p / \partial\theta\partial\theta^T]$ and $\mathbf{B}(\theta) = E[\mathbf{s}(\theta)^T\mathbf{s}(\theta)]$.</p>
-
-  <div class="key-point">
-    <strong>Under correct specification:</strong> $\theta^*=\theta_0$ and $-\mathbf{A}^{-1}(\theta_0)=\mathbf{B}^{-1}(\theta_0)$, so the sandwich reduces to the standard Fisher information-based variance.<br><br>
-    <strong>Under misspecification:</strong> Use the <em>robust Wald</em> or <em>robust Score</em> tests. The LRT is <strong>not</strong> asymptotically $\chi^2$ under misspecification.
-  </div>
-
-  <div class="warning-box">
-    <div class="warn-label">⚠ Key Result</div>
-    Under model misspecification: robust Wald and robust Score tests remain asymptotically equivalent ($(w-s)\xrightarrow{p}0$). However, the LRT loses its $\chi^2$ null distribution.
-  </div>
-</section>
-
-<!-- ========================================================
-     MCQ SECTION
-     ======================================================== -->
-<section class="mcq-section" id="mcq">
-  <div class="mcq-section-header">
-    <h2>📝 Multiple Choice &amp; True/False Questions</h2>
-    <div>
-      <span class="score-display" id="score-display">Score: 0 / 50</span>
-    </div>
-  </div>
-  <div class="progress-row" style="margin-bottom:20px;">
-    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
-    <span class="progress-label" id="progress-label">0 answered</span>
-  </div>
-  <div class="reset-bar">
-    <button class="reset-btn" onclick="resetMCQ()">↺ Reset All Questions</button>
-  </div>
-  <br>
-
-  <!-- Questions are rendered by JS -->
-  <div id="mcq-container"></div>
-</section>
-
-<!-- ========================================================
-     SHORT ANSWER SECTION
-     ======================================================== -->
-<section class="sa-section" id="sa">
-  <div class="sa-section-header">
-    <h2>🗣 Short Answer / Oral Exam Questions</h2>
-  </div>
-  <div id="sa-container"></div>
-</section>
+<!-- ═══════════════════ SHORT ANSWER ═══════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>💬 Short Answer Questions (Oral Exam Style)</h2>
+  <div id="saContainer"></div>
+</div>
 
 <script>
-// ============================================================
-//  MCQ DATA
-// ============================================================
 const mcqData = [
-  // --- RANDOMNESS & DISTRIBUTIONS ---
-  {
-    type: "mc",
-    q: "Which of the following is the correct interpretation of the Normal distribution parameters $\\mu$ and $\\sigma$?",
-    options: [
-      "A) $\\mu$ is the median, $\\sigma$ is the range",
-      "B) $\\mu$ is the mean (= median = mode), $\\sigma$ is the standard deviation",
-      "C) $\\mu$ is the variance, $\\sigma$ is the mean",
-      "D) $\\mu$ is the mode, $\\sigma^2$ is the mean"
-    ],
-    answer: 1,
-    explanation: "The normal distribution is symmetric, so mean = median = mode = $\\mu$. The spread is controlled by $\\sigma$ (standard deviation) or $\\sigma^2$ (variance)."
-  },
-  {
-    type: "tf",
-    q: "True or False: For a Poisson distribution with parameter $\\lambda$, the mean and variance are both equal to $\\lambda$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "This is a defining property of the Poisson distribution: $E(y) = \\text{Var}(y) = \\lambda$."
-  },
-  {
-    type: "mc",
-    q: "If the number of observations from a population increases indefinitely and class widths are made progressively smaller, what does the histogram approach?",
-    options: [
-      "A) A step function",
-      "B) A smooth probability density curve",
-      "C) A uniform distribution",
-      "D) A binomial distribution"
-    ],
-    answer: 1,
-    explanation: "In the limit, as $n \\to \\infty$ and class width $\\to 0$, a smooth probability density curve arises. This is how frequency histograms connect to probability distributions."
-  },
-  // --- POINT ESTIMATION ---
-  {
-    type: "mc",
-    q: "The Mean Squared Error (MSE) of an estimator $\\hat{\\theta}$ decomposes as:",
-    options: [
-      "A) $\\text{MSE} = \\text{Var}(\\hat\\theta) - \\text{bias}(\\hat\\theta)^2$",
-      "B) $\\text{MSE} = \\text{Var}(\\hat\\theta) \\times \\text{bias}(\\hat\\theta)$",
-      "C) $\\text{MSE} = \\text{Var}(\\hat\\theta) + \\text{bias}(\\hat\\theta)^2$",
-      "D) $\\text{MSE} = \\text{bias}(\\hat\\theta)^2 / \\text{Var}(\\hat\\theta)$"
-    ],
-    answer: 2,
-    explanation: "The bias-variance decomposition of MSE is: $\\text{MSE}[\\hat\\theta] = \\text{Var}[\\hat\\theta] + \\text{bias}[\\hat\\theta]^2$. This means a biased estimator with low variance can still have a low MSE."
-  },
-  {
-    type: "tf",
-    q: "True or False: An unbiased estimator is always preferable to a biased estimator.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. A biased estimator can have a smaller MSE if its variance is sufficiently reduced. The lecture explicitly notes this with $S^2 = \\frac{1}{n}\\sum(y_i-\\bar y)^2$, which is biased but has lower MSE than the unbiased version in some settings."
-  },
-  {
-    type: "mc",
-    q: "The sample variance $S^2 = \\frac{1}{n}\\sum_{i=1}^n(y_i-\\bar{y})^2$ satisfies $E(S^2) = \\frac{n-1}{n}\\sigma^2$. This means it is:",
-    options: [
-      "A) Unbiased and consistent",
-      "B) Unbiased but not consistent",
-      "C) Biased but consistent",
-      "D) Biased and inconsistent"
-    ],
-    answer: 2,
-    explanation: "Since $E(S^2) \\neq \\sigma^2$, it is biased. However, as $n\\to\\infty$, the bias $\\to 0$, so it is asymptotically unbiased and consistent."
-  },
-  {
-    type: "mc",
-    q: "An estimator $\\hat{\\mu}(\\mathbf{y}) = y_1$ (the first observation) for estimating the population mean $\\mu$ is:",
-    options: [
-      "A) Unbiased and consistent",
-      "B) Biased but consistent",
-      "C) Unbiased but not consistent",
-      "D) Both biased and inconsistent"
-    ],
-    answer: 2,
-    explanation: "Since $E(y_1) = \\mu$, it is unbiased. However, its variance does not decrease as $n$ increases — the estimator completely ignores observations $y_2, \\ldots, y_n$ — so it is not consistent."
-  },
-  {
-    type: "tf",
-    q: "True or False: The only unbiased estimator of $e^{-2\\lambda}$ in a Poisson model with sample size $n=1$ is $(-1)^y$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True, and this is a famous example showing that unbiasedness can be a pathological property. This estimator can take negative values and is completely useless in practice, yet it is the uniquely unbiased estimator."
-  },
-  // --- CONSISTENCY ---
-  {
-    type: "mc",
-    q: "An estimator $\\hat{\\theta}_n$ is consistent for $\\theta$ if:",
-    options: [
-      "A) $E[\\hat\\theta_n] = \\theta$ for all $n$",
-      "B) $\\lim_{n\\to\\infty} P(|\\hat\\theta_n - \\theta| > \\varepsilon) \\to 0$ for any $\\varepsilon > 0$",
-      "C) $\\text{Var}(\\hat\\theta_n) \\to 0$ as $n\\to\\infty$",
-      "D) $\\hat\\theta_n < \\theta$ for all $n$"
-    ],
-    answer: 1,
-    explanation: "Consistency is defined via convergence in probability: the estimator converges to the true value $\\theta$ as the sample size grows without bound."
-  },
-  // --- CLT ---
-  {
-    type: "mc",
-    q: "According to the Central Limit Theorem, $\\bar{y}_n$ converges in distribution to which distribution as $n \\to \\infty$?",
-    options: [
-      "A) $\\mathcal{N}(0, \\sigma^2)$",
-      "B) $\\mathcal{N}(\\mu, \\sigma^2)$",
-      "C) $\\mathcal{N}(\\mu, \\sigma^2/n)$",
-      "D) $t_{n-1}$"
-    ],
-    answer: 2,
-    explanation: "The CLT states $\\bar{y}_n \\xrightarrow{d} \\mathcal{N}(\\mu, \\sigma^2/n)$, meaning the standard error of the mean shrinks as $1/\\sqrt{n}$."
-  },
-  {
-    type: "tf",
-    q: "True or False: The Central Limit Theorem requires the original data to be normally distributed.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. The CLT applies to any distribution with finite mean and variance. The result holds regardless of the original distribution — normal, Gamma, Uniform, Beta, etc."
-  },
-  {
-    type: "mc",
-    q: "The Delta Method is used to:",
-    options: [
-      "A) Compute exact distributions of MLEs",
-      "B) Find the asymptotic distribution of a smooth function of an asymptotically normal estimator",
-      "C) Test for normality of residuals",
-      "D) Compute confidence intervals using bootstrap resampling"
-    ],
-    answer: 1,
-    explanation: "The Delta Method provides the asymptotic distribution of $\\psi(\\mathbf{y}_n)$ given the asymptotic distribution of $\\mathbf{y}_n$, using a first-order Taylor expansion."
-  },
-  {
-    type: "mc",
-    q: "Using the Delta Method, if $\\hat\\pi \\sim \\mathcal{N}(\\pi, \\pi(1-\\pi)/n)$ and $g(x) = \\ln(x/(1-x))$, then asymptotically $\\text{Var}[\\ln(\\hat\\Theta_{\\text{survival}})]$ equals:",
-    options: [
-      "A) $\\pi(1-\\pi)/n$",
-      "B) $1/(\\pi(1-\\pi)n)$",
-      "C) $\\pi/(1-\\pi)$",
-      "D) $n/\\pi(1-\\pi)$"
-    ],
-    answer: 1,
-    explanation: "With $g'(x) = 1/(x(1-x))$, the Delta Method gives $\\text{Var}[g(\\hat\\pi)] \\approx [g'(\\pi)]^2 \\cdot \\pi(1-\\pi)/n = 1/(\\pi(1-\\pi)n)$."
-  },
-  // --- CONFIDENCE INTERVALS ---
-  {
-    type: "mc",
-    q: "A 95% confidence interval for $\\mu$ is computed from a sample. Which statement is correct?",
-    options: [
-      "A) There is a 95% probability that $\\mu$ lies in this specific interval",
-      "B) 95% of all possible confidence intervals constructed this way will contain $\\mu$",
-      "C) The interval contains 95% of the data",
-      "D) The interval is correct 95% of the time because $\\mu$ changes randomly"
-    ],
-    answer: 1,
-    explanation: "The probability refers to the procedure, not the realized interval. Once computed, the interval either contains $\\mu$ or not. The correct statement is frequentist: 95% of all such intervals over repeated sampling will cover $\\mu$."
-  },
-  {
-    type: "tf",
-    q: "True or False: Many 95% confidence intervals only have asymptotically correct coverage, and for small samples their behavior should be verified via simulation.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. Asymptotic CIs rely on large-sample approximations. For small $n$, the actual coverage probability may differ substantially from the nominal $1-\\alpha$."
-  },
-  // --- LIKELIHOOD & MLE ---
-  {
-    type: "mc",
-    q: "The score function $\\mathbf{S}(\\theta)$ evaluated at the true parameter $\\theta_0$ has expected value:",
-    options: [
-      "A) $\\mathbf{I}(\\theta_0)$",
-      "B) $-\\mathbf{I}(\\theta_0)$",
-      "C) $\\mathbf{0}$",
-      "D) $\\theta_0$"
-    ],
-    answer: 2,
-    explanation: "Under regularity conditions, $E[\\mathbf{S}(\\theta_0)] = \\mathbf{0}$. This is one of the fundamental properties of the score function at the true parameter value."
-  },
-  {
-    type: "mc",
-    q: "Fisher's expected information matrix is defined as:",
-    options: [
-      "A) The expected value of the Hessian matrix",
-      "B) Minus the expected value of the Hessian matrix",
-      "C) The variance of the MLE",
-      "D) The squared score function"
-    ],
-    answer: 1,
-    explanation: "$\\mathbf{I}(\\theta) = -E[\\mathbf{H}(\\theta)]$. Since the Hessian of the log-likelihood at a maximum is negative semi-definite, taking the negative gives a positive definite matrix representing information."
-  },
-  {
-    type: "tf",
-    q: "True or False: The MLE is always unbiased in finite samples.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. MLEs are only asymptotically unbiased. In finite samples, they can be biased — the lecture explicitly states MLEs have 'no optimum properties for finite samples'."
-  },
-  {
-    type: "mc",
-    q: "The Information Matrix Equality (IME) states:",
-    options: [
-      "A) $\\mathbf{I}(\\theta) = \\text{Var}[\\hat\\theta_{\\text{mle}}]$",
-      "B) $E[\\mathbf{s}(\\theta_0)^T\\mathbf{s}(\\theta_0)] = -E[\\partial^2\\log p/\\partial\\theta\\partial\\theta^T]$",
-      "C) The Wald test statistic equals the Score test statistic",
-      "D) $\\hat{\\mathbf{I}}_1 = \\hat{\\mathbf{I}}_2 = \\hat{\\mathbf{I}}_3$ in finite samples"
-    ],
-    answer: 1,
-    explanation: "The IME states $E[\\mathbf{s}(\\theta_0)^T\\mathbf{s}(\\theta_0)] = \\mathbf{I}_1(\\theta_0)$, linking the outer product of scores to the negative expected Hessian. This only holds under correct model specification."
-  },
-  {
-    type: "mc",
-    q: "The Cramér–Rao bound states that for any unbiased estimator $\\hat\\theta$:",
-    options: [
-      "A) $\\text{Var}(\\hat\\theta) \\leq \\mathbf{I}(\\theta)^{-1}$",
-      "B) $\\text{Var}(\\hat\\theta) \\geq \\mathbf{I}(\\theta)^{-1}$",
-      "C) $\\text{Var}(\\hat\\theta) = \\mathbf{I}(\\theta)$",
-      "D) $\\text{Var}(\\hat\\theta) \\geq \\mathbf{I}(\\theta)$"
-    ],
-    answer: 1,
-    explanation: "The CRB gives a lower bound: $\\text{cov}[\\hat\\theta] \\geq \\mathbf{I}(\\theta)^{-1}$. An efficient estimator achieves this bound exactly."
-  },
-  {
-    type: "tf",
-    q: "True or False: The MLE achieves the Cramér–Rao bound in finite samples.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. The MLE only achieves the CRB asymptotically (as $n \\to \\infty$). For finite samples, other estimators may have greater concentration around the true parameter."
-  },
-  {
-    type: "mc",
-    q: "In the Newton–Raphson algorithm for finding the MLE, the update rule is:",
-    options: [
-      "A) $\\theta^{k+1} = \\theta^k + \\mathbf{H}(\\theta^k)^{-1}\\mathbf{S}(\\theta^k)$",
-      "B) $\\theta^{k+1} = \\theta^k - \\mathbf{H}(\\theta^k)^{-1}\\mathbf{S}(\\theta^k)$",
-      "C) $\\theta^{k+1} = \\theta^k - \\mathbf{S}(\\theta^k)\\mathbf{H}(\\theta^k)$",
-      "D) $\\theta^{k+1} = -\\mathbf{H}(\\theta^k)^{-1}\\mathbf{S}(\\theta^k)$"
-    ],
-    answer: 1,
-    explanation: "$\\theta^{k+1} \\approx \\theta^k - \\mathbf{H}(\\theta^k)^{-1}\\mathbf{S}(\\theta^k)$. This comes from solving the linearised score equation $\\mathbf{0} \\approx \\mathbf{S}(\\theta^k) + \\mathbf{H}(\\theta^k)(\\theta - \\theta^k)$."
-  },
-  {
-    type: "mc",
-    q: "In the surgery example with Binomial data ($n=12$, $y=9$ successes), the MLE of $\\pi$ is:",
-    options: ["A) $0.5$", "B) $0.75$", "C) $0.9$", "D) $12/9$"],
-    answer: 1,
-    explanation: "The MLE for a Binomial proportion is $\\hat\\pi = y/n = 9/12 = 0.75$."
-  },
-  {
-    type: "tf",
-    q: "True or False: If $\\hat\\theta_{\\text{mle}}$ is the MLE of $\\theta$ and $\\psi(\\theta)$ is a 1-to-1 transformation, then $\\psi(\\hat\\theta_{\\text{mle}})$ is the MLE of $\\psi(\\theta)$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. This is the equivariance property of the MLE. It is one of the MLE's most useful properties in practice."
-  },
-  // --- HYPOTHESIS TESTING ---
-  {
-    type: "mc",
-    q: "A Type I error occurs when:",
-    options: [
-      "A) $H_0$ is rejected and $H_0$ is false",
-      "B) $H_0$ is not rejected and $H_0$ is false",
-      "C) $H_0$ is rejected and $H_0$ is true",
-      "D) $H_0$ is not rejected and $H_0$ is true"
-    ],
-    answer: 2,
-    explanation: "A Type I error is a false positive: rejecting $H_0$ when it is actually true. Its probability is controlled by the significance level $\\alpha$."
-  },
-  {
-    type: "mc",
-    q: "The power of a test $\\beta(\\theta)$ is best described as:",
-    options: [
-      "A) The probability of a Type I error",
-      "B) The probability of correctly rejecting a false $H_0$",
-      "C) The probability of not rejecting $H_0$ when $H_0$ is true",
-      "D) The significance level $\\alpha$"
-    ],
-    answer: 1,
-    explanation: "Power $= P(W \\mid H_1) = P(\\text{reject }H_0 \\mid H_0\\text{ false})$. It is the probability of correctly detecting an effect when one exists."
-  },
-  {
-    type: "tf",
-    q: "True or False: A uniformly most powerful (UMP) test always exists for two-sided composite alternatives.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. UMP tests do not always exist, and they may be difficult or impossible to find for two-sided alternatives. The Neyman–Pearson lemma guarantees UMP tests only for simple hypotheses."
-  },
-  {
-    type: "mc",
-    q: "The $p$-value in significance testing is:",
-    options: [
-      "A) The probability that $H_0$ is true",
-      "B) The probability, under $H_0$, of obtaining a test statistic at least as extreme as observed",
-      "C) The Type I error probability $\\alpha$",
-      "D) The power of the test"
-    ],
-    answer: 1,
-    explanation: "The $p$-value is a post-data measure: $P(|T| \\geq t_{\\text{obs}} \\mid H_0)$. It quantifies the compatibility of the data with $H_0$, not the probability that $H_0$ is true."
-  },
-  {
-    type: "mc",
-    q: "In the birth weight example ($n=30$, $\\bar{X}=3.482$, $S=0.56$, testing $H_0: \\mu_L = 3.3$), the observed $t$-statistic is approximately 1.78 and the critical value at $\\alpha=0.05$ is 2.04. What is the conclusion?",
-    options: [
-      "A) Reject $H_0$; Limburg birth weight differs from 3.3 kg",
-      "B) Do not reject $H_0$; no evidence the birth weight differs from 3.3 kg",
-      "C) Reject $H_0$; Limburg birth weight is exactly 3.3 kg",
-      "D) The test is inconclusive because the sample is too small"
-    ],
-    answer: 1,
-    explanation: "$|t| = 1.78 < 2.04 = c_{0.05}$, so $H_0$ is not rejected. The 95% CI is $(3.11, 3.85)$, which contains 3.3, leading to the same conclusion."
-  },
-  {
-    type: "tf",
-    q: "True or False: A statistically significant result implies practical importance.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. Statistical significance is a mathematical concept that depends heavily on sample size. A very large $n$ can make trivially small effects statistically significant while having no practical relevance."
-  },
-  {
-    type: "mc",
-    q: "Gosset's $t$-test uses the Student's $t$-distribution rather than the normal because:",
-    options: [
-      "A) The data are assumed to be $t$-distributed",
-      "B) The population standard deviation $\\sigma$ is unknown and estimated by $S$",
-      "C) The sample size is always large",
-      "D) The Poisson approximation is used"
-    ],
-    answer: 1,
-    explanation: "When $\\sigma$ is unknown and replaced by $S$, the test statistic $t=(\\bar X-\\mu)/(S/\\sqrt{n})$ follows a $t_{n-1}$ distribution exactly (under normality), not the standard normal."
-  },
-  {
-    type: "mc",
-    q: "The t-test has valid asymptotic coverage when:",
-    options: [
-      "A) Only if data are perfectly normal",
-      "B) Data are normally distributed OR the sample size is large ($n > 25$) and data are independent",
-      "C) Always, regardless of sample size and distribution",
-      "D) Only for two-sided tests"
-    ],
-    answer: 1,
-    explanation: "The $t$-test requires either normality of the data or a sufficiently large sample (by the CLT). Independence is also required."
-  },
-  // --- HOLY TRINITY ---
-  {
-    type: "mc",
-    q: "The likelihood ratio test statistic is:",
-    options: [
-      "A) $d = 2[\\ell(\\hat\\theta_0) - \\ell(\\hat\\theta)]$",
-      "B) $d = -2[\\ell(\\hat\\theta_0) - \\ell(\\hat\\theta)]$",
-      "C) $d = [\\ell(\\hat\\theta) - \\ell(\\hat\\theta_0)]^2$",
-      "D) $d = \\ell(\\hat\\theta)/\\ell(\\hat\\theta_0)$"
-    ],
-    answer: 1,
-    explanation: "$d = -2[\\ell(\\hat\\theta_0\\mid\\mathbf{y}) - \\ell(\\hat\\theta\\mid\\mathbf{y})]$. The negative sign ensures $d \\geq 0$ since $\\ell(\\hat\\theta) \\geq \\ell(\\hat\\theta_0)$."
-  },
-  {
-    type: "mc",
-    q: "Under $H_0$, the LRT, Wald, and Score statistics all converge to:",
-    options: [
-      "A) $\\mathcal{N}(0,1)$",
-      "B) $t_{n-1}$",
-      "C) $\\chi^2(df)$ where $df$ = number of parameters restricted",
-      "D) $F(1, n-1)$"
-    ],
-    answer: 2,
-    explanation: "All three tests are asymptotically $\\chi^2(df)$ under $H_0$, where $df$ equals the number of parameters fixed under $H_0$ relative to $H_1$."
-  },
-  {
-    type: "tf",
-    q: "True or False: The Likelihood Ratio Test is always invariant to equivalent formulations of $H_0$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. The LRT is invariant to reparametrisation of the null hypothesis and to 1-to-1 transformations of the data. This is one of its key advantages over the Wald test."
-  },
-  {
-    type: "tf",
-    q: "True or False: The Wald test is invariant to all 1-to-1 reparametrisations of the hypothesis.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. The Wald test famously lacks invariance. The same null hypothesis expressed in two different parametrisations can yield completely different $p$-values (as shown by the $\\theta$ vs $\\theta^{25}$ example in the lecture)."
-  },
-  {
-    type: "mc",
-    q: "In the Wald test invariance example from the lecture, testing $H_0: \\theta = 0$ with MLE $\\hat\\theta=1$ and $\\text{Var}(\\hat\\theta)=0.01$ gives $p \\approx 8 \\times 10^{-24}$. Reparametrising as $\\xi = \\theta^{25}$ (equivalent hypothesis) gives a $p$-value of 0.69. This demonstrates that:",
-    options: [
-      "A) The Wald test is more powerful than the LRT",
-      "B) The Wald test result depends on how the hypothesis is phrased",
-      "C) The LRT also lacks invariance",
-      "D) $H_0: \\theta=0$ and $H_0: \\xi=0$ are different hypotheses"
-    ],
-    answer: 1,
-    explanation: "This is the classic demonstration that the Wald test is not invariant to reparametrisation. $H_0: \\theta=0$ and $H_0: \\xi=\\theta^{25}=0$ are equivalent, yet the Wald test gives contradictory results."
-  },
-  {
-    type: "mc",
-    q: "Which confidence interval for a binomial proportion is invariant under transformations (e.g., computing on log-odds scale and back-transforming gives the same interval)?",
-    options: [
-      "A) Wald interval",
-      "B) Wald interval on the log-odds scale",
-      "C) Likelihood ratio interval",
-      "D) None of the above"
-    ],
-    answer: 2,
-    explanation: "The likelihood ratio (profile likelihood) confidence interval is transformation-invariant. This is a direct consequence of the LRT's invariance property."
-  },
-  {
-    type: "tf",
-    q: "True or False: The Wald interval for a binomial proportion can include values outside $[0,1]$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. For $n=10$, $y=1$, the Wald interval is $(-0.086, 0.286)$, which includes negative probabilities — an obvious deficiency. Wilson or likelihood intervals avoid this problem."
-  },
-  {
-    type: "mc",
-    q: "The Score (Wilson) interval for a binomial proportion is obtained by:",
-    options: [
-      "A) Inverting the Wald test statistic",
-      "B) Inverting the score test statistic",
-      "C) Inverting the LRT statistic",
-      "D) Using Bayesian posterior credible intervals"
-    ],
-    answer: 1,
-    explanation: "Inverting the score test statistic $d^2 = [(\\hat\\pi - \\pi_0)/\\sqrt{\\pi_0(1-\\pi_0)/n}]^2$ yields the Wilson interval, which has better coverage properties than the Wald interval."
-  },
-  // --- MISSPECIFICATION ---
-  {
-    type: "mc",
-    q: "Under model misspecification, the MLE $\\hat\\theta_{\\text{mle}}$ converges in probability to:",
-    options: [
-      "A) The true parameter $\\theta_0$",
-      "B) The pseudo-true value $\\theta^*$ minimising the KLIC",
-      "C) Zero",
-      "D) The sample mean"
-    ],
-    answer: 1,
-    explanation: "Under misspecification, the MLE converges to $\\theta^*$ which minimises the Kullback-Leibler divergence $I(f:g,\\theta) = E_g[\\log g(y)/p(y\\mid\\theta)]$."
-  },
-  {
-    type: "mc",
-    q: "The sandwich variance estimator $\\mathbf{C}(\\theta^*) = \\mathbf{A}^{-1}(\\theta^*)\\mathbf{B}(\\theta^*)\\mathbf{A}^{-1}(\\theta^*)$ is used when:",
-    options: [
-      "A) The model is correctly specified",
-      "B) The model may be misspecified and we want robust inference",
-      "C) The sample size is very small",
-      "D) Computing the MLE via Newton-Raphson"
-    ],
-    answer: 1,
-    explanation: "The sandwich estimator provides a consistent variance estimate even under misspecification. Under correct specification, it reduces to the standard Fisher information-based variance."
-  },
-  {
-    type: "tf",
-    q: "True or False: Under model misspecification, the LRT statistic remains asymptotically $\\chi^2(df)$ under $H_0$.",
-    options: ["True", "False"],
-    answer: 1,
-    explanation: "False. The LRT loses its $\\chi^2$ null distribution under misspecification. Only the robust Wald and robust Score tests remain asymptotically equivalent and $\\chi^2$ distributed under $H_0$."
-  },
-  {
-    type: "mc",
-    q: "The matrices $\\mathbf{A}(\\theta)$ and $\\mathbf{B}(\\theta)$ in the sandwich variance are equal (so the sandwich reduces to the standard variance) when:",
-    options: [
-      "A) The sample size is large",
-      "B) The model is correctly specified",
-      "C) The MLE is consistent",
-      "D) The parameter space is one-dimensional"
-    ],
-    answer: 1,
-    explanation: "Under correct specification, $\\theta^*=\\theta_0$ and the Information Matrix Equality holds: $-\\mathbf{A}^{-1}(\\theta_0) = \\mathbf{B}^{-1}(\\theta_0)$, so the sandwich simplifies to the standard Fisher information-based covariance."
-  },
-  {
-    type: "mc",
-    q: "Under model misspecification, which pair of tests remain asymptotically equivalent under $H_0$?",
-    options: [
-      "A) LRT and Wald test",
-      "B) Wald test and Score test",
-      "C) LRT and Score test",
-      "D) All three are equivalent"
-    ],
-    answer: 1,
-    explanation: "Under misspecification, $(w - s) \\xrightarrow{p} 0$, meaning the robust Wald and robust Score tests remain asymptotically equivalent. The LRT is no longer equivalent to either."
-  },
-  // --- MISCELLANEOUS / DEEPER ---
-  {
-    type: "mc",
-    q: "Fisher's scoring algorithm differs from Newton–Raphson in that it replaces:",
-    options: [
-      "A) The score function with its expectation",
-      "B) $-\\mathbf{H}(\\theta^k)$ with its expectation $\\mathbf{I}(\\theta^k)$",
-      "C) The MLE with the method of moments estimator",
-      "D) The Hessian with the identity matrix"
-    ],
-    answer: 1,
-    explanation: "Fisher's scoring replaces $-\\mathbf{H}(\\theta^k)$ with its expected value $\\mathbf{I}(\\theta^k)$. This can simplify computation when the expected information has a closed form."
-  },
-  {
-    type: "tf",
-    q: "True or False: A consistent test has power approaching 1 as sample size increases for any fixed alternative.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. A consistent test satisfies $\\lim_{n\\to\\infty}\\beta_n(\\theta) = 1$ for all $\\theta \\in H_1$. This is a desirable large-sample property."
-  },
-  {
-    type: "mc",
-    q: "The regularity conditions for MLE properties include all EXCEPT:",
-    options: [
-      "A) Identifiability: different $\\theta$ values determine different distributions",
-      "B) The range of the data does not depend on unknown parameters",
-      "C) The number of parameters grows proportionally to $\\sqrt{n}$",
-      "D) The true parameter lies in the interior of the parameter space"
-    ],
-    answer: 2,
-    explanation: "The regularity condition is that the number of parameters must NOT increase with the sample size (at least not too quickly). Growing proportionally to $\\sqrt{n}$ would violate this condition."
-  },
-  {
-    type: "mc",
-    q: "The Neyman-Pearson approach views hypothesis testing primarily as:",
-    options: [
-      "A) A method for computing $p$-values post-data",
-      "B) A decision rule with pre-specified error rates assessed over repeated sampling",
-      "C) A Bayesian procedure for computing posterior probabilities",
-      "D) A method for constructing confidence intervals"
-    ],
-    answer: 1,
-    explanation: "Neyman and Pearson viewed testing as a decision rule. Probability is used pre-data to assess long-run properties (Type I and Type II error rates) over the notional infinite sequence of repetitions."
-  },
-  {
-    type: "tf",
-    q: "True or False: Under the frequentist paradigm, unknown parameters are treated as fixed constants, not random variables.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. This is a defining characteristic of frequentist inference. Parameters are considered fixed but unknown — this contrasts with the Bayesian approach where parameters have prior distributions."
-  },
-  {
-    type: "mc",
-    q: "Simple vs. composite hypotheses: $H_0: \\theta = 2$ is ____; $H_1: \\theta > 2$ is ____.",
-    options: [
-      "A) Composite; simple",
-      "B) Simple; simple",
-      "C) Simple; composite",
-      "D) Composite; composite"
-    ],
-    answer: 2,
-    explanation: "A simple hypothesis completely specifies the distribution ($H_0: \\theta=2$). A composite hypothesis leaves the distribution unspecified ($H_1: \\theta>2$ allows infinitely many distributions)."
-  },
-  {
-    type: "mc",
-    q: "The degrees of freedom for a likelihood ratio test comparing a full model with $p$ parameters to a restricted model with $p-r$ parameters is:",
-    options: ["A) $p$", "B) $p - r$", "C) $r$", "D) $p + r$"],
-    answer: 2,
-    explanation: "$df = $ (# params full) $-$ (# params null) $= p - (p-r) = r$. This equals the number of restrictions imposed under $H_0$."
-  },
-  {
-    type: "tf",
-    q: "True or False: The hypothesis $H_0: \\psi(\\theta)=0$ can be tested using the Wald test $w = \\psi(\\hat\\theta)^T[\\mathbf{J}(\\hat\\theta)\\hat{\\mathbf{I}}(\\hat\\theta)^{-1}\\mathbf{J}(\\hat\\theta)^T]^{-1}\\psi(\\hat\\theta)$, where $\\mathbf{J}$ is the Jacobian of $\\psi$.",
-    options: ["True", "False"],
-    answer: 0,
-    explanation: "True. This is the general form of the Wald test for a differentiable constraint $\\psi(\\theta)=0$. The Jacobian $\\mathbf{J}(\\theta) = \\partial\\psi/\\partial\\theta$ appears to account for the transformation."
-  },
+  { q:"Randomness is defined in statistics as the occurrence of events for which no final deterministic cause can be found.", type:"tf", correct:"True",
+    explain:"This is the definition given in the lecture. It motivates the need for probabilistic models." },
+  { q:"As the number of observations in a histogram increases indefinitely and class width decreases to zero, the histogram converges to a smooth probability density curve.", type:"tf", correct:"True",
+    explain:"This is the conceptual motivation for continuous probability distributions." },
+  { q:"The normal distribution is characterised by which two parameters?", type:"mc",
+    options:["Mean and variance","Mean and standard deviation","Median and IQR","Mode and range"], correct:"Mean and standard deviation",
+    explain:"The normal distribution is parameterised by $\\mu$ (mean) and $\\sigma$ (standard deviation), written $\\mathcal{N}(\\mu, \\sigma^2)$." },
+  { q:"For a normal distribution, which of the following statements is FALSE?", type:"mc",
+    options:["Mode = Median = Mean","It is symmetric around $\\mu$","Approximately 95% of data falls within 1 standard deviation","The PDF integrates to 1"], correct:"Approximately 95% of data falls within 1 standard deviation",
+    explain:"The 68-95-99.7 rule states 68% is within 1σ, 95% within 2σ, and 99.7% within 3σ." },
+  { q:"A Poisson distribution with parameter $\\lambda$ has equal mean and variance.", type:"tf", correct:"True",
+    explain:"A defining property: $E(y) = \\operatorname{Var}(y) = \\lambda$." },
+  { q:"The sum of $n$ independent Bernoulli random variables each with success probability $\\pi$ follows which distribution?", type:"mc",
+    options:["Poisson(nπ)","Normal(nπ, nπ(1−π))","Binomial(n, π)","Beta(n, π)"], correct:"Binomial(n, π)",
+    explain:"This is a fundamental result: $\\sum_{k=1}^n y_k \\sim \\operatorname{Bin}(n, \\pi)$ when each $y_k \\sim \\operatorname{Bernoulli}(\\pi)$ i.i.d." },
+
+  { q:"In the frequentist paradigm, unknown parameters are treated as random variables with prior distributions.", type:"tf", correct:"False",
+    explain:"This is the Bayesian view. In frequentism, parameters are fixed but unknown constants." },
+  { q:"Inferential statistics makes statements about a population based on:", type:"mc",
+    options:["The entire population","A census","A sample","Simulation only"], correct:"A sample",
+    explain:"Since examining entire populations is usually impossible, inference is drawn from samples." },
+  { q:"The frequentist interpretation of probability is based on:", type:"mc",
+    options:["Subjective degrees of belief","Long-run relative frequencies under infinite repetitions","Single-experiment outcomes","The likelihood function"], correct:"Long-run relative frequencies under infinite repetitions",
+    explain:"Frequentist probability is defined as the limiting frequency over an infinite sequence of independent repetitions." },
+  { q:"In a frequentist framework, a 95% confidence interval means: 'There is a 95% probability that the true parameter lies in this specific computed interval.'", type:"tf", correct:"False",
+    explain:"Once computed, the interval either contains θ or it doesn't. The 95% refers to the long-run coverage frequency over repeated samples." },
+
+  { q:"The Mean Squared Error (MSE) of an estimator equals:", type:"mc",
+    options:["Variance + Bias","Variance + Bias²","Standard deviation + Bias","Variance − Bias²"], correct:"Variance + Bias²",
+    explain:"$\\operatorname{MSE}[\\hat{\\theta}] = \\operatorname{Var}[\\hat{\\theta}] + \\operatorname{bias}[\\hat{\\theta}]^2$" },
+  { q:"A biased estimator can never have a smaller MSE than an unbiased estimator.", type:"tf", correct:"False",
+    explain:"A biased estimator may have smaller variance, making its MSE smaller. This is the core of the bias-variance trade-off." },
+  { q:"The point estimator $\\hat{\\theta}(\\mathbf{y})$ is a:", type:"mc",
+    options:["Fixed number","Population parameter","Random variable","Probability density"], correct:"Random variable",
+    explain:"Because $\\hat{\\theta}$ is a function of the random sample $\\mathbf{y}$, it is itself a random variable with a sampling distribution." },
+  { q:"For i.i.d. data, the sample mean $\\bar{y}$ is an unbiased estimator of the population mean $\\mu$.", type:"tf", correct:"True",
+    explain:"$E(\\bar{y}) = \\mu$ by linearity of expectation." },
+  { q:"The estimator $S^2 = \\frac{1}{n}\\sum(y_i - \\bar{y})^2$ is biased for $\\sigma^2$ because:", type:"mc",
+    options:["It uses the sample mean rather than the true mean","It underestimates σ² by a factor of (n-1)/n","It cannot be negative","It has infinite variance"], correct:"It underestimates σ² by a factor of (n-1)/n",
+    explain:"$E(S^2) = \\frac{n-1}{n}\\sigma^2$. Replacing $n$ with $n-1$ in the denominator yields the unbiased version." },
+
+  { q:"Consistency requires that as the sample size grows, the estimator converges in probability to the true parameter.", type:"tf", correct:"True",
+    explain:"$\\hat{\\theta}_n \\xrightarrow{p} \\theta$, meaning $P(|\\hat{\\theta}_n - \\theta| > \\varepsilon) \\to 0$ for all $\\varepsilon > 0$." },
+  { q:"The estimator $\\hat{\\mu}(\\mathbf{y}) = y_1$ (using only the first observation) is:", type:"mc",
+    options:["Biased and consistent","Unbiased and consistent","Unbiased but not consistent","Biased but consistent"], correct:"Unbiased but not consistent",
+    explain:"$E(y_1) = \\mu$ (unbiased), but its distribution does not concentrate around $\\mu$ as $n \\to \\infty$ — it never uses the extra data." },
+  { q:"An asymptotically unbiased estimator has bias that goes to zero as the sample size increases.", type:"tf", correct:"True",
+    explain:"Asymptotic unbiasedness means $E[\\hat{\\theta}_n] - \\theta \\to 0$ as $n \\to \\infty$." },
+  { q:"Which of the following is a necessary condition for an estimator to be consistent?", type:"mc",
+    options:["It must be unbiased","It must be the MLE","Its bias and variance must both go to zero as n → ∞","It must achieve the Cramér-Rao bound"], correct:"Its bias and variance must both go to zero as n → ∞",
+    explain:"A sufficient condition for consistency via Chebyshev is that MSE → 0, which requires both bias → 0 and variance → 0." },
+  { q:"The Law of Large Numbers guarantees that the sample mean is consistent for the population mean.", type:"tf", correct:"True",
+    explain:"The LLN is essentially the statement that $\\bar{y}_n \\xrightarrow{p} \\mu$." },
+
+  { q:"The CLT states that for large $n$, the distribution of the sample mean $\\bar{y}_n$ is approximately:", type:"mc",
+    options:["Poisson","Chi-squared","Normal","t-distributed"], correct:"Normal",
+    explain:"Regardless of the original distribution (with finite variance), $\\bar{y}_n \\xrightarrow{d} \\mathcal{N}(\\mu, \\sigma^2/n)$." },
+  { q:"The CLT applies only when the original data are normally distributed.", type:"tf", correct:"False",
+    explain:"The CLT applies to any i.i.d. random variables with finite mean and variance, regardless of their original distribution." },
+  { q:"The Delta Method is used to find the asymptotic distribution of:", type:"mc",
+    options:["The sample mean","A transformation of an asymptotically normal statistic","The population parameter","Fisher information"], correct:"A transformation of an asymptotically normal statistic",
+    explain:"If $\\sqrt{n}(\\mathbf{y}_n - \\boldsymbol{\\mu}) \\to_d \\mathbf{z}$, the Delta Method gives the distribution of $\\sqrt{n}[\\psi(\\mathbf{y}_n) - \\psi(\\boldsymbol{\\mu})]$." },
+  { q:"In the Delta Method, the variance of $\\psi(\\hat{\\theta})$ involves the square of the derivative $\\psi'(\\theta)$.", type:"tf", correct:"True",
+    explain:"For univariate case: $\\operatorname{Var}[\\psi(\\hat{\\theta})] \\approx [\\psi'(\\theta)]^2 \\operatorname{Var}[\\hat{\\theta}]$." },
+  { q:"According to the CLT, if $y \\sim \\operatorname{Bin}(n=100, \\pi=0.4)$, the approximate normal distribution is:", type:"mc",
+    options:["N(40, 24)","N(40, 0.24)","N(100, 40)","N(0.4, 0.24)"], correct:"N(40, 24)",
+    explain:"$E(y) = n\\pi = 40$ and $\\operatorname{Var}(y) = n\\pi(1-\\pi) = 100(0.4)(0.6) = 24$." },
+  { q:"The standard error of the log-odds estimator $\\ln(\\hat{\\Theta}_{survival})$, derived via the Delta Method, is $\\frac{1}{\\pi(1-\\pi)n}$.", type:"tf", correct:"False",
+    explain:"That is the variance, not the standard error. The standard error is $\\sqrt{1/[\\pi(1-\\pi)n]}$." },
+
+  { q:"A 99% confidence interval is wider than a 95% confidence interval for the same data.", type:"tf", correct:"True",
+    explain:"Higher confidence requires capturing a larger critical value from the t-distribution, producing a wider interval." },
+  { q:"The formula for the $(1-\\alpha)$ CI for the mean is:", type:"mc",
+    options:["$\\bar{X} \\pm z_{1-\\alpha/2} \\frac{\\sigma}{\\sqrt{n}}$","$\\bar{X} \\pm T_{1-\\alpha/2,n-1}\\frac{S}{\\sqrt{n}}$","$\\bar{X} \\pm T_{1-\\alpha/2,n}\\frac{S}{n}$","$\\bar{X} \\pm z_{\\alpha/2}\\frac{S}{\\sqrt{n}}$"], correct:"$\\bar{X} \\pm T_{1-\\alpha/2,n-1}\\frac{S}{\\sqrt{n}}$",
+    explain:"With unknown $\\sigma$, we use the Student's t with $n-1$ degrees of freedom and sample standard deviation $S$." },
+  { q:"For a specific realised confidence interval, there is a 95% probability that it contains $\\theta$.", type:"tf", correct:"False",
+    explain:"Once the data are observed, the interval is fixed; $\\theta$ either is or is not in it. The 95% is a statement about the procedure, not the specific interval." },
+  { q:"Many asymptotic 95% CIs only achieve correct coverage when:", type:"mc",
+    options:["The sample size is 1","The parameter is on the boundary","The sample size is sufficiently large","The distribution is exactly normal"], correct:"The sample size is sufficiently large",
+    explain:"Asymptotic CIs rely on the CLT approximation, which improves as $n$ grows. Small-sample performance must be checked via simulation." },
+
+  { q:"The likelihood function $L(\\theta \\mid \\mathbf{y})$ and the joint density $p(\\mathbf{y} \\mid \\theta)$ are the same mathematical function but viewed differently.", type:"tf", correct:"True",
+    explain:"The density treats $\\theta$ as fixed and $\\mathbf{y}$ as the argument; the likelihood treats $\\mathbf{y}$ as fixed and $\\theta$ as the argument." },
+  { q:"For i.i.d. observations, the log-likelihood is:", type:"mc",
+    options:["Product of $\\log p(y_i \\mid \\theta)$","Sum of $\\log p(y_i \\mid \\theta)$","Product of $p(y_i \\mid \\theta)$","Sum of $p(y_i \\mid \\theta)$"], correct:"Sum of $\\log p(y_i \\mid \\theta)$",
+    explain:"$\\ell(\\theta \\mid \\mathbf{y}) = \\log L = \\log \\prod p(y_i \\mid \\theta) = \\sum \\log p(y_i \\mid \\theta)$." },
+  { q:"The score function evaluated at the true parameter $\\theta_0$ has expected value:", type:"mc",
+    options:["1","−1","0","n"], correct:"0",
+    explain:"A fundamental property: $E[\\mathbf{S}(\\theta_0)] = 0$ when the model is correctly specified." },
+  { q:"The MLE is typically found as the solution to which equation?", type:"mc",
+    options:["$H(\\theta) = 0$","$S(\\theta) = 0$","$I(\\theta) = 0$","$L(\\theta) = 1$"], correct:"$S(\\theta) = 0$",
+    explain:"The score equation $\\mathbf{S}(\\hat{\\theta}) = 0$ (first-order condition for maximum)." },
+  { q:"Fisher's (expected) information matrix is the negative expected Hessian of the log-likelihood.", type:"tf", correct:"True",
+    explain:"$\\mathbf{I}(\\theta) = -E[\\mathbf{H}(\\theta)]$." },
+  { q:"The Information Matrix Equality (IME) states that the Fisher information equals:", type:"mc",
+    options:["The variance of the score function","The expected score","The Hessian of the likelihood","The inverse of the MLE variance"], correct:"The variance of the score function",
+    explain:"IME: $E[\\mathbf{s}(\\theta_0)^T\\mathbf{s}(\\theta_0)] = -E[\\partial^2 \\log p/\\partial\\theta\\partial\\theta^T] = \\mathbf{I}_1(\\theta_0)$." },
+  { q:"The log-likelihood is used instead of the likelihood mainly because:", type:"mc",
+    options:["It is always positive","It avoids numerical underflow and is easier to differentiate","The log transformation makes the likelihood larger","It is required by the Cramér-Rao bound"], correct:"It avoids numerical underflow and is easier to differentiate",
+    explain:"Products of many small probabilities underflow numerically; sums of logs are stable. Also, sums are easier to differentiate than products." },
+  { q:"For the Binomial likelihood with $y=9$ successes out of $n=12$, the MLE of $\\pi$ is 0.75.", type:"tf", correct:"True",
+    explain:"$\\hat{\\pi} = y/n = 9/12 = 0.75$. In general, $\\hat{\\pi}_{MLE} = \\bar{y}$ for Bernoulli/Binomial data." },
+  { q:"The Newton-Raphson algorithm for maximising the log-likelihood updates parameters as:", type:"mc",
+    options:["$\\theta^{k+1} = \\theta^k - H(\\theta^k)^{-1}S(\\theta^k)$","$\\theta^{k+1} = \\theta^k + H(\\theta^k) S(\\theta^k)$","$\\theta^{k+1} = \\theta^k / S(\\theta^k)$","$\\theta^{k+1} = \\theta^k - S(\\theta^k)$"], correct:"$\\theta^{k+1} = \\theta^k - H(\\theta^k)^{-1}S(\\theta^k)$",
+    explain:"This is the standard Newton-Raphson update, solving a linearised version of the score equation at each step." },
+  { q:"Fisher's scoring algorithm replaces the Hessian in Newton-Raphson with:", type:"mc",
+    options:["The log-likelihood","The observed information matrix $-H(\\theta^k)$","The expected Fisher information $I(\\theta^k)$","The score function"], correct:"The expected Fisher information $I(\\theta^k)$",
+    explain:"Fisher's scoring uses $I(\\theta^k) = -E[H(\\theta^k)]$ instead of the actual Hessian, avoiding computation of second derivatives when the expectation is known." },
+
+  { q:"The MLE is guaranteed to be unbiased for any finite sample size.", type:"tf", correct:"False",
+    explain:"The MLE is only asymptotically unbiased. For finite samples, it can be biased." },
+  { q:"Asymptotic normality of the MLE means:", type:"mc",
+    options:["The MLE is normally distributed for any n","$\\sqrt{n}(\\hat{\\theta}_{MLE} - \\theta_0) \\xrightarrow{d} \\mathcal{N}(0, I_1(\\theta_0)^{-1})$","The MLE converges to a normal distribution only for normal data","The MLE has mean zero"], correct:"$\\sqrt{n}(\\hat{\\theta}_{MLE} - \\theta_0) \\xrightarrow{d} \\mathcal{N}(0, I_1(\\theta_0)^{-1})$",
+    explain:"This is the formal statement of asymptotic normality. The $\\sqrt{n}$ scaling is critical." },
+  { q:"The MLE is invariant to 1-to-1 parameter transformations. This property is called:", type:"mc",
+    options:["Consistency","Sufficiency","Equivariance","Efficiency"], correct:"Equivariance",
+    explain:"If $\\hat{\\theta}$ is the MLE of $\\theta$ and $\\psi = \\psi(\\theta)$ is 1-to-1, then $\\hat{\\psi} = \\psi(\\hat{\\theta})$ is the MLE of $\\psi$." },
+  { q:"An MLE that is both $\\sqrt{n}$-consistent and asymptotically efficient means it:", type:"mc",
+    options:["Is biased for finite samples","Reaches the Cramér-Rao bound asymptotically","Has zero variance for all n","Requires normally distributed data"], correct:"Reaches the Cramér-Rao bound asymptotically",
+    explain:"Asymptotic efficiency = achieving the CRB as $n \\to \\infty$, meaning no unbiased estimator can have lower asymptotic variance." },
+  { q:"Identifiability, a regularity condition for MLE properties, means:", type:"mc",
+    options:["The parameter is always positive","Different parameter values produce different probability distributions","The likelihood is always concave","The data range is fixed"], correct:"Different parameter values produce different probability distributions",
+    explain:"Without identifiability, multiple parameter values explain the data equally well and the MLE is not uniquely defined." },
+  { q:"The observed information matrix is defined as $\\hat{I}_1(\\hat{\\theta}) = -H(\\hat{\\theta})$.", type:"tf", correct:"True",
+    explain:"The observed information matrix is minus the Hessian of the log-likelihood evaluated at the MLE." },
+
+  { q:"The Cramér-Rao bound provides an upper bound on the variance of unbiased estimators.", type:"tf", correct:"False",
+    explain:"The CRB provides a LOWER bound. No unbiased estimator can have variance smaller than the inverse Fisher information." },
+  { q:"An estimator that achieves the Cramér-Rao bound is called:", type:"mc",
+    options:["Consistent","Maximum likelihood","Fully efficient (MVU)","Equivariant"], correct:"Fully efficient (MVU)",
+    explain:"Such an estimator is the Minimum Variance Unbiased (MVU) estimator, achieving the smallest possible variance among all unbiased estimators." },
+  { q:"In general, the Cramér-Rao bound can always be achieved by some unbiased estimator.", type:"tf", correct:"False",
+    explain:"In some problems, no unbiased estimator achieves the CRB. The bound is a theoretical floor, not always attained." },
+  { q:"The MLE achieves the Cramér-Rao bound:", type:"mc",
+    options:["Always, for any sample size","Never","Only for normal data","Asymptotically, as n → ∞"], correct:"Asymptotically, as n → ∞",
+    explain:"The CRB is attained by the MLE only in the limit (large samples), as part of its asymptotic efficiency property." },
+  { q:"If $\\hat{\\theta}$ is an unbiased estimator of a scalar $\\theta$, the Cramér-Rao bound states $\\operatorname{Var}(\\hat{\\theta}) \\ge$:", type:"mc",
+    options:["$I(\\theta)$","$I(\\theta)^{-1}$","$I_1(\\theta)$","$n \\cdot I_1(\\theta)$"], correct:"$I(\\theta)^{-1}$",
+    explain:"$\\operatorname{Var}(\\hat{\\theta}) \\ge \\mathbf{I}(\\theta)^{-1}$, where $\\mathbf{I}(\\theta) = n \\mathbf{I}_1(\\theta)$ for i.i.d. data." },
+  { q:"The variance of the score function equals the Fisher information matrix. This result is called:", type:"mc",
+    options:["The Delta Method","The Information Matrix Equality","The Cramér-Rao inequality","The Law of Large Numbers"], correct:"The Information Matrix Equality",
+    explain:"The IME states $\\operatorname{Var}[S(\\theta_0)] = I(\\theta_0)$, linking the variance of the score to the Fisher information." }
 ];
 
-// ============================================================
-//  SHORT ANSWER DATA
-// ============================================================
 const saData = [
-  {
-    q: "Explain why the Maximum Likelihood Estimator is said to be 'equivariant' and why this property is useful. Give an example.",
-    a: "<strong>Equivariance</strong> means that if $\\hat\\theta_{\\text{mle}}$ is the MLE of $\\theta$, then for any 1-to-1 transformation $\\psi = \\psi(\\theta)$, the MLE of $\\psi$ is simply $\\hat\\psi_{\\text{mle}} = \\psi(\\hat\\theta_{\\text{mle}})$. You do not need to re-maximise the likelihood in the new parameterisation.<br><br><strong>Usefulness:</strong> This makes it easy to obtain MLEs for derived quantities. For instance, in the Titanic survival example, the MLE of the log-odds $\\theta = \\log[\\pi/(1-\\pi)]$ is simply $\\log[\\hat\\pi/(1-\\hat\\pi)]$, where $\\hat\\pi = y/n$ is the MLE of $\\pi$. Combined with the Delta Method, one can obtain asymptotic distributions for complex functions of parameters."
-  },
-  {
-    q: "Distinguish between the frequentist and Bayesian approaches to statistical inference in terms of how they treat unknown parameters.",
-    a: "In the <strong>frequentist approach</strong>, unknown parameters are considered fixed but unknown constants. There is no probability distribution associated with $\\theta$ itself. Inference is made by imagining the experiment repeated infinitely many times under the same conditions, and correct conclusions should be drawn with high probability over this notional sequence.<br><br>In the <strong>Bayesian approach</strong>, parameters are treated as random variables with a prior distribution $p(\\theta)$. After observing data, the prior is updated via Bayes' theorem to yield a posterior distribution $p(\\theta\\mid\\mathbf{y}) \\propto L(\\theta\\mid\\mathbf{y})\\,p(\\theta)$. Inference is made from this posterior."
-  },
-  {
-    q: "Why can the Wald test give contradictory results for the same scientific hypothesis? How does this differ from the Likelihood Ratio Test?",
-    a: "The <strong>Wald test lacks invariance</strong> to reparametrisation. Testing $H_0: \\theta=0$ and the equivalent $H_0: \\xi=\\theta^{25}=0$ can yield drastically different $p$-values because the Wald statistic is based on a quadratic approximation to the likelihood surface at the unrestricted MLE, and this approximation changes under nonlinear transformations.<br><br>The <strong>LRT is always invariant</strong> because it directly compares the maximum log-likelihood values under $H_0$ and $H_1$ — these are numbers that don't change with reparametrisation. The LRT's test statistic $d = -2[\\ell(\\hat\\theta_0) - \\ell(\\hat\\theta)]$ is a direct measure of how much the likelihood drops under the constraint."
-  },
-  {
-    q: "Explain the difference between unbiasedness and consistency. Can an estimator be unbiased but inconsistent? Can it be consistent but biased? Give concrete examples from the course.",
-    a: "<strong>Unbiasedness</strong> is a finite-sample property: $E[\\hat\\theta] = \\theta$ for any $n$. <strong>Consistency</strong> is an asymptotic property: $\\hat\\theta_n \\xrightarrow{p} \\theta$ as $n\\to\\infty$.<br><br><strong>Unbiased but inconsistent:</strong> $\\hat\\mu = y_1$ (first observation). $E[y_1]=\\mu$ for all $n$, so it's unbiased. But its variance $\\sigma^2$ doesn't shrink with $n$ — it never improves with more data.<br><br><strong>Consistent but biased:</strong> $S^2 = \\frac{1}{n}\\sum(y_i-\\bar y)^2$. It is biased ($E[S^2] = \\frac{n-1}{n}\\sigma^2$) but the bias $\\to 0$ as $n\\to\\infty$, so it is asymptotically unbiased and consistent."
-  },
-  {
-    q: "What is the role of the Fisher information matrix in the theory of MLE? Describe at least two ways it is used.",
-    a: "The Fisher information matrix $\\mathbf{I}(\\theta) = -E[\\mathbf{H}(\\theta)]$ quantifies how much information the data carry about $\\theta$.<br><br><strong>1. Asymptotic variance:</strong> The asymptotic covariance of the MLE is $\\mathbf{I}(\\theta_0)^{-1}/n$. This allows construction of confidence intervals: $\\hat\\theta \\sim \\mathcal{N}(\\theta_0, \\mathbf{I}(\\theta_0)^{-1})$ for large $n$.<br><br><strong>2. Cramér-Rao bound:</strong> $\\mathbf{I}(\\theta)^{-1}$ gives the minimum variance achievable by any unbiased estimator. Efficiency of an estimator is measured relative to this bound.<br><br><strong>3. Test statistics:</strong> $\\mathbf{I}(\\theta)$ appears in all three significance tests (Wald, Score, LRT) and in the Newton–Raphson / Fisher scoring algorithms.<br><br><strong>4. Estimation:</strong> $\\mathbf{I}(\\theta)$ can be estimated by $\\hat{\\mathbf{I}}_1 = -\\mathbf{H}(\\hat\\theta)$, $\\hat{\\mathbf{I}}_2$, or $\\hat{\\mathbf{I}}_3$, each consistent under the regularity conditions."
-  },
-  {
-    q: "What is the sandwich variance estimator and when should it be used instead of the standard inverse Fisher information?",
-    a: "The <strong>sandwich estimator</strong> is $\\mathbf{C}(\\theta^*) = \\mathbf{A}^{-1}(\\theta^*)\\mathbf{B}(\\theta^*)\\mathbf{A}^{-1}(\\theta^*)$, where $\\mathbf{A}$ is the expected Hessian and $\\mathbf{B}$ is the expected outer product of scores evaluated under the true DGP.<br><br>It should be used when the <strong>model may be misspecified</strong>. Under misspecification, the Information Matrix Equality $\\mathbf{A}=\\mathbf{B}$ no longer holds, so the standard $\\mathbf{I}(\\theta)^{-1}$ gives an incorrect variance. The sandwich estimator remains consistent for the true asymptotic variance regardless of whether the model is correctly specified. Under correct specification, the sandwich reduces to the standard estimator."
-  },
-  {
-    q: "Describe the duality between hypothesis tests and confidence intervals. How can you test $H_0: \\theta = \\theta_0$ using a confidence interval?",
-    a: "There is a direct duality: a $100(1-\\alpha)\\%$ confidence interval for $\\theta$ consists precisely of all values $\\theta_0$ for which $H_0: \\theta=\\theta_0$ would <strong>not be rejected</strong> at level $\\alpha$.<br><br>Conversely, to test $H_0: \\theta=\\theta_0$: construct the $100(1-\\alpha)\\%$ CI from the data. If $\\theta_0 \\notin \\text{CI}$, reject $H_0$ at level $\\alpha$; if $\\theta_0 \\in \\text{CI}$, fail to reject.<br><br><strong>Example:</strong> In the birth weight example, $\\text{CI}_{0.95} = (3.11, 3.85)$ contains $\\mu_0=3.3$, so $H_0: \\mu_L=3.3$ is not rejected at $\\alpha=0.05$. This is equivalent to the $t$-test conclusion where $|t|=1.78 < 2.04$."
-  },
-  {
-    q: "Explain why the Likelihood Ratio Test loses its asymptotic $\\chi^2$ distribution under model misspecification, while the robust Wald and Score tests do not.",
-    a: "Under correct specification, the LRT, Wald, and Score tests are asymptotically equivalent and all follow $\\chi^2(df)$ under $H_0$. This equivalence relies on the Information Matrix Equality $\\mathbf{A} = \\mathbf{B}$.<br><br>Under <strong>misspecification</strong>, $\\mathbf{A} \\neq \\mathbf{B}$, so the IME fails. The <strong>LRT</strong> statistic involves only the log-likelihood values at $\\hat\\theta$ and $\\hat\\theta_0$, and its null distribution becomes a mixture of $\\chi^2$ distributions (not a simple $\\chi^2$) — it cannot be easily corrected.<br><br>The <strong>robust Wald and Score tests</strong> can be corrected by replacing $\\mathbf{I}(\\hat\\theta)^{-1}$ with the sandwich matrix $\\mathbf{C}_n(\\hat\\theta)$. These corrections restore $\\chi^2$ asymptotic distributions under $H_0$, and $(w-s) \\xrightarrow{p} 0$ ensures their equivalence persists."
-  },
-  {
-    q: "What is the $p$-value? Explain why one should not interpret it as the probability that $H_0$ is true.",
-    a: "The <strong>$p$-value</strong> is the probability, computed under the assumption that $H_0$ is true, of observing a test statistic at least as extreme as the one actually observed: $p = P(|T| \\geq t_{\\text{obs}} \\mid H_0)$.<br><br>It should <strong>not</strong> be interpreted as $P(H_0 \\text{ is true} \\mid \\text{data})$ because:<br>1. In the frequentist framework, $H_0$ is either true or false — it has no probability. A probability for $H_0$ requires a prior (Bayesian thinking).<br>2. The $p$-value is computed under the <em>assumption</em> that $H_0$ is true, so it cannot simultaneously quantify the probability of $H_0$.<br>3. A small $p$-value indicates incompatibility of the data with $H_0$, but the degree of incompatibility depends on the prior probability of $H_0$, sample size, and the specific alternative."
-  },
-  {
-    q: "Explain the Central Limit Theorem's role in explaining why so many real-world measurements appear normally distributed, citing the Delta Method as an additional mechanism.",
-    a: "The <strong>CLT</strong> explains normality through additive averaging: when an observable quantity (like body length, intelligence, temperature) is the sum or average of many small, approximately independent contributions (genetic factors, environmental factors, nutrition, etc.), the CLT guarantees that this sum converges to a normal distribution regardless of the distribution of each individual component.<br><br>The <strong>Delta Method</strong> extends this: if $\\bar{\\mathbf{y}}_n$ is asymptotically normal, then any smooth function $\\psi(\\bar{\\mathbf{y}}_n)$ is also asymptotically normal (with variance obtained via the Jacobian). This means that derived quantities — odds ratios, log-transforms, proportions, correlations — also tend to be approximately normal in large samples, further explaining the pervasiveness of the normal distribution in statistical practice."
-  }
+  { q:"Explain the conceptual difference between the frequentist and Bayesian approaches to statistical inference. Why does this distinction matter in practice?",
+    a:"In the <strong>frequentist paradigm</strong>, unknown parameters are treated as fixed but unknown constants, and probability is defined as long-run relative frequency over infinite hypothetical repetitions of the experiment. A 95% CI is interpreted as: 'if we repeated this experiment infinitely, 95% of such intervals would contain the true parameter.' <br><br>In the <strong>Bayesian paradigm</strong>, parameters are treated as random variables with prior distributions representing prior beliefs, updated by the data via Bayes' theorem to yield a posterior distribution. A 95% credible interval genuinely means there is a 95% probability that the parameter lies in that interval, given the prior and data. <br><br>This matters because the two paradigms can produce different intervals and different interpretations, especially in small samples or when prior information is informative." },
+  { q:"Unbiasedness is sometimes described as a 'debatable property.' Construct an argument against requiring estimators to be unbiased, using the Poisson example as support.",
+    a:"Unbiasedness requires $E[\\hat{\\theta}] = \\theta$. While intuitively appealing, it is not always the right criterion: <br><br>(1) <strong>The Poisson pathology:</strong> To estimate $\\theta = e^{-2\\lambda}$ (a probability in [0,1]) from a single observation, the only unbiased estimator is $\\hat{\\theta}(y) = (-1)^y$, which takes values +1 or −1 — clearly outside [0,1] and physically nonsensical. <br><br>(2) <strong>Bias-variance trade-off:</strong> A biased estimator can have smaller MSE if its variance reduction more than compensates for the squared bias. The sample variance $S^2 = \\frac{1}{n}\\sum(y_i-\\bar{y})^2$ is biased but consistent, while its unbiased version $\\frac{1}{n-1}\\sum(y_i-\\bar{y})^2$ has slightly higher variance. <br><br>(3) Many practically useful estimators (shrinkage, regularised estimators) are biased but achieve better predictive performance. MSE is a more comprehensive optimality criterion than bias alone." },
+  { q:"State the Central Limit Theorem carefully and explain why it is fundamental to classical statistical inference.",
+    a:"<strong>CLT (Univariate):</strong> If $y_1, y_2, \\ldots, y_n$ are i.i.d. random variables with finite mean $\\mu = E(y)$ and finite variance $\\sigma^2 = \\operatorname{Var}(y)$, then as $n \\to \\infty$: \\[\\sqrt{n}(\\bar{y}_n - \\mu) \\xrightarrow{d} \\mathcal{N}(0, \\sigma^2)\\] equivalently $\\bar{y}_n \\xrightarrow{d} \\mathcal{N}(\\mu, \\sigma^2/n)$. <br><br><strong>Why it is fundamental:</strong> (1) It justifies using normal-based inference (z-tests, t-tests, confidence intervals) even when the underlying data are not normal, provided n is large enough. (2) It underpins the asymptotic normality of the MLE (via the score function, itself a sum of i.i.d. terms). (3) It explains why normal distributions appear so frequently in nature — many measurements are averages or sums of many independent effects. (4) It is the mathematical foundation for the Delta Method and large-sample inference in general." },
+  { q:"What is the Delta Method and when would you use it? Give an intuitive explanation of why it works.",
+    a:"The <strong>Delta Method</strong> is a technique for deriving the asymptotic distribution of a smooth transformation $\\psi(\\hat{\\theta})$ of an asymptotically normal estimator $\\hat{\\theta}$. <br><br><strong>Statement:</strong> If $\\sqrt{n}(\\hat{\\theta} - \\theta) \\xrightarrow{d} \\mathcal{N}(0, \\Sigma)$ and $\\psi$ is continuously differentiable, then: \\[\\sqrt{n}[\\psi(\\hat{\\theta}) - \\psi(\\theta)] \\xrightarrow{d} \\mathcal{N}(0,\\; J(\\theta)\\Sigma J(\\theta)^T)\\] where $J(\\theta) = \\partial\\psi/\\partial\\theta$ is the Jacobian. <br><br><strong>Intuition:</strong> It is essentially a first-order Taylor expansion of $\\psi$ around the true $\\theta$. For large n, $\\hat{\\theta}$ is close to $\\theta$, so the nonlinear function $\\psi$ is approximately linear there, and a linear transformation of a normal is normal. <br><br><strong>When to use it:</strong> Computing CIs for log-odds, relative risks, variance ratios, nonlinear functions of regression coefficients — any situation where the direct estimator is normal but we care about a transformation of it." },
+  { q:"Define the likelihood function and explain the conceptual idea behind Maximum Likelihood Estimation. Why is the log-likelihood preferred in practice?",
+    a:"The <strong>likelihood function</strong> $L(\\theta \\mid \\mathbf{y}) = p(\\mathbf{y} \\mid \\theta)$ is the joint probability (density) of the observed data, considered as a function of the unknown parameter $\\theta$ rather than the data. For i.i.d. data: $L(\\theta \\mid \\mathbf{y}) = \\prod_{i=1}^n p(y_i \\mid \\theta)$. <br><br><strong>MLE idea:</strong> Choose the parameter value $\\hat{\\theta}$ that makes the observed data most probable — i.e., the value that 'best explains' the data under the assumed model. Intuitively, we ask: 'for which $\\theta$ was it most likely to have observed this particular dataset?' <br><br><strong>Why log-likelihood:</strong> (1) Numerical stability: products of many small probabilities underflow; sums of logs do not. (2) Mathematical tractability: sums are easier to differentiate than products. (3) The maximum is the same for both $L$ and $\\ell = \\log L$ since $\\log$ is monotonically increasing. For i.i.d. data: $\\ell(\\theta) = \\sum_i \\log p(y_i \\mid \\theta)$." },
+  { q:"Explain the score function: what is it, what are its key properties, and what role does it play in maximum likelihood estimation?",
+    a:"The <strong>score function</strong> $\\mathbf{S}(\\theta) = \\partial \\ell(\\theta)/\\partial\\theta$ is the gradient (first derivative vector) of the log-likelihood with respect to the parameters. <br><br><strong>Key properties:</strong> (1) $E[\\mathbf{S}(\\theta_0)] = 0$ when the model is correctly specified — the score has zero expectation at the true parameter. (2) $\\operatorname{Var}[\\mathbf{S}(\\theta_0)] = \\mathbf{I}(\\theta_0)$ — its variance equals the Fisher information (Information Matrix Equality). (3) Asymptotically, $\\mathbf{S}(\\theta_0) \\sim \\mathcal{N}(\\mathbf{0}, \\mathbf{I}(\\theta_0))$ for large samples (CLT on the sum of individual score contributions). <br><br><strong>Role in MLE:</strong> The MLE is the solution to the score equation $\\mathbf{S}(\\hat{\\theta}) = 0$. The score also drives the Newton-Raphson algorithm for numerical optimisation and forms the basis of score tests (Rao tests) in hypothesis testing." },
+  { q:"What is Fisher information and why does it measure 'information about a parameter'? Discuss its relationship to the precision of estimators.",
+    a:"The <strong>Fisher information</strong> $\\mathbf{I}(\\theta) = -E[\\mathbf{H}(\\theta)] = -E[\\partial^2 \\ell / \\partial\\theta\\partial\\theta^T]$ is minus the expected Hessian of the log-likelihood. <br><br><strong>Why it measures 'information':</strong> (1) It measures how 'curved' or 'peaked' the log-likelihood is near the true parameter. A sharp peak means the data are very informative — they pinpoint $\\theta$ precisely. A flat likelihood means little information. (2) Equivalently, $\\mathbf{I}(\\theta) = \\operatorname{Var}[\\mathbf{S}(\\theta)]$ — a highly variable score means the data are sensitive to the parameter value, hence informative. (3) For i.i.d. data: $\\mathbf{I}_n(\\theta) = n\\mathbf{I}_1(\\theta)$, so information accumulates linearly with sample size. <br><br><strong>Relationship to precision:</strong> Via the Cramér-Rao bound, the minimum achievable variance of any unbiased estimator is $\\mathbf{I}(\\theta)^{-1}$. More Fisher information → smaller lower bound on variance → more precise estimation possible." },
+  { q:"State the Cramér-Rao bound and explain its significance. What does it mean when an estimator achieves this bound?",
+    a:"The <strong>Cramér-Rao Bound</strong> states: for any unbiased estimator $T(\\mathbf{y})$ of $\\psi(\\theta)$: \\[\\operatorname{cov}[T(\\mathbf{y})] \\ge J(\\theta)\\mathbf{I}(\\theta)^{-1}J(\\theta)^T\\] where $J = \\partial\\psi/\\partial\\theta$ is the Jacobian. For estimating $\\theta$ directly: $\\operatorname{Var}[\\hat{\\theta}] \\ge \\mathbf{I}(\\theta)^{-1}$. <br><br><strong>Significance:</strong> The CRB is a fundamental theoretical limit — it tells us the best possible precision any unbiased estimator can achieve, regardless of the estimation method. It is a benchmark against which estimators are evaluated. <br><br><strong>When an estimator achieves the CRB:</strong> It is called <em>fully efficient</em> or the Minimum Variance Unbiased (MVU) estimator — it has the smallest possible variance among all unbiased estimators. No other unbiased estimator can do better. Such estimators are optimal in the MSE sense among unbiased estimators. Note that (1) achieving the CRB is not always possible — for some parameters, no estimator attains it; (2) the MLE achieves the CRB only asymptotically." },
+  { q:"Explain the three asymptotic properties of the MLE (consistency, asymptotic normality, efficiency) and discuss the practical implications of these being asymptotic results.",
+    a:"<strong>Three key asymptotic properties:</strong><br><br>(1) <strong>Consistency:</strong> $\\hat{\\theta}_{MLE} \\xrightarrow{p} \\theta_0$ as $n \\to \\infty$. The MLE converges in probability to the true value, guaranteeing it gets 'close' with enough data.<br><br>(2) <strong>Asymptotic Normality:</strong> $\\sqrt{n}(\\hat{\\theta}_{MLE} - \\theta_0) \\xrightarrow{d} \\mathcal{N}(0, \\mathbf{I}_1(\\theta_0)^{-1})$. The MLE is approximately normally distributed for large n, enabling construction of confidence intervals and hypothesis tests.<br><br>(3) <strong>Asymptotic Efficiency:</strong> The MLE achieves the Cramér-Rao bound as $n \\to \\infty$, meaning no other consistent estimator has smaller asymptotic variance.<br><br><strong>Practical implications of 'asymptotic':</strong> These properties hold in the limit but not necessarily for finite samples. For small n: (1) the MLE may be biased; (2) the sampling distribution may not be well-approximated by a normal; (3) competing estimators (e.g., Bayesian or regularised) may have better finite-sample MSE. Simulation studies are needed to validate asymptotic approximations in practice. The 'large sample' requirement varies — for well-behaved problems, n=30–50 may suffice; for complex models, much larger n may be needed." },
+  { q:"Describe two failure modes of the Newton-Raphson algorithm for maximising the likelihood and explain why Fisher's scoring is sometimes preferred.",
+    a:"The Newton-Raphson (NR) update is $\\theta^{k+1} = \\theta^k - H(\\theta^k)^{-1}S(\\theta^k)$. <br><br><strong>Failure modes:</strong><br>(1) <strong>Singular Hessian (Stationary Point):</strong> If $H(\\theta^k)$ is singular, its inverse does not exist, and the update cannot be computed. This occurs near saddle points, on ridges of the likelihood surface, or with redundant parameters. <br><br>(2) <strong>Overshooting / Divergence:</strong> If the likelihood is not well-behaved (e.g., non-concave) near a root, or the initial estimate is far from the MLE, NR can take huge steps and diverge from the solution. The quadratic convergence guarantee only holds close to the root. Additional failure modes include: poor initial estimates leading to convergence to a local rather than global maximum, and very flat likelihoods where the algorithm makes negligible progress. <br><br><strong>Why Fisher's Scoring:</strong> Fisher's scoring replaces $-H(\\theta^k)$ with its expectation $\\mathbf{I}(\\theta^k)$. Advantages: (1) The expected information is always positive (semi-)definite, avoiding numerical issues with indefinite Hessians; (2) For exponential family models, Fisher's scoring and NR coincide and produce the same updates; (3) The expected information may be analytically available when the Hessian must be computed numerically; (4) Generally more numerically stable." }
 ];
 
-// ============================================================
-//  RENDER MCQ
-// ============================================================
-let mcqState = {}; // index -> {answered, correct}
-let totalAnswered = 0;
-let totalCorrect = 0;
+let answeredCount = 0, correctCount = 0;
 
 function renderMCQ() {
-  const container = document.getElementById('mcq-container');
+  const container = document.getElementById('mcqContainer');
   container.innerHTML = '';
-  mcqData.forEach((q, idx) => {
+  mcqData.forEach((item, idx) => {
     const card = document.createElement('div');
     card.className = 'mcq-card';
-    card.id = `mcq-card-${idx}`;
-    const typeLabel = q.type === 'tf' ? 'True / False' : 'Multiple Choice';
-    card.innerHTML = `
-      <div class="question-label">Q${idx+1} &mdash; ${typeLabel}</div>
-      <div class="question-stem">${q.q}</div>
-      <div class="options" id="opts-${idx}">
-        ${q.options.map((opt, oi) => `
-          <button class="option-btn" id="opt-${idx}-${oi}" onclick="selectOption(${idx}, ${oi})">${opt}</button>
-        `).join('')}
-      </div>
-      <div id="feedback-${idx}"></div>
-    `;
+    card.id = `mcq-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = item.type === 'tf' ? `Q${idx+1} — True / False` : `Q${idx+1} — Multiple Choice`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+
+    card.appendChild(label);
+    card.appendChild(stem);
+
+    const opts = item.type === 'tf' ? ['True','False'] : item.options;
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = opt;
+      btn.setAttribute('data-opt', opt);
+      btn.onclick = () => handleAnswer(idx, opt, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback-bar';
+    feedback.id = `fb-${idx}`;
+    feedback.style.display = 'none';
+    card.appendChild(feedback);
+
     container.appendChild(card);
   });
+  if (window.MathJax) MathJax.typesetPromise([container]);
 }
 
-function selectOption(qIdx, oIdx) {
-  if (mcqState[qIdx]) return; // already answered
-  mcqState[qIdx] = { answered: true, correct: oIdx === mcqData[qIdx].answer };
+function handleAnswer(idx, chosen, btn, card, item) {
+  const allBtns = card.querySelectorAll('.option-btn');
+  const fb = document.getElementById(`fb-${idx}`);
+  if (btn.disabled) return;
 
-  // Style buttons
-  const buttons = document.querySelectorAll(`#opts-${qIdx} .option-btn`);
-  buttons.forEach((btn, i) => {
-    btn.disabled = true;
-    if (i === mcqData[qIdx].answer) {
-      btn.classList.add(oIdx === mcqData[qIdx].answer && i === oIdx ? 'correct' : 'reveal-correct');
-    }
-    if (i === oIdx && oIdx !== mcqData[qIdx].answer) {
-      btn.classList.add('incorrect');
-    }
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('data-opt') === item.correct) b.classList.add('reveal-correct');
   });
+  btn.classList.remove('reveal-correct');
 
-  // Feedback
-  const fb = document.getElementById(`feedback-${qIdx}`);
-  const isCorrect = oIdx === mcqData[qIdx].answer;
-  fb.className = `feedback-bar ${isCorrect ? 'correct' : 'incorrect'}`;
-  fb.innerHTML = `${isCorrect ? '✅ Correct!' : '❌ Incorrect.'} ${mcqData[qIdx].explanation}`;
-
-  // Update score
-  totalAnswered++;
-  if (isCorrect) totalCorrect++;
+  answeredCount++;
+  if (chosen === item.correct) {
+    btn.classList.add('correct');
+    correctCount++;
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ Correct! ${item.explain}`;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback-bar incorrect';
+    fb.innerHTML = `❌ Incorrect. The correct answer is <strong>${item.correct}</strong>. ${item.explain}`;
+  }
+  fb.style.display = 'block';
   updateScore();
+  if (window.MathJax) MathJax.typesetPromise([fb]);
 }
 
 function updateScore() {
-  document.getElementById('score-display').textContent = `Score: ${totalCorrect} / ${mcqData.length}`;
-  document.getElementById('progress-label').textContent = `${totalAnswered} answered`;
-  document.getElementById('progress-fill').style.width = `${(totalAnswered / mcqData.length) * 100}%`;
+  document.getElementById('scoreDisplay').textContent = `Score: ${correctCount} / ${answeredCount}`;
 }
 
-function resetMCQ() {
-  mcqState = {};
-  totalAnswered = 0;
-  totalCorrect = 0;
+function resetAll() {
+  answeredCount = 0; correctCount = 0;
   updateScore();
   renderMCQ();
 }
 
-// ============================================================
-//  RENDER SHORT ANSWER
-// ============================================================
 function renderSA() {
-  const container = document.getElementById('sa-container');
+  const container = document.getElementById('saContainer');
   container.innerHTML = '';
   saData.forEach((item, idx) => {
     const card = document.createElement('div');
     card.className = 'sa-card';
-    card.innerHTML = `
-      <div class="question-label">Short Answer Q${idx+1}</div>
-      <div class="question-stem">${item.q}</div>
-      <button class="reveal-btn" id="reveal-btn-${idx}" onclick="toggleAnswer(${idx})">Reveal Answer</button>
-      <div class="answer-panel" id="answer-${idx}">${item.a}</div>
-    `;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer Q${idx+1}`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-btn';
+    revealBtn.textContent = 'Reveal Model Answer';
+
+    const ansPanel = document.createElement('div');
+    ansPanel.className = 'answer-panel';
+    ansPanel.innerHTML = item.a;
+
+    revealBtn.onclick = () => {
+      const shown = ansPanel.style.display === 'block';
+      ansPanel.style.display = shown ? 'none' : 'block';
+      revealBtn.textContent = shown ? 'Reveal Model Answer' : 'Hide Answer';
+      if (!shown && window.MathJax) MathJax.typesetPromise([ansPanel]);
+    };
+
+    card.appendChild(label);
+    card.appendChild(stem);
+    card.appendChild(revealBtn);
+    card.appendChild(ansPanel);
     container.appendChild(card);
   });
+  if (window.MathJax) MathJax.typesetPromise([container]);
 }
 
-function toggleAnswer(idx) {
-  const panel = document.getElementById(`answer-${idx}`);
-  const btn = document.getElementById(`reveal-btn-${idx}`);
-  if (panel.classList.contains('visible')) {
-    panel.classList.remove('visible');
-    btn.textContent = 'Reveal Answer';
-  } else {
-    panel.classList.add('visible');
-    btn.textContent = 'Hide Answer';
-    // Re-typeset MathJax
-    if (window.MathJax) MathJax.typesetPromise([panel]);
-  }
-}
-
-// ============================================================
-//  INIT
-// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
   renderMCQ();
   renderSA();
 });
 </script>
-</body>
-</html>
+
+
+</body></html>

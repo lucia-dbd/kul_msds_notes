@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 – Competing Risks | Survival Analysis Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ── NOTES SECTION ── */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin: 20px 0 8px 0;
+  }
+  .notes-section p { margin-bottom: 12px; }
+
+  .key-point {
+    background: #eef6ff;
+    border-left: 4px solid #2e6da4;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .example-box {
+    background: #f0f7ee;
+    border-left: 4px solid #4caf50;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .theorem-box {
+    background: #f3f0ff;
+    border-left: 4px solid #7c4dff;
+    border-radius: 0;
+    padding: 14px 20px;
+    margin: 16px 0;
+  }
+  .warning-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+  .computation-note {
+    background: #fdf3f3;
+    border-left: 4px solid #e57373;
+    border-radius: 0;
+    padding: 12px 18px;
+    margin: 14px 0;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.93em;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: #1e2a38;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 0.88em;
+    line-height: 1.6;
+    margin: 14px 0;
+    font-family: 'Courier New', monospace;
+  }
+  code { font-family: 'Courier New', monospace; font-size: 0.9em; background: #eef2fb; padding: 2px 5px; border-radius: 3px; }
+
+  /* ── MCQ SECTION ── */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; font-weight: 700; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-bottom: 16px; }
+  .score-display {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 20px;
+    padding: 5px 18px;
+    font-weight: 700;
+    color: #856404;
+    display: inline-block;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+  }
+  .mcq-card {
+    background: #f9fafb;
+    border: 1px solid #e5e9f2;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: #2e6da4;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .mcq-card .question-stem {
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 14px;
+    font-size: 1.0em;
+  }
+  .option-btn {
+    display: block;
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #d0d8ea;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 6px 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #2c2c3a;
+    transition: all 0.18s;
+    font-family: inherit;
+  }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected  { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct   { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+
+  .feedback-bar {
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+  }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* ── SHORT ANSWER SECTION ── */
+  .sa-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; font-weight: 700; border-bottom: 2px solid #e8d5f5; padding-bottom: 8px; margin-bottom: 16px; }
+  .sa-card {
+    background: #faf9ff;
+    border: 1px solid #e2dcf5;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 12px; font-size: 1.0em; }
+  .reveal-btn {
+    background: #6f42c1;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 22px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff;
+    border: 1px solid #d4c8f5;
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-top: 14px;
+    font-size: 0.95em;
+    line-height: 1.8;
+    display: none;
+  }
+  .answer-panel.visible { display: block; }
+  .answer-panel strong { color: #4a148c; }
+
+  /* ── RESET / SUBMIT BUTTONS ── */
+  .quiz-controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .submit-btn {
+    background: #2e6da4; color: #fff; border: none; border-radius: 20px;
+    padding: 8px 24px; font-size: 0.9em; font-weight: 600; cursor: pointer;
+    transition: background 0.2s; font-family: inherit;
+  }
+  .submit-btn:hover { background: #1a5080; }
+  .reset-btn {
+    background: #ffffff; color: #dc3545; border: 1.5px solid #dc3545; border-radius: 20px;
+    padding: 8px 24px; font-size: 0.9em; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; font-family: inherit;
+  }
+  .reset-btn:hover { background: #f8d7da; }
+
+  ul, ol { margin: 10px 0 10px 22px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     PAGE HEADER
+════════════════════════════════════════════ -->
+<div class="page-header">
+  <h1>Chapter 8 – Competing Risks</h1>
+  <div class="subtitle">Survival Analysis · Exam Preparation Notes · Includes 30 Practice Questions</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════ -->
+<nav class="nav-bar">
+  <a href="#intro">Introduction</a>
+  <a href="#setup">Framework</a>
+  <a href="#quantities">Key Quantities</a>
+  <a href="#estimators">Estimators</a>
+  <a href="#csh">Cause-Specific Hazard Regression</a>
+  <a href="#sdh">Subdistribution Hazard Regression</a>
+  <a href="#comparison">Comparison</a>
+  <a href="#multistate">Multi-state Models</a>
+  <a href="#mcq" class="nav-mcq">MCQ (30 Qs)</a>
+  <a href="#sa" class="nav-sa">Short Answer</a>
+</nav>
+
+<!-- ════════════════════════════════════════════
+     STUDY NOTES
+════════════════════════════════════════════ -->
+
+<!-- SECTION 1: Introduction -->
+<div class="notes-section" id="intro">
+  <h2>8.1 Introduction to Competing Risks</h2>
+
+  <div class="key-point">
+    <strong>Core idea:</strong> In standard survival analysis, subjects experience only <em>one</em> type of event. In a competing risks setting, there are <strong>K causes of failure</strong>, and we can only observe the <em>first</em> cause (in the absence of censoring).
+  </div>
+
+  <h3>Clinical Examples</h3>
+  <table>
+    <thead><tr><th>Study Setting</th><th>Event of Interest</th><th>Competing Risk</th></tr></thead>
+    <tbody>
+      <tr><td>Bone marrow transplant</td><td>Graft-vs-host disease / relapse</td><td>Other infections, other causes of death</td></tr>
+      <tr><td>Prostate cancer (DES trial)</td><td>Death from prostate cancer</td><td>Death from cardiovascular / other disease</td></tr>
+      <tr><td>AIDS research</td><td>HIV → AIDS diagnosis</td><td>Death before AIDS diagnosis</td></tr>
+      <tr><td>Covid-19 hospitalisation</td><td>Time to discharge</td><td>In-hospital death</td></tr>
+      <tr><td>Staphylococcus infection</td><td>In-hospital infection</td><td>Discharge without infection</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Key warning:</strong> Naively treating competing events as independent censoring leads to <em>overestimation</em> of the cumulative incidence (Kaplan-Meier overestimates the CIF when competing events are present).
+  </div>
+
+  <h3>Prostate Cancer Example (DES Trial)</h3>
+  <div class="example-box">
+    506 patients (stage III/IV) randomised to placebo or diethylstilbestrol (DES). DES can reduce prostate cancer death but <em>increase</em> cardiovascular death. Simply censoring non-cancer deaths ignores this harmful side-effect — making the competing risks framework essential.
+  </div>
+
+  <h3>Research Question Determines the Approach</h3>
+  <table>
+    <thead><tr><th>Approach</th><th>When to use</th><th>Tool</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1. Marginal distribution</strong></td><td>Interest in T<sub>k</sub> assuming independence from other causes; biological question ("what if everyone stayed?")</td><td>Kaplan-Meier (treating others as censored)</td></tr>
+      <tr><td><strong>2. Dependent censoring</strong></td><td>Interest in marginal T<sub>k</sub> but causes may be <em>dependent</em></td><td>Deresa & VK (2024)-style copula models</td></tr>
+      <tr><td><strong>3. Sub-distribution</strong></td><td>Realistic probability of event in the presence of competing events; clinical question</td><td>CIF / Fine–Gray model</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 2: Framework -->
+<div class="notes-section" id="setup">
+  <h2>8.2 Formal Setup</h2>
+
+  <div class="theorem-box">
+    <strong>Notation:</strong>
+    <ul>
+      <li>\(T\) = latent (true) survival time</li>
+      <li>\(C\) = censoring time (assumed independent of \(T\) and cause)</li>
+      <li>\(Y = \min(T,C)\) = observed time</li>
+      <li>\(D = k\) if cause = \(k\) (\(k=1,\ldots,K\)), \(D=0\) if \(Y=C\)</li>
+    </ul>
+    We observe \((Y, D)\) for each subject.
+  </div>
+
+  <div class="key-point">
+    The <strong>censoring assumption</strong>: \(C\) is independent of \(T\) and of the cause of death. This is analogous to the standard survival analysis assumption.
+  </div>
+</div>
+
+<!-- SECTION 3: Key Quantities -->
+<div class="notes-section" id="quantities">
+  <h2>8.3 Key Quantities</h2>
+
+  <h3>Cumulative Incidence Function (CIF)</h3>
+  <div class="theorem-box">
+    $$I_k(t) = P(T \le t,\, D = k)$$
+    <br>
+    Also called the <em>sub-distribution function</em>. Note:
+    <ul>
+      <li>\(I_k(\infty) = P(D=k) \le 1\) → <strong>not a proper CDF</strong></li>
+      <li>\(\sum_{k=1}^{K} I_k(t) = P(T \le t)\) (overall failure distribution)</li>
+    </ul>
+  </div>
+
+  <h3>Cause-Specific Hazard</h3>
+  <div class="theorem-box">
+    $$\lambda_k(t) = \lim_{\varepsilon\to 0} \frac{P(t \le T < t+\varepsilon,\, D=k \mid T \ge t)}{\varepsilon}$$
+    The hazard of failing from cause \(k\) among those still at risk (no failure from any cause yet).
+    <br><br>
+    \(\displaystyle\sum_{k=1}^K \lambda_k(t) = \lambda(t)\) = overall hazard.
+  </div>
+
+  <h3>Relationship: CIF and Cause-Specific Hazard</h3>
+  <div class="theorem-box">
+    $$I_k(t) = \int_0^t \lambda_k(s)\, S(s)\, ds$$
+    where \(S(s) = P(T > s)\) is the <em>overall</em> survival function.
+  </div>
+
+  <h3>Marginal Quantity vs. CIF</h3>
+  <div class="computation-note">
+    The Kaplan-Meier treating other causes as censoring estimates:
+    $$S_k(t) = \exp(-\Lambda_k(t)) = \exp\!\left(-\int_0^t \lambda_k(s)\,ds\right)$$
+    Since \(S(t) = \exp\!\left(-\sum_{k=1}^K \Lambda_k(t)\right) \le S_k(t)\), we have:
+    $$I_k(t) \le 1 - S_k(t)$$
+    KM <strong>overestimates</strong> the true event probability \(I_k(t)\). Equality holds only when there is no competing risk.
+  </div>
+
+  <h3>Subdistribution Hazard (Fine & Gray, 1999)</h3>
+  <div class="theorem-box">
+    $$h_k(t) = -\frac{d}{dt}\log(1 - I_k(t)) = \frac{I_k'(t)}{1-I_k(t)}$$
+    Key property: directly links to the CIF via
+    $$I_k(t) = 1 - \exp\!\left(-\int_0^t h_k(s)\,ds\right)$$
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Unusual risk set for h<sub>k</sub>:</strong> Individuals who already failed from a competing cause \(j \ne k\) <em>remain</em> in the risk set for \(h_k(t)\). This is mathematically necessary but clinically unnatural.
+  </div>
+
+  <h3>Summary of Hazard Functions</h3>
+  <table>
+    <thead><tr><th>Hazard Type</th><th>Cumulative Quantity</th><th>Risk Set</th></tr></thead>
+    <tbody>
+      <tr><td>Overall \(\lambda(t)\)</td><td>Overall distribution \(P(T\le t)\)</td><td>All still alive</td></tr>
+      <tr><td>Marginal of \(T_k\)</td><td>Marginal \(P(T_k\le t)\)</td><td>Treating all others as censored</td></tr>
+      <tr><td>Cause-specific \(\lambda_k(t)\)</td><td>No direct CIF link</td><td>Subjects without failure from <em>any</em> cause</td></tr>
+      <tr><td>Subdistribution \(h_k(t)\)</td><td>CIF \(I_k(t)\)</td><td>Alive <em>or</em> failed from competing cause</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 4: Estimators -->
+<div class="notes-section" id="estimators">
+  <h2>8.4 Nonparametric Estimation of the CIF</h2>
+
+  <div class="theorem-box">
+    Let \(0 < t_1 < \cdots < t_N\) be the ordered distinct failure times (any cause). Define:
+    <ul>
+      <li>\(d_{kj}\) = number failing from cause \(k\) at \(t_j\)</li>
+      <li>\(d_j = \sum_k d_{kj}\) = total failures at \(t_j\)</li>
+      <li>\(n_j\) = number at risk just before \(t_j\)</li>
+    </ul>
+    Then:
+    $$\hat{\lambda}_k(t_j) = \frac{d_{kj}}{n_j}, \qquad
+    \hat{I}_k(t) = \sum_{t_j \le t} \hat{\lambda}_k(t_j)\,\hat{S}(t_{j-1})$$
+    where \(\hat{S}(t) = \prod_{t_j\le t}\!\left(1 - \frac{d_j}{n_j}\right)\) is the KM estimator for <em>all-cause</em> survival.
+  </div>
+
+  <div class="key-point">
+    Asymptotic normality of \(\hat{I}_k(t)\) holds → confidence intervals can be constructed.
+  </div>
+
+  <h3>R Implementation (cmprsk package)</h3>
+  <pre>library(cmprsk)
+D &lt;- data$d1 + 2*data$d2  # 0=censored, 1=cancer death, 2=other death
+fit &lt;- cuminc(Y, D, group, cencode=0)
+# fit[[1]] = CIF for cause 1 in group 0 (placebo)
+# fit[[2]] = CIF for cause 1 in group 1 (treatment)
+# etc.</pre>
+
+  <div class="example-box">
+    <strong>Prostate cancer result:</strong> \(\hat{I}_{11}(60) = 0.20\) but KM gives \(1 - \hat{S}_{11}(60) = 0.28\). The CIF correctly accounts for the competing risk of non-cancer death, giving a lower (more realistic) estimate.
+  </div>
+</div>
+
+<!-- SECTION 5: CSH Regression -->
+<div class="notes-section" id="csh">
+  <h2>8.5 Cox Regression on Cause-Specific Hazards</h2>
+
+  <div class="theorem-box">
+    <strong>Model:</strong>
+    $$\lambda_k(t\mid X) = \lambda_{k0}(t)\exp(\beta_k^T X)$$
+    Separate baseline hazard \(\lambda_{k0}(t)\) and regression coefficients \(\beta_k\) for each cause \(k\).
+  </div>
+
+  <div class="key-point">
+    <strong>Estimation trick:</strong> Fit a standard Cox model for cause \(k\) treating failures from all other causes as censored. This works because:
+    $$\lambda_k(t\mid X) = \text{hazard of } T_k \mid X \quad \text{if } T_k \perp (T_2,\ldots,T_K)\mid X$$
+    But the conditional independence assumption is only used for estimation convenience, not as a biological claim.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Interpretation:</strong> \(\beta_k\) describes the effect of \(X\) on the <em>cause-specific hazard</em>, not on the marginal hazard. A covariate significant for cause 1 may have no effect on cause 2, and vice versa.
+  </div>
+
+  <h3>R Code</h3>
+  <pre>library(survival)
+# Cause 1: cancer death
+coxph(Surv(dtime, status==1) ~ rx+age+pf+hx+hg+sz+sg, data=data)
+# Cause 2: non-cancer death
+coxph(Surv(dtime, status==2) ~ rx+age+pf+hx+hg+sz+sg, data=data)</pre>
+
+  <h3>Prostate Cancer Results Summary</h3>
+  <table>
+    <thead><tr><th>Covariate</th><th>Cancer death (k=1)</th><th>Non-cancer death (k=2)</th></tr></thead>
+    <tbody>
+      <tr><td>rx (treatment)</td><td>−0.713 ✓ <em>p&lt;0.001</em></td><td>+0.123 (n.s.)</td></tr>
+      <tr><td>age</td><td>−0.162 ✓ <em>p=0.049</em></td><td>+0.375 ✓ <em>p&lt;0.001</em></td></tr>
+      <tr><td>hx (cardiovascular history)</td><td>−0.188 (n.s.)</td><td>+0.686 ✓ <em>p&lt;0.001</em></td></tr>
+      <tr><td>hg (hemoglobin)</td><td>−0.271 ✓ <em>p=0.005</em></td><td>−0.077 (n.s.)</td></tr>
+      <tr><td>sz (lesion size)</td><td>+1.251 ✓ <em>p&lt;0.001</em></td><td>+0.199 (n.s.)</td></tr>
+      <tr><td>sg (tumour stage)</td><td>+2.139 ✓ <em>p&lt;0.001</em></td><td>−0.291 (n.s.)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="computation-note">
+    <strong>CIF under CSH model:</strong> \(I_k(t\mid X) = \int_0^t \lambda_k(s\mid X) S(s\mid X)\,ds\) where \(S(t\mid X) = \exp\!\left(-\sum_k \Lambda_k(t\mid X)\right)\). Not directly available in standard software — requires custom computation.
+  </div>
+</div>
+
+<!-- SECTION 6: Subdistribution Hazard Regression -->
+<div class="notes-section" id="sdh">
+  <h2>8.6 Fine–Gray Model: Regression on Subdistribution Hazards</h2>
+
+  <div class="theorem-box">
+    <strong>Model (Fine & Gray, 1999):</strong>
+    $$h_k(t\mid X) = h_{k0}(t)\exp(\gamma_k^T X)$$
+    This leads to a proportional CIF model:
+    $$1 - I_k(t\mid X) = \bar{I}_{k0}(t)^{\exp(\gamma_k^T X)}$$
+    where \(\bar{I}_{k0}(t) = \exp\!\left(-\int_0^t h_{k0}(s)\,ds\right)\).
+  </div>
+
+  <div class="key-point">
+    <strong>Advantage:</strong> \(\gamma_k\) directly describes the effect on the CIF — a positive coefficient means higher probability of failing from cause \(k\) by time \(t\).
+  </div>
+
+  <h3>R Code</h3>
+  <pre>library(cmprsk)
+cov &lt;- cbind(data$rx, data$age, data$pf, data$hx, data$hg, data$sz, data$sg)
+# Fine-Gray for cancer death (cause 1)
+c1 &lt;- crr(data$dtime, data$status, cov, failcode=1)
+# Alternative: fastcmprsk
+library(fastcmprsk)
+CR &lt;- fastCrr(Crisk(dtime,status) ~ rx+age+pf+hx+hg+sz+sg, data=data)</pre>
+
+  <h3>Fine–Gray Results: Prostate Cancer</h3>
+  <table>
+    <thead><tr><th>Covariate</th><th>Cancer (k=1) γ̂</th><th>p-value</th><th>Non-cancer (k=2) γ̂</th><th>p-value</th></tr></thead>
+    <tbody>
+      <tr><td>rx</td><td>−0.531</td><td>0.005 ✓</td><td>+0.184</td><td>0.170</td></tr>
+      <tr><td>age</td><td>−0.248</td><td>0.003 ✓</td><td>+0.368</td><td>&lt;0.001 ✓</td></tr>
+      <tr><td>hx</td><td>−0.268</td><td>0.210</td><td>+0.664</td><td>&lt;0.001 ✓</td></tr>
+      <tr><td>sz</td><td>+0.868</td><td>&lt;0.001 ✓</td><td>−0.191</td><td>0.490</td></tr>
+      <tr><td>sg</td><td>+2.103</td><td>&lt;0.001 ✓</td><td>−0.566</td><td>&lt;0.001 ✓</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 7: Comparison -->
+<div class="notes-section" id="comparison">
+  <h2>8.7 Cause-Specific vs. Subdistribution Hazard: When to Use Which?</h2>
+
+  <table>
+    <thead><tr><th>Goal</th><th>Recommended Hazard</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Descriptive / exploratory analysis</td><td>All three (CSH, SH, marginal)</td><td>Each gives different insights</td></tr>
+      <tr><td>Predicting probability of event (CIF)</td><td>Subdistribution hazard</td><td>Direct link to CIF</td></tr>
+      <tr><td>Inferential: effect on hazard of T<sub>k</sub></td><td>Cause-specific hazard</td><td>Natural risk set; biological interpretation</td></tr>
+      <tr><td>Inferential: effect on CIF of T<sub>k</sub></td><td>Subdistribution hazard</td><td>Direct link to CIF</td></tr>
+      <tr><td>Marginal distribution of T<sub>k</sub></td><td>Marginal hazard</td><td>Only if T<sub>k</sub> independent of others</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ A covariate can have opposite signs in CSH and Fine–Gray models!</strong> This is not a contradiction — the two quantities measure different things. Always specify which model you are using when interpreting results.
+  </div>
+</div>
+
+<!-- SECTION 8: Multi-state -->
+<div class="notes-section" id="multistate">
+  <h2>8.8 Multi-State Models</h2>
+
+  <div class="key-point">
+    <strong>Competing risks</strong>: one initial state → several mutually exclusive absorbing states.<br>
+    <strong>Multi-state models</strong>: allow intermediate (transient) states before absorption.
+  </div>
+
+  <div class="example-box">
+    <strong>Illness-death model:</strong> State 1 (Healthy) → State 2 (Ill) → State 3 (Dead), plus a direct transition Healthy → Dead. This is the simplest multi-state model and a generalisation of competing risks.
+  </div>
+
+  <div class="example-box">
+    <strong>Breast cancer (Putter et al, 2007):</strong> Surgery → {Local recurrence, Distant metastasis, Local + Distant} → Death.
+  </div>
+
+  <div class="key-point">
+    Key references: Geskus (2016, 2020); Putter, Fiocco & Geskus (2007) <em>Statistics in Medicine</em>.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MCQ SECTION (30 questions)
+════════════════════════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>📝 Multiple Choice &amp; True/False Questions (30)</h2>
+  <div class="quiz-controls">
+    <div class="score-display" id="scoreDisplay">Score: 0 / 0</div>
+    <button class="submit-btn" onclick="submitAll()">Submit All</button>
+    <button class="reset-btn" onclick="resetQuiz()">Reset Quiz</button>
+  </div>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="card-q1">
+    <div class="question-label">Question 1 · Multiple Choice</div>
+    <div class="question-stem">In a competing risks setting with K causes of failure, what do we typically observe for each subject?</div>
+    <button class="option-btn" data-q="q1" data-val="A">A. The failure time for every cause</button>
+    <button class="option-btn" data-q="q1" data-val="B">B. Only the minimum failure time and the corresponding cause</button>
+    <button class="option-btn" data-q="q1" data-val="C">C. The marginal survival function for each cause</button>
+    <button class="option-btn" data-q="q1" data-val="D">D. All latent failure times simultaneously</button>
+    <div class="feedback-bar" id="fb-q1" style="display:none"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="card-q2">
+    <div class="question-label">Question 2 · True / False</div>
+    <div class="question-stem">The cumulative incidence function I<sub>k</sub>(t) = P(T ≤ t, D = k) is a proper probability distribution (i.e., I<sub>k</sub>(∞) = 1).</div>
+    <button class="option-btn" data-q="q2" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q2" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q2" style="display:none"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="card-q3">
+    <div class="question-label">Question 3 · Multiple Choice</div>
+    <div class="question-stem">Which of the following is the correct formula for the cumulative incidence function in terms of the cause-specific hazard?</div>
+    <button class="option-btn" data-q="q3" data-val="A">A. \(I_k(t) = \int_0^t \lambda_k(s)\, ds\)</button>
+    <button class="option-btn" data-q="q3" data-val="B">B. \(I_k(t) = \int_0^t \lambda_k(s)\, S_k(s)\, ds\)</button>
+    <button class="option-btn" data-q="q3" data-val="C">C. \(I_k(t) = \int_0^t \lambda_k(s)\, S(s)\, ds\)</button>
+    <button class="option-btn" data-q="q3" data-val="D">D. \(I_k(t) = 1 - \exp(-\Lambda_k(t))\)</button>
+    <div class="feedback-bar" id="fb-q3" style="display:none"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="card-q4">
+    <div class="question-label">Question 4 · True / False</div>
+    <div class="question-stem">The Kaplan-Meier estimator treating competing events as independent censoring will always underestimate the true cumulative incidence I<sub>k</sub>(t).</div>
+    <button class="option-btn" data-q="q4" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q4" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q4" style="display:none"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="card-q5">
+    <div class="question-label">Question 5 · Multiple Choice</div>
+    <div class="question-stem">In the prostate cancer example, the KM estimate of dying from prostate cancer by month 60 in the treatment group was 0.28, while the CIF estimate was 0.20. What does this discrepancy demonstrate?</div>
+    <button class="option-btn" data-q="q5" data-val="A">A. The KM estimator is more conservative in this setting</button>
+    <button class="option-btn" data-q="q5" data-val="B">B. Treating non-cancer deaths as censored overestimates cancer-death probability</button>
+    <button class="option-btn" data-q="q5" data-val="C">C. The CIF underestimates the true probability</button>
+    <button class="option-btn" data-q="q5" data-val="D">D. Both estimators are equally valid</button>
+    <div class="feedback-bar" id="fb-q5" style="display:none"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="card-q6">
+    <div class="question-label">Question 6 · Multiple Choice</div>
+    <div class="question-stem">The nonparametric estimator of the CIF at time t<sub>j</sub> uses which overall survival estimate?</div>
+    <button class="option-btn" data-q="q6" data-val="A">A. The cause-specific Kaplan-Meier S<sub>k</sub>(t)</button>
+    <button class="option-btn" data-q="q6" data-val="B">B. The all-cause Kaplan-Meier Ŝ(t)</button>
+    <button class="option-btn" data-q="q6" data-val="C">C. The product-limit estimator for cause k only</button>
+    <button class="option-btn" data-q="q6" data-val="D">D. The Nelson-Aalen estimator for cause k</button>
+    <div class="feedback-bar" id="fb-q6" style="display:none"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="card-q7">
+    <div class="question-label">Question 7 · Multiple Choice</div>
+    <div class="question-stem">The subdistribution hazard h<sub>k</sub>(t) has which of the following unusual properties?</div>
+    <button class="option-btn" data-q="q7" data-val="A">A. It is identical to the cause-specific hazard when K = 2</button>
+    <button class="option-btn" data-q="q7" data-val="B">B. Subjects who fail from competing causes remain in its risk set</button>
+    <button class="option-btn" data-q="q7" data-val="C">C. It always exceeds the cause-specific hazard</button>
+    <button class="option-btn" data-q="q7" data-val="D">D. It sums to the overall hazard across all causes</button>
+    <div class="feedback-bar" id="fb-q7" style="display:none"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="card-q8">
+    <div class="question-label">Question 8 · True / False</div>
+    <div class="question-stem">A positive coefficient in the Fine–Gray subdistribution hazard model implies a higher cumulative incidence of the event at any time t.</div>
+    <button class="option-btn" data-q="q8" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q8" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q8" style="display:none"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="card-q9">
+    <div class="question-label">Question 9 · Multiple Choice</div>
+    <div class="question-stem">In the cause-specific Cox model, which censoring scheme is used?</div>
+    <button class="option-btn" data-q="q9" data-val="A">A. Events from all causes contribute; none are censored</button>
+    <button class="option-btn" data-q="q9" data-val="B">B. Failures from cause k are events; failures from other causes are treated as censored</button>
+    <button class="option-btn" data-q="q9" data-val="C">C. All failures are treated as censored events</button>
+    <button class="option-btn" data-q="q9" data-val="D">D. Only administrative censoring is used</button>
+    <div class="feedback-bar" id="fb-q9" style="display:none"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="card-q10">
+    <div class="question-label">Question 10 · Multiple Choice</div>
+    <div class="question-stem">Which R function from the cmprsk package is used to estimate cumulative incidence functions and compare groups?</div>
+    <button class="option-btn" data-q="q10" data-val="A">A. <code>survfit()</code></button>
+    <button class="option-btn" data-q="q10" data-val="B">B. <code>coxph()</code></button>
+    <button class="option-btn" data-q="q10" data-val="C">C. <code>cuminc()</code></button>
+    <button class="option-btn" data-q="q10" data-val="D">D. <code>crr()</code></button>
+    <div class="feedback-bar" id="fb-q10" style="display:none"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="card-q11">
+    <div class="question-label">Question 11 · Multiple Choice</div>
+    <div class="question-stem">In the Fine–Gray model, the CIF is related to the baseline subdistribution survival by:</div>
+    <button class="option-btn" data-q="q11" data-val="A">A. \(1 - I_k(t\mid X) = \bar{I}_{k0}(t)^{\exp(\gamma_k^T X)}\)</button>
+    <button class="option-btn" data-q="q11" data-val="B">B. \(I_k(t\mid X) = \bar{I}_{k0}(t)^{\exp(\gamma_k^T X)}\)</button>
+    <button class="option-btn" data-q="q11" data-val="C">C. \(1 - I_k(t\mid X) = \exp(-\Lambda_{k0}(t) \cdot \gamma_k^T X)\)</button>
+    <button class="option-btn" data-q="q11" data-val="D">D. \(I_k(t\mid X) = \exp(-\Lambda_{k0}(t) \cdot \exp(\gamma_k^T X))\)</button>
+    <div class="feedback-bar" id="fb-q11" style="display:none"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="card-q12">
+    <div class="question-label">Question 12 · True / False</div>
+    <div class="question-stem">The sum of all cause-specific hazards equals the overall hazard: ∑<sub>k</sub> λ<sub>k</sub>(t) = λ(t).</div>
+    <button class="option-btn" data-q="q12" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q12" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q12" style="display:none"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="card-q13">
+    <div class="question-label">Question 13 · Multiple Choice</div>
+    <div class="question-stem">For the prostate cancer data, which covariate was significant for NON-CANCER death in the cause-specific Cox model but NOT for cancer death?</div>
+    <button class="option-btn" data-q="q13" data-val="A">A. Tumour stage (sg)</button>
+    <button class="option-btn" data-q="q13" data-val="B">B. Cardiovascular history (hx)</button>
+    <button class="option-btn" data-q="q13" data-val="C">C. Lesion size (sz)</button>
+    <button class="option-btn" data-q="q13" data-val="D">D. Hemoglobin level (hg)</button>
+    <div class="feedback-bar" id="fb-q13" style="display:none"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="card-q14">
+    <div class="question-label">Question 14 · Multiple Choice</div>
+    <div class="question-stem">In a staphylococcus infection study (burn wounds), a researcher wants to answer: "What percentage of patients gets infected while in hospital?" The appropriate approach is:</div>
+    <button class="option-btn" data-q="q14" data-val="A">A. Kaplan-Meier treating discharge as censoring</button>
+    <button class="option-btn" data-q="q14" data-val="B">B. Sub-distribution of infection in the presence of discharge as competing risk</button>
+    <button class="option-btn" data-q="q14" data-val="C">C. Marginal distribution assuming independence</button>
+    <button class="option-btn" data-q="q14" data-val="D">D. Overall survival without competing risks</button>
+    <div class="feedback-bar" id="fb-q14" style="display:none"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="card-q15">
+    <div class="question-label">Question 15 · True / False</div>
+    <div class="question-stem">Multi-state models are a special case of competing risks models.</div>
+    <button class="option-btn" data-q="q15" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q15" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q15" style="display:none"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="card-q16">
+    <div class="question-label">Question 16 · Multiple Choice</div>
+    <div class="question-stem">Suppose I<sub>k</sub>(∞) = 0.35. What does this mean?</div>
+    <button class="option-btn" data-q="q16" data-val="A">A. 35% of subjects will fail from cause k in the first year</button>
+    <button class="option-btn" data-q="q16" data-val="B">B. 35% of subjects will eventually fail from cause k</button>
+    <button class="option-btn" data-q="q16" data-val="C">C. The hazard of cause k is 0.35 at infinity</button>
+    <button class="option-btn" data-q="q16" data-val="D">D. The overall failure probability is 0.35</button>
+    <div class="feedback-bar" id="fb-q16" style="display:none"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="card-q17">
+    <div class="question-label">Question 17 · Multiple Choice</div>
+    <div class="question-stem">Which R function fits the Fine–Gray subdistribution hazard model?</div>
+    <button class="option-btn" data-q="q17" data-val="A">A. <code>cuminc()</code> from cmprsk</button>
+    <button class="option-btn" data-q="q17" data-val="B">B. <code>crr()</code> from cmprsk</button>
+    <button class="option-btn" data-q="q17" data-val="C">C. <code>coxph()</code> from survival</button>
+    <button class="option-btn" data-q="q17" data-val="D">D. <code>survfit()</code> from survival</button>
+    <div class="feedback-bar" id="fb-q17" style="display:none"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="card-q18">
+    <div class="question-label">Question 18 · True / False</div>
+    <div class="question-stem">The cause-specific hazard λ<sub>k</sub>(t) is directly linked to the cumulative incidence function I<sub>k</sub>(t) in the same way the subdistribution hazard h<sub>k</sub>(t) is.</div>
+    <button class="option-btn" data-q="q18" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q18" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q18" style="display:none"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="card-q19">
+    <div class="question-label">Question 19 · R Output Interpretation</div>
+    <div class="question-stem">
+      The Fine–Gray model for prostate cancer death gives <code>rx</code> coefficient = −0.531 (p = 0.005). How do you interpret this for a patient on treatment vs placebo?
+    </div>
+    <button class="option-btn" data-q="q19" data-val="A">A. Treatment reduces the cause-specific hazard of cancer death by 47%</button>
+    <button class="option-btn" data-q="q19" data-val="B">B. Treatment reduces the cumulative incidence of cancer death (subdistribution hazard ratio = e<sup>−0.531</sup> ≈ 0.59)</button>
+    <button class="option-btn" data-q="q19" data-val="C">C. Treatment increases the CIF of cancer death</button>
+    <button class="option-btn" data-q="q19" data-val="D">D. Treatment has no significant effect on cancer death</button>
+    <div class="feedback-bar" id="fb-q19" style="display:none"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="card-q20">
+    <div class="question-label">Question 20 · R Output Interpretation</div>
+    <div class="question-stem">
+      The CSH Cox model for cancer death gives <code>sz</code> (lesion size &gt; 30 cm²) coefficient = 1.251. What is the hazard ratio and interpretation?
+    </div>
+    <button class="option-btn" data-q="q20" data-val="A">A. HR = 1.251; patients with large lesions have 1.25× higher cause-specific hazard of cancer death</button>
+    <button class="option-btn" data-q="q20" data-val="B">B. HR = e<sup>1.251</sup> ≈ 3.49; patients with large lesions have ~3.5× higher cause-specific hazard of cancer death</button>
+    <button class="option-btn" data-q="q20" data-val="C">C. HR = 1.251; lesion size reduces cancer risk</button>
+    <button class="option-btn" data-q="q20" data-val="D">D. HR = e<sup>−1.251</sup> ≈ 0.29; large lesions protect against cancer death</button>
+    <div class="feedback-bar" id="fb-q20" style="display:none"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="card-q21">
+    <div class="question-label">Question 21 · Calculation</div>
+    <div class="question-stem">
+      At time t<sub>1</sub>, there are n<sub>1</sub> = 100 subjects at risk, d<sub>11</sub> = 2 cancer deaths and d<sub>21</sub> = 1 non-cancer death. Ŝ(t<sub>0</sub>) = 1. What is the contribution to Î<sub>1</sub>(t<sub>1</sub>) from this time point?
+    </div>
+    <button class="option-btn" data-q="q21" data-val="A">A. 2/100 × 1 = 0.02</button>
+    <button class="option-btn" data-q="q21" data-val="B">B. 2/97 × 1 = 0.0206</button>
+    <button class="option-btn" data-q="q21" data-val="C">C. 1/100 × 1 = 0.01</button>
+    <button class="option-btn" data-q="q21" data-val="D">D. 3/100 × 1 = 0.03</button>
+    <div class="feedback-bar" id="fb-q21" style="display:none"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="card-q22">
+    <div class="question-label">Question 22 · Calculation</div>
+    <div class="question-stem">
+      Continuing Q21: what is Ŝ(t<sub>1</sub>) (all-cause KM)?
+    </div>
+    <button class="option-btn" data-q="q22" data-val="A">A. 1 − 3/100 = 0.97</button>
+    <button class="option-btn" data-q="q22" data-val="B">B. 1 − 2/100 = 0.98</button>
+    <button class="option-btn" data-q="q22" data-val="C">C. (1 − 2/100)(1 − 1/100) = 0.9702</button>
+    <button class="option-btn" data-q="q22" data-val="D">D. (97/100) = 0.97</button>
+    <div class="feedback-bar" id="fb-q22" style="display:none"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="card-q23">
+    <div class="question-label">Question 23 · True / False</div>
+    <div class="question-stem">In the illness-death model (a multi-state model), subjects can transition from the healthy state directly to death without passing through the illness state.</div>
+    <button class="option-btn" data-q="q23" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q23" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q23" style="display:none"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="card-q24">
+    <div class="question-label">Question 24 · Multiple Choice</div>
+    <div class="question-stem">Why does naively treating hospital discharge as censoring overestimate survival for Covid-19 patients (time to death)?</div>
+    <button class="option-btn" data-q="q24" data-val="A">A. Because censoring induces informative selection: discharged patients are cured and cannot die from Covid-19</button>
+    <button class="option-btn" data-q="q24" data-val="B">B. Because hospital deaths are systematically missed</button>
+    <button class="option-btn" data-q="q24" data-val="C">C. Because administrative censoring reduces sample size</button>
+    <button class="option-btn" data-q="q24" data-val="D">D. Because the KM is always unbiased</button>
+    <div class="feedback-bar" id="fb-q24" style="display:none"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="card-q25">
+    <div class="question-label">Question 25 · R Output Interpretation</div>
+    <div class="question-stem">
+      In the Fine–Gray model for NON-CANCER death, <code>sg</code> (tumour stage) has coefficient −0.566 (p &lt; 0.001). How do you interpret this?
+    </div>
+    <button class="option-btn" data-q="q25" data-val="A">A. Higher tumour stage increases non-cancer death CIF (HR &gt; 1)</button>
+    <button class="option-btn" data-q="q25" data-val="B">B. Higher tumour stage decreases non-cancer death CIF; HR = e<sup>−0.566</sup> ≈ 0.57</button>
+    <button class="option-btn" data-q="q25" data-val="C">C. Tumour stage has no effect on non-cancer death</button>
+    <button class="option-btn" data-q="q25" data-val="D">D. Higher tumour stage increases both cancer and non-cancer death equally</button>
+    <div class="feedback-bar" id="fb-q25" style="display:none"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="card-q26">
+    <div class="question-label">Question 26 · True / False</div>
+    <div class="question-stem">A covariate can have opposite signs (one positive, one negative) in the cause-specific and Fine–Gray models for the same cause of death.</div>
+    <button class="option-btn" data-q="q26" data-val="A">A. True</button>
+    <button class="option-btn" data-q="q26" data-val="B">B. False</button>
+    <div class="feedback-bar" id="fb-q26" style="display:none"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="card-q27">
+    <div class="question-label">Question 27 · Multiple Choice</div>
+    <div class="question-stem">Which quantity is DIRECTLY estimable from I<sub>k</sub>(∞) without additional modelling assumptions?</div>
+    <button class="option-btn" data-q="q27" data-val="A">A. The marginal probability P(T<sub>k</sub> &lt; ∞)</button>
+    <button class="option-btn" data-q="q27" data-val="B">B. The probability of eventually failing from cause k: P(D = k)</button>
+    <button class="option-btn" data-q="q27" data-val="C">C. The cause-specific hazard at infinity</button>
+    <button class="option-btn" data-q="q27" data-val="D">D. The overall survival at infinity</button>
+    <div class="feedback-bar" id="fb-q27" style="display:none"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="card-q28">
+    <div class="question-label">Question 28 · Multiple Choice</div>
+    <div class="question-stem">Which of the following is NOT a valid argument for using the subdistribution hazard model?</div>
+    <button class="option-btn" data-q="q28" data-val="A">A. It provides a direct link between regression coefficients and the CIF</button>
+    <button class="option-btn" data-q="q28" data-val="B">B. Its risk set is more clinically natural than the cause-specific hazard risk set</button>
+    <button class="option-btn" data-q="q28" data-val="C">C. A positive coefficient directly implies a higher probability of the event of interest</button>
+    <button class="option-btn" data-q="q28" data-val="D">D. It is preferred when prediction of CIF is the primary goal</button>
+    <div class="feedback-bar" id="fb-q28" style="display:none"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="card-q29">
+    <div class="question-label">Question 29 · Calculation</div>
+    <div class="question-stem">
+      A Fine–Gray model gives γ̂<sub>rx</sub> = −0.531 for treatment vs placebo. The baseline CIF at t = 60 months for placebo is Î<sub>10</sub>(60) = 0.31. Approximately what is the predicted CIF at 60 months for the treatment group (all other covariates at reference)?
+    </div>
+    <button class="option-btn" data-q="q29" data-val="A">A. 0.31 × e<sup>−0.531</sup> ≈ 0.18</button>
+    <button class="option-btn" data-q="q29" data-val="B">B. 1 − (1 − 0.31)<sup>e<sup>−0.531</sup></sup> = 1 − 0.69<sup>0.588</sup> ≈ 0.20</button>
+    <button class="option-btn" data-q="q29" data-val="C">C. 0.31 − 0.531 = −0.221 (not valid)</button>
+    <button class="option-btn" data-q="q29" data-val="D">D. 0.31 / e<sup>−0.531</sup> ≈ 0.53</button>
+    <div class="feedback-bar" id="fb-q29" style="display:none"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="card-q30">
+    <div class="question-label">Question 30 · Multiple Choice</div>
+    <div class="question-stem">For a predictive analysis goal, which modelling approach is generally preferred?</div>
+    <button class="option-btn" data-q="q30" data-val="A">A. Cause-specific hazard, because it has a natural risk set</button>
+    <button class="option-btn" data-q="q30" data-val="B">B. Marginal hazard, because it ignores competing events</button>
+    <button class="option-btn" data-q="q30" data-val="C">C. The approach that leads to the best predictive performance (e.g., calibration, discrimination)</button>
+    <button class="option-btn" data-q="q30" data-val="D">D. Always the Fine–Gray model, regardless of the goal</button>
+    <div class="feedback-bar" id="fb-q30" style="display:none"></div>
+  </div>
+
+</div><!-- /mcq-section -->
+
+<!-- ════════════════════════════════════════════
+     SHORT ANSWER SECTION
+════════════════════════════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>🔍 Short Answer &amp; R Output Questions</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1</div>
+    <div class="question-stem">Explain why the Kaplan-Meier estimator <em>overestimates</em> the true cumulative incidence I<sub>k</sub>(t) when other causes are treated as independent censoring.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="sa1">
+      <strong>Answer:</strong> The KM treating other causes as independent censoring estimates <em>S<sub>k</sub>(t) = exp(−Λ<sub>k</sub>(t))</em>, so 1 − S<sub>k</sub>(t) represents the probability of failing from cause k if competing risks did not exist. The true CIF is I<sub>k</sub>(t) = ∫λ<sub>k</sub>(s)S(s)ds where S(s) = exp(−∑Λ<sub>k</sub>(s)) ≤ S<sub>k</sub>(s). Because the overall survival S is always ≤ S<sub>k</sub>, we have I<sub>k</sub>(t) ≤ 1 − S<sub>k</sub>(t). The KM inflates the risk by ignoring the fact that subjects who die from other causes can no longer die from cause k.
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2</div>
+    <div class="question-stem">What is the difference in risk sets between the cause-specific hazard λ<sub>k</sub>(t) and the subdistribution hazard h<sub>k</sub>(t)?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="sa2">
+      <strong>Answer:</strong> For λ<sub>k</sub>(t): the risk set at time t contains only subjects who have not yet experienced <em>any</em> event (alive at t). For h<sub>k</sub>(t): subjects who failed from a competing cause (D ≠ k) before time t <em>remain</em> in the risk set (notionally assigned T*<sub>k</sub> = ∞). This makes the Fine–Gray risk set clinically unnatural — individuals who are already dead from another cause are counted as still "at risk." However, this is mathematically necessary to maintain the direct relationship 1 − I<sub>k</sub>(t|X) = exp(−∫h<sub>k</sub>ds).
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3</div>
+    <div class="question-stem">In the prostate cancer CSH Cox model, the treatment variable rx has β̂ = −0.713 for cancer death and β̂ = +0.123 for non-cancer death. Provide a clinical interpretation of these two results together.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="sa3">
+      <strong>Answer:</strong> Treatment (DES at higher dose) significantly reduces the cause-specific hazard of dying from prostate cancer (HR = e<sup>−0.713</sup> ≈ 0.49 — about 51% reduction). However, treatment shows a slightly higher (though non-significant, p = 0.37) cause-specific hazard for non-cancer death (HR ≈ 1.13), consistent with known cardiovascular side-effects of DES. Taken together, the beneficial cancer effect of DES must be weighed against the potential non-cancer mortality risk — a classic competing risks dilemma that would be missed if cancer deaths were analysed alone.
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4</div>
+    <div class="question-stem">Write the R code to fit a Fine–Gray model for non-cancer death (cause 2) in the prostate data using covariates rx and age, and explain how the event indicator must be coded.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="sa4">
+      <strong>Answer:</strong>
+      <pre>library(cmprsk)
+# status: 0=censored, 1=cancer death, 2=non-cancer death
+cov &lt;- cbind(data$rx, data$age)
+dimnames(cov)[[2]] &lt;- c('rx', 'age')
+c2 &lt;- crr(data$dtime, data$status, cov, failcode=2)</pre>
+      The <code>failcode=2</code> argument tells <code>crr()</code> that non-cancer death (D=2) is the event of interest; cancer deaths (D=1) are treated as competing events (entering the modified risk set). Censored observations have status=0. Alternatively, using <code>fastcmprsk</code>:
+      <pre>data$status2 &lt;- d2 + 2*d1  # swap roles: cause 2 is now coded 1
+fastCrr(Crisk(dtime, status2) ~ rx + age, data=data)</pre>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5</div>
+    <div class="question-stem">Describe how to choose between the cause-specific hazard and the Fine–Gray subdistribution hazard model in a study investigating whether a new drug affects the <em>probability</em> of cancer relapse in the presence of death as a competing event.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="sa5">
+      <strong>Answer:</strong> Since the research question is about the <em>probability</em> of relapse (i.e., the CIF), the Fine–Gray model on the subdistribution hazard is preferred. This is because: (1) the subdistribution hazard h<sub>k</sub>(t|X) has a direct one-to-one relationship with the CIF, so regression coefficients γ<sub>k</sub> directly describe covariate effects on the incidence probability; (2) a positive γ<sub>k</sub> implies a higher CIF, making interpretation straightforward for clinical decision-making. The cause-specific hazard model would be preferred instead if the biological mechanism of drug action on relapse hazard is of primary interest, or for understanding the hazard process separately from the competing event.
+    </div>
+  </div>
+
+</div><!-- /sa-section -->
+
+<script>
+// ── Answer key ──
+const answers = {
+  q1: 'B', q2: 'B', q3: 'C', q4: 'B', q5: 'B',
+  q6: 'B', q7: 'B', q8: 'A', q9: 'B', q10: 'C',
+  q11: 'A', q12: 'A', q13: 'B', q14: 'B', q15: 'B',
+  q16: 'B', q17: 'B', q18: 'B', q19: 'B', q20: 'B',
+  q21: 'A', q22: 'A', q23: 'A', q24: 'A', q25: 'B',
+  q26: 'A', q27: 'B', q28: 'B', q29: 'B', q30: 'C'
+};
+
+const explanations = {
+  q1: 'We observe (Y, D) where Y = min(T, C) and D is the cause at Y.',
+  q2: 'I_k(∞) = P(D = k) which is generally less than 1 since other causes also occur.',
+  q3: 'I_k(t) = ∫λ_k(s)S(s)ds where S(s) is the overall survival, not the cause-specific survival S_k.',
+  q4: 'False — 1−S_k(t) ≥ I_k(t): KM overestimates the CIF (not underestimates).',
+  q5: 'Treating non-cancer deaths as censored leads to KM = 0.28, while correct CIF = 0.20.',
+  q6: 'The CIF estimator uses the all-cause KM Ŝ(t) = ∏(1 − d_j/n_j) at each step.',
+  q7: 'By definition, h_k(t) keeps subjects who died from competing causes in the risk set.',
+  q8: 'A positive γ in Fine-Gray → higher subdistribution hazard → higher CIF.',
+  q9: 'Standard Cox: failure from cause k = event, all other failures = censored.',
+  q10: 'cuminc() estimates and compares CIFs across groups; crr() fits Fine-Gray regression.',
+  q11: '1 − I_k(t|X) = Ī_{k0}(t)^exp(γ_k^T X) is the proportional CIF model.',
+  q12: 'The cause-specific hazards sum to the overall all-cause hazard.',
+  q13: 'hx (cardiovascular history) β = 0.686, p < 0.001 for non-cancer, but −0.188 (n.s.) for cancer.',
+  q14: 'Clinical question → sub-distribution / CIF approach is appropriate.',
+  q15: 'False — it is the reverse: competing risks are a special case of multi-state models (absorbing states only).',
+  q16: 'I_k(∞) = P(D=k) = probability of eventually dying from cause k.',
+  q17: 'crr() fits the Fine-Gray model; cuminc() is for nonparametric CIF estimation.',
+  q18: 'False — λ_k has NO direct link to I_k. Only h_k satisfies I_k = 1−exp(−∫h_k).',
+  q19: 'Subdistribution HR = e^{−0.531} ≈ 0.588 → ~41% lower CIF for treatment group.',
+  q20: 'HR = e^{1.251} ≈ 3.49 for the cause-specific hazard of cancer death.',
+  q21: 'Contribution to Î_1(t_1) = (d_{11}/n_1) × Ŝ(t_0) = (2/100) × 1 = 0.02.',
+  q22: 'All-cause KM: Ŝ(t_1) = (1 − d_1/n_1) = 1 − 3/100 = 0.97.',
+  q23: 'Yes — in the illness-death model, State 1 (Healthy) can go directly to State 3 (Dead).',
+  q24: 'Discharged patients are effectively "immune" — censoring them as if still at risk is informative.',
+  q25: 'γ = −0.566 → HR = e^{−0.566} ≈ 0.57; higher tumour stage reduces non-cancer CIF.',
+  q26: 'True — the two models measure different quantities; sign reversal is theoretically possible.',
+  q27: 'I_k(∞) = P(D = k) directly.',
+  q28: 'The Fine-Gray risk set is clinically UNnatural — this is a known disadvantage, not advantage.',
+  q29: '1 − (1−0.31)^{e^{−0.531}} = 1 − 0.69^{0.588} ≈ 1 − 0.80 ≈ 0.20.',
+  q30: 'For predictive analysis, choose the model with best predictive performance.'
+};
+
+let selected = {};
+
+// Handle option selection
+document.querySelectorAll('.option-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const q = this.dataset.q;
+    if (this.disabled) return;
+    document.querySelectorAll(`[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+    this.classList.add('selected');
+    selected[q] = this.dataset.val;
+  });
+});
+
+function submitAll() {
+  let correct = 0, total = 0;
+  Object.keys(answers).forEach(q => {
+    total++;
+    const correctVal = answers[q];
+    const userVal = selected[q];
+    const fb = document.getElementById('fb-' + q);
+    const btns = document.querySelectorAll(`[data-q="${q}"]`);
+    btns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.val === correctVal) b.classList.add(userVal ? (userVal === correctVal ? 'correct' : 'reveal-correct') : 'reveal-correct');
+      if (b.dataset.val === userVal && userVal !== correctVal) b.classList.add('incorrect');
+      if (b.dataset.val === userVal && userVal === correctVal) b.classList.add('correct');
+    });
+    fb.style.display = 'block';
+    if (userVal === correctVal) {
+      correct++;
+      fb.className = 'feedback-bar correct';
+      fb.innerHTML = '✅ Correct! ' + explanations[q];
+    } else if (!userVal) {
+      fb.className = 'feedback-bar incorrect';
+      fb.innerHTML = '⚠️ Not attempted. Correct: ' + correctVal + '. ' + explanations[q];
+    } else {
+      fb.className = 'feedback-bar incorrect';
+      fb.innerHTML = '❌ Incorrect. Correct answer: ' + correctVal + '. ' + explanations[q];
+    }
+  });
+  document.getElementById('scoreDisplay').textContent = `Score: ${correct} / ${total}`;
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function resetQuiz() {
+  selected = {};
+  Object.keys(answers).forEach(q => {
+    const fb = document.getElementById('fb-' + q);
+    fb.style.display = 'none';
+    fb.textContent = '';
+    document.querySelectorAll(`[data-q="${q}"]`).forEach(b => {
+      b.disabled = false;
+      b.className = 'option-btn';
+    });
+  });
+  document.getElementById('scoreDisplay').textContent = 'Score: 0 / 0';
+}
+
+function toggleAnswer(id) {
+  const panel = document.getElementById(id);
+  panel.classList.toggle('visible');
+  const btn = panel.previousElementSibling;
+  btn.textContent = panel.classList.contains('visible') ? 'Hide Answer' : 'Reveal Answer';
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// Render MathJax on load
+window.addEventListener('load', () => { if (window.MathJax) MathJax.typesetPromise(); });
+</script>
+</body>
+</html>

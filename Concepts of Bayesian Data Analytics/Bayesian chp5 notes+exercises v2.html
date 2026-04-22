@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5 — Markov Chain Monte Carlo Sampling</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+<style>
+:root{
+  --primary:#1a3a5c;--accent:#2878b8;--accent2:#c0580a;
+  --bg:#f3f6fb;--card:#fff;--border:#cdd8e8;
+  --ok:#1e7e34;--ok-bg:#d4edda;--err:#a71d2a;--err-bg:#f8d7da;
+  --nb:#eef4fc;--text:#1c2a38;--muted:#5a6a7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.72;font-size:15px;}
+header{background:var(--primary);color:#fff;padding:26px 20px 18px;text-align:center;}
+header h1{font-size:1.55rem;letter-spacing:.3px;}
+header p{margin-top:5px;color:#aac8e4;font-size:.9rem;}
+.toc{background:var(--accent);display:flex;flex-wrap:wrap;gap:5px;padding:9px 18px;justify-content:center;}
+.toc a{color:#fff;text-decoration:none;font-size:.78rem;background:rgba(255,255,255,.15);
+  padding:4px 11px;border-radius:20px;transition:background .2s;}
+.toc a:hover{background:rgba(255,255,255,.32);}
+.wrap{max-width:720px;margin:0 auto;padding:26px 14px 70px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:20px 24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(30,60,100,.06);}
+.card h2{color:var(--primary);font-size:1.12rem;border-bottom:2px solid var(--accent);
+  padding-bottom:7px;margin-bottom:13px;}
+.card h3{color:var(--accent);font-size:.96rem;margin:15px 0 7px;}
+.card p{margin-bottom:9px;}
+.card ul{padding-left:20px;margin-bottom:9px;}
+.card li{margin-bottom:5px;}
+.nb{background:var(--nb);border-left:4px solid var(--accent);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.nb strong{color:var(--primary);}
+.warn{background:#fff8e8;border-left:4px solid var(--accent2);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.fbox{background:#f0f6ff;border:1px solid #aaccee;border-radius:6px;
+  padding:11px 15px;margin:11px 0;font-size:.9rem;overflow-x:auto;}
+.fbox p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin:11px 0;font-size:.86rem;}
+th{background:var(--primary);color:#fff;padding:8px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:var(--nb);}
+
+.score-bar{background:var(--card);border:2px solid var(--accent);border-radius:10px;
+  padding:13px 20px;margin-bottom:20px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:9px;}
+.score-bar span{font-size:.9rem;color:var(--muted);}
+#score-display{font-size:1.5rem;font-weight:700;color:var(--accent);}
+.reset-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;
+  padding:7px 18px;font-size:.83rem;cursor:pointer;font-weight:600;}
+.reset-btn:hover{background:#0f2540;}
+.qblock{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;box-shadow:0 1px 4px rgba(30,60,100,.05);}
+.qnum{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:5px;}
+.qtext{font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.opt{background:var(--nb);border:1px solid var(--border);border-radius:6px;
+  padding:7px 12px;text-align:left;cursor:pointer;font-size:.87rem;color:var(--text);
+  transition:background .15s,border-color .15s;}
+.opt:hover:not(:disabled){background:#dceeff;border-color:var(--accent);}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600;}
+.opt.bad{background:var(--err-bg);border-color:var(--err);color:var(--err);}
+.opt:disabled{cursor:default;}
+.fb{display:none;margin-top:7px;padding:7px 12px;border-radius:5px;font-size:.86rem;}
+.fb.ok-fb{display:block;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.fb.bad-fb{display:block;background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.saq{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;}
+.saq .qtext{margin-bottom:10px;}
+.reveal-btn{background:var(--accent2);color:#fff;border:none;border-radius:6px;
+  padding:7px 15px;font-size:.83rem;font-weight:700;cursor:pointer;transition:background .2s;}
+.reveal-btn:hover{background:#9e460a;}
+.ans-box{display:none;background:var(--ok-bg);border:1px solid var(--ok);border-radius:6px;
+  padding:12px 15px;margin-top:10px;font-size:.87rem;line-height:1.65;}
+.ans-box.shown{display:block;}
+.ans-box strong{color:var(--ok);}
+.aform{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:8px 12px;
+  margin:7px 0;font-size:.86rem;overflow-x:auto;}
+
+.sec-title{background:var(--primary);color:#fff;border-radius:8px;padding:10px 18px;
+  margin:28px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:.3px;}
+
+@media(max-width:600px){
+  .wrap{padding:12px 8px 50px;}
+  .card{padding:13px 11px;}
+  header h1{font-size:1.1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📘 Chapter 5 — Markov Chain Monte Carlo Sampling</h1>
+  <p>Bayesian Biostatistics · Lesaffre &amp; Lawson · Study Notes + 40 MCQ + 8 Short-Answer Questions</p>
+</header>
+
+<nav class="toc">
+  <a href="#s51">5.1 Introduction</a>
+  <a href="#s52">5.2 Gibbs Sampler</a>
+  <a href="#s523">5.2.3 General Gibbs</a>
+  <a href="#s524">5.2.4 Remarks</a>
+  <a href="#s525">5.2.5 Review</a>
+  <a href="#s526">5.2.6 Slice Sampler</a>
+  <a href="#s53">5.3 MH Algorithm</a>
+  <a href="#s534">5.3.4 Review MH</a>
+  <a href="#s54">5.4 Justification</a>
+  <a href="#s55">5.5 Sampler Choice</a>
+  <a href="#s56">5.6 RJMCMC</a>
+  <a href="#mcq">40 MCQ</a>
+  <a href="#saq">8 Short Answer</a>
+</nav>
+
+<div class="wrap">
+
+<div class="sec-title">📖 Study Notes</div>
+
+<!-- 5.1 -->
+<div class="card" id="s51">
+  <h2>5.1 Introduction — Why MCMC?</h2>
+  <p>Bayes' theorem yields the posterior distribution \(p(\boldsymbol{\theta} \mid \boldsymbol{y}) \propto L(\boldsymbol{\theta} \mid \boldsymbol{y})\,p(\boldsymbol{\theta})\), but evaluating it requires the normalizing constant:</p>
+  <div class="fbox">
+    <p>\[p(\boldsymbol{y}) = \int L(\boldsymbol{\theta} \mid \boldsymbol{y})\,p(\boldsymbol{\theta})\,d\boldsymbol{\theta}\]</p>
+  </div>
+  <p>This integral is analytically intractable for most non-conjugate models and computationally prohibitive for high-dimensional \(\boldsymbol{\theta}\) even with numerical integration. <strong>Sampling</strong> is the solution: instead of computing the posterior exactly, draw a large sample from it and use that sample for inference.</p>
+
+  <table>
+    <thead><tr><th>Approach</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td>Analytical solution</td><td>Only feasible for conjugate models; too restrictive in practice</td></tr>
+      <tr><td>Numerical integration</td><td>Curse of dimensionality: cost grows exponentially with \(d = \dim(\boldsymbol{\theta})\)</td></tr>
+      <tr><td><strong>MCMC sampling</strong></td><td>Scales to high dimensions; requires only the un-normalized posterior \(p(\boldsymbol{\theta}\mid\boldsymbol{y}) \propto L\cdot p\)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Two main MCMC families:</strong> (1) <em>Gibbs sampler</em> — samples each parameter from its full conditional distribution, cycling through all parameters. Requires the ability to sample from each full conditional. (2) <em>Metropolis-Hastings (MH) algorithm</em> — proposes candidate values from a proposal density and accepts or rejects them; far more general than Gibbs. Both generate a dependent Markov chain whose stationary distribution is the target posterior.
+  </div>
+</div>
+
+<!-- 5.2 -->
+<div class="card" id="s52">
+  <h2>5.2 The Gibbs Sampler</h2>
+  <p>Introduced by Geman &amp; Geman (1984) for image processing; brought to Bayesian statistics by Gelfand &amp; Smith (1990).</p>
+
+  <h3>5.2.1 Bivariate Gibbs Sampler</h3>
+  <p>The joint posterior \(p(\theta_1, \theta_2 \mid \boldsymbol{y})\) is completely determined by the two <strong>full conditional distributions (full conditionals)</strong>:</p>
+  <div class="fbox">
+    <p>\[p(\theta_1 \mid \theta_2, \boldsymbol{y}) \qquad \text{and} \qquad p(\theta_2 \mid \theta_1, \boldsymbol{y})\]</p>
+  </div>
+
+  <p><strong>Gibbs sampling algorithm</strong> (bivariate case): Starting from initial values \(\theta_1^{(0)}, \theta_2^{(0)}\), at iteration \(k+1\):</p>
+  <div class="fbox">
+    <p>Step 1: Sample \(\theta_1^{(k+1)} \sim p(\theta_1 \mid \theta_2^{(k)}, \boldsymbol{y})\)</p>
+    <p>Step 2: Sample \(\theta_2^{(k+1)} \sim p(\theta_2 \mid \theta_1^{(k+1)}, \boldsymbol{y})\) &nbsp;&nbsp; <em>(uses the updated \(\theta_1\)!)</em></p>
+  </div>
+
+  <p>This yields the chain \(\boldsymbol{\theta}^{(k)} = (\theta_1^{(k)}, \theta_2^{(k)})^T,\; k = 1, 2, \ldots\) of <em>dependent</em> samples. The <strong>Markov property</strong> holds:</p>
+  <div class="fbox">
+    <p>\[p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^{(k-1)}, \ldots, \boldsymbol{y}) = p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{y})\]</p>
+  </div>
+
+  <div class="warn">
+    <strong>Burn-in (initial portion):</strong> The early part of the chain depends on the starting values and is not representative of the posterior. This portion must be discarded. Under mild regularity conditions, from iteration \(k_0\) onwards the chain samples from the true posterior: \(\boldsymbol{\theta}^{(k)} \overset{d}{\to} p(\boldsymbol{\theta} \mid \boldsymbol{y})\).
+  </div>
+
+  <p><strong>Visual signature — Zigzag pattern:</strong> In the \((\theta_1, \theta_2)\) plane, the Gibbs path forms a characteristic zigzag (horizontal and vertical moves only), since each step updates only one parameter.</p>
+
+  <h3>Example VI.1 — SAP Study (NI Prior)</h3>
+  <p>Data: \(n = 250\) ALP measurements. Likelihood: \(\mathrm{N}(\mu, \sigma^2)\). NI prior: \(p(\mu, \sigma^2) \propto \sigma^{-2}\).</p>
+  <p>Full conditionals:</p>
+  <div class="fbox">
+    <p>\[p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}\!\left(\bar{y},\; \frac{\sigma^2}{n}\right)\]</p>
+    <p>\[p(\sigma^2 \mid \mu, \boldsymbol{y}) = \mathrm{Inv}\text{-}\chi^2\!\left(n,\; s_\mu^2\right), \quad s_\mu^2 = \frac{1}{n}\sum_{i=1}^n (y_i - \mu)^2\]</p>
+  </div>
+  <div class="nb">
+    <strong>Result:</strong> Burn-in = 500, total chain = 1,500. Marginal histograms closely match the true analytical posteriors (solid lines). The zigzag in the \((\mu, \sigma^2)\) plane is clearly visible; each complete Gibbs step consists of two sub-steps.
+  </div>
+
+  <h3>Example VI.2 — Mixed Discrete-Continuous Distribution</h3>
+  <p>Joint distribution \(f(x, y) \propto \binom{n}{x} y^{x+\alpha-1}(1-y)^{n-x+\beta-1}\) with \(x\) discrete, \(y \in [0,1]\).</p>
+  <div class="fbox">
+    <p>Full conditional 1: \(f(x \mid y) = \mathrm{Binomial}(n, y)\)</p>
+    <p>Full conditional 2: \(f(y \mid x) = \mathrm{Beta}(x + \alpha,\; n - x + \beta)\)</p>
+  </div>
+  <p>The Gibbs sampler handles mixed discrete-continuous joint distributions transparently — no special treatment required.</p>
+
+  <h3>Example VI.3 — SAP Study (Informative Prior)</h3>
+  <p>Semi-conjugate (product) prior: \(\mu \sim \mathrm{N}(\mu_0, \sigma_0^2)\) and \(\sigma^2 \sim \mathrm{Inv}\text{-}\chi^2(\ell_0, \pi_0^2)\) independently.</p>
+  <div class="fbox">
+    <p>\[p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}(\mu_k, \tilde{\sigma}^2_k), \quad \text{where } \frac{1}{\tilde{\sigma}^2_k} = \frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}, \quad \mu_k = \tilde{\sigma}^2_k\!\left(\frac{n\bar{y}}{\sigma^2} + \frac{\mu_0}{\sigma_0^2}\right)\]</p>
+    <p>\[p(\sigma^2 \mid \mu, \boldsymbol{y}) = \mathrm{Inv}\text{-}\chi^2\!\left(\ell_0 + n,\; \frac{\sum_{i=1}^n(y_i - \mu)^2 + \ell_0\pi_0^2}{\ell_0 + n}\right)\]</p>
+  </div>
+  <div class="nb">
+    <strong>Derivation of \(p(\mu \mid \sigma^2, \boldsymbol{y})\):</strong> Multiplying the likelihood contribution \(\exp\!\left(-\tfrac{n}{2\sigma^2}(\mu - \bar{y})^2\right)\) by the prior \(\exp\!\left(-\tfrac{1}{2\sigma_0^2}(\mu - \mu_0)^2\right)\) gives a Gaussian kernel in \(\mu\). Precisions add: the posterior precision of \(\mu\) is \(n/\sigma^2 + 1/\sigma_0^2\), and the posterior mean is the precision-weighted average of \(\bar{y}\) and \(\mu_0\). This is a general result for combining two Gaussian sources of information.
+  </div>
+</div>
+
+<!-- 5.2.3 -->
+<div class="card" id="s523">
+  <h2>5.2.2–5.2.3 The General Gibbs Sampler</h2>
+  <p>For a \(d\)-dimensional parameter vector \(\boldsymbol{\theta} = (\theta_1, \ldots, \theta_d)^T\), the Gibbs sampler at iteration \(k+1\) sequentially draws:</p>
+  <div class="fbox">
+    <p>\(\theta_1^{(k+1)} \sim p(\theta_1 \mid \theta_2^{(k)}, \theta_3^{(k)}, \ldots, \theta_d^{(k)}, \boldsymbol{y})\)</p>
+    <p>\(\theta_2^{(k+1)} \sim p(\theta_2 \mid \theta_1^{(k+1)}, \theta_3^{(k)}, \ldots, \theta_d^{(k)}, \boldsymbol{y})\)</p>
+    <p>\(\quad \vdots\)</p>
+    <p>\(\theta_d^{(k+1)} \sim p(\theta_d \mid \theta_1^{(k+1)}, \theta_2^{(k+1)}, \ldots, \theta_{d-1}^{(k+1)}, \boldsymbol{y})\)</p>
+  </div>
+  <p>Each step conditions on <em>the most recently updated values</em> of all other parameters. Under mild regularity conditions, the chain ultimately yields samples from \(p(\boldsymbol{\theta} \mid \boldsymbol{y})\).</p>
+
+  <h3>Example VI.4 — British Coal Mining Disasters (Change-Point Model)</h3>
+  <p>Dataset: annual counts of severe accidents in British coal mines, 1851–1962 (\(n = 112\)). A change-point at year \(k\) (approximately 1890) is modelled as:</p>
+  <div class="fbox">
+    <p>\(y_i \sim \mathrm{Poisson}(\lambda),\; i = 1, \ldots, k \qquad y_i \sim \mathrm{Poisson}(\mu),\; i = k+1, \ldots, n\)</p>
+    <p>Priors: \(\lambda \sim \mathrm{Gamma}(a_1, b_1)\), \(\mu \sim \mathrm{Gamma}(a_2, b_2)\), \(k \sim \mathrm{Uniform}(1, n)\), \(b_j \sim \mathrm{Gamma}(c_j, d_j)\)</p>
+  </div>
+  <p>The five-dimensional parameter vector \((\lambda, \mu, k, b_1, b_2)\) has tractable full conditionals:</p>
+  <table>
+    <thead><tr><th>Parameter</th><th>Full Conditional</th></tr></thead>
+    <tbody>
+      <tr><td>\(\lambda \mid \cdot\)</td><td>\(\mathrm{Gamma}\!\left(a_1 + \sum_{i=1}^k y_i,\; k + b_1\right)\)</td></tr>
+      <tr><td>\(\mu \mid \cdot\)</td><td>\(\mathrm{Gamma}\!\left(a_2 + \sum_{i=k+1}^n y_i,\; n - k + b_2\right)\)</td></tr>
+      <tr><td>\(b_1 \mid \cdot\)</td><td>\(\mathrm{Gamma}(a_1 + c_1,\; \lambda + d_1)\)</td></tr>
+      <tr><td>\(b_2 \mid \cdot\)</td><td>\(\mathrm{Gamma}(a_2 + c_2,\; \mu + d_2)\)</td></tr>
+      <tr><td>\(k \mid \cdot\)</td><td>Discrete: \(p(k \mid \cdot) \propto \mathcal{L}(y \mid k, \lambda, \mu) = \exp[k(\mu - \lambda)](\lambda/\mu)^{\sum_{i=1}^k y_i}\)</td></tr>
+    </tbody>
+  </table>
+  <div class="nb">
+    <strong>Results (settings: \(a_1 = a_2 = 0.5\), \(c_1 = c_2 = 0\), \(d_1 = d_2 = 1\)):</strong> Posterior mode of \(k\) = 1891 (historically, the year of major safety reforms). Posterior mean of \(\lambda/\mu = 3.42\), 95% CI = [2.48, 4.59], indicating the pre-change accident rate was approximately 3.4× the post-change rate.
+  </div>
+
+  <h3>Example VI.5 — Osteoporosis Study (Bayesian Linear Regression)</h3>
+  <p>Model: \(\mathrm{tbbmc}_i = \beta_0 + \beta_1\,\mathrm{bmi}_i + \varepsilon_i\), \(\varepsilon_i \sim \mathrm{N}(0, \sigma^2)\), \(n = 234\). NI prior: \(p(\beta_0, \beta_1, \sigma^2) \propto \sigma^{-2}\).</p>
+  <div class="fbox">
+    <p>\(p(\sigma^2 \mid \beta_0, \beta_1, \boldsymbol{y}) = \mathrm{Inv}\text{-}\chi^2(n,\; s_\alpha^2)\), \quad \(s_\alpha^2 = \tfrac{1}{n}\sum(y_i - \beta_0 - \beta_1 x_i)^2\)</p>
+    <p>\(p(\beta_0 \mid \sigma^2, \beta_1, \boldsymbol{y}) = \mathrm{N}(r_1,\; \sigma^2/n)\), \quad \(r_1 = \tfrac{1}{n}\sum(y_i - \beta_1 x_i)\)</p>
+    <p>\(p(\beta_1 \mid \sigma^2, \beta_0, \boldsymbol{y}) = \mathrm{N}(r_0,\; \sigma^2/\boldsymbol{x}^T\boldsymbol{x})\), \quad \(r_0 = \sum(y_i - \beta_0)x_i / \boldsymbol{x}^T\boldsymbol{x}\)</p>
+  </div>
+  <div class="warn">
+    <strong>Trace plot vs Index plot — slow mixing:</strong> For \(\sigma^2\), the trace plot closely resembles the index plot from Method of Composition (MoC) — indicating near-independent sampling. For \(\beta_1\), the trace plot shows slow mixing (high autocorrelation), meaning the Gibbs chain takes many steps to explore the posterior as effectively as MoC. This is because \(\beta_0\) and \(\beta_1\) are correlated a posteriori (correlation ≈ −0.99 due to collinearity).
+  </div>
+
+  <h3>Autocorrelation in MCMC Chains</h3>
+  <div class="fbox">
+    <p><strong>Autocorrelation of lag \(m\):</strong> \(\rho_m = \mathrm{corr}(\theta^{(k)},\, \theta^{(k-m)})\)</p>
+  </div>
+  <ul>
+    <li><strong>High autocorrelation</strong> → longer burn-in needed; chain "forgets" its starting point slowly</li>
+    <li><strong>High autocorrelation</strong> → effective sample size (ESS) much smaller than chain length</li>
+    <li>ESS = \(K / (1 + 2\sum_{m=1}^\infty \rho_m)\), where \(K\) = post-burn-in chain length</li>
+  </ul>
+</div>
+
+<!-- 5.2.4 -->
+<div class="card" id="s524">
+  <h2>5.2.4 Remarks — Theoretical Foundations of the Gibbs Sampler</h2>
+
+  <h3>Full Conditionals Determine the Joint Distribution</h3>
+  <p>By Besag (1974) and Hammersley &amp; Clifford (1971), under mild positivity conditions the full conditionals uniquely determine the joint distribution. For the bivariate case (Proof sketch):</p>
+  <div class="fbox">
+    <p>1. \(p(\theta_1, \theta_2) = p(\theta_2 \mid \theta_1)\,p_1(\theta_1) = p(\theta_1 \mid \theta_2)\,p_2(\theta_2)\)</p>
+    <p>2. Dividing: \(\dfrac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)} = \dfrac{p_2(\theta_2)}{p_1(\theta_1)}\), which on integrating over \(\theta_2\) gives \(\dfrac{1}{p_1(\theta_1)} = \int \dfrac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)}\,d\theta_2\)</p>
+    <p>3. Therefore: \(p(\theta_1, \theta_2) = p(\theta_2 \mid \theta_1)\Big/\int \dfrac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)}\,d\theta_2\)</p>
+  </div>
+  <div class="warn">
+    <strong>Existence is not enough:</strong> That the joint distribution exists does not by itself determine it. One must also verify that the conditionals are consistent (i.e., they actually arise from some joint distribution). In the Gibbs sampler, the fixed-point equation \(p_1(\theta_1) = \int K(\nu_1, \theta_1)\,p_1(\nu_1)\,d\nu_1\) with \(K(\nu_1, \theta_1) = \int p(\theta_1 \mid \theta_2)\,p(\theta_2 \mid \nu_1)\,d\theta_2\) must be satisfied.
+  </div>
+
+  <h3>Transition Kernel</h3>
+  <p>The <strong>transition kernel</strong> is the engine moving the chain from \(\boldsymbol{\theta}^{(k)}\) to \(\boldsymbol{\theta}^{(k+1)}\). For the \(d\)-dimensional Gibbs sampler:</p>
+  <div class="fbox">
+    <p>\[K(\boldsymbol{\theta}, \boldsymbol{\phi}) = p(\phi_1 \mid \theta_2, \ldots, \theta_d) \times p(\phi_2 \mid \phi_1, \theta_3, \ldots, \theta_d) \times \cdots \times p(\phi_d \mid \phi_1, \ldots, \phi_{d-1})\]</p>
+  </div>
+  <p>In the bivariate case, the marginal transition kernel is \(K_1(\nu_1, \theta_1) = \int p(\theta_1 \mid \theta_2)\,p(\theta_2 \mid \nu_1)\,d\theta_2\), representing the probability of moving from \(\nu_1\) to \(\theta_1\) via all possible intermediate values of \(\theta_2\).</p>
+</div>
+
+<!-- 5.2.5 -->
+<div class="card" id="s525">
+  <h2>5.2.5–5.2.6 Gibbs Sampler Variants and Slice Sampler</h2>
+
+  <h3>Sampling the Full Conditionals</h3>
+  <p>When a full conditional has a recognizable standard form, classical samplers are used. When it does not, general-purpose algorithms are applied:</p>
+  <ul>
+    <li>SAS® GENMOD/LIFEREG/PHREG: <strong>ARMS algorithm</strong> (Adaptive Rejection Metropolis Sampling)</li>
+    <li>WinBUGS: uses a variety of samplers depending on the full conditional's shape</li>
+  </ul>
+
+  <h3>Variants of the Basic Gibbs Sampler</h3>
+  <table>
+    <thead><tr><th>Variant</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Deterministic (systematic) scan</strong></td><td>All \(d\) dimensions visited in a fixed cyclic order</td></tr>
+      <tr><td><strong>Random-scan</strong></td><td>At each iteration, one dimension chosen at random</td></tr>
+      <tr><td><strong>Reversible scan</strong></td><td>Dimensions visited in order, then in reversed order</td></tr>
+      <tr><td><strong>Block Gibbs sampler</strong></td><td>Parameters split into \(m\) blocks; entire blocks sampled jointly — can dramatically accelerate convergence by capturing within-block correlations</td></tr>
+    </tbody>
+  </table>
+  <div class="nb">
+    <strong>Block Gibbs for linear regression:</strong> Instead of updating \(\sigma^2\), \(\beta_0\), \(\beta_1\) one at a time, one can sample \((\beta_0, \beta_1)\) jointly from \(p(\beta_0, \beta_1 \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}_2(\hat{\boldsymbol{\beta}},\, \sigma^2(\boldsymbol{X}^T\boldsymbol{X})^{-1})\) and update \(\sigma^2\) separately. This removes the high posterior correlation between \(\beta_0\) and \(\beta_1\) that causes slow mixing when updated individually.
+  </div>
+
+  <h3>5.2.6 The Slice Sampler</h3>
+  <p>The <strong>slice sampler</strong> converts the problem of sampling from a density \(f(x)\) on \([a,b]\) into sampling from a bivariate uniform distribution on the region \(A = \{(x, y) : 0 < y < f(x)\}.\)</p>
+  <ul>
+    <li><em>Auxiliary variable:</em> \(y\) is introduced artificially; marginalizing over \(y\) recovers \(f(x)\).</li>
+    <li>For the <strong>unimodal case</strong> (a bivariate Gibbs algorithm):
+      <ul>
+        <li>\(y \mid x \sim \mathrm{Uniform}(0,\, f(x))\)</li>
+        <li>\(x \mid y \sim \mathrm{Uniform}(\min_y, \max_y)\), where the interval \(S(y) = [\min_y, \max_y]\) is the <em>slice</em> at level \(y\)</li>
+      </ul>
+    </li>
+    <li>For the <strong>multimodal case</strong>, slices \(S(y)\) become unions of intervals rather than single intervals.</li>
+  </ul>
+  <div class="fbox">
+    <strong>Example VI.6 — Slice sampling the standard normal:</strong>
+    <p>\(y \mid x \sim \mathrm{Uniform}\!\left(0,\; e^{-x^2/2}\right)\)</p>
+    <p>\(x \mid y \sim \mathrm{Uniform}\!\left(-\sqrt{-2\log y},\; \sqrt{-2\log y}\right) \quad \Rightarrow \quad S(y) = [-\sqrt{-2\log y},\, \sqrt{-2\log y}]\)</p>
+  </div>
+  <div class="nb">
+    <strong>Implementation:</strong> WinBUGS implements the slice sampler for the finite-support case. The key insight is that the area beneath a density curve is uniform — slicing at a uniformly chosen height gives a uniform draw from the corresponding \(x\)-interval, which marginalizes back to the target density.
+  </div>
+</div>
+
+<!-- 5.3 -->
+<div class="card" id="s53">
+  <h2>5.3 The Metropolis(-Hastings) Algorithm</h2>
+  <p>The <strong>Metropolis-Hastings (MH) algorithm</strong> is a general MCMC technique that does <em>not</em> require full conditional distributions to be of standard form — making it far more widely applicable than the Gibbs sampler.</p>
+  <ul>
+    <li>Metropolis algorithm: Metropolis et al. (1953) — symmetric proposal density</li>
+    <li>Metropolis-Hastings algorithm: Hastings (1970) — asymmetric proposal density</li>
+    <li>Gained wide use in Bayesian statistics after Gelfand &amp; Smith (1990)</li>
+    <li>Further extended by Green (1995): <em>Reversible Jump MCMC</em></li>
+  </ul>
+
+  <h3>5.3.1 The Metropolis Algorithm</h3>
+  <p>Given the chain is at \(\boldsymbol{\theta}^{(k)}\), the Metropolis algorithm generates \(\boldsymbol{\theta}^{(k+1)}\) as follows:</p>
+  <div class="fbox">
+    <p><strong>Step 1:</strong> Sample a candidate \(\boldsymbol{\theta}^* \sim q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})\), where \(q\) is a <em>symmetric</em> proposal density: \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}) = q(\boldsymbol{\theta} \mid \boldsymbol{\theta}^*)\).</p>
+    <p><strong>Step 2:</strong> Set \(\boldsymbol{\theta}^{(k+1)} = \boldsymbol{\theta}^*\) with probability \(\alpha(\boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^*)\), else \(\boldsymbol{\theta}^{(k+1)} = \boldsymbol{\theta}^{(k)}\).</p>
+    <p>\[\alpha(\boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^*) = \min\!\left(r,\; 1\right), \qquad r = \frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})}\]</p>
+  </div>
+
+  <div class="nb">
+    <strong>Interpretation of the acceptance rule:</strong> If the candidate \(\boldsymbol{\theta}^*\) has higher posterior density than the current point (\(r \geq 1\)), it is always accepted. If it has lower posterior density (\(r < 1\)), it is accepted with probability \(r\) (the ratio of posterior densities). This probabilistic acceptance allows the chain to escape local modes and explore the full posterior. When rejected, the chain stays at \(\boldsymbol{\theta}^{(k)}\) — recording the <em>current point again</em> (unlike the AR algorithm, which simply tries again).
+  </div>
+
+  <h3>Effect of Proposal Scale — Example VI.7</h3>
+  <p>Proposal: \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = \mathrm{N}_2(\boldsymbol{\theta}^{(k)}, \boldsymbol{\Sigma})\) with \(\boldsymbol{\Sigma} = \mathrm{diag}(\delta^2, \delta^2)\).</p>
+  <table>
+    <thead><tr><th>Proposal variance \(\delta^2\)</th><th>Acceptance rate</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>\(\delta^2 = 0.03\) (appropriate)</td><td>≈ 40%</td><td>Good exploration; accurate marginal distributions</td></tr>
+      <tr><td>\(\delta^2 = 0.001\) (too small)</td><td>≈ 84%</td><td>Nearly all proposals accepted, but tiny steps — very slow mixing; poor approximation</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">
+    <strong>Optimal acceptance rates (tuning rule):</strong> For a 1-dimensional target, the optimal acceptance rate is approximately 45%. For high-dimensional targets (\(d \gg 1\)), it is approximately 23.4%. WinBUGS auto-tunes in the first 4,000 iterations to achieve 20–40%; SAS® PROC MCMC uses multiple adaptive loops.
+  </div>
+
+  <h3>5.3.2 The Metropolis-Hastings Algorithm</h3>
+  <p>Generalizes the Metropolis algorithm to <em>asymmetric</em> proposal densities \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) \neq q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*)\):</p>
+  <div class="fbox">
+    <p>\[\alpha(\boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^*) = \min\!\left(\frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\; q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*)}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\; q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})},\; 1\right)\]</p>
+  </div>
+  <p>The additional ratio \(q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*) / q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})\) corrects for the asymmetry of the proposal: if the proposal favors moving from \(\boldsymbol{\theta}^{(k)}\) to \(\boldsymbol{\theta}^*\) more than the reverse, the acceptance probability is reduced accordingly.</p>
+
+  <div class="nb">
+    <strong>Reversibility condition:</strong> The MH algorithm constructs a chain satisfying the <em>detailed balance condition</em>: the probability flux from \(\boldsymbol{\theta}\) to \(\boldsymbol{\phi}\) equals the flux from \(\boldsymbol{\phi}\) to \(\boldsymbol{\theta}\):
+    \[p(\boldsymbol{\theta} \mid \boldsymbol{y})\,K(\boldsymbol{\theta}, \boldsymbol{\phi}) = p(\boldsymbol{\phi} \mid \boldsymbol{y})\,K(\boldsymbol{\phi}, \boldsymbol{\theta})\]
+    A chain satisfying this is called <em>reversible</em>. The MH acceptance probability is precisely chosen (by Hastings, 1970) to satisfy this condition optimally.
+  </div>
+
+  <h3>Gibbs Sampler as a Special Case of MH</h3>
+  <p>Define the proposal kernel for the \(j\)-th Gibbs step as \(q_j^G(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})\) when \(\boldsymbol{\theta}_{-j}^* = \boldsymbol{\theta}_{-j}^{(k)}\) (zero otherwise). Substituting into the MH ratio:</p>
+  <div class="fbox">
+    <p>\[r = \frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\;p(\theta_j^{(k)} \mid \boldsymbol{\theta}_{-j}^*, \boldsymbol{y})}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\;p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})} = \frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\;/\;p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\;/\;p(\theta_j^{(k)} \mid \boldsymbol{\theta}_{-j}^*, \boldsymbol{y})} = 1\]</p>
+  </div>
+  <p>The ratio equals 1, so <strong>every Gibbs proposal is accepted</strong>. The Gibbs sampler is therefore a special case of MH with acceptance rate identically equal to 1.</p>
+
+  <h3>MH vs AR Algorithm</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>Accept-Reject (AR)</th><th>Metropolis-Hastings (MH)</th></tr></thead>
+    <tbody>
+      <tr><td>Instrumental density</td><td>✓ Used to propose</td><td>✓ Used as proposal</td></tr>
+      <tr><td>Acceptance/rejection</td><td>✓ Yes</td><td>✓ Yes</td></tr>
+      <tr><td>Sample dependence</td><td><strong>Independent</strong> samples</td><td><strong>Dependent</strong> (Markov chain) samples</td></tr>
+      <tr><td>Rejected proposals</td><td>Discarded entirely; try again</td><td>Rejected → <strong>current point kept again</strong> in chain</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 5.3.4 -->
+<div class="card" id="s534">
+  <h2>5.3.4 Review of Metropolis-Hastings Approaches</h2>
+
+  <h3>Random-Walk MH (RWMH)</h3>
+  <p>Proposal: \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = q(\boldsymbol{\theta}^* - \boldsymbol{\theta}^{(k)})\), symmetric in the increment. Common choices:</p>
+  <ul>
+    <li><strong>Multivariate normal</strong>: \(\mathrm{N}_d(\boldsymbol{\theta}^{(k)}, \boldsymbol{\Sigma})\) — used in WinBUGS and SAS® procedures</li>
+    <li><strong>Multivariate \(t\)-distribution</strong>: SAS® PROC MCMC for long-tailed posteriors</li>
+  </ul>
+  <p>Optimal acceptance rates: 45% for \(d = 1\); 23.4% for \(d \gg 1\).</p>
+
+  <h3>Independent MH</h3>
+  <p>Proposal does <em>not</em> depend on the current position: \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = q(\boldsymbol{\theta}^*)\). A candidate \(\boldsymbol{\theta}^*\) is accepted when \(p(\boldsymbol{\theta}^* \mid \boldsymbol{y})/q(\boldsymbol{\theta}^*) > p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})/q(\boldsymbol{\theta}^{(k)})\). Key results:</p>
+  <ul>
+    <li>If \(p(\boldsymbol{\theta} \mid \boldsymbol{y}) \leq A\,q(\boldsymbol{\theta})\) for all \(\boldsymbol{\theta}\), the chain enjoys excellent convergence (geometric ergodicity)</li>
+    <li>Under this condition, the expected acceptance rate <em>exceeds</em> that of the AR algorithm</li>
+  </ul>
+
+  <h3>Block MH (Metropolis-within-Gibbs)</h3>
+  <p>Combines Gibbs and MH: parameters are divided into blocks; within each block, a MH step is used when the full conditional is non-standard. WinBUGS uses this strategy (regression coefficients in one block, variance parameters in another). SAS® PROC MCMC allows user-specified blocks.</p>
+
+  <h3>Reversible Jump MCMC (RJMCMC)</h3>
+  <p>A special case of MH that allows jumps <em>between parameter spaces of different dimension</em> — the "trans-dimensional" case. Proposed by Green (1995). Key construction: a bijective map between the spaces of different dimensions is used, and the MH ratio is computed with the appropriate Jacobian to ensure the detailed balance condition holds.</p>
+</div>
+
+<!-- 5.4 -->
+<div class="card" id="s54">
+  <h2>5.4 Justification of MCMC Approaches</h2>
+
+  <h3>Ergodicity — The Convergence Guarantee</h3>
+  <p>For an MCMC chain to converge to the target posterior, it must be <strong>ergodic</strong>, which requires:</p>
+  <table>
+    <thead><tr><th>Property</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Irreducibility</strong></td><td>The chain can reach every region of positive posterior probability from any starting point</td></tr>
+      <tr><td><strong>Aperiodicity</strong></td><td>The chain has no cyclic behavior (it does not return to a state only at multiples of some fixed period)</td></tr>
+      <tr><td><strong>Positive recurrence</strong></td><td>The chain visits every region infinitely often and the expected return time to any region is finite</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Autocovariance and Autocorrelation</h3>
+  <div class="fbox">
+    <p>Autocovariance of lag \(m\): \(\tau_m = \mathrm{cov}(t(\boldsymbol{\theta}^{(k)}),\, t(\boldsymbol{\theta}^{(k+m)}))\)</p>
+    <p>Autocorrelation of lag \(m\): \(\rho_m = \tau_m / \tau_0\)</p>
+  </div>
+  <p>Even though consecutive chain elements are conditionally independent given the immediate past (Markov property), they are <em>unconditionally dependent</em>.</p>
+
+  <h3>Ergodic Theorems for Markov Chains</h3>
+  <div class="fbox">
+    <p><strong>Markov Chain LLN:</strong> For an ergodic chain with stationary distribution \(\pi\):
+    \[\frac{1}{K}\sum_{k=1}^K t(\boldsymbol{\theta}^{(k)}) \xrightarrow{K \to \infty} E_\pi[t(\boldsymbol{\theta})]\]</p>
+    <p><strong>Markov Chain CLT:</strong> For a uniformly (or geometrically) ergodic chain:
+    \[\sqrt{K}\left(\bar{t}_K - E[t(\boldsymbol{\theta})]\right) \xrightarrow{d} \mathrm{N}(0, \pi^2)\]
+    where the <em>asymptotic variance</em> is:
+    \[\pi^2 = \tau_0\!\left[1 + 2\sum_{m=1}^\infty \rho_m\right]\]</p>
+  </div>
+  <div class="nb">
+    <strong>Interpretation of \(\pi^2\):</strong> The asymptotic variance \(\pi^2\) equals the variance \(\tau_0\) multiplied by \((1 + 2\sum \rho_m)\). For an independent sample all \(\rho_m = 0\), so \(\pi^2 = \tau_0\) (minimal variance). For a correlated chain, \(\pi^2 > \tau_0\): the effective sample size is \(K_{\mathrm{eff}} = K / (1 + 2\sum \rho_m) < K\). High autocorrelation inflates the variance of MCMC estimates.
+  </div>
+
+  <h3>MH Algorithm Creates a Reversible Chain — Proof (Discrete Case)</h3>
+  <p>Let \(\pi_i = p(\theta = x_i)\) and \(q_{ij}\) be the proposal probability from \(x_i\) to \(x_j\). The acceptance probability is \(\alpha_{ij} = \min(1,\, \pi_j q_{ji} / \pi_i q_{ij})\). The transition probability is \(p_{ij} = \alpha_{ij} q_{ij}\). Detailed balance:</p>
+  <div class="fbox">
+    <p>\[\pi_i p_{ij} = \pi_i \alpha_{ij} q_{ij} = \pi_i \min\!\left(1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}}\right) q_{ij} = \min(\pi_i q_{ij}, \pi_j q_{ji}) = \pi_j p_{ji}\]</p>
+  </div>
+  <p>Therefore \(\pi\) is the stationary distribution: the MH algorithm produces a Markov chain with the target distribution as its stationary distribution. ✓</p>
+</div>
+
+<!-- 5.5 -->
+<div class="card" id="s55">
+  <h2>5.5 Choice of Sampler — Example VI.9 (Caries Study)</h2>
+  <p>Data: \(n = 500\) children; binary outcome (caries experience CE); covariates: gender and x-coordinate. Model: Bayesian logistic regression with \(\mathrm{N}(0, 100^2)\) priors on regression coefficients. No standard full conditionals → MH required.</p>
+  <p>Three implementations compared:</p>
+  <table>
+    <thead><tr><th>Program</th><th>Algorithm</th><th>Strategy</th></tr></thead>
+    <tbody>
+      <tr><td>Self-written R</td><td>Full conditional on grid + ICDF</td><td>Grid-based; exact up to grid resolution</td></tr>
+      <tr><td>WinBUGS</td><td>Multivariate MH (blocking on)</td><td>Block proposal for regression coefficients</td></tr>
+      <tr><td>SAS® PROC MCMC</td><td>Random-Walk MH</td><td>Component-wise tuned proposals</td></tr>
+    </tbody>
+  </table>
+  <div class="nb">
+    <strong>Conclusions:</strong> Posterior means/medians from all three samplers are close to the MLE. The Monte Carlo Standard Error (MCSE) differs considerably: R and WinBUGS achieved much smaller MCSE than SAS® (0.006–0.010 vs 0.021–0.032 for the intercept), indicating substantially higher efficiency. The clinical conclusions were identical across all three. <em>Different samplers can have very different efficiency for the same model.</em>
+  </div>
+</div>
+
+<!-- 5.6 -->
+<div class="card" id="s56">
+  <h2>5.6 The Reversible Jump MCMC Algorithm</h2>
+  <p><strong>RJMCMC</strong> (Green, 1995) extends the standard MH algorithm to target distributions on spaces of <em>varying dimension</em> — the trans-dimensional case. It constructs a Markov chain that moves both <em>within</em> a parameter space of fixed dimension and <em>between</em> spaces of different dimensions.</p>
+
+  <h3>Key Applications</h3>
+  <ul>
+    <li>Mixture models with an unknown number of components</li>
+    <li>Change-point problems with unknown number/location of change-points</li>
+    <li><strong>Bayesian variable selection</strong> — most important application in practice</li>
+    <li>Analysis of quantitative trait locus (QTL) data</li>
+    <li>Hidden Markov models with unknown number of states</li>
+  </ul>
+
+  <h3>Core Idea</h3>
+  <p>To move between model \(\mathcal{M}_1\) (dimension \(d_1\)) and \(\mathcal{M}_2\) (dimension \(d_2 > d_1\)): augment the lower-dimensional model with auxiliary random variables \(\boldsymbol{u}\) of dimension \(d_2 - d_1\) to create a <em>bijective</em> (invertible) map \((\boldsymbol{\theta}_1, \boldsymbol{u}) \leftrightarrow \boldsymbol{\theta}_2\). The MH acceptance ratio includes the Jacobian of this map, ensuring the detailed balance condition holds.</p>
+
+  <h3>Example VI.10 — Poisson vs Negative Binomial (Caries Study)</h3>
+  <p>Data: dmft-index (count of decayed/missing/filled teeth) for all children. Mean = 2.24, variance = 7.93 → <strong>overdispersion</strong> (variance ≫ mean), suggesting the Poisson model is inadequate.</p>
+  <p>Candidate models:</p>
+  <div class="fbox">
+    <p><strong>Poisson:</strong> \(\mathcal{M}_1 = (1, \lambda)\) with \(\lambda > 0\); mean = variance = \(\lambda\)</p>
+    <p><strong>Negative Binomial:</strong> \(\mathcal{M}_2 = (2, (\lambda, \phi))\) with \(\phi > 0\); mean = \(\lambda\), variance = \(\lambda(1 + \phi)\)</p>
+    <p>Parameter \(\phi\) measures overdispersion; \(\phi = 0\) collapses the NB to Poisson.</p>
+  </div>
+  <p>Four types of RJMCMC moves:</p>
+  <table>
+    <thead><tr><th>Move type</th><th>From → To</th></tr></thead>
+    <tbody>
+      <tr><td>Classical within-model</td><td>Poisson → Poisson (updates \(\lambda\))</td></tr>
+      <tr><td>Trans-dimensional (birth)</td><td>Poisson → Negative Binomial (adds \(\phi\))</td></tr>
+      <tr><td>Trans-dimensional (death)</td><td>Negative Binomial → Poisson (removes \(\phi\))</td></tr>
+      <tr><td>Classical within-model</td><td>Negative Binomial → Negative Binomial (updates \(\lambda, \phi\))</td></tr>
+    </tbody>
+  </table>
+  <div class="nb">
+    <strong>Results:</strong> Across four different prior settings, the chain spent 56–74% of time in the Negative Binomial model, with proposed moves from Poisson to NB always accepted. Trans-dimensional moves comprised 32–55% of all moves. Conclusion: the data strongly favor the Negative Binomial model, consistent with the observed overdispersion.
+  </div>
+</div>
+
+<!-- MCQ SECTION -->
+<div class="sec-title" id="mcq">✏️ 40 Multiple Choice Questions</div>
+
+<div class="score-bar">
+  <div>
+    <span>Score: </span><span id="score-display">0 / 0</span>
+    <span style="margin-left:14px;font-size:.82rem;">(out of 40 questions)</span>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+</div>
+
+<!-- Q1 -->
+<div class="qblock" id="q1">
+  <div class="qnum">Question 1 of 40 — MCMC Motivation</div>
+  <div class="qtext">The primary computational challenge that motivates MCMC methods is the difficulty of computing:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">A. The likelihood \(L(\boldsymbol{\theta} \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q1',this)">B. The normalizing constant \(p(\boldsymbol{y}) = \int L(\boldsymbol{\theta} \mid \boldsymbol{y})\,p(\boldsymbol{\theta})\,d\boldsymbol{\theta}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">C. The prior distribution \(p(\boldsymbol{\theta})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">D. The posterior mode via optimization</button>
+  </div>
+  <div class="fb" id="q1-fb"></div>
+</div>
+
+<!-- Q2 -->
+<div class="qblock" id="q2">
+  <div class="qnum">Question 2 of 40 — Gibbs History</div>
+  <div class="qtext">The Gibbs sampler was originally introduced by Geman &amp; Geman (1984) for which application, and later popularized in Bayesian statistics by whom?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">A. Finance; Hastings (1970)</button>
+    <button class="opt" data-correct="true" onclick="answer('q2',this)">B. Image processing; Gelfand &amp; Smith (1990)</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">C. Genetics; Green (1995)</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">D. Clinical trials; Besag (1974)</button>
+  </div>
+  <div class="fb" id="q2-fb"></div>
+</div>
+
+<!-- Q3 -->
+<div class="qblock" id="q3">
+  <div class="qnum">Question 3 of 40 — Full Conditionals</div>
+  <div class="qtext">In the bivariate Gibbs sampler for \((\theta_1, \theta_2)\), starting from \(\theta_2^{(k)}\), the first sub-step at iteration \(k+1\) draws:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q3',this)">A. \(\theta_1^{(k+1)} \sim p(\theta_1 \mid \theta_2^{(k)}, \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">B. \(\theta_1^{(k+1)} \sim p(\theta_1 \mid \theta_2^{(k+1)}, \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">C. \(\theta_1^{(k+1)} \sim p(\theta_1 \mid \boldsymbol{y})\) (marginal)</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">D. \(\theta_1^{(k+1)} \sim p(\theta_1, \theta_2^{(k)} \mid \boldsymbol{y})\) (joint)</button>
+  </div>
+  <div class="fb" id="q3-fb"></div>
+</div>
+
+<!-- Q4 -->
+<div class="qblock" id="q4">
+  <div class="qnum">Question 4 of 40 — Markov Property</div>
+  <div class="qtext">The Markov property of the Gibbs chain \(\{\boldsymbol{\theta}^{(k)}\}\) states that:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">A. \(p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^{(k-1)}, \ldots) = p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q4',this)">B. \(p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^{(k-1)}, \ldots, \boldsymbol{y}) = p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{y})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">C. \(\boldsymbol{\theta}^{(k+1)}\) and \(\boldsymbol{\theta}^{(k)}\) are independent given \(\boldsymbol{y}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">D. \(p(\boldsymbol{\theta}^{(k+1)} \mid \boldsymbol{\theta}^{(k)}, \boldsymbol{y})\) is the same for all \(k\) only if the chain has converged</button>
+  </div>
+  <div class="fb" id="q4-fb"></div>
+</div>
+
+<!-- Q5 -->
+<div class="qblock" id="q5">
+  <div class="qnum">Question 5 of 40 — Burn-in</div>
+  <div class="qtext">The "burn-in" period of an MCMC chain refers to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">A. A warm-up where the proposal variance is calibrated only — these iterations can be kept</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">B. The period after convergence when the chain explores the posterior</button>
+    <button class="opt" data-correct="true" onclick="answer('q5',this)">C. The initial portion of the chain that depends heavily on starting values and must be discarded</button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">D. The number of rejected proposals in the Metropolis-Hastings algorithm</button>
+  </div>
+  <div class="fb" id="q5-fb"></div>
+</div>
+
+<!-- Q6 -->
+<div class="qblock" id="q6">
+  <div class="qnum">Question 6 of 40 — Zigzag Pattern</div>
+  <div class="qtext">In the Gibbs sampler for a bivariate parameter \((\theta_1, \theta_2)\), the trajectory in parameter space shows a characteristic zigzag pattern because:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">A. The proposal density is asymmetric</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">B. Some proposals are rejected</button>
+    <button class="opt" data-correct="true" onclick="answer('q6',this)">C. Each step updates only one parameter at a time, so moves are strictly horizontal or vertical</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">D. The chain oscillates between two posterior modes</button>
+  </div>
+  <div class="fb" id="q6-fb"></div>
+</div>
+
+<!-- Q7 -->
+<div class="qblock" id="q7">
+  <div class="qnum">Question 7 of 40 — SAP Study Full Conditionals (NI Prior)</div>
+  <div class="qtext">For the normal likelihood with NI prior, the full conditional of \(\sigma^2\) given \(\mu\) and data is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">A. \(\mathrm{N}(\bar{y},\; \sigma^2/n)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">B. \(\mathrm{Gamma}(n/2,\; ns_\mu^2/2)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q7',this)">C. \(\mathrm{Inv}\text{-}\chi^2\!\left(n,\; s_\mu^2\right)\) where \(s_\mu^2 = \tfrac{1}{n}\sum(y_i - \mu)^2\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">D. \(\mathrm{Inv}\text{-}\chi^2(n-1,\; s^2)\)</button>
+  </div>
+  <div class="fb" id="q7-fb"></div>
+</div>
+
+<!-- Q8 -->
+<div class="qblock" id="q8">
+  <div class="qnum">Question 8 of 40 — Mixed Distribution Gibbs</div>
+  <div class="qtext">In Example VI.2, the Gibbs sampler is applied to sample from a joint distribution \(f(x, y)\) where \(x\) is discrete and \(y\) is continuous. The full conditional \(f(x \mid y)\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">A. \(\mathrm{Beta}(x + \alpha, n - x + \beta)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q8',this)">B. \(\mathrm{Binomial}(n, y)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">C. \(\mathrm{Poisson}(ny)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">D. \(\mathrm{Uniform}(0, n)\)</button>
+  </div>
+  <div class="fb" id="q8-fb"></div>
+</div>
+
+<!-- Q9 -->
+<div class="qblock" id="q9">
+  <div class="qnum">Question 9 of 40 — Informative Prior Full Conditional for μ</div>
+  <div class="qtext">For the normal likelihood with independent informative prior \(\mu \sim \mathrm{N}(\mu_0, \sigma_0^2)\), the posterior precision of \(\mu\) given \(\sigma^2\) and data is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">A. \(n / \sigma^2\) only (data contribution)</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">B. \(1/\sigma_0^2\) only (prior contribution)</button>
+    <button class="opt" data-correct="true" onclick="answer('q9',this)">C. \(n/\sigma^2 + 1/\sigma_0^2\) (data + prior precisions add)</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">D. \(\sqrt{n/\sigma^2 \cdot 1/\sigma_0^2}\) (geometric mean)</button>
+  </div>
+  <div class="fb" id="q9-fb"></div>
+</div>
+
+<!-- Q10 -->
+<div class="qblock" id="q10">
+  <div class="qnum">Question 10 of 40 — General Gibbs Sampler Order</div>
+  <div class="qtext">In the general \(d\)-dimensional Gibbs sampler, when sampling \(\theta_j^{(k+1)}\) at iteration \(k+1\), the conditioning values for \(\theta_1, \ldots, \theta_{j-1}\) are:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">A. The values from the previous iteration: \(\theta_1^{(k)}, \ldots, \theta_{j-1}^{(k)}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q10',this)">B. The most recently updated values from the current iteration: \(\theta_1^{(k+1)}, \ldots, \theta_{j-1}^{(k+1)}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">C. The posterior means estimated from a pilot run</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">D. Random draws from the prior</button>
+  </div>
+  <div class="fb" id="q10-fb"></div>
+</div>
+
+<!-- Q11 -->
+<div class="qblock" id="q11">
+  <div class="qnum">Question 11 of 40 — Coal Mining Change-Point Model</div>
+  <div class="qtext">In Example VI.4 (British coal mining disasters), the posterior mode of the change-point \(k\) was found to be approximately 1891. The full conditional of \(k\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">A. A continuous Gamma distribution</button>
+    <button class="opt" data-correct="true" onclick="answer('q11',this)">B. A discrete distribution proportional to \(\exp[k(\mu - \lambda)](\lambda/\mu)^{\sum_{i=1}^k y_i}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">C. A Poisson distribution with mean \(\lambda\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">D. A Uniform distribution on \(\{1, \ldots, n\}\) regardless of other parameters</button>
+  </div>
+  <div class="fb" id="q11-fb"></div>
+</div>
+
+<!-- Q12 -->
+<div class="qblock" id="q12">
+  <div class="qnum">Question 12 of 40 — Slow Mixing</div>
+  <div class="qtext">In Example VI.5 (Osteoporosis Gibbs sampler), \(\beta_1\) shows slow mixing while \(\sigma^2\) does not. The most likely cause for the slow mixing of \(\beta_1\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">A. The prior on \(\beta_1\) is too diffuse</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">B. \(\beta_1\) has a heavy-tailed posterior</button>
+    <button class="opt" data-correct="true" onclick="answer('q12',this)">C. \(\beta_0\) and \(\beta_1\) are highly correlated a posteriori (≈ −0.99), so updating them individually is inefficient</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">D. The burn-in period was too short</button>
+  </div>
+  <div class="fb" id="q12-fb"></div>
+</div>
+
+<!-- Q13 -->
+<div class="qblock" id="q13">
+  <div class="qnum">Question 13 of 40 — Autocorrelation of Lag \(m\)</div>
+  <div class="qtext">The autocorrelation of lag \(m\) of an MCMC chain \(\{\theta^{(k)}\}\) is defined as:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">A. \(\mathrm{cov}(\theta^{(k)}, \theta^{(k+1)})\) for any \(k\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">B. The variance of \(\theta^{(k)}\) divided by the variance of \(\theta^{(k+m)}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q13',this)">C. \(\rho_m = \mathrm{corr}(\theta^{(k)}, \theta^{(k-m)})\) — the correlation between chain elements \(m\) steps apart</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">D. The proportion of the chain where two consecutive values differ by less than \(m\)</button>
+  </div>
+  <div class="fb" id="q13-fb"></div>
+</div>
+
+<!-- Q14 -->
+<div class="qblock" id="q14">
+  <div class="qnum">Question 14 of 40 — Effect of High Autocorrelation</div>
+  <div class="qtext">When an MCMC chain has high autocorrelation, which of the following statements is TRUE?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">A. A shorter burn-in period is needed since the chain converges faster</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">B. The acceptance rate in the MH algorithm must be increased</button>
+    <button class="opt" data-correct="true" onclick="answer('q14',this)">C. A longer chain is needed because the effective sample size is much smaller than the chain length</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">D. The chain has converged to the target distribution</button>
+  </div>
+  <div class="fb" id="q14-fb"></div>
+</div>
+
+<!-- Q15 -->
+<div class="qblock" id="q15">
+  <div class="qnum">Question 15 of 40 — Besag's Theorem</div>
+  <div class="qtext">Besag's (1974) key result — that the full conditional distributions determine the joint distribution — implies for the Gibbs sampler that:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">A. Only the marginal distributions are needed to run the Gibbs sampler</button>
+    <button class="opt" data-correct="true" onclick="answer('q15',this)">B. Knowing all full conditionals \(p(\theta_j \mid \boldsymbol{\theta}_{-j}, \boldsymbol{y})\) is sufficient to recover and sample from the joint posterior</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">C. The joint distribution can always be computed analytically from the full conditionals</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">D. The Gibbs sampler always converges faster than the Metropolis algorithm</button>
+  </div>
+  <div class="fb" id="q15-fb"></div>
+</div>
+
+<!-- Q16 -->
+<div class="qblock" id="q16">
+  <div class="qnum">Question 16 of 40 — Block Gibbs Sampler</div>
+  <div class="qtext">The main advantage of the Block Gibbs sampler over the standard (component-wise) Gibbs sampler is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">A. It requires fewer full conditional distributions to be specified</button>
+    <button class="opt" data-correct="true" onclick="answer('q16',this)">B. It samples correlated parameters jointly, which can substantially reduce autocorrelation and speed up convergence</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">C. It always achieves an acceptance rate of exactly 100%</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">D. It does not require a burn-in period</button>
+  </div>
+  <div class="fb" id="q16-fb"></div>
+</div>
+
+<!-- Q17 -->
+<div class="qblock" id="q17">
+  <div class="qnum">Question 17 of 40 — Slice Sampler Auxiliary Variable</div>
+  <div class="qtext">In the slice sampler, the auxiliary variable \(y\) is introduced so that the bivariate distribution of \((x, y)\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">A. \(\mathrm{N}(0, 1)\) marginally in \(x\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q17',this)">B. Uniform on the region \(\{(x, y) : 0 < y < f(x)\}\), so that the marginal distribution of \(x\) is proportional to \(f(x)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">C. Uniform on \([a, b] \times [0, 1]\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">D. A product of two independent uniform distributions</button>
+  </div>
+  <div class="fb" id="q17-fb"></div>
+</div>
+
+<!-- Q18 -->
+<div class="qblock" id="q18">
+  <div class="qnum">Question 18 of 40 — Slice Sampler Full Conditionals</div>
+  <div class="qtext">For the unimodal slice sampler, the conditional distribution \(x \mid y\) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">A. \(\mathrm{N}(0, 1)\) truncated to the slice \(S(y)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q18',this)">B. \(\mathrm{Uniform}(\min_y, \max_y)\) where \(S(y) = [\min_y, \max_y]\) is the slice at level \(y\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">C. \(\mathrm{Uniform}(0, f(x))\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">D. Proportional to \(f(x)\) restricted to \(x > y\)</button>
+  </div>
+  <div class="fb" id="q18-fb"></div>
+</div>
+
+<!-- Q19 -->
+<div class="qblock" id="q19">
+  <div class="qnum">Question 19 of 40 — Metropolis vs Metropolis-Hastings</div>
+  <div class="qtext">The key structural difference between the Metropolis algorithm (1953) and the Metropolis-Hastings algorithm (1970) is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">A. MH does not use a proposal density; Metropolis does</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">B. Metropolis can handle multi-dimensional parameters; MH cannot</button>
+    <button class="opt" data-correct="true" onclick="answer('q19',this)">C. MH allows asymmetric proposal densities with a correction factor \(q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*) / q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})\) in the acceptance ratio; Metropolis requires a symmetric proposal</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">D. MH requires the full conditional distributions; Metropolis does not</button>
+  </div>
+  <div class="fb" id="q19-fb"></div>
+</div>
+
+<!-- Q20 -->
+<div class="qblock" id="q20">
+  <div class="qnum">Question 20 of 40 — MH Acceptance Probability</div>
+  <div class="qtext">In the Metropolis-Hastings algorithm, if the candidate \(\boldsymbol{\theta}^*\) has posterior density ratio \(r = p(\boldsymbol{\theta}^* \mid \boldsymbol{y}) / p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y}) = 0.3\) (for a symmetric proposal), then:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">A. The candidate is always rejected since \(r < 1\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q20',this)">B. The candidate is accepted with probability 0.3; with probability 0.7 the chain stays at \(\boldsymbol{\theta}^{(k)}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">C. The acceptance probability is \(1 - r = 0.7\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">D. The candidate is accepted with probability \(r^2 = 0.09\)</button>
+  </div>
+  <div class="fb" id="q20-fb"></div>
+</div>
+
+<!-- Q21 -->
+<div class="qblock" id="q21">
+  <div class="qnum">Question 21 of 40 — Proposal Variance (Too Small)</div>
+  <div class="qtext">In Example VI.7 (SAP study Metropolis algorithm), using proposal variance \(\delta^2 = 0.001\) produced an acceptance rate of 84%. This leads to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">A. Excellent exploration of the posterior — high acceptance is always desirable</button>
+    <button class="opt" data-correct="true" onclick="answer('q21',this)">B. Very slow mixing: the chain takes tiny steps and poorly approximates the true marginal distributions</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">C. The chain is equivalent to independent sampling from the posterior</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">D. The chain converges in fewer iterations than with a larger proposal variance</button>
+  </div>
+  <div class="fb" id="q21-fb"></div>
+</div>
+
+<!-- Q22 -->
+<div class="qblock" id="q22">
+  <div class="qnum">Question 22 of 40 — Optimal Acceptance Rate</div>
+  <div class="qtext">For the Random-Walk Metropolis algorithm, the theoretically optimal acceptance rate for a high-dimensional target (\(d \gg 1\)) is approximately:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">A. 100% (always accept)</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">B. 45%</button>
+    <button class="opt" data-correct="true" onclick="answer('q22',this)">C. 23.4%</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">D. 5% (very few proposals accepted)</button>
+  </div>
+  <div class="fb" id="q22-fb"></div>
+</div>
+
+<!-- Q23 -->
+<div class="qblock" id="q23">
+  <div class="qnum">Question 23 of 40 — MH Acceptance Probability (General)</div>
+  <div class="qtext">The MH acceptance probability for an asymmetric proposal density is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">A. \(\min\!\left(\dfrac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})}, 1\right)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q23',this)">B. \(\min\!\left(\dfrac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\;q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*)}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\;q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})}, 1\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">C. \(\min\!\left(\dfrac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\;q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\;q(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*)}, 1\right)\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">D. \(\dfrac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})}{p(\boldsymbol{\theta}^* \mid \boldsymbol{y}) + p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})}\)</button>
+  </div>
+  <div class="fb" id="q23-fb"></div>
+</div>
+
+<!-- Q24 -->
+<div class="qblock" id="q24">
+  <div class="qnum">Question 24 of 40 — Gibbs as Special Case of MH</div>
+  <div class="qtext">When the Gibbs sampler is viewed as a special case of the Metropolis-Hastings algorithm (with proposal = full conditional), the acceptance ratio \(r\) evaluates to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">A. A value between 0 and 1, depending on the posterior density ratio</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">B. 0 (always reject)</button>
+    <button class="opt" data-correct="true" onclick="answer('q24',this)">C. 1 (always accept)</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">D. The ratio \(p(\theta_j^* \mid \boldsymbol{y}) / p(\theta_j^{(k)} \mid \boldsymbol{y})\)</button>
+  </div>
+  <div class="fb" id="q24-fb"></div>
+</div>
+
+<!-- Q25 -->
+<div class="qblock" id="q25">
+  <div class="qnum">Question 25 of 40 — Reversibility Condition</div>
+  <div class="qtext">The "reversibility condition" (detailed balance) for a Markov chain with transition kernel \(K(\boldsymbol{\theta}, \boldsymbol{\phi})\) and stationary distribution \(\pi\) states:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">A. \(K(\boldsymbol{\theta}, \boldsymbol{\phi}) = K(\boldsymbol{\phi}, \boldsymbol{\theta})\) for all \(\boldsymbol{\theta}, \boldsymbol{\phi}\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q25',this)">B. \(\pi(\boldsymbol{\theta})\,K(\boldsymbol{\theta}, \boldsymbol{\phi}) = \pi(\boldsymbol{\phi})\,K(\boldsymbol{\phi}, \boldsymbol{\theta})\) for all \(\boldsymbol{\theta}, \boldsymbol{\phi}\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">C. The chain must return to its starting point in an even number of steps</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">D. \(\int K(\boldsymbol{\theta}, \boldsymbol{\phi})\,d\boldsymbol{\phi} = 1\) (proper transition kernel)</button>
+  </div>
+  <div class="fb" id="q25-fb"></div>
+</div>
+
+<!-- Q26 -->
+<div class="qblock" id="q26">
+  <div class="qnum">Question 26 of 40 — MH vs AR: Rejected Proposals</div>
+  <div class="qtext">A key difference between the Accept-Reject (AR) algorithm and the Metropolis-Hastings (MH) algorithm when a proposal is rejected is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">A. Both algorithms discard rejected proposals and draw a new candidate</button>
+    <button class="opt" data-correct="true" onclick="answer('q26',this)">B. AR discards rejected proposals and tries again (producing independent samples); MH records the current point again in the chain (producing dependent samples)</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">C. MH discards rejected proposals; AR keeps the current point</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">D. Both algorithms keep the current point, so both produce the same dependent chain</button>
+  </div>
+  <div class="fb" id="q26-fb"></div>
+</div>
+
+<!-- Q27 -->
+<div class="qblock" id="q27">
+  <div class="qnum">Question 27 of 40 — Ergodicity Requirements</div>
+  <div class="qtext">For an MCMC chain to converge to the target posterior (be ergodic), it must be:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">A. Irreducible only</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">B. Aperiodic only</button>
+    <button class="opt" data-correct="true" onclick="answer('q27',this)">C. Irreducible, aperiodic, and positively recurrent</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">D. Reversible only (detailed balance is sufficient)</button>
+  </div>
+  <div class="fb" id="q27-fb"></div>
+</div>
+
+<!-- Q28 -->
+<div class="qblock" id="q28">
+  <div class="qnum">Question 28 of 40 — Markov Chain LLN</div>
+  <div class="qtext">The Markov Chain Law of Large Numbers guarantees that for an ergodic chain \(\{\boldsymbol{\theta}^{(k)}\}\) with stationary distribution \(\pi\), the time average converges to:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">A. The posterior mode \(\hat{\boldsymbol{\theta}}_M\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q28',this)">B. The true posterior mean \(E_\pi[t(\boldsymbol{\theta})]\), regardless of the starting value</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">C. The prior mean \(E[t(\boldsymbol{\theta})]\) under the prior \(p(\boldsymbol{\theta})\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">D. The sample mean \(\bar{y}\)</button>
+  </div>
+  <div class="fb" id="q28-fb"></div>
+</div>
+
+<!-- Q29 -->
+<div class="qblock" id="q29">
+  <div class="qnum">Question 29 of 40 — Asymptotic Variance of MCMC Estimator</div>
+  <div class="qtext">The asymptotic variance \(\pi^2\) in the Markov Chain CLT is related to the variance \(\tau_0\) of the target function by:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">A. \(\pi^2 = \tau_0\) regardless of autocorrelation</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">B. \(\pi^2 = \tau_0 / (1 + 2\sum_{m=1}^\infty \rho_m)\)</button>
+    <button class="opt" data-correct="true" onclick="answer('q29',this)">C. \(\pi^2 = \tau_0\!\left[1 + 2\sum_{m=1}^\infty \rho_m\right]\), so high autocorrelation inflates the asymptotic variance</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">D. \(\pi^2 = \tau_0 \cdot \rho_1\) (only lag-1 autocorrelation matters)</button>
+  </div>
+  <div class="fb" id="q29-fb"></div>
+</div>
+
+<!-- Q30 -->
+<div class="qblock" id="q30">
+  <div class="qnum">Question 30 of 40 — Random-Walk MH: Proposal</div>
+  <div class="qtext">In the Random-Walk Metropolis-Hastings algorithm, the proposal density \(q\) satisfies:</div>
+  <div class="opts">
+    <button class="opt" data-correct="true" onclick="answer('q30',this)">A. \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = q(\boldsymbol{\theta}^* - \boldsymbol{\theta}^{(k)})\), i.e., it depends only on the increment — making it symmetric</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">B. \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = q(\boldsymbol{\theta}^*)\), i.e., it does not depend on the current position</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">C. \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\), i.e., it equals the target posterior</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">D. \(q(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})\) is a Dirac delta function at \(\boldsymbol{\theta}^*\)</button>
+  </div>
+  <div class="fb" id="q30-fb"></div>
+</div>
+
+<!-- Q31 -->
+<div class="qblock" id="q31">
+  <div class="qnum">Question 31 of 40 — Independent MH Algorithm</div>
+  <div class="qtext">In the Independent Metropolis-Hastings algorithm, if \(p(\boldsymbol{\theta} \mid \boldsymbol{y}) \leq A\,q(\boldsymbol{\theta})\) for all \(\boldsymbol{\theta}\) (the proposal dominates the target up to a constant), then:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">A. The chain will never accept any proposals</button>
+    <button class="opt" data-correct="true" onclick="answer('q31',this)">B. The chain enjoys excellent convergence properties (geometric ergodicity) and the expected acceptance rate exceeds that of the AR algorithm</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">C. The chain reduces to simple random sampling from \(q\)</button>
+    <button class="opt" data-correct="false" onclick="answer('q31',this)">D. The chain is equivalent to the Gibbs sampler</button>
+  </div>
+  <div class="fb" id="q31-fb"></div>
+</div>
+
+<!-- Q32 -->
+<div class="qblock" id="q32">
+  <div class="qnum">Question 32 of 40 — MCMC vs Method of Composition</div>
+  <div class="qtext">Comparing the Gibbs sampler with the Method of Composition (MoC) in Example VI.5 (Osteoporosis), the main practical difference is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">A. MoC cannot be applied to the normal linear regression model</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">B. Both methods produce identical results because both target the same posterior</button>
+    <button class="opt" data-correct="true" onclick="answer('q32',this)">C. MoC generates independent samples, while the Gibbs chain generates dependent samples; for parameters with high posterior correlation (\(\beta_0, \beta_1\)), the Gibbs chain is less efficient (higher posterior uncertainty in estimates from the same number of draws)</button>
+    <button class="opt" data-correct="false" onclick="answer('q32',this)">D. The Gibbs sampler requires more computational time per iteration than MoC</button>
+  </div>
+  <div class="fb" id="q32-fb"></div>
+</div>
+
+<!-- Q33 -->
+<div class="qblock" id="q33">
+  <div class="qnum">Question 33 of 40 — Caries Study: Sampler Efficiency (Example VI.9)</div>
+  <div class="qtext">In Example VI.9 (Caries logistic regression), three MCMC implementations (R, WinBUGS, SAS®) were compared. The main finding regarding efficiency was:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">A. All three achieved the same Monte Carlo Standard Error (MCSE)</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">B. SAS® PROC MCMC had the lowest MCSE, indicating the highest efficiency</button>
+    <button class="opt" data-correct="true" onclick="answer('q33',this)">C. Posterior means/medians were similar across all three, but SAS® had considerably higher MCSE (lower efficiency); clinical conclusions were identical</button>
+    <button class="opt" data-correct="false" onclick="answer('q33',this)">D. WinBUGS failed to converge for this logistic regression model</button>
+  </div>
+  <div class="fb" id="q33-fb"></div>
+</div>
+
+<!-- Q34 -->
+<div class="qblock" id="q34">
+  <div class="qnum">Question 34 of 40 — Trace Plot Interpretation</div>
+  <div class="qtext">A trace plot of an MCMC chain shows the parameter value plotted against iteration number. A well-mixing chain should display:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">A. A smooth monotone trend toward the posterior mode</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">B. A flat horizontal line (no variation)</button>
+    <button class="opt" data-correct="true" onclick="answer('q34',this)">C. Rapid, noisy oscillations around a stable level — like a "fuzzy caterpillar" — indicating fast exploration with no trends after burn-in</button>
+    <button class="opt" data-correct="false" onclick="answer('q34',this)">D. A cyclic pattern that repeats every fixed number of iterations</button>
+  </div>
+  <div class="fb" id="q34-fb"></div>
+</div>
+
+<!-- Q35 -->
+<div class="qblock" id="q35">
+  <div class="qnum">Question 35 of 40 — RJMCMC: Trans-Dimensional Moves</div>
+  <div class="qtext">The Reversible Jump MCMC (RJMCMC) algorithm differs from standard MH by allowing:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">A. Only moves within a fixed-dimensional parameter space</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">B. Jumps to any candidate regardless of the acceptance ratio</button>
+    <button class="opt" data-correct="true" onclick="answer('q35',this)">C. Jumps between parameter spaces of different dimension, using bijective maps and Jacobian corrections to maintain detailed balance</button>
+    <button class="opt" data-correct="false" onclick="answer('q35',this)">D. Reversing the chain to remove the burn-in period retrospectively</button>
+  </div>
+  <div class="fb" id="q35-fb"></div>
+</div>
+
+<!-- Q36 -->
+<div class="qblock" id="q36">
+  <div class="qnum">Question 36 of 40 — RJMCMC Application: Caries (Example VI.10)</div>
+  <div class="qtext">In Example VI.10 (dmft-index, Poisson vs Negative Binomial using RJMCMC), the Negative Binomial model is favored because:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">A. The Poisson model has a larger marginal likelihood by definition</button>
+    <button class="opt" data-correct="true" onclick="answer('q36',this)">B. The data showed overdispersion (variance 7.93 ≫ mean 2.24) and the chain spent 56–74% of time in the NB model, with Poisson→NB moves always accepted</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">C. The NB model is always preferred in dental studies by convention</button>
+    <button class="opt" data-correct="false" onclick="answer('q36',this)">D. The change-point analysis revealed a structural break in the dmft data</button>
+  </div>
+  <div class="fb" id="q36-fb"></div>
+</div>
+
+<!-- Q37 -->
+<div class="qblock" id="q37">
+  <div class="qnum">Question 37 of 40 — Overdispersion in Count Data</div>
+  <div class="qtext">In Example VI.10, the Poisson distribution is considered inadequate for the dmft-index data because:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">A. The dmft-index can be negative, violating Poisson assumptions</button>
+    <button class="opt" data-correct="true" onclick="answer('q37',this)">B. The Poisson distribution requires mean = variance, but the data show mean = 2.24 and variance = 7.93, indicating overdispersion</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">C. The sample size is too small for the Poisson approximation</button>
+    <button class="opt" data-correct="false" onclick="answer('q37',this)">D. The Poisson distribution does not allow a zero count</button>
+  </div>
+  <div class="fb" id="q37-fb"></div>
+</div>
+
+<!-- Q38 -->
+<div class="qblock" id="q38">
+  <div class="qnum">Question 38 of 40 — Deterministic vs Random-Scan Gibbs</div>
+  <div class="qtext">In the deterministic (systematic) scan Gibbs sampler, the order in which parameters are updated is:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">A. Randomly chosen at each iteration using a uniform distribution over all \(d!\) orderings</button>
+    <button class="opt" data-correct="true" onclick="answer('q38',this)">B. Fixed and cyclic: parameters \(\theta_1, \theta_2, \ldots, \theta_d\) are updated in the same order every iteration</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">C. Chosen by the user to maximize the acceptance rate</button>
+    <button class="opt" data-correct="false" onclick="answer('q38',this)">D. Based on posterior correlation: the most correlated parameters are updated first</button>
+  </div>
+  <div class="fb" id="q38-fb"></div>
+</div>
+
+<!-- Q39 -->
+<div class="qblock" id="q39">
+  <div class="qnum">Question 39 of 40 — Metropolis-within-Gibbs</div>
+  <div class="qtext">The "Metropolis-within-Gibbs" (Block MH) strategy is used when:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">A. All full conditionals are available in standard form</button>
+    <button class="opt" data-correct="true" onclick="answer('q39',this)">B. Some full conditional distributions are not of standard form, so a MH step is applied within those blocks of the Gibbs sampler</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">C. The posterior is multimodal and the standard Gibbs sampler gets stuck</button>
+    <button class="opt" data-correct="false" onclick="answer('q39',this)">D. The target distribution is defined on a space of unknown dimension</button>
+  </div>
+  <div class="fb" id="q39-fb"></div>
+</div>
+
+<!-- Q40 -->
+<div class="qblock" id="q40">
+  <div class="qnum">Question 40 of 40 — MCMC Requirement vs Analytical Posterior</div>
+  <div class="qtext">MCMC methods (rather than analytical solutions) become necessary primarily when:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">A. The sample size \(n\) is large (MCMC is always more accurate for large samples)</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">B. The prior and likelihood are conjugate but the computation is tedious</button>
+    <button class="opt" data-correct="true" onclick="answer('q40',this)">C. The posterior does not have a closed analytical form — e.g., with non-conjugate priors, complex likelihoods (censoring, random effects, GLMs), or high-dimensional parameter spaces</button>
+    <button class="opt" data-correct="false" onclick="answer('q40',this)">D. More than two parameters are involved — the Gibbs sampler cannot handle \(d > 2\)</button>
+  </div>
+  <div class="fb" id="q40-fb"></div>
+</div>
+
+<!-- SAQ SECTION -->
+<div class="sec-title" id="saq">📝 8 Short-Answer Questions</div>
+
+<!-- SA1 -->
+<div class="saq">
+  <div class="qnum">Short Answer 1 of 8 — Gibbs Sampler: Full Conditionals and the Joint Distribution</div>
+  <div class="qtext">State the Besag-Hammersley-Clifford result for the bivariate case. Provide the proof sketch showing how the full conditionals \(p(\theta_1 \mid \theta_2)\) and \(p(\theta_2 \mid \theta_1)\) uniquely determine the joint distribution \(p(\theta_1, \theta_2)\). Why is existence of the joint distribution alone not sufficient?</div>
+  <button class="reveal-btn" onclick="toggleAns('sa1')">Reveal Answer</button>
+  <div class="ans-box" id="sa1">
+    <strong>Answer:</strong><br>
+    <p><strong>Result (Besag, 1974; Hammersley-Clifford, 1971):</strong> Under mild positivity conditions (the joint distribution is strictly positive on its support), the full conditional distributions \(p(\theta_1 \mid \theta_2)\) and \(p(\theta_2 \mid \theta_1)\) uniquely determine the joint distribution \(p(\theta_1, \theta_2)\).</p>
+    <p><strong>Proof sketch:</strong></p>
+    <p>1. From the joint distribution: \(p(\theta_1, \theta_2) = p(\theta_2 \mid \theta_1)\,p_1(\theta_1) = p(\theta_1 \mid \theta_2)\,p_2(\theta_2)\).</p>
+    <p>2. Dividing the two expressions: \(\dfrac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)} = \dfrac{p_2(\theta_2)}{p_1(\theta_1)}\).</p>
+    <p>3. Integrating both sides over \(\theta_2\):
+    \[\int \frac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)}\,d\theta_2 = \frac{1}{p_1(\theta_1)}\int p_2(\theta_2)\,d\theta_2 = \frac{1}{p_1(\theta_1)}\]</p>
+    <div class="aform">\[p(\theta_1, \theta_2) = \frac{p(\theta_2 \mid \theta_1)}{\int \frac{p(\theta_2 \mid \theta_1)}{p(\theta_1 \mid \theta_2)}\,d\theta_2}\]</div>
+    <p>This shows the joint is uniquely recoverable from the two full conditionals.</p>
+    <p><strong>Why existence alone is not sufficient:</strong> One must verify that the specified conditionals are <em>consistent</em> — i.e., that they actually arise from some valid joint distribution. The Gibbs sampler solves this by finding the fixed-point solution of the integral equation \(p_1(\theta_1) = \int K_1(\nu_1, \theta_1)\,p_1(\nu_1)\,d\nu_1\) with kernel \(K_1(\nu_1, \theta_1) = \int p(\theta_1 \mid \theta_2)\,p(\theta_2 \mid \nu_1)\,d\theta_2\). Two conditionals may be specified without arising from any common joint distribution — in that case the Gibbs sampler will not converge to a valid posterior.
+    </p>
+  </div>
+</div>
+
+<!-- SA2 -->
+<div class="saq">
+  <div class="qnum">Short Answer 2 of 8 — Informative Prior Full Conditional for μ</div>
+  <div class="qtext">For the normal likelihood \(y_i \overset{\text{iid}}{\sim} \mathrm{N}(\mu, \sigma^2)\) with independent informative prior \(\mu \sim \mathrm{N}(\mu_0, \sigma_0^2)\), derive the full conditional distribution \(p(\mu \mid \sigma^2, \boldsymbol{y})\). Identify the posterior mean and precision, and give the interpretation in terms of information combining.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa2')">Reveal Answer</button>
+  <div class="ans-box" id="sa2">
+    <strong>Answer:</strong><br>
+    <p><strong>Derivation:</strong> The full conditional is proportional to the product of the likelihood contribution (in \(\mu\)) and the prior on \(\mu\):</p>
+    <div class="aform">\[p(\mu \mid \sigma^2, \boldsymbol{y}) \propto \exp\!\left[-\frac{1}{2\sigma^2}\sum_{i=1}^n(y_i - \mu)^2\right] \cdot \exp\!\left[-\frac{1}{2\sigma_0^2}(\mu - \mu_0)^2\right]\]</div>
+    <p>Expanding \(\sum(y_i - \mu)^2 = \sum(y_i - \bar{y})^2 + n(\bar{y} - \mu)^2\) and dropping terms not involving \(\mu\):</p>
+    <div class="aform">\[p(\mu \mid \sigma^2, \boldsymbol{y}) \propto \exp\!\left[-\frac{n}{2\sigma^2}(\mu - \bar{y})^2 - \frac{1}{2\sigma_0^2}(\mu - \mu_0)^2\right]\]</div>
+    <p>Completing the square: the exponent is quadratic in \(\mu\). Collecting terms in \(\mu^2\) and \(\mu\):
+    \[\text{Posterior precision: } \tilde{\tau}^{-2} = \frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}\]
+    \[\text{Posterior mean: } \mu_k = \tilde{\tau}^2\!\left(\frac{n\bar{y}}{\sigma^2} + \frac{\mu_0}{\sigma_0^2}\right)\]</p>
+    <div class="aform">\[p(\mu \mid \sigma^2, \boldsymbol{y}) = \mathrm{N}(\mu_k,\; \tilde{\tau}^2)\]</div>
+    <p><strong>Interpretation:</strong> The posterior precision is the <em>sum</em> of the data precision (\(n/\sigma^2\)) and the prior precision (\(1/\sigma_0^2\)) — "precisions add." The posterior mean is the precision-weighted average of the sample mean \(\bar{y}\) (weighted by data precision) and the prior mean \(\mu_0\) (weighted by prior precision). With more data (\(n\) large), the data dominate; with strong prior (\(\sigma_0^2\) small), the prior dominates. This is the general Gaussian information combination formula.
+    </p>
+  </div>
+</div>
+
+<!-- SA3 -->
+<div class="saq">
+  <div class="qnum">Short Answer 3 of 8 — Coal Mining Change-Point Model Full Conditionals</div>
+  <div class="qtext">In Example VI.4 (British coal mining disasters), describe the Bayesian change-point model for Poisson data. State all five full conditional distributions and explain how the discrete full conditional of \(k\) is derived and sampled.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa3')">Reveal Answer</button>
+  <div class="ans-box" id="sa3">
+    <strong>Answer:</strong><br>
+    <p><strong>Model:</strong> \(y_i \sim \mathrm{Poisson}(\lambda)\) for \(i = 1,\ldots,k\) and \(y_i \sim \mathrm{Poisson}(\mu)\) for \(i = k+1,\ldots,n\), where \(k\) is an unknown change-point. Priors: \(\lambda \sim \mathrm{Gamma}(a_1, b_1)\), \(\mu \sim \mathrm{Gamma}(a_2, b_2)\), \(b_j \sim \mathrm{Gamma}(c_j, d_j)\), \(k \sim \mathrm{Uniform}(1,n)\).</p>
+    <p><strong>Five full conditionals:</strong></p>
+    <div class="aform">
+      \[p(\lambda \mid \cdot) = \mathrm{Gamma}\!\left(a_1 + \sum_{i=1}^k y_i,\; k + b_1\right)\]
+      \[p(\mu \mid \cdot) = \mathrm{Gamma}\!\left(a_2 + \sum_{i=k+1}^n y_i,\; n - k + b_2\right)\]
+      \[p(b_1 \mid \cdot) = \mathrm{Gamma}(a_1 + c_1,\; \lambda + d_1)\]
+      \[p(b_2 \mid \cdot) = \mathrm{Gamma}(a_2 + c_2,\; \mu + d_2)\]
+      \[p(k \mid \cdot) \propto \mathcal{L}(y \mid k, \lambda, \mu) = \exp[k(\mu - \lambda)]\left(\frac{\lambda}{\mu}\right)^{\sum_{i=1}^k y_i}\]
+    </div>
+    <p><strong>Derivation of \(p(k \mid \cdot)\):</strong> The log-likelihood of \(k\) is
+    \[\log\mathcal{L} = k(\log\lambda - \log\mu) + \log\lambda\sum_{i=1}^k y_i - k\lambda - (n-k)\mu + \mathrm{const}\]
+    Rearranging: \(\propto \exp[k(\mu - \lambda)](\lambda/\mu)^{\sum_{i=1}^k y_i}\).</p>
+    <p><strong>Sampling from \(p(k \mid \cdot)\):</strong> Compute the unnormalized probability for each value \(k = 1, \ldots, n\) (only \(n\) evaluations), normalize to a proper probability mass function, and sample using the inverse-CDF method. This is exact since the support of \(k\) is finite.
+    </p>
+  </div>
+</div>
+
+<!-- SA4 -->
+<div class="saq">
+  <div class="qnum">Short Answer 4 of 8 — Proof that the MH Algorithm Satisfies Detailed Balance</div>
+  <div class="qtext">For the discrete Metropolis-Hastings algorithm with target distribution \(\boldsymbol{\pi} = (\pi_1, \ldots, \pi_r)\), proposal matrix \(\boldsymbol{Q} = (q_{ij})\), and acceptance probability \(\alpha_{ij} = \min(1, \pi_j q_{ji}/\pi_i q_{ij})\), prove that the resulting transition probabilities \(p_{ij} = \alpha_{ij} q_{ij}\) satisfy the detailed balance condition \(\pi_i p_{ij} = \pi_j p_{ji}\).</div>
+  <button class="reveal-btn" onclick="toggleAns('sa4')">Reveal Answer</button>
+  <div class="ans-box" id="sa4">
+    <strong>Answer:</strong><br>
+    <p><strong>Proof:</strong> We need to show \(\pi_i p_{ij} = \pi_j p_{ji}\) for all \(i \neq j\).</p>
+    <p>The transition probability is \(p_{ij} = \alpha_{ij}\,q_{ij}\), with \(\alpha_{ij} = \min\!\left(1, \dfrac{\pi_j q_{ji}}{\pi_i q_{ij}}\right)\).</p>
+    <p>Consider the product \(\pi_i p_{ij}\):
+    \[\pi_i p_{ij} = \pi_i \alpha_{ij} q_{ij} = \pi_i \min\!\left(1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}}\right) q_{ij} = \min(\pi_i q_{ij},\; \pi_j q_{ji})\]</p>
+    <p>By symmetry of the \(\min\) function:
+    \[\pi_j p_{ji} = \pi_j \alpha_{ji} q_{ji} = \pi_j \min\!\left(1, \frac{\pi_i q_{ij}}{\pi_j q_{ji}}\right) q_{ji} = \min(\pi_j q_{ji},\; \pi_i q_{ij}) = \min(\pi_i q_{ij},\; \pi_j q_{ji})\]</p>
+    <div class="aform">\[\therefore \quad \pi_i p_{ij} = \min(\pi_i q_{ij}, \pi_j q_{ji}) = \pi_j p_{ji} \quad \checkmark\]</div>
+    <p><strong>Conclusion:</strong> The detailed balance condition is satisfied, so \(\pi\) is the stationary distribution of the MH chain. This proof generalizes to the continuous case. One must additionally verify irreducibility and aperiodicity (usually mild conditions on the proposal density) to guarantee convergence.
+    </p>
+  </div>
+</div>
+
+<!-- SA5 -->
+<div class="saq">
+  <div class="qnum">Short Answer 5 of 8 — Gibbs Sampler as a Special Case of MH</div>
+  <div class="qtext">Show explicitly that the Gibbs sampler is a special case of the Metropolis-Hastings algorithm with acceptance probability identically equal to 1. Define the proposal kernel, compute the MH ratio \(r\), and simplify.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa5')">Reveal Answer</button>
+  <div class="ans-box" id="sa5">
+    <strong>Answer:</strong><br>
+    <p><strong>Setup:</strong> Consider the \(j\)-th sub-step of the Gibbs sampler, which samples \(\theta_j^{(k+1)}\) from the full conditional \(p(\theta_j \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})\). A "proposal" in MH terms proposes a new parameter vector \(\boldsymbol{\theta}^*\) that matches \(\boldsymbol{\theta}^{(k)}\) in all components except \(j\).</p>
+    <p><strong>Proposal kernel:</strong>
+    \[q_j^G(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)}) = \begin{cases} p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y}) & \text{if } \boldsymbol{\theta}_{-j}^* = \boldsymbol{\theta}_{-j}^{(k)} \\ 0 & \text{otherwise} \end{cases}\]</p>
+    <p><strong>MH ratio computation:</strong>
+    \[r = \frac{p(\boldsymbol{\theta}^* \mid \boldsymbol{y})\;q_j^G(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{\theta}^*)}{p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\;q_j^G(\boldsymbol{\theta}^* \mid \boldsymbol{\theta}^{(k)})}\]</p>
+    <p>Using the factorization \(p(\boldsymbol{\theta} \mid \boldsymbol{y}) = p(\theta_j \mid \boldsymbol{\theta}_{-j}, \boldsymbol{y})\,p(\boldsymbol{\theta}_{-j} \mid \boldsymbol{y})\):
+    \[r = \frac{p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})\;p(\boldsymbol{\theta}_{-j}^{(k)} \mid \boldsymbol{y})\;p(\theta_j^{(k)} \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})}{p(\theta_j^{(k)} \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})\;p(\boldsymbol{\theta}_{-j}^{(k)} \mid \boldsymbol{y})\;p(\theta_j^* \mid \boldsymbol{\theta}_{-j}^{(k)}, \boldsymbol{y})} = 1\]</p>
+    <div class="aform">\[\alpha(\boldsymbol{\theta}^{(k)}, \boldsymbol{\theta}^*) = \min(r, 1) = \min(1, 1) = 1\]</div>
+    <p><strong>Conclusion:</strong> The Gibbs sampler always accepts its proposal. It is therefore a Metropolis-Hastings algorithm with acceptance probability \(\equiv 1\) — the most efficient possible acceptance behavior. The efficiency gain over the general MH comes at the cost of requiring the full conditionals to be in a form that can be sampled directly.
+    </p>
+  </div>
+</div>
+
+<!-- SA6 -->
+<div class="saq">
+  <div class="qnum">Short Answer 6 of 8 — Markov Chain CLT and Effective Sample Size</div>
+  <div class="qtext">State the Markov Chain Central Limit Theorem (CLT). Define the asymptotic variance \(\pi^2\), explain how it relates to the autocorrelations \(\rho_m\), and define the effective sample size (ESS). Explain why high autocorrelation is problematic for MCMC-based inference.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa6')">Reveal Answer</button>
+  <div class="ans-box" id="sa6">
+    <strong>Answer:</strong><br>
+    <p><strong>Markov Chain CLT:</strong> For a uniformly (or geometrically) ergodic Markov chain \(\{\boldsymbol{\theta}^{(k)}\}\) with stationary distribution \(\pi\), and a function \(t(\boldsymbol{\theta})\) with \(t^2(\boldsymbol{\theta})\) integrable under \(\pi\):
+    \[\sqrt{K}\left(\frac{1}{K}\sum_{k=1}^K t(\boldsymbol{\theta}^{(k)}) - E_\pi[t(\boldsymbol{\theta})]\right) \xrightarrow{d} \mathrm{N}(0,\; \pi^2)\]</p>
+    <p><strong>Asymptotic variance:</strong>
+    \[\pi^2 = \tau_0\!\left[1 + 2\sum_{m=1}^\infty \rho_m\right]\]
+    where \(\tau_0 = \mathrm{var}_\pi(t(\boldsymbol{\theta}))\) is the marginal variance and \(\rho_m\) is the autocorrelation of lag \(m\).</p>
+    <p><strong>Effective sample size (ESS):</strong> The equivalent number of independent observations that would give the same estimation precision:
+    \[K_{\mathrm{eff}} = \frac{K}{1 + 2\sum_{m=1}^\infty \rho_m} = \frac{K\tau_0}{\pi^2}\]</p>
+    <p><strong>Why high autocorrelation is problematic:</strong></p>
+    <ul>
+      <li>High \(\rho_m\) → large \(\pi^2\) → large variance of the MCMC estimator → poor precision</li>
+      <li>\(K_{\mathrm{eff}} \ll K\): a chain of length 10,000 with autocorrelation factor 50 is equivalent to only 200 independent observations</li>
+      <li>High autocorrelation → longer burn-in (chain "forgets" its starting position slowly)</li>
+      <li>Posterior summary measures (means, credible intervals) are less accurate for a given computational effort</li>
+    </ul>
+    <p><strong>Remedies:</strong> Block sampling to remove high posterior correlations; thinning (retaining every \(m\)-th draw); re-parameterization; or switching to a more efficient algorithm (e.g., HMC, slice sampler).
+    </p>
+  </div>
+</div>
+
+<!-- SA7 -->
+<div class="saq">
+  <div class="qnum">Short Answer 7 of 8 — Reversible Jump MCMC: Methodology and Application</div>
+  <div class="qtext">Describe the core theoretical challenge of trans-dimensional MCMC. Explain how RJMCMC (Green, 1995) addresses this challenge using bijective maps and Jacobian corrections. Illustrate with the Poisson-vs-Negative-Binomial example (VI.10), identifying the four types of moves and summarizing the results.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa7')">Reveal Answer</button>
+  <div class="ans-box" id="sa7">
+    <strong>Answer:</strong><br>
+    <p><strong>Core challenge:</strong> Standard MH operates in a fixed-dimensional parameter space. Bayesian model comparison (e.g., between models of different complexity) requires sampling from a <em>mixture</em> of spaces of different dimensions. A naive MH ratio \(p(\boldsymbol{\theta}^* \mid \boldsymbol{y}) / p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\) is undefined when \(\boldsymbol{\theta}^*\) and \(\boldsymbol{\theta}^{(k)}\) lie in spaces of different dimension — there is no common dominating measure.</p>
+    <p><strong>RJMCMC solution:</strong> To jump from model \(\mathcal{M}_1\) (dimension \(d_1\)) to \(\mathcal{M}_2\) (dimension \(d_2 > d_1\)):</p>
+    <ul>
+      <li>Augment the current state with auxiliary variables \(\boldsymbol{u} \sim q(\boldsymbol{u})\) of dimension \(d_2 - d_1\)</li>
+      <li>Define a bijective (invertible) map \((\boldsymbol{\theta}_1, \boldsymbol{u}) \mapsto \boldsymbol{\theta}_2\)</li>
+      <li>The MH acceptance ratio includes the Jacobian \(|\partial(\boldsymbol{\theta}_2)/\partial(\boldsymbol{\theta}_1, \boldsymbol{u})|\) of this map, ensuring detailed balance is maintained on the union of all spaces</li>
+    </ul>
+    <p><strong>Example VI.10 — Four types of RJMCMC moves:</strong></p>
+    <div class="aform">
+      (1) Poisson → Poisson: classical within-model update of \(\lambda\) \\
+      (2) Poisson → NB: trans-dimensional "birth" — propose \(\phi\) from a prior/auxiliary distribution; apply bijective map \((\lambda, u) \to (\lambda, \phi)\) \\
+      (3) NB → Poisson: trans-dimensional "death" — remove \(\phi\) \\
+      (4) NB → NB: classical within-model update of \((\lambda, \phi)\)
+    </div>
+    <p><strong>Results:</strong> The chain spent 56–74% of time in the NB model (over four different prior settings). Proposed moves from Poisson to NB were always accepted (the data strongly disfavor the Poisson model given the observed overdispersion: mean = 2.24, variance = 7.93). Trans-dimensional moves accounted for 32–55% of all moves, indicating active model switching. Conclusion: Bayesian model comparison via RJMCMC provides a fully probabilistic assessment of model uncertainty, not merely a point comparison via a criterion like AIC or BIC.
+    </p>
+  </div>
+</div>
+
+<!-- SA8 -->
+<div class="saq">
+  <div class="qnum">Short Answer 8 of 8 — Comparing MCMC Algorithms: Gibbs, RWMH, Independent MH, and Slice Sampler</div>
+  <div class="qtext">Compare and contrast the Gibbs sampler, the Random-Walk Metropolis-Hastings (RWMH) algorithm, the Independent MH algorithm, and the Slice sampler. For each, state: (a) the proposal mechanism, (b) what is required from the model, (c) the acceptance behavior, and (d) key strengths and weaknesses.</div>
+  <button class="reveal-btn" onclick="toggleAns('sa8')">Reveal Answer</button>
+  <div class="ans-box" id="sa8">
+    <strong>Answer:</strong><br>
+    <table style="margin:8px 0;">
+      <thead><tr><th>Property</th><th>Gibbs</th><th>RWMH</th><th>Independent MH</th><th>Slice Sampler</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>(a) Proposal</strong></td>
+          <td>Full conditional \(p(\theta_j \mid \boldsymbol{\theta}_{-j}, \boldsymbol{y})\)</td>
+          <td>Symmetric increment: \(\boldsymbol{\theta}^* = \boldsymbol{\theta}^{(k)} + \boldsymbol{\epsilon}\), \(\boldsymbol{\epsilon} \sim \mathrm{N}(0, \boldsymbol{\Sigma})\)</td>
+          <td>Fixed density: \(q(\boldsymbol{\theta}^*)\) independent of \(\boldsymbol{\theta}^{(k)}\)</td>
+          <td>Auxiliary variable \(y \sim \mathrm{U}(0, f(\theta^{(k)}))\); then \(\theta^* \sim \mathrm{U}(S(y))\)</td>
+        </tr>
+        <tr>
+          <td><strong>(b) Model requirement</strong></td>
+          <td>Full conditionals must be sampleable (standard form or ARMS)</td>
+          <td>Only unnormalized posterior needed; ratio \(p(\boldsymbol{\theta}^* \mid \boldsymbol{y})/p(\boldsymbol{\theta}^{(k)} \mid \boldsymbol{y})\)</td>
+          <td>Only unnormalized posterior needed; good proposal \(q\) required</td>
+          <td>Unnormalized posterior; ability to invert \(y = f(\theta)\) for the slice bounds</td>
+        </tr>
+        <tr>
+          <td><strong>(c) Acceptance</strong></td>
+          <td>Always 100% (special case of MH)</td>
+          <td>Optimal ≈ 45% (d=1) or 23.4% (d≫1); tuned via \(\boldsymbol{\Sigma}\)</td>
+          <td>High when \(q\) ≈ posterior; excellent if \(p \leq Aq\)</td>
+          <td>Deterministic given the slice; always accepts within \(S(y)\)</td>
+        </tr>
+        <tr>
+          <td><strong>(d) Strengths</strong></td>
+          <td>Efficient when full conditionals are standard; no tuning needed</td>
+          <td>Very general; easy to implement; WinBUGS/SAS® standard</td>
+          <td>Excellent convergence when good proposal available; similar to AR but for MCMC</td>
+          <td>No tuning of proposal scale; automatically adapts to posterior shape</td>
+        </tr>
+        <tr>
+          <td><strong>(d) Weaknesses</strong></td>
+          <td>Slow mixing when parameters are highly correlated; requires sampleable full conditionals</td>
+          <td>Requires careful tuning of \(\boldsymbol{\Sigma}\); random walk can be inefficient in high dimensions</td>
+          <td>Requires a good global proposal; hard to construct for complex posteriors</td>
+          <td>More complex to implement; slice inversion needed; multimodal case is harder</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Practical guidance:</strong> The Gibbs sampler is the default when full conditionals are available. RWMH (Metropolis-within-Gibbs) fills in for non-standard full conditionals. The Independent MH is preferred when a good global approximation (e.g., a Laplace approximation to the posterior) can be constructed. The Slice sampler is attractive when the density can be evaluated pointwise but proposal tuning is difficult. For highly correlated parameters, Block Gibbs or Hamiltonian Monte Carlo (HMC) may be needed.
+    </p>
+  </div>
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+let score = 0, answered = 0;
+
+function answer(qId, btn) {
+  const block = document.getElementById(qId);
+  const buttons = block.querySelectorAll('.opt');
+  if (buttons[0].disabled) return;
+  const isCorrect = btn.dataset.correct === 'true';
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('ok');
+  });
+  const fb = document.getElementById(qId + '-fb');
+  if (isCorrect) {
+    score++;
+    fb.textContent = '✓ Correct!';
+    fb.className = 'fb ok-fb';
+  } else {
+    btn.classList.add('bad');
+    fb.textContent = '✗ Incorrect. The correct answer is highlighted above.';
+    fb.className = 'fb bad-fb';
+  }
+  answered++;
+  document.getElementById('score-display').textContent = score + ' / ' + answered;
+}
+
+function resetAll() {
+  score = 0; answered = 0;
+  document.getElementById('score-display').textContent = '0 / 0';
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('ok', 'bad');
+  });
+  document.querySelectorAll('.fb').forEach(f => {
+    f.className = 'fb';
+    f.textContent = '';
+  });
+}
+
+function toggleAns(id) {
+  const box = document.getElementById(id);
+  box.classList.toggle('shown');
+  const btn = box.previousElementSibling;
+  btn.textContent = box.classList.contains('shown') ? 'Hide Answer' : 'Reveal Answer';
+}
+</script>
+
+</body>
+</html>
