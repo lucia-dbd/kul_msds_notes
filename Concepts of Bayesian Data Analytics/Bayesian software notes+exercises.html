@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayesian Software — Study Notes &amp; Exercises</title>
+<style>
+:root{
+  --primary:#1a3a5c;--accent:#2878b8;--accent2:#c0580a;
+  --bg:#f3f6fb;--card:#fff;--border:#cdd8e8;
+  --ok:#1e7e34;--ok-bg:#d4edda;--err:#a71d2a;--err-bg:#f8d7da;
+  --nb:#eef4fc;--text:#1c2a38;--muted:#5a6a7a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.72;font-size:15px;}
+header{background:var(--primary);color:#fff;padding:26px 20px 18px;text-align:center;}
+header h1{font-size:1.55rem;letter-spacing:.3px;}
+header p{margin-top:5px;color:#aac8e4;font-size:.9rem;}
+.toc{background:var(--accent);display:flex;flex-wrap:wrap;gap:5px;padding:9px 18px;justify-content:center;}
+.toc a{color:#fff;text-decoration:none;font-size:.78rem;background:rgba(255,255,255,.15);
+  padding:4px 11px;border-radius:20px;transition:background .2s;}
+.toc a:hover{background:rgba(255,255,255,.32);}
+.wrap{max-width:720px;margin:0 auto;padding:26px 14px 70px;}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:20px 24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(30,60,100,.06);}
+.card h2{color:var(--primary);font-size:1.12rem;border-bottom:2px solid var(--accent);
+  padding-bottom:7px;margin-bottom:13px;}
+.card h3{color:var(--accent);font-size:.96rem;margin:15px 0 7px;}
+.card p{margin-bottom:9px;}
+.card ul{padding-left:20px;margin-bottom:9px;}
+.card li{margin-bottom:5px;}
+.nb{background:var(--nb);border-left:4px solid var(--accent);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.nb strong{color:var(--primary);}
+.warn{background:#fff8e8;border-left:4px solid var(--accent2);padding:10px 14px;
+  border-radius:0 6px 6px 0;margin:11px 0;}
+.fbox{background:#f0f6ff;border:1px solid #aaccee;border-radius:6px;
+  padding:11px 15px;margin:11px 0;font-size:.9rem;overflow-x:auto;}
+.fbox p{margin:4px 0;}
+.codeblock{background:#1e2a38;color:#cce8ff;border-radius:7px;padding:13px 16px;
+  margin:11px 0;font-family:'Consolas','Courier New',monospace;font-size:.82rem;
+  line-height:1.65;overflow-x:auto;white-space:pre;}
+.codeblock .cm{color:#7fba9e;}
+.codeblock .kw{color:#c586c0;}
+.codeblock .str{color:#ce9178;}
+.codeblock .fn{color:#dcdcaa;}
+table{width:100%;border-collapse:collapse;margin:11px 0;font-size:.86rem;}
+th{background:var(--primary);color:#fff;padding:8px 10px;text-align:left;}
+td{padding:7px 10px;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:var(--nb);}
+
+.score-bar{background:var(--card);border:2px solid var(--accent);border-radius:10px;
+  padding:13px 20px;margin-bottom:20px;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:9px;}
+.score-bar span{font-size:.9rem;color:var(--muted);}
+#score-display{font-size:1.5rem;font-weight:700;color:var(--accent);}
+.reset-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;
+  padding:7px 18px;font-size:.83rem;cursor:pointer;font-weight:600;}
+.reset-btn:hover{background:#0f2540;}
+.qblock{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:15px 17px;margin-bottom:15px;box-shadow:0 1px 4px rgba(30,60,100,.05);}
+.qnum{font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;
+  letter-spacing:.8px;margin-bottom:5px;}
+.qtext{font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.opt{background:var(--nb);border:1px solid var(--border);border-radius:6px;
+  padding:7px 12px;text-align:left;cursor:pointer;font-size:.87rem;color:var(--text);
+  transition:background .15s,border-color .15s;}
+.opt:hover:not(:disabled){background:#dceeff;border-color:var(--accent);}
+.opt.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600;}
+.opt.bad{background:var(--err-bg);border-color:var(--err);color:var(--err);}
+.opt:disabled{cursor:default;}
+.fb{display:none;margin-top:7px;padding:7px 12px;border-radius:5px;font-size:.86rem;}
+.fb.ok-fb{display:block;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.fb.bad-fb{display:block;background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.sec-title{background:var(--primary);color:#fff;border-radius:8px;padding:10px 18px;
+  margin:28px 0 16px;font-size:1.05rem;font-weight:700;letter-spacing:.3px;}
+
+@media(max-width:600px){
+  .wrap{padding:12px 8px 50px;}
+  .card{padding:13px 11px;}
+  header h1{font-size:1.1rem;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🖥️ Bayesian Software — Introduction</h1>
+  <p>Bayesian Biostatistics · Faes (Hasselt / KU Leuven) · Study Notes + 30 MCQ</p>
+</header>
+
+<nav class="toc">
+  <a href="#s1">Software Overview</a>
+  <a href="#s2">WinBUGS / OpenBUGS</a>
+  <a href="#s3">BUGS Language</a>
+  <a href="#s4">Running MCMC</a>
+  <a href="#s5">Convergence Tools</a>
+  <a href="#s6">R2OpenBUGS</a>
+  <a href="#s7">JAGS from R</a>
+  <a href="#s8">NIMBLE from R</a>
+  <a href="#s9">Summarising MCMC</a>
+  <a href="#mcq">30 MCQ</a>
+</nav>
+
+<div class="wrap">
+
+<div class="sec-title">📖 Study Notes</div>
+
+<!-- Section 1: Software Overview -->
+<div class="card" id="s1">
+  <h2>1.1 Overview of Bayesian Software</h2>
+  <p>The rise of MCMC methods — catalysed by <strong>WinBUGS</strong> — transformed practical Bayesian statistics. Before software automation, Bayesian analyses required hand-derived full conditionals and custom code; WinBUGS made arbitrary graphical models accessible to applied researchers.</p>
+
+  <table>
+    <thead><tr><th>Software</th><th>Language / Backend</th><th>Status / Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>WinBUGS</strong></td><td>BUGS, Windows GUI</td><td>Final version 1.4.3; no longer updated; installation issues on Windows 10</td></tr>
+      <tr><td><strong>OpenBUGS</strong></td><td>BUGS (open source)</td><td>Actively maintained; larger sampler set; supports censoring C() and truncation T()</td></tr>
+      <tr><td><strong>JAGS</strong></td><td>BUGS dialect, C++</td><td>Cross-platform; interfaced via <code>rjags</code></td></tr>
+      <tr><td><strong>NIMBLE</strong></td><td>BUGS + R extensions, C++</td><td>Flexible MCMC config; write your own samplers/distributions</td></tr>
+      <tr><td><strong>Stan</strong></td><td>HMC / NUTS, C++</td><td>Requires gradient info; highly efficient for complex models</td></tr>
+    </tbody>
+  </table>
+
+  <div class="nb">
+    <strong>Key progression:</strong> WinBUGS (click-and-point GUI) → batch mode via R2WinBUGS / R2OpenBUGS → JAGS / NIMBLE (fully scriptable, cross-platform, greater flexibility). The BUGS <em>language</em> is shared across WinBUGS, OpenBUGS, JAGS, and NIMBLE, so model code is largely portable.
+  </div>
+
+  <h3>Why batch mode?</h3>
+  <p>Repetitive point-and-click interaction with WinBUGS is error-prone and non-reproducible. Batch processing via R scripts allows automatic looping over sensitivity analyses, reproducibility, and integration with downstream R-based reporting.</p>
+
+  <h3>OpenBUGS extensions over WinBUGS</h3>
+  <ul>
+    <li>Larger class of sampling algorithms with improved blocking</li>
+    <li>Additional distributions and functions</li>
+    <li>Censoring: <code>C(lower, upper)</code> — likelihood contribution from censored observations</li>
+    <li>Truncation: <code>T(lower, upper)</code> — restricts a distribution to a bounded range</li>
+    <li>Detailed sampler diagnostics printed by default</li>
+  </ul>
+
+  <h3>NIMBLE: Key Differentiators</h3>
+  <ul>
+    <li>Almost identical model syntax to WinBUGS/JAGS — minimal porting effort</li>
+    <li>C++ compilation of models gives substantially faster sampling</li>
+    <li>Users can call existing R functions directly in model code</li>
+    <li>Users can implement custom distributions and samplers in R/C++</li>
+    <li>Full programmatic control over the MCMC configuration (change, add, or remove individual samplers)</li>
+  </ul>
+</div>
+
+<!-- Section 2: WinBUGS / OpenBUGS -->
+<div class="card" id="s2">
+  <h2>1.2 WinBUGS and OpenBUGS — Workflow</h2>
+  <p>Win/OpenBUGS operates through an <strong>.odc compound document</strong> — a single file that holds model code, data, and initial values. Opening this document in Win/OpenBUGS then proceeds through a fixed sequence of GUI steps.</p>
+
+  <h3>Three Required Tools (in order)</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Tool</th><th>Menu Path</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>(a)</td><td><strong>Specification Tool</strong></td><td>Model → Specification…</td><td>Load model, data, initial values; compile</td></tr>
+      <tr><td>(b)</td><td><strong>Sample Monitor Tool</strong></td><td>Inference → Samples…</td><td>Select parameters to track during sampling</td></tr>
+      <tr><td>(c)</td><td><strong>Update Tool</strong></td><td>Model → Update…</td><td>Specify iterations and run the MCMC chain</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Specification Tool — Four Sub-steps</h3>
+  <ul>
+    <li><strong>Check model:</strong> Highlight the <code>model{}</code> block → click <em>check model</em>. Message: "model is syntactically correct."</li>
+    <li><strong>Load data:</strong> Highlight the <code>list(…)</code> data block → click <em>load data</em>.</li>
+    <li><strong>Compile:</strong> Click <em>compile</em>. For multiple chains, first set num of chains before compiling.</li>
+    <li><strong>Load inits:</strong> Highlight each initial values <code>list(…)</code> → click <em>load inits</em> once per chain. Click <em>gen inits</em> if remaining inits are still needed.</li>
+  </ul>
+
+  <div class="warn">
+    <strong>Order matters:</strong> You must Check → Load Data → Compile → Load Inits in exactly this sequence. Skipping or reordering these steps causes error messages such as "model not compiled."
+  </div>
+
+  <h3>Sample Monitor Tool</h3>
+  <ul>
+    <li>Type node name → click <em>set</em> for each parameter to monitor. End with <code>*</code> → <em>set</em> to monitor all nodes.</li>
+    <li>After sampling: <em>history</em> (full trace), <em>density</em> (marginal posterior density), <em>stats</em> (summary statistics), <em>auto corr</em> (ACF), <em>bgr diag</em> (Gelman-Rubin convergence diagnostic).</li>
+    <li>Remove burn-in: fill in <code>beg = 1001</code> (to discard first 1,000) then click <em>history</em> again.</li>
+    <li>Thinning: fill in <code>thin = 10</code> — note this generates 10× the requested iterations.</li>
+  </ul>
+
+  <div class="nb">
+    <strong>Dynamic Trace:</strong> In WinBUGS, click <em>trace</em> before running to watch the chain evolve in real time. In OpenBUGS, run a small number of iterations first, then click <em>trace</em>.
+  </div>
+</div>
+
+<!-- Section 3: BUGS Language -->
+<div class="card" id="s3">
+  <h2>1.2 The BUGS Language — Key Concepts</h2>
+
+  <h3>Osteoporosis Simple Linear Regression Example</h3>
+  <p>Model: tbbmc<sub>i</sub> ~ Normal(μ<sub>i</sub>, τ), μ<sub>i</sub> = β₀ + β₁ · bmi<sub>i</sub>, with τ = 1/σ². The BUGS code structure:</p>
+  <div class="codeblock"><span class="kw">model</span>
+{
+  <span class="kw">for</span> (i <span class="kw">in</span> 1:N) {
+    tbbmc[i] ~ <span class="fn">dnorm</span>(mu[i], tau)    <span class="cm">## likelihood (blue)</span>
+    mu[i] &lt;- beta0 + beta1 * bmi[i]   <span class="cm">## logical node (green)</span>
+  }
+  sigma2 &lt;- 1 / tau                   <span class="cm">## derived quantity (green)</span>
+  sigma  &lt;- <span class="fn">sqrt</span>(sigma2)
+
+  beta0 ~ <span class="fn">dnorm</span>(0, 1.0E-6)          <span class="cm">## priors (red)</span>
+  beta1 ~ <span class="fn">dnorm</span>(0, 1.0E-6)
+  tau   ~ <span class="fn">dgamma</span>(1.0E-3, 1.0E-3)
+}
+<span class="cm"># data</span>
+<span class="fn">list</span>(tbbmc=<span class="fn">c</span>(1.798, 2.588, ...), bmi=<span class="fn">c</span>(23.61, 30.48, ...), N=234)
+<span class="cm"># initial values</span>
+<span class="fn">list</span>(beta0=0.4, beta1=0.025, tau=1/0.05)</div>
+
+  <h3>Three Types of Nodes</h3>
+  <table>
+    <thead><tr><th>Node type</th><th>BUGS operator</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Stochastic</strong> (priors + likelihood)</td><td><code>~</code></td><td>Random variable; defines prior or likelihood</td></tr>
+      <tr><td><strong>Logical</strong> (deterministic)</td><td><code>&lt;-</code></td><td>Deterministic transformation of other nodes</td></tr>
+      <tr><td><strong>Observed data</strong></td><td><code>~</code> (data provided)</td><td>Likelihood term; value is fixed</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Critical BUGS Conventions</h3>
+  <ul>
+    <li><strong>Precision parameterization:</strong> <code>dnorm(mu, tau)</code> uses precision τ = 1/σ², not variance. Always specify variance parameters as tau ~ dgamma(…) and derive sigma via logical nodes.</li>
+    <li><strong>Declarative language:</strong> Statement order does not matter — BUGS figures out the dependency graph (DAG) automatically.</li>
+    <li><strong>No improper priors:</strong> Win/OpenBUGS does not accept improper priors (e.g., uniform on the whole real line). Use a very vague but proper prior such as <code>dnorm(0, 1.0E-6)</code>.</li>
+    <li><strong>No if-then-else:</strong> Use the <code>step()</code> and <code>equals()</code> functions instead.</li>
+    <li><strong>Initial values:</strong> Do not specify initial values for logical nodes. It is advisable to always set initial values for variance parameters explicitly.</li>
+    <li><strong>Vectors:</strong> Denoted by <code>[]</code> (e.g., <code>beta[]</code>, <code>bmi[]</code>). Ranges: <code>beta[1:6]</code>.</li>
+  </ul>
+
+  <h3>Vector / Matrix Operations (Multiple Regression)</h3>
+  <div class="codeblock">mu[i] &lt;- <span class="fn">inprod</span>(beta[], x[i,])          <span class="cm">## scalar product</span>
+beta[1:6] ~ <span class="fn">dmnorm</span>(mu.beta[], prec.beta[,]) <span class="cm">## multivariate normal prior</span>
+prec.beta[r,s] &lt;- <span class="fn">equals</span>(r,s) * c       <span class="cm">## diagonal precision (ridge)</span></div>
+
+  <div class="nb">
+    <strong>Rectangular data format:</strong> When data is in table form, the table ends with <code>END</code> and must be loaded separately from the <code>list()</code> statement. Click <em>load data</em> for each part.
+  </div>
+
+  <h3>Convergence Acceleration Techniques</h3>
+  <ul>
+    <li><strong>Centering/standardizing covariates:</strong> <code>mu[i] &lt;- beta0 + beta1*(bmi[i]-mean(bmi[]))/sd(bmi[])</code> — reduces posterior correlation between intercept and slope, dramatically improving mixing.</li>
+    <li><strong>Blocking:</strong> Sample correlated coefficients jointly with a multivariate normal prior (<code>dmnorm</code>) to remove within-block correlations.</li>
+    <li><strong>Over-relaxation:</strong> Switch on <em>over relax</em> in the Update Tool — negatively correlates successive draws to reduce autocorrelation.</li>
+    <li><strong>Cross-correlation plot:</strong> Use <em>bgr diag</em> / cross-correlation output to diagnose problematic parameter correlations.</li>
+  </ul>
+
+  <div class="warn">
+    <strong>Ridge vs vague prior on β:</strong> Using a ridge normal prior (c = 5 instead of c = 1e-6) substantially reduces cross-correlations among regression coefficients, as visible in the cross-correlation plot — darker off-diagonal elements disappear.
+  </div>
+</div>
+
+<!-- Section 4: Running MCMC / Convergence -->
+<div class="card" id="s4">
+  <h2>1.2.2 BGR Convergence Diagnostic</h2>
+  <p>The <strong>Brooks-Gelman-Rubin (BGR) diagnostic</strong> assesses convergence by comparing within-chain and between-chain variance across multiple chains started from overdispersed initial values.</p>
+
+  <ul>
+    <li>Requires ≥ 2 chains (ideally 3–8), started from <em>overdispersed</em> initial values — intentionally far from the posterior mode.</li>
+    <li>The BGR ratio (red line) should converge to 1 as the chains mix. A value near 1 indicates the between-chain variance is no larger than the within-chain variance.</li>
+    <li>In WinBUGS: compile with multiple chains → load inits once per chain → after sampling, click <em>bgr diag</em> in the Sample Monitor Tool.</li>
+  </ul>
+
+  <div class="nb">
+    <strong>Reading the BGR plot:</strong> Three lines are shown for each parameter: (i) pooled posterior interval width, (ii) average within-chain interval width, and (iii) their ratio. Convergence is indicated when the ratio stabilizes near 1 and the two interval widths converge. The example in the slides shows convergence around iteration 500 for β₁ and σ².
+  </div>
+
+  <h3>Troubleshooting Win/OpenBUGS</h3>
+  <p>Errors can occur at five stages: syntax checking, data loading, compilation, providing initial values, and running the sampler. The most disruptive error is the <strong>TRAP error</strong> — a crash of the OpenBUGS GUI, often caused by invalid initial values (e.g., initializing a standard deviation at a negative value) or an ill-specified model. Always consult the <em>Tips and Troubleshooting</em> section of the Win/OpenBUGS manual as a first resource.</p>
+</div>
+
+<!-- Section 5: R2OpenBUGS -->
+<div class="card" id="s5">
+  <h2>1.3.1 Running OpenBUGS from R (R2OpenBUGS)</h2>
+  <p>R2OpenBUGS replaces point-and-click by running OpenBUGS in <em>script mode</em> from R, making analyses reproducible and automatable. The workflow has 13 steps + a final interpretation step.</p>
+
+  <h3>Steps 1–3: Setup and Data</h3>
+  <div class="codeblock"><span class="fn">install.packages</span>(<span class="str">"R2OpenBUGS"</span>); <span class="fn">install.packages</span>(<span class="str">"coda"</span>); <span class="fn">install.packages</span>(<span class="str">"readr"</span>)
+<span class="fn">library</span>(<span class="str">"R2OpenBUGS"</span>); <span class="fn">library</span>(<span class="str">"coda"</span>); <span class="fn">library</span>(<span class="str">"readr"</span>)
+<span class="fn">setwd</span>(<span class="str">"C:/root/Programs course"</span>)
+osteop &lt;- <span class="fn">read_delim</span>(<span class="str">"osteop.txt"</span>, <span class="str">" "</span>, escape_double=FALSE, trim_ws=TRUE)
+<span class="fn">head</span>(osteop); <span class="fn">summary</span>(osteop)</div>
+
+  <h3>Step 4: Write the Model</h3>
+  <p>Two approaches: (a) write model to a <code>.txt</code> file and load with <code>file.show()</code>, or (b) embed model directly in R using <code>cat()</code>:</p>
+  <div class="codeblock"><span class="fn">cat</span>(<span class="str">"model {
+  for (i in 1:N){
+    tbbmc[i] ~dnorm(mu[i],tau)
+    mu[i] &lt;- beta0+beta1*bmi[i]
+  }
+  sigma2 &lt;- 1/tau
+  beta0 ~ dnorm(0,1.0E-6)
+  beta1 ~ dnorm(0,1.0E-6)
+  tau ~ dgamma(1.0E-3,1.0E-3)
+}"</span>, file=<span class="str">"osteo.model2.txt"</span>)
+<span class="fn">file.show</span>(<span class="str">"osteo.model2.txt"</span>)</div>
+
+  <h3>Steps 5–7: Data, Inits, Parameters</h3>
+  <div class="codeblock">N &lt;- <span class="fn">length</span>(osteop$tbbmc)
+my.data &lt;- <span class="fn">list</span>(tbbmc=osteop$tbbmc, bmi=osteop$bmi, N=N)
+
+<span class="cm">## Explicit initial values for 3 chains:</span>
+my.inits &lt;- <span class="fn">list</span>(
+  <span class="fn">list</span>(beta0=0.4, beta1=0.025, tau=1/0.05),
+  <span class="fn">list</span>(beta0=0.4, beta1=0.055, tau=1/0.05),
+  <span class="fn">list</span>(beta0=0.4, beta1=0.025, tau=1/0.12))
+
+<span class="cm">## OR randomly generated:</span>
+my.inits &lt;- <span class="kw">function</span>()(<span class="fn">list</span>(beta0=<span class="fn">rnorm</span>(1,0.4,1), beta1=<span class="fn">rnorm</span>(1), tau=<span class="fn">runif</span>(1,0.5,1)))
+
+parameters &lt;- <span class="fn">c</span>(<span class="str">"beta0"</span>, <span class="str">"beta1"</span>, <span class="str">"sigma2"</span>)</div>
+
+  <h3>Step 8: Run the MCMC Chain</h3>
+  <div class="codeblock">osteo.sim &lt;- <span class="fn">bugs</span>(data=my.data, inits=my.inits,
+  parameters.to.save=parameters, <span class="str">"osteo.model.txt"</span>,
+  n.chains=3, n.iter=1500, n.burnin=750, n.thin=1,
+  OpenBUGS.pgm=<span class="str">"c:/Program Files (x86)/OpenBUGS/OpenBUGS323/OpenBUGS.exe"</span>,
+  working.directory=wd, clearWD=FALSE, debug=TRUE, DIC=TRUE)</div>
+
+  <div class="nb">
+    <strong>Key arguments:</strong>
+    <ul>
+      <li><code>n.iter</code>: total iterations per chain (includes burn-in)</li>
+      <li><code>n.burnin</code>: iterations to discard from start (default = 50% of n.iter)</li>
+      <li><code>n.thin</code>: thinning factor — retain every n.thin-th draw</li>
+      <li><code>debug=TRUE</code>: waits for user signal before returning to R, so you can inspect the OpenBUGS window</li>
+      <li><code>DIC=TRUE</code>: compute the Deviance Information Criterion</li>
+      <li><code>clearWD=FALSE</code>: retains the OpenBUGS log files in the working directory</li>
+    </ul>
+  </div>
+
+  <h3>Steps 9–13: Summaries and Diagnostics</h3>
+  <div class="codeblock"><span class="cm">## General output</span>
+<span class="fn">print</span>(osteo.sim); <span class="fn">plot</span>(osteo.sim)
+
+<span class="cm">## Convert to mcmc.list for CODA</span>
+osteo.mcmc &lt;- <span class="fn">as.mcmc.list</span>(osteo.sim)
+<span class="fn">plot</span>(osteo.mcmc); <span class="fn">summary</span>(osteo.mcmc)
+
+<span class="cm">## CODA diagnostics</span>
+<span class="fn">traceplot</span>(osteo.mcmc)          <span class="cm"># trace plots</span>
+<span class="fn">cumuplot</span>(osteo.mcmc, ask=FALSE) <span class="cm"># running mean plots</span>
+<span class="fn">acfplot</span>(osteo.mcmc)             <span class="cm"># ACF plot</span>
+<span class="fn">autocorr</span>(osteo.mcmc)            <span class="cm"># ACF values</span>
+<span class="fn">crosscorr.plot</span>(osteo.mcmc)     <span class="cm"># cross-correlation</span>
+<span class="fn">densplot</span>(osteo.mcmc)            <span class="cm"># marginal density plots</span>
+<span class="fn">effectiveSize</span>(osteo.mcmc)       <span class="cm"># effective sample size</span>
+<span class="fn">HPDinterval</span>(osteo.mcmc)         <span class="cm"># HPD credible intervals</span>
+
+<span class="cm">## Convergence tests</span>
+<span class="fn">gelman.diag</span>(osteo.mcmc)
+<span class="fn">gelman.plot</span>(osteo.mcmc, ask=FALSE)
+<span class="fn">geweke.diag</span>(osteo.mcmc)
+<span class="fn">geweke.plot</span>(osteo.mcmc, ask=FALSE)</div>
+</div>
+
+<!-- Section 6: JAGS -->
+<div class="card" id="s6">
+  <h2>1.3.2 Running JAGS from R (rjags)</h2>
+  <p>JAGS ("Just Another Gibbs Sampler", Plummer 2011) is written in C++ and runs on all major operating systems. The model syntax is a dialect of BUGS. The R workflow uses <strong>two-stage sampling</strong>: first build the model object, then draw samples.</p>
+
+  <h3>Steps 1–7</h3>
+  <p>Identical to the R2OpenBUGS workflow: install/load packages (<code>rjags</code>, <code>coda</code>, <code>readr</code>), load data, write the model, prepare data list, prepare initial values, and collect parameter names.</p>
+
+  <div class="warn">
+    <strong>Package note:</strong> The slide shows <code>install.packages("R2OpenBUGS")</code> in the JAGS section — this appears to be a copy-paste artefact. For JAGS, the correct package to install is <code>rjags</code>. Both <code>coda</code> and <code>readr</code> are still required.
+  </div>
+
+  <h3>Step 8: Two-Stage Sampling in JAGS</h3>
+  <div class="codeblock"><span class="cm">## Stage 1: Build model object (compiles + runs adaptation)</span>
+jags &lt;- <span class="fn">jags.model</span>(file=<span class="str">"osteo.model.txt"</span>,
+                  data=my.data, inits=my.inits, n.chains=3)
+
+<span class="cm">## Stage 2: Draw samples</span>
+osteo.sim &lt;- <span class="fn">coda.samples</span>(model=jags,
+               variable.names=parameters,
+               n.iter=1500, thin=1)</div>
+
+  <div class="nb">
+    <strong>JAGS vs R2OpenBUGS:</strong> JAGS does not require a path to an external executable — it is a pure R package. The two-stage approach (build then sample) separates model compilation from sampling, making it easy to run multiple rounds of sampling on the same compiled model. <code>coda.samples()</code> returns an <code>mcmc.list</code> object directly, so conversion is not needed.
+  </div>
+
+  <h3>Steps 9–13 and Final Step</h3>
+  <p>Identical to R2OpenBUGS: <code>print</code>, <code>plot</code>, <code>summary</code>, all CODA functions (<code>traceplot</code>, <code>effectiveSize</code>, <code>HPDinterval</code>, <code>gelman.diag</code>, <code>geweke.diag</code>, etc.), then interpret results.</p>
+</div>
+
+<!-- Section 7: NIMBLE -->
+<div class="card" id="s7">
+  <h2>1.3.3 Running NIMBLE from R</h2>
+  <p>NIMBLE ("Numerical Inference for statistical Models using Bayesian and Likelihood Estimation") extends BUGS with a programmable interface and C++ compilation. It is the most flexible of the three R-based options covered.</p>
+
+  <h3>Key Differences from JAGS / R2OpenBUGS</h3>
+  <ul>
+    <li>Model code is written inside <code>nimbleCode({ … })</code> directly in R — no separate text file required.</li>
+    <li>Data and constants are supplied <em>separately</em>: <code>my.data</code> (observed random variables) vs <code>my.constants</code> (fixed values like <code>N</code>). This distinction matters for C++ compilation.</li>
+    <li>The sampling call is <code>nimbleMCMC()</code> with the argument <code>samplesAsCodaMCMC=TRUE</code> to return an <code>mcmc.list</code>.</li>
+  </ul>
+
+  <h3>Step 4: Model Specification</h3>
+  <div class="codeblock">model &lt;- <span class="fn">nimbleCode</span>({
+  <span class="kw">for</span> (i <span class="kw">in</span> 1:N){
+    tbbmc[i] ~<span class="fn">dnorm</span>(mu[i], tau)
+    mu[i] &lt;- beta0 + beta1 * bmi[i]
+  }
+  sigma2 &lt;- 1 / tau
+  sigma  &lt;- <span class="fn">sqrt</span>(sigma2)
+  beta0 ~ <span class="fn">dnorm</span>(0, 1.0E-6)
+  beta1 ~ <span class="fn">dnorm</span>(0, 1.0E-6)
+  tau   ~ <span class="fn">dgamma</span>(1.0E-3, 1.0E-3)
+})</div>
+
+  <h3>Steps 5–6: Data and Constants</h3>
+  <div class="codeblock">N &lt;- <span class="fn">length</span>(osteop$tbbmc)
+my.data      &lt;- <span class="fn">list</span>(tbbmc=osteop$tbbmc, bmi=osteop$bmi)  <span class="cm"># stochastic nodes</span>
+my.constants &lt;- <span class="fn">list</span>(N=N)                                   <span class="cm"># fixed constants</span></div>
+
+  <h3>Step 8: Running nimbleMCMC</h3>
+  <div class="codeblock">osteo.sim &lt;- <span class="fn">nimbleMCMC</span>(
+  code=model, data=my.data, constants=my.constants,
+  inits=my.inits, monitors=parameters,
+  niter=1500, nburnin=750, nchains=3, thin=1,
+  samplesAsCodaMCMC=TRUE)</div>
+
+  <div class="nb">
+    <strong>samplesAsCodaMCMC=TRUE:</strong> This argument makes <code>nimbleMCMC()</code> return an <code>mcmc.list</code> object directly, so all standard CODA functions (traceplot, effectiveSize, gelman.diag, etc.) apply immediately without conversion.
+  </div>
+</div>
+
+<!-- Section 8: CODA / Summarising -->
+<div class="card" id="s8">
+  <h2>1.4 Summarising the MCMC Chain</h2>
+  <p>Post-sampling summarisation is done primarily with the <strong>coda</strong> package. All three workflows (R2OpenBUGS, JAGS, NIMBLE) converge to an <code>mcmc.list</code> object as the common input to CODA functions.</p>
+
+  <h3>Combining Chains</h3>
+  <div class="codeblock"><span class="fn">library</span>(runjags)
+osteo.combined &lt;- <span class="fn">combine.mcmc</span>(osteo.mcmc)
+<span class="fn">HPDinterval</span>(osteo.combined)   <span class="cm"># HPD interval on combined chain</span></div>
+
+  <div class="nb">
+    <strong>Why combine?</strong> Most CODA functions (e.g., <code>summary</code>, <code>densplot</code>) process each chain separately. Combining chains with <code>combine.mcmc()</code> pools all posterior draws into a single chain, which is needed for functions like <code>HPDinterval</code> that operate on a single sample.
+  </div>
+
+  <h3>MCMCvis Package</h3>
+  <div class="codeblock"><span class="fn">library</span>(MCMCvis)
+<span class="fn">MCMCplot</span>(object=osteo.mcmc)                           <span class="cm"># caterpillar plot</span>
+<span class="fn">MCMCtrace</span>(object=osteo.mcmc, iter=4000, pdf=FALSE,
+          params=parameters, type=<span class="str">"trace"</span>)              <span class="cm"># trace plot</span>
+<span class="fn">MCMCtrace</span>(object=osteo.mcmc, iter=4000, pdf=FALSE,
+          ind=TRUE, params=parameters, type=<span class="str">"density"</span>)  <span class="cm"># density by chain</span>
+<span class="fn">MCMCpstr</span>(mcmc.output, func=<span class="kw">function</span>(x) <span class="fn">sd</span>(x)/<span class="fn">sqrt</span>(<span class="fn">length</span>(x)))  <span class="cm"># MCSE</span>
+<span class="fn">MCMCsummary</span>(object=osteo.mcmc, round=2)                <span class="cm"># table summary</span>
+<span class="fn">MCMCsummary</span>(object=osteo.mcmc, round=2,
+            HPD=TRUE, hpd_prob=0.95)                    <span class="cm"># with HPD intervals</span></div>
+
+  <h3>ggmcmc Package</h3>
+  <div class="codeblock"><span class="fn">library</span>(ggmcmc)
+out.ggs &lt;- <span class="fn">ggs</span>(osteo.mcmc)         <span class="cm"># convert to ggs object</span>
+<span class="fn">ggs_histogram</span>(out.ggs)              <span class="cm"># posterior histograms</span>
+<span class="fn">ggs_traceplot</span>(out.ggs)              <span class="cm"># trace plots</span>
+<span class="fn">ggs_running</span>(out.ggs)                <span class="cm"># running mean plots</span>
+<span class="fn">ggs_compare_partial</span>(out.ggs)        <span class="cm"># chain comparison</span>
+<span class="fn">ggs_geweke</span>(out.ggs)                 <span class="cm"># Geweke diagnostic</span>
+<span class="fn">ggs_pairs</span>(out.ggs)                  <span class="cm"># bivariate scatter plots</span>
+<span class="fn">ggs_autocorrelation</span>(out.ggs)        <span class="cm"># ACF</span>
+<span class="fn">ggs_caterpillar</span>(out.ggs)            <span class="cm"># credible interval plot</span>
+<span class="fn">ggs_crosscorrelation</span>(out.ggs)       <span class="cm"># cross-correlation matrix</span>
+<span class="fn">ggs_density</span>(out.ggs)                <span class="cm"># density plots</span>
+<span class="fn">ggs_diagnostics</span>(out.ggs)            <span class="cm"># combined diagnostics</span></div>
+
+  <h3>Summary of CODA Output Functions</h3>
+  <table>
+    <thead><tr><th>Function</th><th>Package</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>traceplot()</code></td><td>coda</td><td>Raw chain values over iterations — checks stationarity</td></tr>
+      <tr><td><code>cumuplot()</code></td><td>coda</td><td>Running posterior mean — checks convergence of estimates</td></tr>
+      <tr><td><code>acfplot()</code></td><td>coda</td><td>Autocorrelation function — diagnoses mixing quality</td></tr>
+      <tr><td><code>densplot()</code></td><td>coda</td><td>Kernel density estimate of marginal posterior</td></tr>
+      <tr><td><code>effectiveSize()</code></td><td>coda</td><td>Effective sample size K_eff (accounts for autocorrelation)</td></tr>
+      <tr><td><code>HPDinterval()</code></td><td>coda</td><td>Highest Posterior Density credible interval</td></tr>
+      <tr><td><code>gelman.diag()</code></td><td>coda</td><td>Gelman-Rubin convergence statistic R-hat</td></tr>
+      <tr><td><code>gelman.plot()</code></td><td>coda</td><td>R-hat evolution over iterations</td></tr>
+      <tr><td><code>geweke.diag()</code></td><td>coda</td><td>Z-statistic comparing early vs late chain segments</td></tr>
+      <tr><td><code>crosscorr.plot()</code></td><td>coda</td><td>Posterior cross-correlation matrix — identifies blocking needs</td></tr>
+      <tr><td><code>MCMCsummary()</code></td><td>MCMCvis</td><td>Table: mean, SD, quantiles, R-hat, n_eff</td></tr>
+      <tr><td><code>ggs_caterpillar()</code></td><td>ggmcmc</td><td>ggplot2 credible interval plot across parameters</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== MCQ ==================== -->
+<div class="sec-title" id="mcq">📝 30 Multiple-Choice Questions</div>
+<p style="margin-bottom:16px;color:var(--muted);font-size:.88rem;">Focus: R operations, BUGS language, output interpretation, and CODA diagnostics. Click an option to check your answer.</p>
+
+<div class="score-bar">
+  <span>Score</span>
+  <span id="score-display">0 / 0</span>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+</div>
+
+<!-- Q1 -->
+<div class="qblock" id="q1">
+  <div class="qnum">Question 1 of 30 — Software Landscape</div>
+  <div class="qtext">Which of the following statements about WinBUGS and OpenBUGS is CORRECT?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">A. WinBUGS is the actively maintained open-source successor to OpenBUGS</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">B. OpenBUGS and WinBUGS use entirely different model languages and are not compatible</button>
+    <button class="opt" data-correct="true" onclick="answer('q1',this)">C. OpenBUGS is the open-source continuation of WinBUGS; WinBUGS is no longer updated and its final version is 1.4.3</button>
+    <button class="opt" data-correct="false" onclick="answer('q1',this)">D. WinBUGS can be installed without issues on all versions of Windows including Windows 10</button>
+  </div>
+  <div class="fb" id="q1-fb"></div>
+</div>
+
+<!-- Q2 -->
+<div class="qblock" id="q2">
+  <div class="qnum">Question 2 of 30 — BUGS Parameterization</div>
+  <div class="qtext">In the BUGS language, the statement <code>tbbmc[i] ~ dnorm(mu[i], tau)</code> specifies that tbbmc[i] follows a normal distribution with mean mu[i] and:</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">A. Standard deviation tau</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">B. Variance tau</button>
+    <button class="opt" data-correct="true" onclick="answer('q2',this)">C. Precision tau (= 1/variance)</button>
+    <button class="opt" data-correct="false" onclick="answer('q2',this)">D. Log-standard deviation tau</button>
+  </div>
+  <div class="fb" id="q2-fb"></div>
+</div>
+
+<!-- Q3 -->
+<div class="qblock" id="q3">
+  <div class="qnum">Question 3 of 30 — BUGS Language: Declarative Property</div>
+  <div class="qtext">A student writes a WinBUGS model where the prior for tau appears before the likelihood loop. Their supervisor says this will cause an error. The student argues the order does not matter. Who is correct?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">A. The supervisor — BUGS requires likelihood before priors</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">B. The supervisor — priors must always appear after all logical nodes</button>
+    <button class="opt" data-correct="true" onclick="answer('q3',this)">C. The student — the BUGS language is declarative, so statement order does not affect the result</button>
+    <button class="opt" data-correct="false" onclick="answer('q3',this)">D. Neither — both orderings produce identical output by accident only</button>
+  </div>
+  <div class="fb" id="q3-fb"></div>
+</div>
+
+<!-- Q4 -->
+<div class="qblock" id="q4">
+  <div class="qnum">Question 4 of 30 — WinBUGS Workflow Order</div>
+  <div class="qtext">After opening a .odc file in WinBUGS, what is the correct order of operations in the Specification Tool?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">A. Load data → Check model → Compile → Load inits</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">B. Compile → Check model → Load data → Load inits</button>
+    <button class="opt" data-correct="true" onclick="answer('q4',this)">C. Check model → Load data → Compile → Load inits</button>
+    <button class="opt" data-correct="false" onclick="answer('q4',this)">D. Load inits → Load data → Check model → Compile</button>
+  </div>
+  <div class="fb" id="q4-fb"></div>
+</div>
+
+<!-- Q5 -->
+<div class="qblock" id="q5">
+  <div class="qnum">Question 5 of 30 — Sample Monitor Tool</div>
+  <div class="qtext">In Win/OpenBUGS, to monitor all nodes in the Sample Monitor Tool, what do you type in the node field?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">A. <code>all</code></button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">B. <code>model</code></button>
+    <button class="opt" data-correct="true" onclick="answer('q5',this)">C. <code>*</code></button>
+    <button class="opt" data-correct="false" onclick="answer('q5',this)">D. <code>?</code></button>
+  </div>
+  <div class="fb" id="q5-fb"></div>
+</div>
+
+<!-- Q6 -->
+<div class="qblock" id="q6">
+  <div class="qnum">Question 6 of 30 — Burn-in Removal in WinBUGS</div>
+  <div class="qtext">After running 2,000 total iterations in WinBUGS, you want to view the trace of iterations 1,001 to 2,000 only (discarding the first 1,000 as burn-in). In the Sample Monitor Tool, which values do you set?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">A. beg = 1, end = 1000</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">B. beg = 1000, end = 2000</button>
+    <button class="opt" data-correct="true" onclick="answer('q6',this)">C. beg = 1001, end = 2000, then click history</button>
+    <button class="opt" data-correct="false" onclick="answer('q6',this)">D. Set n.burnin = 1000 in the Update Tool and re-run</button>
+  </div>
+  <div class="fb" id="q6-fb"></div>
+</div>
+
+<!-- Q7 -->
+<div class="qblock" id="q7">
+  <div class="qnum">Question 7 of 30 — Thinning Behaviour</div>
+  <div class="qtext">In WinBUGS, you set <code>thin = 10</code> in the Sample Monitor Tool and then request 500 iterations from the Update Tool. How many iterations are actually generated?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">A. 50 — because only every 10th is kept</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">B. 500 — thinning only affects which draws are stored, not how many are generated</button>
+    <button class="opt" data-correct="true" onclick="answer('q7',this)">C. 5,000 — with thin = 10, the number of iterations generated is 10 × the requested number</button>
+    <button class="opt" data-correct="false" onclick="answer('q7',this)">D. 500, but only 50 are used to compute summary statistics</button>
+  </div>
+  <div class="fb" id="q7-fb"></div>
+</div>
+
+<!-- Q8 -->
+<div class="qblock" id="q8">
+  <div class="qnum">Question 8 of 30 — Improper Priors</div>
+  <div class="qtext">A researcher wants to specify a flat (improper) prior for an intercept β₀ in WinBUGS by writing <code>beta0 ~ dunif(-1e10, 1e10)</code>. Which statement is most accurate?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">A. This is the standard way to specify improper priors in WinBUGS</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">B. WinBUGS will accept this but it is mathematically identical to dnorm(0, 1e-6)</button>
+    <button class="opt" data-correct="true" onclick="answer('q8',this)">C. WinBUGS does not allow improper priors; a vague proper prior such as <code>dnorm(0, 1.0E-6)</code> should be used instead</button>
+    <button class="opt" data-correct="false" onclick="answer('q8',this)">D. This will compile but the sampler will produce biased posterior estimates</button>
+  </div>
+  <div class="fb" id="q8-fb"></div>
+</div>
+
+<!-- Q9 -->
+<div class="qblock" id="q9">
+  <div class="qnum">Question 9 of 30 — Initial Values for Logical Nodes</div>
+  <div class="qtext">In the osteoporosis WinBUGS model, <code>sigma &lt;- sqrt(sigma2)</code> is a logical node. Which statement about initial values is correct?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">A. An initial value for sigma must be provided since it is monitored</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">B. Initial values for both sigma and tau must be provided</button>
+    <button class="opt" data-correct="true" onclick="answer('q9',this)">C. Initial values must not be specified for logical nodes — only for stochastic nodes like tau</button>
+    <button class="opt" data-correct="false" onclick="answer('q9',this)">D. Initial values for logical nodes are optional but always improve convergence</button>
+  </div>
+  <div class="fb" id="q9-fb"></div>
+</div>
+
+<!-- Q10 -->
+<div class="qblock" id="q10">
+  <div class="qnum">Question 10 of 30 — BGR Diagnostic Setup</div>
+  <div class="qtext">To use the Gelman-Rubin (BGR) convergence diagnostic in Win/OpenBUGS, which of the following is REQUIRED?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">A. At least 10,000 post-burn-in iterations</button>
+    <button class="opt" data-correct="true" onclick="answer('q10',this)">B. Multiple chains (≥ 2) started from overdispersed initial values</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">C. A single long chain with at least 50% thinning</button>
+    <button class="opt" data-correct="false" onclick="answer('q10',this)">D. The CODA package installed in R before running WinBUGS</button>
+  </div>
+  <div class="fb" id="q10-fb"></div>
+</div>
+
+<!-- Q11 -->
+<div class="qblock" id="q11">
+  <div class="qnum">Question 11 of 30 — R2OpenBUGS: n.burnin Argument</div>
+  <div class="qtext">In an R2OpenBUGS <code>bugs()</code> call with <code>n.iter=2000</code> and <code>n.burnin=500</code>, how many post-burn-in iterations per chain are retained (assuming <code>n.thin=1</code>)?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">A. 2,000</button>
+    <button class="opt" data-correct="true" onclick="answer('q11',this)">B. 1,500</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">C. 500</button>
+    <button class="opt" data-correct="false" onclick="answer('q11',this)">D. 1,000 (n.iter / 2 by default)</button>
+  </div>
+  <div class="fb" id="q11-fb"></div>
+</div>
+
+<!-- Q12 -->
+<div class="qblock" id="q12">
+  <div class="qnum">Question 12 of 30 — R2OpenBUGS: debug Argument</div>
+  <div class="qtext">In <code>bugs(…, debug=TRUE)</code>, what is the effect of setting <code>debug=TRUE</code>?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">A. It prints verbose R error messages if the model fails to compile</button>
+    <button class="opt" data-correct="true" onclick="answer('q12',this)">B. It keeps the OpenBUGS window open and waits for a user signal before returning control to R</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">C. It activates step-by-step iteration output for checking the sampler</button>
+    <button class="opt" data-correct="false" onclick="answer('q12',this)">D. It disables DIC computation to allow faster debugging</button>
+  </div>
+  <div class="fb" id="q12-fb"></div>
+</div>
+
+<!-- Q13 -->
+<div class="qblock" id="q13">
+  <div class="qnum">Question 13 of 30 — as.mcmc.list()</div>
+  <div class="qtext">Why is <code>osteo.mcmc &lt;- as.mcmc.list(osteo.sim)</code> called after <code>bugs()</code> in the R2OpenBUGS workflow?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">A. To combine multiple chains into a single chain for summarisation</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">B. To thin the chain to reduce storage size</button>
+    <button class="opt" data-correct="true" onclick="answer('q13',this)">C. To convert the bugs output object into an mcmc.list so that all CODA diagnostic functions can be applied</button>
+    <button class="opt" data-correct="false" onclick="answer('q13',this)">D. To discard the burn-in samples that were not removed by R2OpenBUGS</button>
+  </div>
+  <div class="fb" id="q13-fb"></div>
+</div>
+
+<!-- Q14 -->
+<div class="qblock" id="q14">
+  <div class="qnum">Question 14 of 30 — effectiveSize()</div>
+  <div class="qtext">The R output <code>effectiveSize(osteo.mcmc)</code> returns a value of 120 for beta1, while the total retained chain length is 3,000 (3 chains × 1,000 iterations). What does this tell you?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">A. Only 120 iterations were retained after burn-in across all chains</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">B. The acceptance rate for beta1 was 120/3000 ≈ 4%</button>
+    <button class="opt" data-correct="true" onclick="answer('q14',this)">C. Due to high autocorrelation, the 3,000 draws contain only as much information as 120 independent draws — the chain for beta1 is mixing poorly</button>
+    <button class="opt" data-correct="false" onclick="answer('q14',this)">D. The convergence diagnostic passed: 120 > 100 effective samples is sufficient</button>
+  </div>
+  <div class="fb" id="q14-fb"></div>
+</div>
+
+<!-- Q15 -->
+<div class="qblock" id="q15">
+  <div class="qnum">Question 15 of 30 — HPDinterval()</div>
+  <div class="qtext">After running <code>HPDinterval(osteo.mcmc)</code> in R, you receive a list with one matrix per chain. You want a single HPD interval that pools all chains. What is the correct approach?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">A. Average the lower and upper bounds across the three chain-specific intervals</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">B. Take the widest of the three chain-specific intervals to be conservative</button>
+    <button class="opt" data-correct="true" onclick="answer('q15',this)">C. First combine chains with <code>combine.mcmc()</code> from the runjags package, then call <code>HPDinterval()</code> on the combined object</button>
+    <button class="opt" data-correct="false" onclick="answer('q15',this)">D. Use <code>gelman.diag()</code> instead, which automatically pools chains for HPD computation</button>
+  </div>
+  <div class="fb" id="q15-fb"></div>
+</div>
+
+<!-- Q16 -->
+<div class="qblock" id="q16">
+  <div class="qnum">Question 16 of 30 — gelman.diag() Interpretation</div>
+  <div class="qtext">You run <code>gelman.diag(osteo.mcmc)</code> and observe that the Point estimate (R-hat) for beta1 is 1.52. What is the correct interpretation?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">A. The chains have converged; R-hat values above 1 are expected and acceptable</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">B. 52% of the posterior mass for beta1 lies above the prior mean</button>
+    <button class="opt" data-correct="true" onclick="answer('q16',this)">C. The chains have NOT converged; R-hat >> 1 indicates the between-chain variance is much larger than the within-chain variance — more iterations or better starting values are needed</button>
+    <button class="opt" data-correct="false" onclick="answer('q16',this)">D. The effective sample size is 1.52 times the total chain length</button>
+  </div>
+  <div class="fb" id="q16-fb"></div>
+</div>
+
+<!-- Q17 -->
+<div class="qblock" id="q17">
+  <div class="qnum">Question 17 of 30 — traceplot() Interpretation</div>
+  <div class="qtext">Inspecting <code>traceplot(osteo.mcmc)</code>, you see that sigma2 shows a "hairy caterpillar" pattern — dense, rapidly varying values centered around a stable level. What does this indicate?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">A. The chain for sigma2 has not converged — it needs more burn-in</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">B. The sigma2 posterior is multimodal</button>
+    <button class="opt" data-correct="true" onclick="answer('q17',this)">C. Good mixing — the chain for sigma2 is exploring the posterior efficiently with low autocorrelation</button>
+    <button class="opt" data-correct="false" onclick="answer('q17',this)">D. The acceptance rate is too high and the proposal variance should be increased</button>
+  </div>
+  <div class="fb" id="q17-fb"></div>
+</div>
+
+<!-- Q18 -->
+<div class="qblock" id="q18">
+  <div class="qnum">Question 18 of 30 — cumuplot() Interpretation</div>
+  <div class="qtext">The function <code>cumuplot(osteo.mcmc)</code> shows a running mean plot. What pattern would you expect to see for a parameter that has converged well?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">A. The running mean oscillates between two extreme values throughout the chain</button>
+    <button class="opt" data-correct="true" onclick="answer('q18',this)">B. The running mean stabilizes to a constant value relatively early in the chain</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">C. The running mean decreases monotonically toward zero</button>
+    <button class="opt" data-correct="false" onclick="answer('q18',this)">D. The running mean from each chain should converge to a different value</button>
+  </div>
+  <div class="fb" id="q18-fb"></div>
+</div>
+
+<!-- Q19 -->
+<div class="qblock" id="q19">
+  <div class="qnum">Question 19 of 30 — JAGS: Two-Stage Sampling</div>
+  <div class="qtext">In the JAGS workflow from R, which function corresponds to <em>compiling the model and running adaptation</em>, and which function draws the actual posterior samples?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">A. <code>bugs()</code> compiles; <code>coda.samples()</code> adapts</button>
+    <button class="opt" data-correct="true" onclick="answer('q19',this)">B. <code>jags.model()</code> compiles and adapts; <code>coda.samples()</code> draws posterior samples</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">C. <code>coda.samples()</code> compiles; <code>jags.model()</code> draws samples</button>
+    <button class="opt" data-correct="false" onclick="answer('q19',this)">D. <code>nimbleMCMC()</code> is used for both steps when running JAGS</button>
+  </div>
+  <div class="fb" id="q19-fb"></div>
+</div>
+
+<!-- Q20 -->
+<div class="qblock" id="q20">
+  <div class="qnum">Question 20 of 30 — JAGS Output Format</div>
+  <div class="qtext">After running <code>osteo.sim &lt;- coda.samples(model=jags, variable.names=parameters, n.iter=1500)</code> in JAGS, what class is <code>osteo.sim</code>?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">A. A bugs object that must be converted with <code>as.mcmc.list()</code></button>
+    <button class="opt" data-correct="true" onclick="answer('q20',this)">B. An mcmc.list object, ready for direct use with all CODA functions</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">C. A list of matrices — one per parameter — that must be reformatted</button>
+    <button class="opt" data-correct="false" onclick="answer('q20',this)">D. A nimble object that requires the NIMBLE package to process</button>
+  </div>
+  <div class="fb" id="q20-fb"></div>
+</div>
+
+<!-- Q21 -->
+<div class="qblock" id="q21">
+  <div class="qnum">Question 21 of 30 — NIMBLE: data vs constants</div>
+  <div class="qtext">In NIMBLE, <code>my.data</code> and <code>my.constants</code> are supplied separately to <code>nimbleMCMC()</code>. What is the distinction between them?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">A. <code>my.data</code> contains the prior hyperparameters; <code>my.constants</code> contains the observed data</button>
+    <button class="opt" data-correct="true" onclick="answer('q21',this)">B. <code>my.data</code> contains observed stochastic nodes (e.g., the response and covariates); <code>my.constants</code> contains fixed values like sample size N that are not random variables</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">C. <code>my.data</code> is used only for the likelihood; <code>my.constants</code> is used only for the priors</button>
+    <button class="opt" data-correct="false" onclick="answer('q21',this)">D. They are interchangeable in NIMBLE — the separation is a stylistic convention only</button>
+  </div>
+  <div class="fb" id="q21-fb"></div>
+</div>
+
+<!-- Q22 -->
+<div class="qblock" id="q22">
+  <div class="qnum">Question 22 of 30 — NIMBLE: samplesAsCodaMCMC</div>
+  <div class="qtext">What is the effect of setting <code>samplesAsCodaMCMC=TRUE</code> in <code>nimbleMCMC()</code>?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">A. It triggers additional adaptive MCMC steps to improve mixing</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">B. It automatically runs the Gelman-Rubin convergence test after sampling</button>
+    <button class="opt" data-correct="true" onclick="answer('q22',this)">C. It returns the output directly as an mcmc.list object, so CODA functions can be applied without any conversion step</button>
+    <button class="opt" data-correct="false" onclick="answer('q22',this)">D. It stores each MCMC sample to disk as a coda-formatted CSV file</button>
+  </div>
+  <div class="fb" id="q22-fb"></div>
+</div>
+
+<!-- Q23 -->
+<div class="qblock" id="q23">
+  <div class="qnum">Question 23 of 30 — Multiple Regression in BUGS</div>
+  <div class="qtext">In the multiple regression WinBUGS program for the osteoporosis data, the linear predictor is coded as <code>mu[i] &lt;- inprod(beta[], x[i,])</code>. What does <code>inprod()</code> compute?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">A. The inner product of x[i,] with itself (i.e., the squared norm)</button>
+    <button class="opt" data-correct="true" onclick="answer('q23',this)">B. The scalar (dot) product between the vector of coefficients beta[] and the covariate row vector x[i,]</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">C. A matrix product that returns a vector</button>
+    <button class="opt" data-correct="false" onclick="answer('q23',this)">D. The inverse of the product of beta[] and x[i,]</button>
+  </div>
+  <div class="fb" id="q23-fb"></div>
+</div>
+
+<!-- Q24 -->
+<div class="qblock" id="q24">
+  <div class="qnum">Question 24 of 30 — Centering Covariates</div>
+  <div class="qtext">The code <code>mu[i] &lt;- beta0 + beta1*(bmi[i]-mean(bmi[]))/sd(bmi[])</code> standardizes bmi in the WinBUGS model. What is the primary statistical motivation for this?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">A. It forces beta1 to be dimensionless for interpretability</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">B. It is required syntax for using mean() and sd() in BUGS</button>
+    <button class="opt" data-correct="true" onclick="answer('q24',this)">C. It reduces the posterior correlation between beta0 and beta1, which improves MCMC mixing and convergence speed</button>
+    <button class="opt" data-correct="false" onclick="answer('q24',this)">D. It makes the posterior for beta0 identical to that of a ridge prior</button>
+  </div>
+  <div class="fb" id="q24-fb"></div>
+</div>
+
+<!-- Q25 -->
+<div class="qblock" id="q25">
+  <div class="qnum">Question 25 of 30 — MCMCsummary() Output</div>
+  <div class="qtext">You call <code>MCMCsummary(object=osteo.mcmc, round=2, HPD=TRUE, hpd_prob=0.95)</code>. Compared to the default <code>MCMCsummary(object=osteo.mcmc, round=2)</code>, what additional information appears in the output?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">A. The Geweke Z-statistic for each parameter</button>
+    <button class="opt" data-correct="true" onclick="answer('q25',this)">B. The lower and upper bounds of the 95% Highest Posterior Density (HPD) credible interval, in addition to the standard equal-tails quantile interval</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">C. The prior mean and prior variance for each parameter</button>
+    <button class="opt" data-correct="false" onclick="answer('q25',this)">D. The DIC and effective number of parameters pD</button>
+  </div>
+  <div class="fb" id="q25-fb"></div>
+</div>
+
+<!-- Q26 -->
+<div class="qblock" id="q26">
+  <div class="qnum">Question 26 of 30 — ggmcmc: ggs() Conversion</div>
+  <div class="qtext">In the ggmcmc workflow, what is the purpose of calling <code>out.ggs &lt;- ggs(osteo.mcmc)</code> before using functions like <code>ggs_traceplot()</code>?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">A. It burns in the chain using ggplot2's internal optimizer</button>
+    <button class="opt" data-correct="true" onclick="answer('q26',this)">B. It converts the mcmc.list into a long-format data frame (ggs object) that all ggmcmc plotting functions expect as input</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">C. It applies thinning and stores only every 10th draw for faster plotting</button>
+    <button class="opt" data-correct="false" onclick="answer('q26',this)">D. It computes summary statistics and caches them to speed up subsequent plots</button>
+  </div>
+  <div class="fb" id="q26-fb"></div>
+</div>
+
+<!-- Q27 -->
+<div class="qblock" id="q27">
+  <div class="qnum">Question 27 of 30 — ACF Plot Interpretation</div>
+  <div class="qtext">After calling <code>acfplot(osteo.mcmc)</code>, you see that for beta1 the autocorrelation at lag 1 is 0.96 and remains above 0.5 until lag 40. For sigma2 the autocorrelation drops to near zero by lag 3. What is the most appropriate next step for beta1?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">A. Accept the results since convergence depends only on traceplot stationarity, not ACF</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">B. Reduce the total number of iterations since the chain has converged for sigma2</button>
+    <button class="opt" data-correct="true" onclick="answer('q27',this)">C. Investigate poor mixing for beta1 — consider standardizing covariates, using blocking, or running more iterations; the effective sample size for beta1 is very small relative to the chain length</button>
+    <button class="opt" data-correct="false" onclick="answer('q27',this)">D. Re-specify the prior for beta1 as it is causing the high autocorrelation</button>
+  </div>
+  <div class="fb" id="q27-fb"></div>
+</div>
+
+<!-- Q28 -->
+<div class="qblock" id="q28">
+  <div class="qnum">Question 28 of 30 — crosscorr.plot() and Blocking</div>
+  <div class="qtext">The <code>crosscorr.plot(osteo.mcmc)</code> output shows a very dark square for the (beta[2], beta[4]) cell, indicating a cross-correlation close to ±1. What BUGS model modification is most likely to address this?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">A. Replace the vague normal prior with a Gamma prior on beta[2] and beta[4]</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">B. Increase n.iter to run the chain for longer</button>
+    <button class="opt" data-correct="true" onclick="answer('q28',this)">C. Use a multivariate normal prior <code>beta[1:6] ~ dmnorm(mu.beta[], prec.beta[,])</code> to sample the correlated coefficients jointly (blocking), or standardize the correlated covariates</button>
+    <button class="opt" data-correct="false" onclick="answer('q28',this)">D. Remove one of beta[2] or beta[4] from the model to eliminate the collinearity</button>
+  </div>
+  <div class="fb" id="q28-fb"></div>
+</div>
+
+<!-- Q29 -->
+<div class="qblock" id="q29">
+  <div class="qnum">Question 29 of 30 — NIMBLE vs JAGS Key Difference</div>
+  <div class="qtext">Which feature of NIMBLE is NOT available in JAGS or R2OpenBUGS?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">A. Specification of the model using BUGS-like syntax</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">B. Running multiple chains with different initial values</button>
+    <button class="opt" data-correct="false" onclick="answer('q29',this)">C. Post-processing chains with CODA functions</button>
+    <button class="opt" data-correct="true" onclick="answer('q29',this)">D. Writing and plugging in custom user-defined MCMC samplers and distributions directly in R/C++</button>
+  </div>
+  <div class="fb" id="q29-fb"></div>
+</div>
+
+<!-- Q30 -->
+<div class="qblock" id="q30">
+  <div class="qnum">Question 30 of 30 — Rectangular Data Format in WinBUGS</div>
+  <div class="qtext">In the multiple regression WinBUGS .odc file, the data section contains both a <code>list(N=186)</code> statement and a rectangular table ending with <code>END</code>. How must these two data parts be loaded?</div>
+  <div class="opts">
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">A. Only the list() statement needs to be loaded; the rectangular table is read automatically</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">B. Both parts must be merged into a single list() before loading</button>
+    <button class="opt" data-correct="true" onclick="answer('q30',this)">C. Each part must be highlighted separately and <em>load data</em> clicked once for each part</button>
+    <button class="opt" data-correct="false" onclick="answer('q30',this)">D. The rectangular table is loaded automatically at compile time; only the list() needs to be loaded manually</button>
+  </div>
+  <div class="fb" id="q30-fb"></div>
+</div>
+
+</div><!-- end .wrap -->
+
+<script>
+let score = 0, answered = 0;
+
+function answer(qId, btn) {
+  const block = document.getElementById(qId);
+  const buttons = block.querySelectorAll('.opt');
+  if (buttons[0].disabled) return;
+  const isCorrect = btn.dataset.correct === 'true';
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('ok');
+  });
+  const fb = document.getElementById(qId + '-fb');
+  if (isCorrect) {
+    score++;
+    fb.textContent = '✓ Correct!';
+    fb.className = 'fb ok-fb';
+  } else {
+    btn.classList.add('bad');
+    fb.textContent = '✗ Incorrect. The correct answer is highlighted above.';
+    fb.className = 'fb bad-fb';
+  }
+  answered++;
+  document.getElementById('score-display').textContent = score + ' / ' + answered;
+}
+
+function resetAll() {
+  score = 0; answered = 0;
+  document.getElementById('score-display').textContent = '0 / 0';
+  document.querySelectorAll('.opt').forEach(b => {
+    b.disabled = false;
+    b.classList.remove('ok', 'bad');
+  });
+  document.querySelectorAll('.fb').forEach(f => {
+    f.className = 'fb';
+    f.textContent = '';
+  });
+}
+</script>
+
+</body>
+</html>
