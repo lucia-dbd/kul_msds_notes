@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistical Inference II – Chapter 2 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() { console.log('MathJax ready'); });
+    }
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* ── Nav Bar ── */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ── Notes Section ── */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin: 20px 0 8px;
+  }
+
+  /* ── Content Boxes ── */
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+
+  /* ── Tables ── */
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+
+  /* ── MCQ Section ── */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 {
+    color: #92400e;
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .score-display {
+    background:#fff3cd; border:1px solid #ffc107; border-radius:20px;
+    padding:5px 18px; font-weight:700; color:#856404;
+    display:inline-block; font-size:0.95em; margin-bottom:20px;
+  }
+  .mcq-card {
+    background:#f9fafb; border:1px solid #e5e9f2;
+    border-radius:10px; padding:20px 24px; margin-bottom:20px;
+  }
+  .mcq-card .question-label {
+    font-size:0.8em; font-weight:700; color:#2e6da4;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .mcq-card .question-stem {
+    font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em;
+  }
+  .option-btn {
+    display:block; width:100%; background:#ffffff;
+    border:1.5px solid #d0d8ea; border-radius:8px;
+    padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.selected  { background:#dce8f8; border-color:#2e6da4; color:#1a3a5c; font-weight:600; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+
+  /* ── Short Answer Section ── */
+  .sa-section {
+    background-color:#ffffff;
+    border-radius:12px;
+    padding:28px 36px;
+    margin-bottom:28px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section > h2 {
+    color:#4a148c;
+    font-size:1.2em;
+    font-weight:700;
+    margin-bottom:20px;
+    font-family:'Crimson Pro', Georgia, serif;
+  }
+  .sa-card {
+    background:#faf9ff; border:1px solid #e2dcf5;
+    border-radius:10px; padding:20px 24px; margin-bottom:20px;
+  }
+  .sa-card .question-label {
+    color:#6f42c1; font-size:0.8em; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn {
+    background:#6f42c1; color:#ffffff; border:none;
+    border-radius:20px; padding:7px 22px; font-size:0.88em;
+    font-weight:600; cursor:pointer; margin-top:12px;
+    transition:background 0.2s; font-family:inherit;
+  }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel {
+    background:#f3f0ff; border:1px solid #d4c8f5;
+    border-radius:8px; padding:18px 22px; margin-top:14px;
+    font-size:0.95em; line-height:1.8; display:none;
+  }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block {
+    background:#fff8e1; border-left:3px solid #ffc107;
+    padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0;
+    font-size:0.92em;
+  }
+  .followup-block strong { color:#7c5800; }
+
+  /* ── Reset Button ── */
+  .reset-btn {
+    background:#1a3a5c; color:#fff; border:none; border-radius:20px;
+    padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer;
+    margin-bottom:20px; transition:background 0.2s; font-family:inherit;
+  }
+  .reset-btn:hover { background:#2e6da4; }
+
+  @media(max-width:600px){
+    .notes-section, .mcq-section, .sa-section { padding:18px 14px; }
+    .page-header { padding:20px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<div class="page-header">
+  <h1>Statistical Inference II — Chapter 2</h1>
+  <div class="subtitle">Hypothesis Testing · The Holy Trinity · Invariance · Misspecification · Generalized Linear Models · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav class="nav-bar">
+  <a href="#intro">Introduction</a>
+  <a href="#hypotheses">Hypotheses</a>
+  <a href="#critical">Critical Region</a>
+  <a href="#errors">Type I &amp; II</a>
+  <a href="#ttest">t-Test</a>
+  <a href="#sigtesting">p-Values &amp; CIs</a>
+  <a href="#trinity">Holy Trinity</a>
+  <a href="#invariance">Invariance</a>
+  <a href="#binomial">Binomial Proportion</a>
+  <a href="#misspec">Misspecification</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ═══════════════════ NOTES ═══════════════════ -->
+
+<!-- 1. Introduction -->
+<div class="notes-section" id="intro">
+  <h2>1. Inferential Statistics: Introduction</h2>
+  <div class="key-point">
+    Scientific research often aims to test whether a hypothesis about a <strong>population</strong> is correct. Since studying an entire population is rarely feasible, we use a <strong>sample</strong> and must account for <em>inevitable sampling variability</em> when drawing conclusions.
+  </div>
+  <p>Three main inferential frameworks are distinguished in this course:</p>
+  <table>
+    <thead><tr><th>Method</th><th>Tool</th><th>Probability Role</th><th>Hypotheses</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Hypothesis Testing</strong> (Neyman–Pearson)</td><td>Critical region $W$</td><td>Pre-data; long-run frequency of the decision rule</td><td>Both $H_0$ and $H_1$</td></tr>
+      <tr><td><strong>Significance Testing</strong> (Fisher)</td><td>p-value</td><td>Post-data; compatibility of data with $H_0$</td><td>Only $H_0$</td></tr>
+      <tr><td><strong>Confidence Intervals</strong></td><td>Interval $[u(\mathbf{y}), v(\mathbf{y})]$</td><td>Inversion of a test; plausible parameter range</td><td>Implicitly $H_0$</td></tr>
+    </tbody>
+  </table>
+  <div class="example-box">
+    <strong>Running Example — Birth Weight in Limburg:</strong> A journal reports average birth weight in Flanders is 3.3 kg. A gynecologist suspects Limburg differs. With $\mu_L$ denoting the Limburg mean and a sample of $n = 30$ babies: $H_0: \mu_L = 3.3$ vs $H_A: \mu_L \neq 3.3$, assuming $X_i \sim \mathcal{N}(\mu_L, \sigma_L^2)$.
+  </div>
+</div>
+
+<!-- 2. Hypotheses -->
+<div class="notes-section" id="hypotheses">
+  <h2>2. Hypothesis Formulation</h2>
+
+  <div class="theorem-box">
+    <strong>Definition (Hypothesis):</strong> A statement about a population parameter. Testing always involves a <em>null hypothesis</em> $H_0$ and an <em>alternative</em> $H_1$ (or $H_A$).
+  </div>
+
+  <div class="theorem-box">
+    <strong>Definition (Simple vs Composite):</strong><br>
+    A <strong>simple hypothesis</strong> completely specifies the population distribution.<br>
+    A <strong>composite hypothesis</strong> does not — it leaves some freedom.<br><br>
+    Example: $H_0: \theta = \theta_0$ is <em>simple</em>. $H_1: \theta > \theta_0$, $H_1: \theta < \theta_0$, $H_1: \theta \neq \theta_0$ are all <em>composite</em>.
+  </div>
+
+  <table>
+    <thead><tr><th>Test Type</th><th>Assumption</th><th>Scope of this course</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Parametric</strong></td><td>Data follow a known family; test concerns parameters of that family</td><td>Yes — focus throughout</td></tr>
+      <tr><td><strong>Non-parametric</strong></td><td>No assumed distributional form or parameters</td><td>Not covered</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 3. Critical Region -->
+<div class="notes-section" id="critical">
+  <h2>3. The Critical Region &amp; Neyman–Pearson Framework</h2>
+
+  <p>A statistical test rests on <strong>three elements</strong>: (1) null and alternative hypotheses, (2) a rejection region based on a test statistic and critical value, (3) Type I and Type II errors.</p>
+
+  <div class="theorem-box">
+    <strong>Definition (Critical Region):</strong> The set of sample values for which $H_0$ is rejected:
+    \[W = \{\mathbf{y} : T(\mathbf{y}) > c\}\]
+    The test statistic $T(\mathbf{y})$ has an exact or asymptotic distribution $D$ under $H_0$, from which the critical value $c$ is derived.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Neyman–Pearson Lemma:</strong> For testing two point hypotheses $H_0: \theta = \theta_0$ vs $H_1: \theta = \theta_1$, the <em>uniformly most powerful (UMP)</em> test rejects $H_0$ when:
+    \[W = \left\{\mathbf{y} : \frac{L(\theta_0 \mid \mathbf{y})}{L(\theta_1 \mid \mathbf{y})} < c\right\}\]
+    where $c$ satisfies $P(W \mid H_0) = \alpha$.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Definition (Consistent Test):</strong> A test is consistent if $\lim_{n \to \infty} \beta_n(\theta) = 1$ for all $\theta \in H_1$ — power approaches 1 as $n \to \infty$.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Definition (UMP Test):</strong> Test $A$ is uniformly most powerful if for any other test $B$ with $\alpha_A = \alpha_B = \alpha$:
+    \[\beta_A(\theta) \geq \beta_B(\theta) \quad \forall\, \theta \in H_1\]
+    UMP tests do not always exist, particularly for two-sided alternatives.
+  </div>
+</div>
+
+<!-- 4. Type I & II Errors -->
+<div class="notes-section" id="errors">
+  <h2>4. Type I and Type II Errors, Size, and Power</h2>
+
+  <table>
+    <thead><tr><th></th><th>$H_0$ Rejected</th><th>$H_0$ Not Rejected</th></tr></thead>
+    <tbody>
+      <tr><td><strong>$H_0$ True</strong></td><td style="color:#721c24;font-weight:700;">Type I Error ❌</td><td style="color:#155724;font-weight:700;">Correct ✓</td></tr>
+      <tr><td><strong>$H_0$ False</strong></td><td style="color:#155724;font-weight:700;">Correct ✓</td><td style="color:#721c24;font-weight:700;">Type II Error ❌</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Definition (Size / Significance Level):</strong>
+    \[\alpha = P(W \mid H_0) = P(\text{reject } H_0 \mid H_0 \text{ true})\]
+    Also called the <em>nominal size</em>. In science, Type I errors are often more serious, so we keep $\alpha$ small (typically 0.05 or 0.01).
+  </div>
+
+  <div class="theorem-box">
+    <strong>Definition (Power):</strong>
+    \[\beta = P(W \mid H_1) = P(\text{reject } H_0 \mid H_0 \text{ false})\]
+    $(1 - \beta)$ is the probability of a Type II error. For composite $H_1$, power is a function $\beta(\theta)$ for $\theta \in H_1$.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Notes on Statistical Tests:</strong><br>
+    (1) Statistical significance ≠ practical importance. A p-value measures evidence against $H_0$, not effect size.<br>
+    (2) Use two-sided tests unless a direction is <em>a priori</em> justified — one-sided tests reject $H_0$ more easily.<br>
+    (3) Science never proves or disproves with 100% certainty; it only assesses the <em>likelihood</em> that something is true or false.<br>
+    (4) Formulate the medical/scientific hypothesis in terms of $H_0$.
+  </div>
+</div>
+
+<!-- 5. t-Test -->
+<div class="notes-section" id="ttest">
+  <h2>5. The One-Sample t-Test</h2>
+
+  <h3>Setting: $\sigma^2$ Unknown</h3>
+  <p>When $X_i \overset{\text{iid}}{\sim} \mathcal{N}(\mu, \sigma^2)$ with $\sigma^2$ unknown, we estimate it with the sample standard deviation and switch from z-scores to t-scores.</p>
+
+  <div class="key-point">
+    <strong>Test statistic:</strong>
+    \[t = \frac{\bar{X} - \mu_0}{S/\sqrt{n}}, \qquad S = \sqrt{\frac{1}{n-1}\sum_{i=1}^n (X_i - \bar{X})^2}\]
+    Under $H_0$ and normality: $t \sim t_{n-1}$ (Student's t with $n-1$ degrees of freedom).<br>
+    <strong>Critical region (two-sided):</strong> $W = \{\mathbf{y}: |t(\mathbf{y})| > t_{1-\alpha/2,\, n-1}\}$
+  </div>
+
+  <div class="theorem-box">
+    <strong>William Gosset ("Student", 1876–1937):</strong> Published the t-distribution in 1908 under a pseudonym to protect trade secrets at Guinness Brewery. Key insight: when $\sigma$ is unknown and replaced by $S$, the ratio $(\bar{X} - \mu)/(S/\sqrt{n})$ follows a $t_{n-1}$ distribution — heavier-tailed than the standard normal to account for the additional estimation uncertainty. As $\text{df} \to \infty$, $t_\nu \to \mathcal{N}(0,1)$.
+  </div>
+
+  <div class="example-box">
+    <strong>Birth Weight — Full Calculation:</strong><br>
+    $n=30$, $\bar{X} = 3.482$, $S = 0.56$, $\mu_0 = 3.3$, $\alpha = 0.05$, $t_{0.975,29} = 2.04$.<br><br>
+    <em>Hypothesis test:</em> $|t| = \left|\frac{3.482 - 3.3}{0.56/\sqrt{30}}\right| = \frac{0.182}{0.1022} = 1.78 < 2.04 \Rightarrow$ <strong>Do not reject $H_0$</strong>.<br><br>
+    <em>p-value:</em> $P(|T_{29}| \geq 1.78 \mid \mu_L = 3.3) = 0.086 > 0.05$.<br><br>
+    <em>95% CI:</em> $\left(3.48 - 2.04 \cdot \frac{0.56}{\sqrt{30}},\; 3.48 + 2.04 \cdot \frac{0.56}{\sqrt{30}}\right) = (3.1075,\; 3.8525)$.<br>
+    Since $3.3 \in (3.1075, 3.8525)$, consistent with not rejecting $H_0$.
+  </div>
+
+  <h3>Assumptions of the t-Test</h3>
+  <div class="key-point">
+    (1) Data are normally distributed <strong>OR</strong> sample size is large ($n > 25$, by CLT).<br>
+    (2) Observations are independent.
+  </div>
+
+  <h3>Hybrid Decision Procedure (Common Practice)</h3>
+  <div class="formula-box">
+    Compute $|t| = \left|\frac{\bar{X} - \mu_0}{S/\sqrt{n}}\right|$ → compute p-value $= P(|T_{n-1}| \geq |t_{\text{obs}}|)$ → reject $H_0$ if p-value $< \alpha$.
+  </div>
+</div>
+
+<!-- 6. p-Values & CIs -->
+<div class="notes-section" id="sigtesting">
+  <h2>6. p-Values, Significance Testing, and Confidence Interval Duality</h2>
+
+  <div class="key-point">
+    <strong>p-value (Fisher's significance testing):</strong> The probability of observing a test statistic at least as extreme as the one obtained, <em>assuming $H_0$ is true</em>. A smaller p-value indicates greater incompatibility of the data with $H_0$.
+    \[p = P(|T_{n-1}| \geq |t_{\text{obs}}| \mid H_0)\]
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Critical Misconceptions about p-values:</strong><br>
+    ✗ "p = 0.086 means there is an 8.6% chance $H_0$ is true." → <strong>Wrong</strong>. p-value is $P(\text{data} \mid H_0)$, not $P(H_0 \mid \text{data})$.<br>
+    ✗ "p > 0.05 proves $H_0$." → <strong>Wrong</strong>. Failure to reject ≠ accepting $H_0$.<br>
+    ✗ "Statistical significance = practical importance." → <strong>Wrong</strong>. Large $n$ can make trivial effects significant.
+  </div>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Hypothesis Testing (NP)</th><th>Significance Testing (Fisher)</th></tr></thead>
+    <tbody>
+      <tr><td>Hypotheses</td><td>Both $H_0$ and $H_1$</td><td>Only $H_0$</td></tr>
+      <tr><td>Main tool</td><td>Critical region (pre-data)</td><td>p-value (post-data)</td></tr>
+      <tr><td>Error framework</td><td>Type I &amp; II errors</td><td>No formal Type II</td></tr>
+      <tr><td>Output</td><td>Binary: reject or not reject</td><td>Graded strength of evidence</td></tr>
+    </tbody>
+  </table>
+
+  <h3>CI–Test Duality</h3>
+  <div class="key-point">
+    A $100(1-\alpha)$% confidence interval consists of all $\mu_0$ for which $H_0: \mu = \mu_0$ would <em>not</em> be rejected at level $\alpha$. Equivalently, reject $H_0: \mu = \mu_0$ at level $\alpha$ iff $\mu_0 \notin \text{CI}_{1-\alpha}$. This duality is exact for the t-test.
+  </div>
+</div>
+
+<!-- 7. Holy Trinity -->
+<div class="notes-section" id="trinity">
+  <h2>7. The Holy Trinity: Three Significance Tests Based on ML</h2>
+
+  <p>Let $\boldsymbol{\theta} = (\boldsymbol{\theta}_1, \boldsymbol{\theta}_2)$ with $\boldsymbol{\theta}_2$ under test. Denote $\hat{\boldsymbol{\theta}}$ = unrestricted MLE, $\hat{\boldsymbol{\theta}}_0$ = restricted MLE under $H_0$. For composite $H_0: \boldsymbol{\theta}_2 = \boldsymbol{\theta}_{20}$, or generally $H_0: \boldsymbol{\psi}(\boldsymbol{\theta}) = \mathbf{0}$.</p>
+
+  <div class="theorem-box">
+    <strong>1. Likelihood Ratio Test (LR / Deviance):</strong>
+    \[d = -2\left[\ell(\hat{\boldsymbol{\theta}}_0 \mid \mathbf{y}) - \ell(\hat{\boldsymbol{\theta}} \mid \mathbf{y})\right]\]
+    <em>Idea:</em> Measures the vertical drop in log-likelihood from the unconstrained maximum to the constrained maximum. Uses information from <em>both</em> $\hat{\boldsymbol{\theta}}$ and $\hat{\boldsymbol{\theta}}_0$.
+  </div>
+
+  <div class="theorem-box">
+    <strong>2. Wald Test:</strong>
+    <br>Simple $H_0$: $w = (\hat{\boldsymbol{\theta}} - \boldsymbol{\theta}_0)^T \mathbf{I}(\hat{\boldsymbol{\theta}})(\hat{\boldsymbol{\theta}} - \boldsymbol{\theta}_0)$<br>
+    General $H_0: \boldsymbol{\psi}(\boldsymbol{\theta}) = \mathbf{0}$: $w = \boldsymbol{\psi}(\hat{\boldsymbol{\theta}})^T\left[\mathbf{J}(\hat{\boldsymbol{\theta}})\hat{\mathbf{I}}(\hat{\boldsymbol{\theta}})^{-1}\mathbf{J}(\hat{\boldsymbol{\theta}})^T\right]^{-1}\boldsymbol{\psi}(\hat{\boldsymbol{\theta}})$<br>
+    <em>Idea:</em> Measures the horizontal distance between $\hat{\boldsymbol{\theta}}$ and $\boldsymbol{\theta}_0$, weighted by the curvature at $\hat{\boldsymbol{\theta}}$. Uses only $\hat{\boldsymbol{\theta}}$.
+  </div>
+
+  <div class="theorem-box">
+    <strong>3. Score Test (Rao / Lagrange Multiplier):</strong>
+    <br>Simple $H_0$: $s = \mathbf{S}(\boldsymbol{\theta}_0)^T \mathbf{I}(\boldsymbol{\theta}_0)^{-1}\mathbf{S}(\boldsymbol{\theta}_0)$<br>
+    General $H_0$: $s = \mathbf{S}(\hat{\boldsymbol{\theta}}_0)^T\hat{\mathbf{I}}(\hat{\boldsymbol{\theta}}_0)^{-1}\mathbf{S}(\hat{\boldsymbol{\theta}}_0)$<br>
+    <em>Idea:</em> If $\hat{\boldsymbol{\theta}}_0$ is near the unconstrained maximum, the score (gradient) at $\hat{\boldsymbol{\theta}}_0$ should be near zero. Uses only $\hat{\boldsymbol{\theta}}_0$ — computationally attractive when unconstrained optimisation is hard.
+  </div>
+
+  <div class="formula-box">
+    All three tests: Under $H_0$, the statistics are asymptotically $\chi^2(\text{df})$, where<br>
+    $\text{df} = \#(\text{parameters in full model}) - \#(\text{parameters in null model})$
+  </div>
+
+  <table>
+    <thead><tr><th>Test</th><th>Evaluated At</th><th>Geometric Interpretation</th><th>Computes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LR</strong></td><td>Both $\hat{\boldsymbol{\theta}}$ and $\hat{\boldsymbol{\theta}}_0$</td><td>Vertical drop in $\ell$</td><td>Two model fits</td></tr>
+      <tr><td><strong>Wald</strong></td><td>$\hat{\boldsymbol{\theta}}$ only (unrestricted)</td><td>Horizontal distance from $\hat{\boldsymbol{\theta}}$ to $\boldsymbol{\theta}_0$</td><td>One model fit</td></tr>
+      <tr><td><strong>Score</strong></td><td>$\hat{\boldsymbol{\theta}}_0$ only (restricted)</td><td>Slope of $\ell$ at $\hat{\boldsymbol{\theta}}_0$</td><td>One model fit (null)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    The three tests are <strong>asymptotically equivalent under $H_0$</strong> — differences vanish as $n \to \infty$ when $H_0$ is true. When $H_0$ is <em>false</em>, they may differ substantially in finite samples, but all grow without bound and p-values → 0.
+  </div>
+</div>
+
+<!-- 8. Invariance -->
+<div class="notes-section" id="invariance">
+  <h2>8. Invariance Properties of the Holy Trinity</h2>
+
+  <div class="key-point">
+    <strong>Fundamental principle:</strong> Inferences should not depend on arbitrary elements with no bearing on the decision. Two types of invariance are studied: (1) invariance to equivalent formulations of $H_0$, and (2) invariance to one-to-one transformations of model variables.
+  </div>
+
+  <h3>Type 1: Invariance to Equivalent Representations of $H_0$</h3>
+  <p>If $\psi(\boldsymbol{\theta}) = 0 \Leftrightarrow \psi_1(\boldsymbol{\theta}) = 0$ (two ways to write the same null), the test result should be identical.</p>
+
+  <table>
+    <thead><tr><th>Test</th><th>Invariant to $H_0$ re-formulation?</th><th>Invariant to variable transformation?</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LR</strong></td><td>✓ Always</td><td>✓ Always</td></tr>
+      <tr><td><strong>Score</strong></td><td>✓ Always (any $\hat{\mathbf{I}}$)</td><td>✓ If $\hat{\mathbf{I}}$ is $\hat{\mathbf{I}}_2$ or $\hat{\mathbf{I}}_3$</td></tr>
+      <tr><td><strong>Wald</strong></td><td>✗ Not invariant</td><td>✗ Not invariant in general</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Wald Test Lack-of-Invariance Example:</strong><br>
+    Test $H_0: \theta = 0$ with $\hat{\theta} = 1$, $\widehat{\text{Var}}(\hat{\theta}) = 0.01$.<br>
+    $w_\theta = \hat{\theta}^2 / 0.01 = 100 \sim \chi^2(1)$, p-value $\approx 8 \times 10^{-24}$. <strong>Strong rejection.</strong><br><br>
+    Reparametrise: $\xi = \theta^{25}$. Then $\hat{\xi} = 1$ and by the delta method $\widehat{\text{Var}}(\hat{\xi}) = (25)^2 \cdot 0.01 = 6.25$.<br>
+    $w_\xi = 1/6.25 = 0.16$, p-value $= 0.69$. <strong>No rejection.</strong><br><br>
+    Same scientific question — opposite conclusions! The LR test is immune to this.
+  </div>
+
+  <h3>Type 2: Invariance to One-to-One Variable Transformations</h3>
+  <div class="key-point">
+    If transformation $g$ on the data induces $\bar{g}$ on parameters and $H_0: \psi(\boldsymbol{\theta}) = 0 \Leftrightarrow H_0^*: \psi_*(\boldsymbol{\theta}^*) = 0$, then the test result on $\mathbf{z}$ should match the test result on $\mathbf{z}_*$. Spitzer (1984) showed Wald test statistics for regression coefficients depend on measurement units of $y$ (Box-Cox transformations) — the LR test does not share this deficiency.
+  </div>
+
+  <h3>CI Inversion and the Holy Trinity</h3>
+  <div class="key-point">
+    A $100(1-\alpha)$% CI is obtained by inverting a test: all $\theta_0$ not rejected at level $\alpha$. Inverting the Wald test gives the Wald CI. Inverting the score test gives the Wilson interval (for proportions). Inverting the LR test gives the likelihood interval — transformation invariant and generally preferred.
+  </div>
+</div>
+
+<!-- 9. Binomial Proportion -->
+<div class="notes-section" id="binomial">
+  <h2>9. Binomial Proportion: The Three Tests Compared</h2>
+
+  <p>Testing $H_0: \pi = \pi_0$ with binomial data. MLE: $\hat{\pi} = y/n$.</p>
+
+  <div class="theorem-box">
+    <strong>Wald interval:</strong> $\hat{\pi} \pm z_{1-\alpha/2}\sqrt{\hat{\pi}(1-\hat{\pi})/n}$<br>
+    Problems: (1) May contain invalid values (e.g., negative probabilities for $n=10, y=1$: $(-0.086, 0.286)$). (2) Not transformation invariant — different scales give different back-transformed CIs.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Score (Wilson) interval:</strong> Invert $d^2 = \left[(\hat{\pi} - \pi_0)/\sqrt{\pi_0(1-\pi_0)/n}\right]^2$.<br>
+    Always lies in $[0,1]$. Better coverage for small $n$. Recommended in practice.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Likelihood (Profile) interval:</strong> All $\pi$ satisfying $\Lambda = 2[\ell(\hat{\pi}|y) - \ell(\pi|y)] \leq 3.84$, equivalently $\ell(\pi|y) \geq \ell(\hat{\pi}|y) - 1.92$. Requires numerical solution. Transformation invariant. Generally preferred.
+  </div>
+
+  <div class="example-box">
+    <strong>Example ($n=10$, $y=1$, $\hat{\pi} = 0.1$):</strong><br>
+    Wald (probability scale): $(-0.086, 0.286)$ — invalid!<br>
+    Wald (log-odds scale, back-transformed): $(0.014, 0.467)$ — valid but not invariant.<br>
+    Likelihood 95% CI: $(0.006, 0.372)$ — valid, transformation invariant.
+  </div>
+
+  <div class="key-point">
+    The <strong>likelihood ratio interval</strong> is preferred: (1) always contains admissible values, (2) transformation invariant — computing the interval on the log-odds scale and back-transforming gives an identical interval, (3) better coverage properties.
+  </div>
+</div>
+
+<!-- 10. Misspecification -->
+<div class="notes-section" id="misspec">
+  <h2>10. Inference Under Model Misspecification</h2>
+
+  <h3>Correctly Specified Model</h3>
+  <p>Under regularity conditions with correct model $p(y|\mathbf{x},\boldsymbol{\theta})$, the MLE $\hat{\boldsymbol{\theta}}_{mle}$ is consistent for $\boldsymbol{\theta}_0$ and asymptotically normal:</p>
+  <div class="formula-box">
+    $\sqrt{n}(\hat{\boldsymbol{\theta}}_{mle} - \boldsymbol{\theta}_0) \xrightarrow{d} \mathcal{N}(\mathbf{0},\; \mathbf{I}_1(\boldsymbol{\theta}_0)^{-1})$
+  </div>
+  <p>The Fisher information $\mathbf{I}_1(\boldsymbol{\theta}_0) = -E[\partial^2 \log p / \partial\boldsymbol{\theta}\partial\boldsymbol{\theta}^T]$ can be estimated by $\hat{\mathbf{I}}_1$, $\hat{\mathbf{I}}_2$, or $\hat{\mathbf{I}}_3$ (expected, outer product, or observed information). The three are equivalent under correct specification via the <em>Information Matrix Equality</em>: $-\mathbf{A}(\boldsymbol{\theta}_0) = \mathbf{B}(\boldsymbol{\theta}_0)$.
+  </p>
+
+  <h3>Misspecified Model: The Sandwich Variance</h3>
+  <div class="key-point">
+    If the true DGP is $g(y|\mathbf{z},\gamma_0) \neq p(y|\mathbf{x},\boldsymbol{\theta})$, the MLE converges to the <strong>pseudo-true value</strong> $\boldsymbol{\theta}^*$ minimising the Kullback-Leibler divergence:
+    \[I(f:g,\boldsymbol{\theta}) = E_g\left[\log \frac{g(y|\mathbf{z},\gamma_0)}{p(y|\mathbf{x},\boldsymbol{\theta})}\right]\]
+  </div>
+
+  <div class="theorem-box">
+    <strong>Asymptotic distribution under misspecification:</strong>
+    \[\sqrt{n}(\hat{\boldsymbol{\theta}}_{mle} - \boldsymbol{\theta}^*) \xrightarrow{d} \mathcal{N}[\mathbf{0},\; \mathbf{C}(\boldsymbol{\theta}^*)]\]
+    where $\mathbf{C}(\boldsymbol{\theta}^*) = \mathbf{A}^{-1}(\boldsymbol{\theta}^*)\mathbf{B}(\boldsymbol{\theta}^*)\mathbf{A}^{-1}(\boldsymbol{\theta}^*)$ is the <strong>sandwich variance–covariance matrix</strong>.<br><br>
+    $\mathbf{A}(\boldsymbol{\theta}) = E\!\left[\frac{\partial^2 \log p}{\partial\boldsymbol{\theta}\partial\boldsymbol{\theta}^T}\right]$ (expected Hessian, "bread"),  $\quad\mathbf{B}(\boldsymbol{\theta}) = E[\mathbf{s}(\boldsymbol{\theta})\mathbf{s}(\boldsymbol{\theta})^T]$ (outer product of scores, "meat")<br><br>
+    Under correct specification: $-\mathbf{A}(\boldsymbol{\theta}_0) = \mathbf{B}(\boldsymbol{\theta}_0)$ (information matrix equality), so $\mathbf{C} = \mathbf{I}^{-1}$.
+  </div>
+
+  <h3>The Holy Trinity Under Misspecification</h3>
+  <table>
+    <thead><tr><th>Test</th><th>Under misspecification, $H_0$ null dist'n?</th><th>Remedy</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LR</strong></td><td>✗ NOT $\chi^2(\text{df})$ in general</td><td>No simple fix — avoid or use corrected versions</td></tr>
+      <tr><td><strong>Wald (robust)</strong></td><td>✓ $\chi^2(\text{df})$ with sandwich variance</td><td>Replace $\hat{\mathbf{I}}^{-1}$ with $\hat{\mathbf{C}}_n$</td></tr>
+      <tr><td><strong>Score (robust)</strong></td><td>✓ $\chi^2(\text{df})$ with sandwich variance</td><td>Modified form; $(w-s) \xrightarrow{p} 0$ under $H_0$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Critical result:</strong> Under misspecification, the LR test statistic does <em>not</em> asymptotically follow $\chi^2(\text{df})$ under $H_0$. However, the robust Wald and Score tests (using the sandwich variance) remain asymptotically $\chi^2(\text{df})$ and are asymptotically equivalent to each other under $H_0$.
+  </div>
+
+  <div class="computation-note">
+    <strong>Practical advice:</strong> Use sandwich (robust) standard errors as a default in applied work, or at minimum as a sensitivity check. The LR test, despite being the most invariant, is the least robust to misspecification. When misspecification is suspected (e.g., over-dispersion in Poisson regression), prefer robust Wald or Score tests.
+  </div>
+</div>
+
+<!-- ═══════════════════ MCQ ═══════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions</h2>
+  <div class="score-display" id="scoreDisplay">Score: 0 / 0</div><br>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button>
+  <div id="mcqContainer"></div>
+</div>
+
+<!-- ═══════════════════ SHORT ANSWER ═══════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Oral Exam Questions with Model Answers &amp; Follow-ups</h2>
+  <p style="margin-bottom:20px; color:#555;">Each question is designed for an oral exam setting. Model answers are provided, followed by likely follow-up questions an examiner would ask. Reveal the answer only after formulating your own response.</p>
+  <div id="saContainer"></div>
+</div>
+
+<script>
+// ── MCQ DATA ──
+const mcqData = [
+  // Hypotheses
+  { q:"A hypothesis $H_0: \\theta = 5$ is best described as:", type:"mc",
+    options:["Composite, because it involves a single number","Simple, because it specifies the distribution completely","Composite, because it leaves the variance unspecified","Simple only if the data are normally distributed"],
+    correct:"Simple, because it specifies the distribution completely",
+    explain:"A simple hypothesis pins down the parameter value (and hence the entire distribution if the model family is fixed). $H_0: \\theta = 5$ is simple; $H_1: \\theta > 5$ is composite." },
+
+  { q:"$H_1: \\mu \\neq 3.3$ is a composite hypothesis.", type:"tf", correct:"True",
+    explain:"It does not pin down a single value — $\\mu$ can be any value except 3.3, leaving the distribution incompletely specified." },
+
+  { q:"A parametric test differs from a non-parametric test in that it:", type:"mc",
+    options:["Always requires normally distributed data","Assumes a distributional family and makes inferences about its parameters","Has higher power for any dataset","Does not require random sampling"],
+    correct:"Assumes a distributional family and makes inferences about its parameters",
+    explain:"Parametric tests assume a known distributional form (e.g., normal, Poisson) and test hypotheses about the parameters of that family. Non-parametric tests make no such assumption." },
+
+  // Critical Region
+  { q:"In the Neyman–Pearson Lemma, the UMP test for $H_0: \\theta=\\theta_0$ vs $H_1: \\theta=\\theta_1$ rejects when $L(\\theta_0|\\mathbf{y})/L(\\theta_1|\\mathbf{y}) < c$. A small ratio here means:", type:"mc",
+    options:["The data are far more likely under $H_0$ than $H_1$","The data are far more likely under $H_1$ than $H_0$","$H_0$ and $H_1$ are equally likely","The test statistic falls below the critical value"],
+    correct:"The data are far more likely under $H_1$ than $H_0$",
+    explain:"If $L(\\theta_0|\\mathbf{y}) \\ll L(\\theta_1|\\mathbf{y})$, the ratio is small, meaning the observed data is much more probable under $H_1$ — strong evidence against $H_0$." },
+
+  { q:"A UMP test always exists for two-sided alternative hypotheses.", type:"tf", correct:"False",
+    explain:"UMP tests can fail to exist for two-sided alternatives. The NP Lemma guarantees a UMP only for simple vs simple (or one-sided alternatives in exponential families via the monotone likelihood ratio property)." },
+
+  { q:"A consistent test is one where the power $\\beta_n(\\theta)$:", type:"mc",
+    options:["Equals $\\alpha$ for all sample sizes","Approaches 1 as $n \\to \\infty$ for all $\\theta \\in H_1$","Remains fixed regardless of sample size","Equals 0 under $H_0$"],
+    correct:"Approaches 1 as $n \\to \\infty$ for all $\\theta \\in H_1$",
+    explain:"Consistency of a test means that as $n$ grows, we will eventually detect any fixed departure from $H_0$ with probability approaching 1." },
+
+  { q:"The critical value $c$ in a test statistic is obtained from:", type:"mc",
+    options:["The alternative hypothesis $H_1$","The distribution of the test statistic under $H_0$","The sample data directly","The power function $\\beta(\\theta)$"],
+    correct:"The distribution of the test statistic under $H_0$",
+    explain:"We choose $c$ such that $P(T > c \\mid H_0) = \\alpha$. We need the null distribution of $T$ to find this quantile." },
+
+  // Type I & II Errors
+  { q:"Failing to reject $H_0$ when $H_0$ is actually false is called:", type:"mc",
+    options:["Type I error","A correct decision","Type II error","The significance level"],
+    correct:"Type II error",
+    explain:"Type II error = not rejecting $H_0$ when it is false (false negative). Its probability is $1 - \\beta$, where $\\beta$ is the power." },
+
+  { q:"Increasing the significance level $\\alpha$ from 0.01 to 0.05 while keeping $n$ fixed:", type:"mc",
+    options:["Decreases power","Increases power but also increases Type I error","Only decreases Type II error","Has no effect on power"],
+    correct:"Increases power but also increases Type I error",
+    explain:"A larger $\\alpha$ means a larger critical region, making it easier to reject $H_0$. This increases both power (correct rejections) and Type I errors (incorrect rejections)." },
+
+  { q:"For a fixed $\\alpha$ and sample size, there is a fundamental trade-off: decreasing Type I error necessarily decreases Type II error.", type:"tf", correct:"False",
+    explain:"The trade-off goes the other way: for fixed $n$ and $\\alpha$, decreasing $\\alpha$ (making Type I error smaller) widens the acceptance region and increases Type II error (1 minus power)." },
+
+  { q:"The power function $\\beta(\\theta)$ evaluated at $\\theta = \\theta_0$ (i.e., at the null) equals:", type:"mc",
+    options:["1","0","$\\alpha$","$1 - \\alpha$"],
+    correct:"$\\alpha$",
+    explain:"At $\\theta = \\theta_0$, the probability of rejecting $H_0$ is the Type I error rate, which is $\\alpha$ by design of the test." },
+
+  { q:"A researcher uses $\\alpha = 0.05$ and obtains $p = 0.048$. At $\\alpha = 0.01$, the same data would lead to:", type:"mc",
+    options:["Rejection of $H_0$","Non-rejection of $H_0$","The same conclusion","A different test statistic"],
+    correct:"Non-rejection of $H_0$",
+    explain:"Since $p = 0.048 > 0.01 = \\alpha$, we would not reject $H_0$ at the 1% level, even though we do at the 5% level." },
+
+  // t-Test
+  { q:"The t-test uses $t_{n-1}$ rather than $\\mathcal{N}(0,1)$ because:", type:"mc",
+    options:["The data are never exactly normal","The population variance $\\sigma^2$ is unknown and estimated by $S^2$","The sample size is always small","The alternative hypothesis is composite"],
+    correct:"The population variance $\\sigma^2$ is unknown and estimated by $S^2$",
+    explain:"Replacing the known $\\sigma$ with the estimated $S$ introduces additional variability. The t-distribution has heavier tails to reflect this, converging to $\\mathcal{N}(0,1)$ as $n \\to \\infty$." },
+
+  { q:"For the birth weight example ($n=30$, $\\bar{X}=3.482$, $S=0.56$, $\\mu_0=3.3$, $\\alpha=0.05$), $|t| = 1.78 < 2.04$. This means:", type:"mc",
+    options:["We prove $\\mu_L = 3.3$","We reject $H_0$","We fail to reject $H_0$; data are compatible with $\\mu_L = 3.3$","The data prove $\\mu_L \\neq 3.3$"],
+    correct:"We fail to reject $H_0$; data are compatible with $\\mu_L = 3.3$",
+    explain:"Since the observed $|t|$ falls outside the critical region ($|t| < 2.04$), we do not reject $H_0$. This means only that the data are insufficient to detect a difference, not that $\\mu_L = 3.3$ is proven." },
+
+  { q:"The p-value for the birth weight test is 0.086. Which statement is correct?", type:"mc",
+    options:["There is an 8.6% probability that $H_0$ is true","At $\\alpha=0.10$, we reject $H_0$","We prove $H_0$ at the 5% level","The test statistic exceeds its critical value at $\\alpha=0.05$"],
+    correct:"At $\\alpha=0.10$, we reject $H_0$",
+    explain:"Since $p = 0.086 < 0.10$, we reject $H_0$ at the 10% level. At $\\alpha = 0.05$, since $0.086 > 0.05$, we do not reject. The p-value is NOT the probability that $H_0$ is true." },
+
+  { q:"The 95% CI for $\\mu_L$ is $(3.1075, 3.8525)$ and $\\mu_0 = 3.3$ lies inside it. This is consistent with:", type:"mc",
+    options:["Rejecting $H_0: \\mu_L = 3.3$ at $\\alpha = 0.05$","Not rejecting $H_0: \\mu_L = 3.3$ at $\\alpha = 0.05$","Proving $\\mu_L = 3.3$","The p-value being less than 0.05"],
+    correct:"Not rejecting $H_0: \\mu_L = 3.3$ at $\\alpha = 0.05$",
+    explain:"By CI–test duality: $H_0: \\mu = \\mu_0$ is rejected at level $\\alpha$ iff $\\mu_0 \\notin \\text{CI}_{1-\\alpha}$. Since $3.3 \\in (3.1075, 3.8525)$, $H_0$ is not rejected." },
+
+  { q:"The t-test is valid for non-normal data provided:", type:"mc",
+    options:["The variance is known","The sample size is large (e.g., $n > 25$) so the CLT applies","The population is binary","The data are positively skewed"],
+    correct:"The sample size is large (e.g., $n > 25$) so the CLT applies",
+    explain:"By the CLT, $\\bar{X}$ is approximately normal for large $n$ regardless of the data distribution, validating the t-test asymptotically." },
+
+  { q:"A one-sided test at $\\alpha = 0.05$ has a less extreme critical value than the two-sided test at the same $\\alpha$, making it easier to reject $H_0$ in the tested direction.", type:"tf", correct:"True",
+    explain:"For one-sided: critical value is $z_{0.95} = 1.645$. For two-sided: $z_{0.975} = 1.960$. Since $1.645 < 1.960$, the one-sided test rejects more easily in the relevant direction." },
+
+  // Holy Trinity
+  { q:"The likelihood ratio test statistic is defined as:", type:"mc",
+    options:["$d = \\ell(\\hat{\\theta}|\\mathbf{y}) / \\ell(\\hat{\\theta}_0|\\mathbf{y})$","$d = -2[\\ell(\\hat{\\theta}_0|\\mathbf{y}) - \\ell(\\hat{\\theta}|\\mathbf{y})]$","$d = [\\hat{\\theta} - \\theta_0]^2 \\mathbf{I}(\\hat{\\theta})$","$d = \\mathbf{S}(\\theta_0)^T\\mathbf{I}(\\theta_0)^{-1}\\mathbf{S}(\\theta_0)$"],
+    correct:"$d = -2[\\ell(\\hat{\\theta}_0|\\mathbf{y}) - \\ell(\\hat{\\theta}|\\mathbf{y})]$",
+    explain:"The LR statistic is twice the difference in log-likelihoods (restricted vs unrestricted). Since $\\ell(\\hat{\\theta}) \\geq \\ell(\\hat{\\theta}_0)$, the statistic is always $\\geq 0$." },
+
+  { q:"The score test is computationally advantageous when:", type:"mc",
+    options:["The null model is harder to fit than the full model","The unrestricted MLE is difficult to compute but the restricted MLE (under $H_0$) is easy","The sample size is very large","The likelihood is concave"],
+    correct:"The unrestricted MLE is difficult to compute but the restricted MLE (under $H_0$) is easy",
+    explain:"The score test only requires fitting the model under $H_0$ (the restricted estimator $\\hat{\\theta}_0$), making it attractive when unconstrained optimisation is challenging." },
+
+  { q:"Under $H_0$, all three holy trinity tests follow a $\\chi^2(\\text{df})$ distribution asymptotically, with df equal to:", type:"mc",
+    options:["$n - 1$","The number of parameters in the null model","The number of parameters in the full model minus those in the null model","Always 1"],
+    correct:"The number of parameters in the full model minus those in the null model",
+    explain:"df equals the number of restrictions imposed by $H_0$, i.e., the dimension of $\\psi(\\theta)$." },
+
+  { q:"The Wald test measures:", type:"mc",
+    options:["The vertical drop in log-likelihood from $\\hat{\\theta}$ to $\\hat{\\theta}_0$","The slope of the log-likelihood at $\\hat{\\theta}_0$","The weighted squared distance between $\\hat{\\theta}$ and $\\theta_0$, using curvature at $\\hat{\\theta}$","The ratio of two likelihoods"],
+    correct:"The weighted squared distance between $\\hat{\\theta}$ and $\\theta_0$, using curvature at $\\hat{\\theta}$",
+    explain:"$w = (\\hat{\\theta} - \\theta_0)^T\\mathbf{I}(\\hat{\\theta})(\\hat{\\theta}-\\theta_0)$ weights the squared distance by the Fisher information (curvature) at $\\hat{\\theta}$." },
+
+  { q:"The three holy trinity tests are exactly equivalent in finite samples.", type:"tf", correct:"False",
+    explain:"They are only asymptotically equivalent (as $n \\to \\infty$ under $H_0$). In finite samples they can give different values and occasionally different conclusions." },
+
+  { q:"When $H_0$ is false, the three holy trinity tests:", type:"mc",
+    options:["Remain asymptotically equivalent","May take very different finite-sample values, but all grow without bound and p-values approach zero","Always give the LR test the most power","Converge to the same value"],
+    correct:"May take very different finite-sample values, but all grow without bound and p-values approach zero",
+    explain:"Under a fixed alternative, all three consistent tests will eventually reject as $n \\to \\infty$, but their finite-sample power can differ substantially." },
+
+  // Invariance
+  { q:"Which test is invariant to BOTH equivalent $H_0$ formulations AND one-to-one variable transformations?", type:"mc",
+    options:["Wald test","Score test (always)","Likelihood ratio test","t-test"],
+    correct:"Likelihood ratio test",
+    explain:"The LR test is always invariant to both types of transformations. The Score test is invariant to $H_0$ re-formulations but only to variable transformations when $\\hat{\\mathbf{I}}$ is $\\hat{\\mathbf{I}}_2$ or $\\hat{\\mathbf{I}}_3$." },
+
+  { q:"In the Wald invariance failure example, testing $H_0: \\theta = 0$ with $\\hat{\\theta}=1$, $\\widehat{\\text{Var}}(\\hat{\\theta})=0.01$ gives $w = 100$ (p ≈ 0). Testing the equivalent $H_0: \\xi = \\theta^{25} = 0$ gives $w = 0.16$ (p = 0.69). The root cause is:", type:"mc",
+    options:["An error in the delta method application","The nonlinear transformation distorts the metric; the delta method variance depends on the derivative at $\\hat{\\theta}$, not $\\theta_0$","The Wald test was incorrectly computed","The chi-squared approximation fails"],
+    correct:"The nonlinear transformation distorts the metric; the delta method variance depends on the derivative at $\\hat{\\theta}$, not $\\theta_0$",
+    explain:"$\\widehat{\\text{Var}}(\\hat{\\xi}) = [\\psi'(\\hat{\\theta})]^2 \\cdot 0.01 = (25)^2 \\cdot 0.01 = 6.25$. The derivative $25\\hat{\\theta}^{24}=25$ at $\\hat{\\theta}=1$ amplifies the variance, collapsing the Wald statistic." },
+
+  { q:"The Score test is invariant to equivalent representations of $H_0$ regardless of which information matrix estimate ($\\hat{\\mathbf{I}}_1$, $\\hat{\\mathbf{I}}_2$, or $\\hat{\\mathbf{I}}_3$) is used.", type:"tf", correct:"True",
+    explain:"For invariance to $H_0$ re-formulations, the Score test is always invariant. For invariance to variable transformations, it additionally requires $\\hat{\\mathbf{I}}_2$ or $\\hat{\\mathbf{I}}_3$." },
+
+  { q:"Spitzer (1984) showed that for regression models with Box-Cox transformed response, the asymptotic t-statistics (Wald tests) for regression coefficients depend on:", type:"mc",
+    options:["The sample size","The measurement units of the dependent variable","The choice of significance level","The number of predictors"],
+    correct:"The measurement units of the dependent variable",
+    explain:"This is a concrete illustration of Wald test non-invariance to variable transformations. The LR test is not affected by such measurement unit changes." },
+
+  { q:"A $100(1-\\alpha)$% confidence interval obtained by inverting the score test for a binomial proportion is known as:", type:"mc",
+    options:["The Wald interval","The Jeffreys interval","The Wilson interval","The likelihood interval"],
+    correct:"The Wilson interval",
+    explain:"Inverting the score (Rao) test statistic for a binomial proportion yields the Wilson interval, which always lies in $[0,1]$ and has better small-sample coverage than the Wald interval." },
+
+  // Binomial proportion
+  { q:"For $n=10$, $y=1$, the Wald 95% CI on the probability scale is $(-0.086, 0.286)$. The primary deficiency demonstrated here is:", type:"mc",
+    options:["The interval is too wide","The interval contains invalid (negative) probability values","The interval is not centred at $\\hat{\\pi}$","The interval requires a continuity correction"],
+    correct:"The interval contains invalid (negative) probability values",
+    explain:"Probabilities must lie in $[0,1]$. The Wald interval's symmetric normal approximation can extend into negative territory for small $n$ or extreme $\\hat{\\pi}$." },
+
+  { q:"The likelihood 95% CI for $\\pi$ includes all values where the log-likelihood drops by no more than:", type:"mc",
+    options:["3.84 units from the maximum","1.96 units from the maximum","1.92 units from the maximum","0.05 units from the maximum"],
+    correct:"1.92 units from the maximum",
+    explain:"The 95% likelihood interval satisfies $\\ell(\\pi|y) \\geq \\ell(\\hat{\\pi}|y) - 1.92$ (since $\\chi^2_{0.95,1}/2 = 3.84/2 = 1.92$)." },
+
+  { q:"The Wald interval for a binomial proportion is transformation invariant.", type:"tf", correct:"False",
+    explain:"Computing the Wald interval on the probability scale and on the log-odds scale, then back-transforming, gives different intervals. This is the second major deficiency of the Wald interval." },
+
+  { q:"Computing the Wald CI for a binomial proportion on the log-odds scale, then back-transforming to the probability scale:", type:"mc",
+    options:["Gives the same interval as computing directly on the probability scale","Gives a valid interval (stays in [0,1]) but is still not transformation invariant","Gives the Wilson interval","Gives the likelihood interval"],
+    correct:"Gives a valid interval (stays in [0,1]) but is still not transformation invariant",
+    explain:"Back-transforming from log-odds gives valid probabilities in [0,1], but since Wald intervals are not transformation invariant, the result differs from the direct Wald interval — and also differs from the likelihood interval computed on log-odds." },
+
+  // Misspecification
+  { q:"Under model misspecification, the MLE $\\hat{\\theta}_{mle}$ converges in probability to:", type:"mc",
+    options:["The true parameter $\\theta_0$","Zero","$\\theta^*$, the minimiser of the Kullback-Leibler divergence between the true and assumed models","The sample mean"],
+    correct:"$\\theta^*$, the minimiser of the Kullback-Leibler divergence between the true and assumed models",
+    explain:"Under misspecification, MLE targets the pseudo-true value $\\theta^*$ that makes the assumed model closest to the truth in the KL sense. $\\theta^* = \\theta_0$ only when the model is correctly specified." },
+
+  { q:"The sandwich variance matrix $\\mathbf{C}(\\theta^*) = \\mathbf{A}^{-1}(\\theta^*)\\mathbf{B}(\\theta^*)\\mathbf{A}^{-1}(\\theta^*)$ reduces to $\\mathbf{I}(\\theta_0)^{-1}$ when:", type:"mc",
+    options:["The sample size is large","The null hypothesis is true","The model is correctly specified (information matrix equality holds)","The Hessian is positive definite"],
+    correct:"The model is correctly specified (information matrix equality holds)",
+    explain:"Under correct specification, $-\\mathbf{A}(\\theta_0) = \\mathbf{B}(\\theta_0) = \\mathbf{I}(\\theta_0)$, so $\\mathbf{C} = \\mathbf{I}^{-1}(\\theta_0)$. The sandwich collapses to the standard Fisher information-based variance." },
+
+  { q:"Under model misspecification, which test(s) remain asymptotically $\\chi^2(\\text{df})$ under $H_0$ when robust (sandwich) variance is used?", type:"mc",
+    options:["LR test only","Wald and Score tests only","All three tests","None of the three"],
+    correct:"Wald and Score tests only",
+    explain:"The robust Wald and Score tests maintain $\\chi^2(\\text{df})$ null distributions under misspecification. The LR test does NOT have a $\\chi^2(\\text{df})$ limit under misspecification — it requires model correction." },
+
+  { q:"Under model misspecification, the LR test statistic is asymptotically $\\chi^2(\\text{df})$ under $H_0$.", type:"tf", correct:"False",
+    explain:"This is a critical result: the LR test statistic's null distribution is generally not $\\chi^2(\\text{df})$ under misspecification. Its limit involves a weighted sum of chi-squared variables with weights depending on $\\mathbf{A}$ and $\\mathbf{B}$." },
+
+  { q:"$\\mathbf{B}_n(\\theta) = \\frac{1}{n}\\sum_{i=1}^n \\mathbf{s}_i(\\theta)\\mathbf{s}_i(\\theta)^T$ is an estimate of:", type:"mc",
+    options:["The expected Hessian of the log-likelihood","The expected outer product of the score function","The sandwich variance directly","The Fisher information under misspecification"],
+    correct:"The expected outer product of the score function",
+    explain:"$\\mathbf{B}(\\theta) = E[\\mathbf{s}(\\theta)\\mathbf{s}(\\theta)^T]$ is the expected outer product of scores (the 'meat' of the sandwich). $\\mathbf{B}_n$ is its empirical estimate." },
+
+  { q:"Under misspecification, the robust Wald and Score statistics satisfy $(w - s) \\xrightarrow{p} 0$ under $H_0$. This establishes their:", type:"mc",
+    options:["Identical finite-sample distributions","Asymptotic equivalence under the null","Equivalence to the LR test","Consistency"],
+    correct:"Asymptotic equivalence under the null",
+    explain:"$(w-s) \\xrightarrow{p} 0$ under $H_0$ means the two robust statistics converge to the same value in large samples, establishing asymptotic equivalence." },
+
+  // Deeper conceptual
+  { q:"A researcher reports: 'The p-value is 0.049, confirming that our treatment is effective.' The error in this statement is:", type:"mc",
+    options:["The p-value should be compared to 0.01, not 0.05","The p-value indicates that $H_0$ is likely false, but does not confirm the effect size or practical importance","p-values cannot be less than 0.05","The treatment cannot be effective with p < 0.05"],
+    correct:"The p-value indicates that $H_0$ is likely false, but does not confirm the effect size or practical importance",
+    explain:"A small p-value indicates incompatibility of data with $H_0$. It says nothing about whether the effect is large, important, or reproducible. 'Confirming effectiveness' conflates statistical with practical significance." },
+
+  { q:"If $H_0$ is rejected at the 5% level, it will necessarily be rejected at the 10% level.", type:"tf", correct:"True",
+    explain:"If $p < 0.05$, then $p < 0.10$ as well. Rejection at a stricter level implies rejection at all less strict levels. The converse is false." },
+
+  { q:"Increasing sample size $n$ while keeping $\\alpha$ fixed will:", type:"mc",
+    options:["Decrease power","Have no effect on power","Increase power (consistent tests have power → 1)","Change the significance level"],
+    correct:"Increase power (consistent tests have power → 1)",
+    explain:"For any consistent test, power $\\beta_n(\\theta) \\to 1$ as $n \\to \\infty$ for any fixed alternative. More data = more ability to detect true departures from $H_0$." },
+
+  { q:"The information matrix equality $-\\mathbf{A}(\\theta_0) = \\mathbf{B}(\\theta_0)$ states that:", type:"mc",
+    options:["The Hessian is always positive definite","The negative expected Hessian equals the expected outer product of scores, when the model is correctly specified","The sandwich and Hessian-based variances are always different","Fisher information is zero at the MLE"],
+    correct:"The negative expected Hessian equals the expected outer product of scores, when the model is correctly specified",
+    explain:"Under correct specification: $-E[\\partial^2\\ell/\\partial\\theta\\partial\\theta^T] = E[\\mathbf{s}(\\theta)\\mathbf{s}(\\theta)^T]$. This fails under misspecification, necessitating the sandwich variance." },
+
+  { q:"Under the Neyman–Pearson framework, the significance level $\\alpha$ is chosen:", type:"mc",
+    options:["After seeing the data","Before the experiment, to control the long-run Type I error rate","Based on the p-value","To maximise power regardless of Type I error"],
+    correct:"Before the experiment, to control the long-run Type I error rate",
+    explain:"The NP framework is pre-data: we commit to $\\alpha$ before observing data. This is what gives the long-run frequentist guarantee that Type I errors occur at rate $\\alpha$." },
+
+  { q:"Under correct specification, the three Fisher information estimates $\\hat{\\mathbf{I}}_1$ (expected), $\\hat{\\mathbf{I}}_2$ (outer product of scores), and $\\hat{\\mathbf{I}}_3$ (observed) are asymptotically equivalent.", type:"tf", correct:"True",
+    explain:"Under correct specification, all three consistently estimate $\\mathbf{I}(\\theta_0)$ by the information matrix equality. They differ under misspecification." },
+
+  { q:"The KLIC (Kullback-Leibler Information Criterion) $I(f:g,\\theta) = E_g[\\log g/p]$ is always:", type:"mc",
+    options:["Negative","Zero when the model is correctly specified","Positive and zero only when $g = p$","Independent of the parameter $\\theta$"],
+    correct:"Positive and zero only when $g = p$",
+    explain:"The KL divergence satisfies $I(f:g,\\theta) \\geq 0$ with equality iff $g = p$ a.e. Under misspecification $g \\neq p$, so $I > 0$, and MLE targets the $\\theta^*$ minimising this positive quantity." },
+
+  { q:"The score test for a simple hypothesis evaluates $\\mathbf{S}(\\theta_0)^T\\mathbf{I}(\\theta_0)^{-1}\\mathbf{S}(\\theta_0)$. Under $H_0$, $E[\\mathbf{S}(\\theta_0)]$ equals:", type:"mc",
+    options:["$\\mathbf{I}(\\theta_0)$","$\\theta_0$","$\\mathbf{0}$","$\\infty$"],
+    correct:"$\\mathbf{0}$",
+    explain:"Under regularity conditions, $E[\\mathbf{S}(\\theta_0)] = \\mathbf{0}$ at the true parameter. This is why a small score at $\\hat{\\theta}_0$ (close to zero) provides no evidence against $H_0$." },
+
+  { q:"The Wilson confidence interval for a binomial proportion is preferred over the Wald interval because:", type:"mc",
+    options:["It is always narrower","It is always centred at $\\hat{\\pi}$","It always lies in $[0,1]$ and has better coverage for small $n$","It requires fewer distributional assumptions"],
+    correct:"It always lies in $[0,1]$ and has better coverage for small $n$",
+    explain:"The Wilson interval, obtained by inverting the score test, always contains valid probability values and has better empirical coverage for small samples or extreme $\\hat{\\pi}$, unlike the Wald interval." },
+
+  { q:"Two researchers analyse the same data but parametrise their model differently (a one-to-one reparametrisation). Using the LR test, they will obtain:", type:"mc",
+    options:["Different test statistics and different p-values","The same test statistic and the same p-value","Different test statistics but the same p-value","The same test statistic only if the sample is large"],
+    correct:"The same test statistic and the same p-value",
+    explain:"The LR test is invariant to reparametrisation because the log-likelihood values $\\ell(\\hat{\\theta})$ and $\\ell(\\hat{\\theta}_0)$ are unchanged by a one-to-one parameter transformation." },
+
+  { q:"A model is misspecified (wrong distributional family assumed). The MLE is still useful because:", type:"mc",
+    options:["It still equals the true parameter $\\theta_0$","It converges to $\\theta^*$, the best approximation to the truth in the KL sense, and robust inference (sandwich SE) remains valid","It is unbiased","It achieves the Cramér-Rao bound"],
+    correct:"It converges to $\\theta^*$, the best approximation to the truth in the KL sense, and robust inference (sandwich SE) remains valid",
+    explain:"Even under misspecification, MLE targets the best-fitting parameter in the assumed family. With sandwich SEs, the Wald and Score tests maintain correct asymptotic size. This is the foundation of quasi-likelihood and robust inference." },
+
+  { q:"Statistical significance is equivalent to scientific importance.", type:"tf", correct:"False",
+    explain:"This is one of the most common misconceptions. With large $n$, trivially small effects become statistically significant. Statistical significance only indicates evidence against $H_0$; it says nothing about practical or clinical relevance." },
+
+  { q:"If the likelihood ratio 95% confidence interval for a proportion $\\pi$ is computed on the log-odds scale and then back-transformed to the probability scale, the result:", type:"mc",
+    options:["Differs from the interval computed directly on the probability scale","Is the same as the interval computed directly on the probability scale","Is wider than the direct interval","Requires the delta method"],
+    correct:"Is the same as the interval computed directly on the probability scale",
+    explain:"The LR interval is transformation invariant. Computing it on any monotone scale and back-transforming gives an identical result — a key advantage over Wald intervals." }
+];
+
+// ── SHORT ANSWER DATA (Oral Exam Style) ──
+const saData = [
+  { q:"Define the Type I and Type II errors in hypothesis testing. Explain why, in most scientific contexts, Type I errors are considered more serious, and describe the fundamental trade-off between the two.",
+    followups:["How does the choice of $\\alpha = 0.05$ reflect a value judgment about Type I vs Type II errors?","If we want to reduce both errors simultaneously without changing $\\alpha$, what can we do?","In what scientific context might Type II errors be considered more serious than Type I errors?"],
+    a:"<strong>Definitions:</strong><br>A <strong>Type I error</strong> (false positive) occurs when $H_0$ is rejected despite being true: $P(\\text{Type I}) = \\alpha = P(W \\mid H_0)$.<br>A <strong>Type II error</strong> (false negative) occurs when $H_0$ is not rejected despite being false: $P(\\text{Type II}) = 1 - \\beta$, where $\\beta = P(W \\mid H_1)$ is the power.<br><br><strong>Why Type I is usually more serious:</strong> Falsely claiming an effect exists when it doesn't can lead to: approving ineffective or harmful treatments, publishing irreproducible findings, wasting resources on follow-up research. In regulatory contexts (drug approval, clinical trials), a false positive directly harms patients. The Type I error rate is therefore controlled at a pre-specified small level $\\alpha$ (typically 0.05 or 0.01).<br><br><strong>Fundamental trade-off:</strong> For fixed $n$ and $\\alpha$, decreasing $\\alpha$ (stricter Type I control) widens the acceptance region, increasing the probability of missing true effects (larger Type II error). Resolving the tension requires increasing $n$ — power analysis determines the $n$ needed to achieve target $\\alpha$ and $1 - \\beta$ (e.g., $\\alpha=0.05$, power $= 0.80$)." },
+
+  { q:"Explain the three methods for testing a hypothesis (hypothesis testing, significance testing, and confidence intervals), comparing their philosophical underpinnings and practical outputs.",
+    followups:["What is the key difference between a p-value and a confidence level?","Can you reject $H_0$ using a CI even if you don't know the exact p-value?","A colleague says 'the p-value is the probability that $H_0$ is true.' How do you correct this?"],
+    a:"<strong>Hypothesis Testing (Neyman–Pearson):</strong> Pre-specifies both $H_0$ and $H_1$, defines a critical region $W$ based on a test statistic and critical value, and establishes Type I ($\\alpha$) and Type II ($1-\\beta$) error rates. Decision is binary: reject or not reject. Probability is used <em>pre-data</em> to characterise the long-run frequency properties of the decision algorithm over hypothetical repetitions.<br><br><strong>Significance Testing (Fisher):</strong> Only $H_0$ is specified. After observing data, a p-value is computed as $P(|T| \\geq |t_\\text{obs}| \\mid H_0)$. The p-value provides a <em>post-data</em> measure of how incompatible the data are with $H_0$ — a continuous measure of evidence rather than a binary decision. No Type II error is formally defined.<br><br><strong>Confidence Intervals:</strong> Inverts the test — the $100(1-\\alpha)$% CI is the set of all $\\theta_0$ values for which $H_0: \\theta = \\theta_0$ would not be rejected. Provides a range of plausible parameter values with an associated coverage probability.<br><br><strong>Practical hybrid:</strong> Modern practice combines all three: compute a test statistic, report both the p-value and CI, and use a pre-specified $\\alpha$ for binary decision-making.<br><br><strong>Philosophical note:</strong> A p-value is $P(\\text{data} \\mid H_0)$, not $P(H_0 \\mid \\text{data})$ — the latter is a Bayesian posterior probability requiring a prior." },
+
+  { q:"Describe the holy trinity of significance tests (LR, Wald, Score). For each, state what it measures geometrically and what quantities are required to compute it. When would you prefer one over the others?",
+    followups:["What does the log-likelihood curve look like for each test?","Why does the Wald test lack the invariance property of the LR and Score tests?","How many model fits does each test require?"],
+    a:"<strong>1. Likelihood Ratio (LR / Deviance) test:</strong> $d = -2[\\ell(\\hat{\\theta}_0|\\mathbf{y}) - \\ell(\\hat{\\theta}|\\mathbf{y})]$.<br>Geometrically: the <em>vertical drop</em> in log-likelihood from the unconstrained peak $\\hat{\\theta}$ to the constrained maximum $\\hat{\\theta}_0$.<br>Requires: <em>two model fits</em> — both the full and null models.<br>Advantages: invariant to reparametrisation of both $H_0$ and the model; generally preferred for its invariance properties.<br><br><strong>2. Wald test:</strong> $w = (\\hat{\\theta} - \\theta_0)^T\\mathbf{I}(\\hat{\\theta})(\\hat{\\theta} - \\theta_0)$.<br>Geometrically: the <em>horizontal distance</em> between $\\hat{\\theta}$ and $\\theta_0$, scaled by the curvature at $\\hat{\\theta}$.<br>Requires: one model fit (unrestricted) plus variance estimation.<br>Advantages: direct and simple; widely reported (regression t-statistics are Wald). Key disadvantage: not invariant to reparametrisation — can give contradictory answers for equivalent null hypotheses.<br><br><strong>3. Score (Rao) test:</strong> $s = \\mathbf{S}(\\hat{\\theta}_0)^T\\mathbf{I}(\\hat{\\theta}_0)^{-1}\\mathbf{S}(\\hat{\\theta}_0)$.<br>Geometrically: the <em>slope</em> (gradient) of the log-likelihood at $\\hat{\\theta}_0$. If $\\hat{\\theta}_0 \\approx \\hat{\\theta}$, the gradient there is near zero.<br>Requires: one model fit (restricted under $H_0$) — computationally advantageous.<br><br><strong>Asymptotic equivalence:</strong> All three follow $\\chi^2(\\text{df})$ under $H_0$ and are asymptotically equivalent as $n \\to \\infty$. In finite samples they can differ; preference depends on context: LR for invariance, Score when unconstrained optimisation is hard, Wald for familiarity in linear models." },
+
+  { q:"Explain what model misspecification means and describe its consequences for maximum likelihood estimation and for the three classical significance tests.",
+    followups:["What is the Kullback-Leibler divergence and how does it determine what the MLE targets under misspecification?","What is the sandwich variance and why is it called that?","Why does the LR test break down under misspecification while Wald and Score tests can be rescued?"],
+    a:"<strong>Model misspecification:</strong> The assumed statistical model $p(y|\\mathbf{x},\\theta)$ is not the true data-generating process $g(y|\\mathbf{z},\\gamma_0)$. This is the rule rather than the exception in practice.<br><br><strong>Consequences for MLE:</strong> Instead of converging to the true $\\theta_0$, the MLE converges to the pseudo-true value $\\theta^*$ that minimises the Kullback-Leibler divergence:<br>$I(f:g,\\theta) = E_g[\\log g(y)/p(y|\\theta)]$<br>The KL divergence is always $\\geq 0$ and zero only when $g = p$. So MLE finds the best-fitting parameter within the assumed family.<br><br><strong>Consequences for asymptotic distribution:</strong> The standard result $\\sqrt{n}(\\hat{\\theta}_{mle} - \\theta_0) \\to \\mathcal{N}(0,\\mathbf{I}^{-1})$ fails. Instead:<br>$\\sqrt{n}(\\hat{\\theta}_{mle} - \\theta^*) \\to \\mathcal{N}(0, \\mathbf{C}(\\theta^*))$<br>where $\\mathbf{C} = \\mathbf{A}^{-1}\\mathbf{B}\\mathbf{A}^{-1}$ is the <em>sandwich variance</em>. The information matrix equality $-\\mathbf{A} = \\mathbf{B}$ fails under misspecification, so using $\\mathbf{I}^{-1}$ instead of $\\mathbf{C}$ gives wrong standard errors.<br><br><strong>Consequences for hypothesis tests:</strong><br>• <strong>LR test:</strong> No longer $\\chi^2(\\text{df})$ under $H_0$ — its null distribution involves a weighted sum of chi-squared variables with weights determined by $\\mathbf{A}$ and $\\mathbf{B}$.<br>• <strong>Robust Wald and Score:</strong> With sandwich variance replacing $\\hat{\\mathbf{I}}^{-1}$, both maintain $\\chi^2(\\text{df})$ null distributions and remain asymptotically equivalent to each other." },
+
+  { q:"A researcher wants to construct a confidence interval for a binomial proportion $\\pi$ with $n=10$ and $y=1$. Compare the Wald, Wilson, and likelihood intervals in terms of validity, transformation invariance, and practical recommendation.",
+    followups:["Why does the Wald interval sometimes give negative lower bounds for a probability?","What does 'transformation invariance' mean concretely for the likelihood interval?","For large $n$ and moderate $\\hat{\\pi}$, which interval would you use and why?"],
+    a:"<strong>Setup:</strong> $\\hat{\\pi} = y/n = 1/10 = 0.1$.<br><br><strong>Wald interval:</strong> $\\hat{\\pi} \\pm z_{0.975}\\sqrt{\\hat{\\pi}(1-\\hat{\\pi})/n} = 0.1 \\pm 1.96\\sqrt{0.009} \\approx (-0.086, 0.286)$.<br>Problems: (1) Contains invalid negative values — fundamental deficiency for a probability. (2) Not transformation invariant: computing on log-odds scale and back-transforming gives $(0.014, 0.467)$, a completely different interval.<br><br><strong>Wilson (Score) interval:</strong> Obtained by inverting the score test. Always lies in $[0,1]$. Better empirical coverage than Wald for small $n$ or extreme $\\hat{\\pi}$. Obtained analytically without numerical search. Recommended as the default for proportions.<br><br><strong>Likelihood interval:</strong> All $\\pi$ with $\\ell(\\pi|y) \\geq \\ell(\\hat{\\pi}|y) - 1.92$. Result: $(0.006, 0.372)$. Properties: (1) Always in $[0,1]$. (2) Transformation invariant — computing on log-odds and back-transforming gives the identical interval. (3) Requires numerical solution. (4) Generally provides the best coverage properties.<br><br><strong>Practical recommendation:</strong> For small $n$ or extreme $\\hat{\\pi}$: prefer Wilson or likelihood intervals. For large $n$ and moderate $\\hat{\\pi}$ (e.g., $\\hat{\\pi} \\in [0.2, 0.8]$): Wald is adequate as an approximation. Never use Wald near the boundary $\\hat{\\pi} \\approx 0$ or $1$." },
+
+  { q:"State and explain the Neyman–Pearson Lemma. What does it guarantee, and what are its limitations?",
+    followups:["The NP Lemma uses the likelihood ratio as the test statistic. How does this connect to the likelihood ratio test?","What is a UMP test and when does one exist?","Why might a scientist prefer a two-sided test even when the NP Lemma suggests a one-sided UMP test exists?"],
+    a:"<strong>Statement:</strong> For testing two simple hypotheses $H_0: \\theta = \\theta_0$ vs $H_1: \\theta = \\theta_1$ at level $\\alpha$, the uniformly most powerful (UMP) test has rejection region:<br>$W = \\{\\mathbf{y}: L(\\theta_0|\\mathbf{y})/L(\\theta_1|\\mathbf{y}) < c\\}$<br>where $c$ is chosen so $P(W|H_0) = \\alpha$.<br><br><strong>What it guarantees:</strong> This is the most powerful test of its size — no other test with the same $\\alpha$ can have higher power against $H_1$. The proof is elegant: it compares likelihoods directly, asking 'do the data look more like $\\theta_0$ or $\\theta_1$?'<br><br><strong>Connection to LR test:</strong> The NP critical region is equivalent to $-2\\log[L(\\theta_0)/L(\\theta_1)] > c'$, which is a version of the LR test. This shows the LR test is optimal for simple vs simple alternatives.<br><br><strong>Limitations:</strong><br>(1) Directly applies only to simple vs simple hypotheses — most practical problems involve composite $H_1$.<br>(2) UMP tests don't always exist for two-sided alternatives ($H_1: \\theta \\neq \\theta_0$) or multi-parameter problems.<br>(3) Extensions to exponential families (monotone likelihood ratio) allow UMP tests for one-sided composite alternatives.<br>(4) For composite vs composite problems, optimality must be sought via other criteria (UMP unbiased, UMP invariant, etc.)." },
+
+  { q:"What is the p-value? Give a precise definition and carefully discuss three common misconceptions about p-values.",
+    followups:["A colleague sets $\\alpha = 0.05$ and gets $p = 0.051$. They say the result is 'nearly significant.' How do you respond?","What is the relationship between the p-value and Type I error rate $\\alpha$?","Why might two studies with the same p-value lead to different scientific conclusions?"],
+    a:"<strong>Precise definition:</strong> The p-value is the probability of observing a test statistic at least as extreme as the one computed from the data, <em>assuming $H_0$ is true</em>:<br>$p = P(|T| \\geq |t_\\text{obs}| \\mid H_0)$ (two-sided)<br>It measures the compatibility of the data with $H_0$ — the smaller the p-value, the less compatible.<br><br><strong>Misconception 1: 'p is the probability $H_0$ is true.'</strong><br>False. p-value is $P(\\text{data or more extreme} \\mid H_0)$, a frequentist probability about data given the hypothesis. $P(H_0 \\mid \\text{data})$ is a Bayesian posterior requiring a prior. Confusing these leads to dramatically overconfident claims.<br><br><strong>Misconception 2: 'p > 0.05 proves $H_0$.'</strong><br>False. Failure to reject $H_0$ means the data are <em>compatible</em> with $H_0$, not that $H_0$ is true. The result may be due to low power (small $n$, small effect). Absence of evidence is not evidence of absence.<br><br><strong>Misconception 3: 'Statistical significance = practical importance.'</strong><br>False. Statistical significance ($p < \\alpha$) depends on sample size. With very large $n$, even trivially small effects become statistically significant. A p-value does not indicate effect size or clinical relevance. Effect size measures (Cohen's $d$, odds ratio, etc.) are essential complements.<br><br><strong>Key relationship:</strong> $\\alpha$ is pre-specified to control long-run Type I error rate. The p-value is a random variable (a function of data); when $H_0$ is true, $p \\sim \\text{Uniform}(0,1)$, so $P(p < \\alpha \\mid H_0) = \\alpha$ by design." },
+
+  { q:"Explain the concept of test invariance. Why is the Wald test not invariant to reparametrisation, while the likelihood ratio test always is? Illustrate with a concrete example.",
+    followups:["If you were forced to use a Wald test, how could you mitigate the invariance problem?","Does the lack of invariance have practical consequences in real data analysis?","For which types of transformations is the Score test invariant?"],
+    a:"<strong>Concept of invariance:</strong> A test is invariant to reparametrisation if the test result (p-value, rejection/non-rejection) is identical when equivalent null hypotheses are expressed differently. If $\\psi(\\theta) = 0 \\Leftrightarrow \\psi_1(\\theta) = 0$ describe the same scientific question, an invariant test gives the same answer regardless of the formulation.<br><br><strong>Why LR is invariant:</strong> The LR statistic $d = -2[\\ell(\\hat{\\theta}_0) - \\ell(\\hat{\\theta})]$ depends only on log-likelihood values. A one-to-one transformation $\\xi = \\psi(\\theta)$ does not change $\\ell(\\hat{\\theta})$ or $\\ell(\\hat{\\theta}_0)$ — the MLE of the reparametrised model gives the same fitted value. Hence $d$ is identical.<br><br><strong>Why Wald is not invariant:</strong> The Wald statistic measures distance $\\hat{\\theta} - \\theta_0$ in parameter space, scaled by the local curvature (variance) at $\\hat{\\theta}$. A nonlinear transformation distorts this distance. By the delta method, $\\widehat{\\text{Var}}(\\psi(\\hat{\\theta})) = [\\psi'(\\hat{\\theta})]^2 \\widehat{\\text{Var}}(\\hat{\\theta})$, introducing a derivative factor that changes with different formulations.<br><br><strong>Concrete example (from the lecture):</strong><br>$H_0: \\theta = 0$, $\\hat{\\theta} = 1$, $\\widehat{\\text{Var}}(\\hat{\\theta}) = 0.01$.<br>$w_\\theta = 1/0.01 = 100$ → p-value $\\approx 8 \\times 10^{-24}$ (strong rejection)<br>For $\\xi = \\theta^{25}$: $\\widehat{\\text{Var}}(\\hat{\\xi}) = 25^2 \\cdot 0.01 = 6.25$, $w_\\xi = 1/6.25 = 0.16$ → p-value $= 0.69$ (no rejection!)<br>Same question — opposite conclusions. The LR test gives identical results for both formulations." },
+
+  { q:"Derive from first principles why the one-sample t-statistic $t = (\\bar{X} - \\mu)/(S/\\sqrt{n})$ follows a $t_{n-1}$ distribution when data are i.i.d. normal with unknown variance.",
+    followups:["What happens to the t-distribution as $n \\to \\infty$?","If the data are not normal but $n$ is large, what justifies using a t-test?","Why does the t-distribution have heavier tails than the normal distribution?"],
+    a:"<strong>Setup:</strong> $X_1, \\ldots, X_n \\overset{\\text{iid}}{\\sim} \\mathcal{N}(\\mu, \\sigma^2)$, both $\\mu$ and $\\sigma^2$ unknown.<br><br><strong>Step 1 — Distribution of $\\bar{X}$:</strong><br>$\\bar{X} \\sim \\mathcal{N}(\\mu, \\sigma^2/n)$, so $Z = \\frac{\\bar{X} - \\mu}{\\sigma/\\sqrt{n}} \\sim \\mathcal{N}(0,1)$. But $\\sigma$ is unknown.<br><br><strong>Step 2 — Distribution of $S^2$:</strong><br>It is a fundamental result that $\\frac{(n-1)S^2}{\\sigma^2} \\sim \\chi^2_{n-1}$, independently of $\\bar{X}$. This follows from the spectral decomposition of the quadratic form $\\sum(X_i - \\bar{X})^2/\\sigma^2$.<br><br><strong>Step 3 — Combine:</strong><br>$t = \\frac{\\bar{X}-\\mu}{S/\\sqrt{n}} = \\frac{(\\bar{X}-\\mu)/(\\sigma/\\sqrt{n})}{S/\\sigma} = \\frac{Z}{\\sqrt{(n-1)S^2/\\sigma^2 \\cdot \\frac{1}{n-1}}}$<br>This is the ratio of a $\\mathcal{N}(0,1)$ to $\\sqrt{\\chi^2_{n-1}/(n-1)}$, independently distributed. By definition, this is a $t_{n-1}$ distribution.<br><br><strong>Intuition for heavier tails:</strong> The unknown $\\sigma$ is estimated by $S$, which is random. When $S$ happens to be small (underestimate), the ratio becomes large. This additional variability is captured by the heavier tails of $t_\\nu$ relative to $\\mathcal{N}(0,1)$.<br><br><strong>As $n \\to \\infty$:</strong> By the LLN, $S^2 \\xrightarrow{p} \\sigma^2$, so $S/\\sigma \\xrightarrow{p} 1$, and $t \\xrightarrow{d} Z \\sim \\mathcal{N}(0,1)$. For non-normal data with large $n$, the CLT ensures $\\bar{X}$ is approximately normal, and $S^2 \\xrightarrow{p} \\sigma^2$, validating the normal approximation to the t-test." },
+
+  { q:"Describe the confidence interval–test duality. How can a confidence interval be used to test a hypothesis, and conversely, how is a confidence interval constructed by inverting a test? Use the birth weight example to illustrate.",
+    followups:["What is the coverage probability of a confidence interval, and how does it differ from a Bayesian credible interval?","If the 95% CI is $(3.1, 3.9)$, can you determine whether $H_0: \\mu = 4$ is rejected at $\\alpha = 0.01$?","How would you construct a one-sided CI from a one-sided test?"],
+    a:"<strong>The Duality Theorem:</strong> For a two-sided test $H_0: \\theta = \\theta_0$ at level $\\alpha$, the $100(1-\\alpha)$% confidence interval equals the set of all $\\theta_0$ values for which $H_0$ would <em>not</em> be rejected:<br>$\\text{CI}_{1-\\alpha} = \\{\\theta_0: T(\\mathbf{y}, \\theta_0) \\leq c_\\alpha\\}$<br>Conversely: reject $H_0: \\theta = \\theta_0$ at level $\\alpha$ iff $\\theta_0 \\notin \\text{CI}_{1-\\alpha}$.<br><br><strong>CI construction via test inversion:</strong><br>For the t-test: $H_0$ not rejected iff $|\\bar{X} - \\theta_0|/(S/\\sqrt{n}) \\leq t_{1-\\alpha/2, n-1}$, which gives:<br>$\\theta_0 \\in \\left(\\bar{X} - t_{1-\\alpha/2,n-1}\\frac{S}{\\sqrt{n}},\\; \\bar{X} + t_{1-\\alpha/2,n-1}\\frac{S}{\\sqrt{n}}\\right)$<br>This is exactly the standard t-interval.<br><br><strong>Birth weight illustration:</strong><br>$n=30$, $\\bar{X}=3.482$, $S=0.56$, $t_{0.975,29} = 2.04$:<br>CI$_{0.95} = (3.482 - 2.04\\times 0.1022,\\; 3.482 + 2.04\\times 0.1022) = (3.274,\\; 3.690)$ ≈ $(3.1075, 3.8525)$<br>Since $\\mu_0 = 3.3 \\in (3.1075, 3.8525)$: do NOT reject $H_0: \\mu_L = 3.3$ at 5% level. ✓ Consistent with $|t|=1.78 < 2.04$.<br>If instead $\\mu_0 = 4.0 \\notin (3.1075, 3.8525)$: we WOULD reject $H_0: \\mu_L = 4.0$.<br><br><strong>Frequentist interpretation:</strong> Over repeated samples, 95% of such CIs contain the true $\\mu_L$. The probability refers to the random interval, not to the fixed (but unknown) parameter — it either is or isn't in any specific computed interval." }
+];
+
+let answeredCount = 0, correctCount = 0;
+
+function renderMCQ() {
+  const container = document.getElementById('mcqContainer');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = item.type === 'tf' ? `Q${idx+1} — True / False` : `Q${idx+1} — Multiple Choice`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+
+    card.appendChild(label);
+    card.appendChild(stem);
+
+    const opts = item.type === 'tf' ? ['True','False'] : item.options;
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = opt;
+      btn.setAttribute('data-opt', opt);
+      btn.onclick = () => handleAnswer(idx, opt, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback-bar';
+    feedback.id = `fb-${idx}`;
+    feedback.style.display = 'none';
+    card.appendChild(feedback);
+
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+}
+
+function handleAnswer(idx, chosen, btn, card, item) {
+  const allBtns = card.querySelectorAll('.option-btn');
+  const fb = document.getElementById(`fb-${idx}`);
+  if (btn.disabled) return;
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('data-opt') === item.correct) b.classList.add('reveal-correct');
+  });
+  btn.classList.remove('reveal-correct');
+
+  answeredCount++;
+  if (chosen === item.correct) {
+    btn.classList.add('correct');
+    correctCount++;
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ Correct! ${item.explain}`;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback-bar incorrect';
+    fb.innerHTML = `❌ Incorrect. The correct answer is <strong>${item.correct}</strong>. ${item.explain}`;
+  }
+  fb.style.display = 'block';
+  updateScore();
+  if (window.MathJax) MathJax.typesetPromise([fb]);
+}
+
+function updateScore() {
+  document.getElementById('scoreDisplay').textContent = `Score: ${correctCount} / ${answeredCount}`;
+}
+
+function resetAll() {
+  answeredCount = 0; correctCount = 0;
+  updateScore();
+  renderMCQ();
+}
+
+function renderSA() {
+  const container = document.getElementById('saContainer');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Oral Exam Q${idx+1}`;
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+
+    // Follow-up questions block
+    if (item.followups && item.followups.length > 0) {
+      const fuDiv = document.createElement('div');
+      fuDiv.className = 'followup-block';
+      fuDiv.innerHTML = '<strong>🎓 Likely follow-up questions:</strong><ol style="margin:6px 0 0 18px;">' +
+        item.followups.map(f => `<li style="margin-bottom:4px;">${f}</li>`).join('') + '</ol>';
+      card.appendChild(label);
+      card.appendChild(stem);
+      card.appendChild(fuDiv);
+    } else {
+      card.appendChild(label);
+      card.appendChild(stem);
+    }
+
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-btn';
+    revealBtn.textContent = 'Reveal Model Answer';
+
+    const ansPanel = document.createElement('div');
+    ansPanel.className = 'answer-panel';
+    ansPanel.innerHTML = item.a;
+
+    revealBtn.onclick = () => {
+      const shown = ansPanel.style.display === 'block';
+      ansPanel.style.display = shown ? 'none' : 'block';
+      revealBtn.textContent = shown ? 'Reveal Model Answer' : 'Hide Answer';
+      if (!shown && window.MathJax) MathJax.typesetPromise([ansPanel]);
+    };
+
+    card.appendChild(revealBtn);
+    card.appendChild(ansPanel);
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderMCQ();
+  renderSA();
+});
+</script>
+
+</body>
+</html>

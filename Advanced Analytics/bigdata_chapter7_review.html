@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Chapter 7: Big Data Tools & Platforms Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    border-radius: 12px;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 { color: #1a3a5c; font-size: 1.25em; font-weight: 700; border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0; }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin-top: 20px; }
+  .key-point    { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box  { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box  { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box  { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .formula-box  { background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px; padding: 14px 20px; margin: 14px 0; text-align: center; font-size: 1.05em; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+  .mcq-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-top: 0; }
+  .score-display { background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px; padding: 5px 18px; font-weight: 700; color: #856404; display: inline-block; font-size: 0.95em; }
+  .mcq-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .reset-btn-mcq { background: #2e6da4; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .reset-btn-mcq:hover { background: #1a3a5c; }
+  .mcq-card { background: #f9fafb; border: 1px solid #e5e9f2; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .mcq-card .question-label { font-size: 0.8em; font-weight: 700; color: #2e6da4; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .mcq-card .question-stem  { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+  .option-btn { display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea; border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left; cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s; font-family: inherit; }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected       { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct        { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect      { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+  .sa-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; border-bottom: 2px solid #e8d5ff; padding-bottom: 8px; margin-top: 0; }
+  .sa-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .sa-card { background: #faf9ff; border: 1px solid #e2dcf5; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .sa-card .question-stem  { font-weight: 600; color: #1a1a2e; margin: 8px 0 14px 0; font-size: 1.0em; }
+  .reveal-btn { background: #6f42c1; color: #ffffff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel { background: #f3f0ff; border: 1px solid #d4c8f5; border-radius: 8px; padding: 18px 22px; margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none; }
+  .answer-panel strong { color: #4a148c; }
+  .reset-btn-sa { background: #6f42c1; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+  .reset-btn-sa:hover { background: #5a32a3; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin-bottom: 4px; }
+  code { background: #eef2fb; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Chapter 7: Big Data — Tools &amp; Platforms — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#inmemory">In-Memory Analytics</a>
+  <a href="#ecosystems">Python &amp; R Ecosystems</a>
+  <a href="#notebooks">Notebooks &amp; IDEs</a>
+  <a href="#formats">File Formats</a>
+  <a href="#packaging">Packaging &amp; Versioning</a>
+  <a href="#deployment">Model Deployment</a>
+  <a href="#hadoop">Hadoop &amp; HDFS</a>
+  <a href="#mapreduce">MapReduce</a>
+  <a href="#spark">Spark</a>
+  <a href="#streaming">Streaming Analytics</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa"  class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ===================== STUDY NOTES ===================== -->
+
+<div class="notes-section" id="inmemory">
+  <h2>1. In-Memory Analytics &amp; The Data Landscape</h2>
+  <div class="key-point">
+    <strong>Core assumption of most data science tools:</strong> the dataset fits in RAM. Servers with 512 GB of RAM have become relatively cheap — often cheaper than running a full HDFS cluster, particularly in cloud environments. This covers a surprisingly large range of real-world problems.
+  </div>
+
+  <h3>Two Sides of the Modern Data Stack</h3>
+  <table>
+    <thead><tr><th>Infrastructure Side</th><th>Analytics &amp; ML Side</th></tr></thead>
+    <tbody>
+      <tr><td>Big Data storage &amp; integration</td><td>Data Science &amp; Machine Learning</td></tr>
+      <tr><td>Architecture, NoSQL &amp; NewSQL</td><td>AI, NLP, Computer Vision</td></tr>
+      <tr><td>Streaming &amp; real-time pipelines</td><td>Business Intelligence &amp; Visualization</td></tr>
+      <tr><td>AI/ML Ops, CI/CD for models</td><td>Statistical modelling &amp; analytics</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The Spectrum: In-Memory → On-Disk → Distributed</h3>
+  <table>
+    <thead><tr><th>Tier</th><th>When to use</th><th>Tools</th></tr></thead>
+    <tbody>
+      <tr><td>In-memory</td><td>Data fits in RAM (most cases!)</td><td>pandas, Polars, R data.table, DuckDB</td></tr>
+      <tr><td>On-disk / intermediate</td><td>Data exceeds RAM but single machine</td><td>Dask, Vaex, disk.frame, DuckDB, Polars</td></tr>
+      <tr><td>On-GPU</td><td>Massive parallelisable linear algebra</td><td>CUDA, JAX, PyTorch, CuDF (RAPIDS)</td></tr>
+      <tr><td>Distributed (big data)</td><td>Truly petabyte-scale, multi-machine</td><td>Spark, Hadoop, cloud warehouses</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ "Pandas is crashing because I'm trying to work with a 50GB dataset" is <em>not</em> a good reason to jump straight to Spark. Most organisations that went full Hadoop/Spark would have been better served by better in-memory techniques, Polars, or DuckDB. Assess before committing.</div>
+
+  <h3>On-Disk Intermediate Solutions</h3>
+  <div class="key-point">
+    Tools like <strong>Dask</strong>, <strong>Polars</strong>, <strong>DuckDB</strong>, and <strong>Vaex</strong> use <strong>Directed Acyclic Graph (DAG)</strong> execution plans and column-oriented data structures to process datasets larger than RAM on a single machine — the same DAG principle later "rediscovered" by Spark.
+  </div>
+  <div class="example-box">
+    <strong>Dask mirrors the Pandas API:</strong><br>
+    <code>df = dd.read_csv('2015-*-*.csv')</code> — lazy, partitioned reads.<br>
+    <code>df.groupby(df.user_id).value.mean().compute()</code> — triggers execution.
+  </div>
+</div>
+
+<div class="notes-section" id="ecosystems">
+  <h2>2. Python &amp; R Ecosystems for Analytics</h2>
+  <h3>Why Python and R?</h3>
+  <div class="key-point">
+    The languages themselves are not what matter — it's their <strong>ecosystems</strong>. Python is described as "the second best language for everything." Both languages succeed because of the enormous library support built by their communities, not intrinsic language properties.
+  </div>
+
+  <h3>The Python Scientific Stack (SciPy ecosystem)</h3>
+  <table>
+    <thead><tr><th>Library</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>NumPy</td><td>N-dimensional array object, broadcasting, fast linear algebra</td></tr>
+      <tr><td>pandas</td><td>DataFrame: tabular data with mixed types, built on NumPy</td></tr>
+      <tr><td>Polars</td><td>Fast DataFrame library in Rust/Python; uses Arrow; DAG execution; recommended over pandas for large data</td></tr>
+      <tr><td>matplotlib</td><td>Comprehensive 2D plotting foundation</td></tr>
+      <tr><td>seaborn</td><td>Statistical visualisation built on matplotlib</td></tr>
+      <tr><td>scikit-learn</td><td>Standard ML library — classification, regression, clustering, pipelines</td></tr>
+      <tr><td>statsmodels</td><td>Statistical model estimation, hypothesis testing</td></tr>
+      <tr><td>DuckDB</td><td>"SQLite for data analysis" — fast analytical SQL on DataFrames</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The R Tidyverse</h3>
+  <table>
+    <thead><tr><th>Package</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>ggplot2</td><td>Grammar of Graphics — declarative, layered visualisation</td></tr>
+      <tr><td>dplyr</td><td>Data manipulation verbs: filter, select, mutate, summarise, join</td></tr>
+      <tr><td>tidyr</td><td>Reshaping data (pivot_longer, pivot_wider)</td></tr>
+      <tr><td>tidymodels</td><td>Modern ML framework with unified pipeline API (successor to caret)</td></tr>
+      <tr><td>caret / mlr3</td><td>Unified interfaces to hundreds of ML algorithms with cross-validation &amp; tuning</td></tr>
+    </tbody>
+  </table>
+  <div class="key-point">
+    <strong>scikit-learn's design constraint:</strong> It deliberately excludes deep learning and reinforcement learning — these require GPU support and a richer vocabulary for architecture definition that falls outside scikit-learn's in-memory, CPU-first design. Use TensorFlow or PyTorch for those tasks.
+  </div>
+</div>
+
+<div class="notes-section" id="notebooks">
+  <h2>3. Notebooks &amp; Development Environments</h2>
+  <h3>Evolution of Notebooks</h3>
+  <table>
+    <thead><tr><th>Year</th><th>Milestone</th></tr></thead>
+    <tbody>
+      <tr><td>1966</td><td>Joss — earliest interactive computational notebook concept</td></tr>
+      <tr><td>1988</td><td>Mathematica — popularised notebook-style computing</td></tr>
+      <tr><td>2001</td><td>IPython console — Fernando Pérez (~259 lines of code)</td></tr>
+      <tr><td>2005</td><td>Sage Notebook — open-source Mathematica alternative</td></tr>
+      <tr><td>2015</td><td>Jupyter project — IPython Notebook becomes language-agnostic (kernels)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Jupyter: Benefits</h3>
+  <ul>
+    <li>Quick iteration; immediate output inline with code.</li>
+    <li>Easy construction of dynamic, shareable reports.</li>
+    <li>Rich ecosystem of widgets, extensions, and themes.</li>
+    <li>JupyterHub for multi-user hosted environments.</li>
+    <li>Papermill: parameterise and schedule notebooks at scale (used by Netflix).</li>
+    <li>All cloud providers offer Jupyter as their primary data science environment.</li>
+  </ul>
+
+  <h3>Jupyter: Known Pitfalls</h3>
+  <div class="warning-box">
+    ⚠ The "Joel Grus" critique (and others) highlights 11 systemic issues: hidden state &amp; out-of-order execution, discourages modularity and testing, version control friction (large JSON diffs), reproducibility challenges, and the tendency to encourage poor coding habits. Notebooks are best for <em>exploration and communication</em>, not production code.
+  </div>
+
+  <h3>Alternatives &amp; Modern Notebooks</h3>
+  <table>
+    <thead><tr><th>Tool</th><th>Key Differentiator</th></tr></thead>
+    <tbody>
+      <tr><td>Apache Zeppelin</td><td>JVM-based; historically popular with Spark stacks</td></tr>
+      <tr><td>Observable HQ</td><td>JavaScript-first, reactive browser notebook</td></tr>
+      <tr><td>Marimo</td><td>Next-gen Python notebook — every program is also a web app; reactive</td></tr>
+      <tr><td>Pluto.jl</td><td>Reactive Julia notebook</td></tr>
+      <tr><td>Google Colab</td><td>Free hosted Jupyter with GPU access</td></tr>
+      <tr><td>Azure ML Studio</td><td>Cloud-hosted notebooks with MLOps integration</td></tr>
+    </tbody>
+  </table>
+
+  <h3>IDEs</h3>
+  <div class="key-point">
+    IDEs offer superior debugging, code inspection, refactoring, and documentation tooling vs. notebooks. Key options: <strong>RStudio</strong> (R), <strong>PyCharm / DataSpell</strong> (JetBrains, Python), <strong>VS Code</strong> (universal, extensible), <strong>JupyterLab</strong> (Jupyter + IDE panels + file browser). JupyterLab Desktop bridges notebook and IDE.
+  </div>
+</div>
+
+<div class="notes-section" id="formats">
+  <h2>4. Data File Formats</h2>
+  <h3>Key Dimensions When Choosing a Format</h3>
+  <ul>
+    <li>Read speed vs. write (serialisation) speed</li>
+    <li>File size / compression efficiency</li>
+    <li>Row-oriented vs. column-oriented storage</li>
+    <li>Schema evolution support (can columns be added/renamed?)</li>
+    <li>Splittable for distributed processing</li>
+    <li>Human readability</li>
+  </ul>
+
+  <h3>Format Comparison</h3>
+  <table>
+    <thead><tr><th>Format</th><th>Orientation</th><th>Schema Evol.</th><th>Best For</th><th>Weakness</th></tr></thead>
+    <tbody>
+      <tr><td>CSV / JSON</td><td>Row (text)</td><td>Poor</td><td>Exchange, debugging</td><td>Bulky, slow to query, no typing</td></tr>
+      <tr><td>Apache AVRO</td><td>Row (binary)</td><td>Excellent</td><td>ETL, data pipelines, streaming (Kafka)</td><td>Not columnar — slow for analytics reads</td></tr>
+      <tr><td>Apache Parquet</td><td>Column (binary)</td><td>Good</td><td>Analytics, data lakes, ML feature stores</td><td>Not ideal for frequent row-level updates</td></tr>
+      <tr><td>Apache Arrow / Feather</td><td>Column (in-memory spec)</td><td>Good</td><td>Fast in-process exchange between R &amp; Python</td><td>Not a persistent archival format</td></tr>
+      <tr><td>HDF5</td><td>Hierarchical</td><td>Complex</td><td>Scientific data, deep learning model weights</td><td>Very complex spec; overkill for tabular data</td></tr>
+      <tr><td>ORC</td><td>Row+Column hybrid</td><td>Good</td><td>Hive / Hadoop ecosystems</td><td>Declining usage; largely replaced by Parquet</td></tr>
+      <tr><td>SQLite</td><td>Row (relational)</td><td>Via ALTER</td><td>Embedded, multi-table, SQL queries</td><td>Operational OLTP focus; less suited to analytics</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Practical recommendation:</strong> Use <strong>Parquet or Feather/Arrow</strong> as primary formats. AVRO for write-heavy ETL and Kafka integration. Many organisations adopt a hybrid — AVRO for ingestion/streaming, Parquet for the analytical layer.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Apache Arrow</strong> is not a file format — it is a <em>columnar in-memory representation specification</em>. Its layout is designed to be highly cache-efficient for analytics and enables zero-copy data interchange between systems (Python ↔ R, Spark ↔ pandas) without serialisation overhead. Feather is Arrow on disk.
+  </div>
+</div>
+
+<div class="notes-section" id="packaging">
+  <h2>5. Packaging, Versioning &amp; Reproducibility</h2>
+  <h3>Package Managers &amp; Virtual Environments</h3>
+  <div class="key-point">
+    A package manager automates install, upgrade, and dependency resolution. Virtual environments create isolated per-project package sets — essential for the "runs on my machine" problem. The goal is a fully <strong>reproducible environment</strong>.
+  </div>
+
+  <table>
+    <thead><tr><th>Tool</th><th>Language</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>pip + venv</td><td>Python</td><td>Built-in, ubiquitous; pip-tools for lockfiles</td></tr>
+      <tr><td>conda / mamba</td><td>Python + R + others</td><td>Cross-language; slow (conda), faster (mamba); one env per project recommended</td></tr>
+      <tr><td>Poetry</td><td>Python</td><td>Deterministic lockfile; pyproject.toml; integrates dependency management + publishing</td></tr>
+      <tr><td>uv</td><td>Python</td><td>10–100× faster than pip; single tool replacing pip, pyenv, virtualenv, Poetry; <strong>current recommendation</strong></td></tr>
+      <tr><td>packrat / renv</td><td>R</td><td>Per-project library snapshots for R</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Version Control with Git</h3>
+  <div class="key-point">
+    Git (created by Linus Torvalds in 2005 for the Linux kernel) is the universal standard for source code versioning. Every directory is a full-fledged repository with complete history. GitHub / GitLab host remote repositories. Good practice even for a "team of one." Recruiters routinely review GitHub profiles to assess practical experience.
+  </div>
+
+  <h3>AutoML</h3>
+  <div class="key-point">
+    AutoML tools (Auto-sklearn, H2O AutoML, TPOT, AutoGluon, FLAML, etc.) automate the search through algorithm + hyperparameter space. The hardest component is the <strong>hyperparameter search procedure</strong> over a vast combinatorial space. May also incorporate automated feature engineering (FeatureTools, AutoFeat). Increasingly superseded by LLM-based approaches.
+  </div>
+
+  <h3>Data Labelling</h3>
+  <ul>
+    <li>Manual labelling is expensive and slow — tools like Labelbox, imglab, and make-sense provide efficient UIs.</li>
+    <li><strong>Active learning</strong> speeds labelling: train a model → query its most uncertain predictions → label those next.</li>
+    <li><strong>Weak supervision</strong> (Snorkel): programmatic labelling with noisy heuristics ("labelling functions") combined by a generative model — avoids labelling every example manually.</li>
+    <li>Foundation models (SAM — Segment Anything; LLMs) are now widely used to pre-label data, dramatically reducing human effort.</li>
+  </ul>
+</div>
+
+<div class="notes-section" id="deployment">
+  <h2>6. Model Deployment &amp; MLOps</h2>
+  <div class="key-point">
+    In real-world ML systems, only a small fraction of code is actual ML. The vast infrastructure surrounding it — data pipelines, serving, monitoring, governance — represents enormous <em>hidden technical debt</em> (Sculley et al., 2015).
+  </div>
+
+  <h3>Five Categories of Deployment Issues</h3>
+  <table>
+    <thead><tr><th>Category</th><th>Core problem</th><th>Key principle</th></tr></thead>
+    <tbody>
+      <tr><td>Data lineage</td><td>Training data sources are dispersed; preprocessing steps not tracked</td><td>Unified data layer; all preprocessing in the data layer; data dictionary with GDPR metadata</td></tr>
+      <tr><td>Deployment context</td><td>Dev environment (Jupyter/Anaconda) ≠ IT environment (Java/.NET)</td><td>Define common environment; containerise with Docker; semantic API versioning (/v1/, /v2/)</td></tr>
+      <tr><td>Development governance</td><td>Training code not reproducible; "runs on my machine" phenomenon</td><td>Version code with Git; CI/CD pipelines; reproducible training artifacts</td></tr>
+      <tr><td>Model governance</td><td>No versioning; model lineage not tracked; metadata unavailable</td><td>Model registry; versioned endpoints; canary / shadow deployments</td></tr>
+      <tr><td>Monitoring</td><td>Models degrade silently; concept drift not detected</td><td>Monitor input distributions, output distributions, and latency; alert on drift; backtest periodically</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Runtime Deployment Patterns</h3>
+  <table>
+    <thead><tr><th>Pattern</th><th>Description</th><th>Typical output</th></tr></thead>
+    <tbody>
+      <tr><td>Push (batch)</td><td>Model scheduled to run over a batch of data</td><td>Results saved to DB, data lake, Excel, FTP</td></tr>
+      <tr><td>Pull (API/microservice)</td><td>Model deployed as REST endpoint, queried on demand</td><td>JSON predictions consumed by web apps, BI tools</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Isolation Levels</h3>
+  <ul>
+    <li><strong>Virtual environments:</strong> Python-level package isolation only.</li>
+    <li><strong>Docker containers:</strong> Process + file system isolation above shared OS. Industry standard today.</li>
+    <li><strong>Kubernetes / Kubeflow:</strong> Container orchestration at scale; auto-scaling, self-healing.</li>
+    <li><strong>Serverless (Lambda, Azure Functions):</strong> No infrastructure management; pay-per-call; cold-start latency.</li>
+    <li><strong>Virtualisation:</strong> Full OS stack isolated on hardware emulation; maximum isolation, highest overhead.</li>
+  </ul>
+
+  <div class="warning-box">⚠ <strong>Concept drift</strong>: ML models degrade silently. People take actions based on predictions (feedback loop); external world changes (products, promotions, regulation). Without monitoring, a model will happily produce increasingly stale predictions indefinitely.</div>
+
+  <h3>MLOps → AIops</h3>
+  <div class="key-point">
+    Moving from MLOps (model deployment pipelines) to AIops involves additional complexity: seamless model selection per query, guardrails and model judges, token caching, and vector databases for retrieval-augmented generation.
+  </div>
+</div>
+
+<div class="notes-section" id="hadoop">
+  <h2>7. Hadoop: HDFS &amp; the Distributed File System</h2>
+  <h3>Origin &amp; History</h3>
+  <ul>
+    <li>2003: Google File System paper → inspired Google MapReduce paper.</li>
+    <li>Hadoop originated in the Nutch search engine (Doug Cutting &amp; Mike Cafarella), named after Cutting's son's toy elephant.</li>
+    <li>2006: Yahoo! open-sources Hadoop after Cutting joins to work on their search engine.</li>
+    <li>2008: Yahoo! donates Hadoop to the Apache Software Foundation.</li>
+    <li>Today: the Hadoop hype has passed; Spark and cloud warehouses dominate.</li>
+  </ul>
+
+  <h3>Hadoop's Four Core Modules</h3>
+  <table>
+    <thead><tr><th>Module</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td>Hadoop Common</td><td>Shared utilities and libraries used by other Hadoop modules</td></tr>
+      <tr><td>HDFS</td><td>Distributed file system — stores data across commodity nodes in 64 MB blocks with replication</td></tr>
+      <tr><td>MapReduce</td><td>Programming model for parallel processing of large datasets</td></tr>
+      <tr><td>YARN</td><td>Yet Another Resource Negotiator — cluster resource scheduling and management</td></tr>
+    </tbody>
+  </table>
+
+  <h3>HDFS Key Properties</h3>
+  <div class="key-point">
+    HDFS stores data in <strong>64 MB blocks</strong> distributed across <strong>data nodes</strong>. A <strong>name node</strong> maintains metadata and makes replication decisions. Default replication factor = 3 (Hadoop 2) → 1.5× overhead via erasure coding (Hadoop 3). HDFS provides distributed <em>storage</em> — not computation. "A massive, distributed C:-drive."
+  </div>
+  <div class="warning-box">⚠ HDFS is purely a storage system. Storing a file in HDFS and then reading it naively on a single client will still cause the same memory problems as reading it locally. Distributed storage ≠ distributed computing.</div>
+
+  <h3>SQL on Hadoop — A Cautionary Tale</h3>
+  <p>Every time a new distributed data store became popular, the immediate demand was for SQL access. Apache Hive (2008) translated SQL to MapReduce jobs — effective but extremely slow due to MapReduce overhead. This drove the development of Tez (DAG-based Hive backend), Impala (Cloudera's no-MapReduce SQL engine), and ultimately Spark SQL. The lesson: SQL on Hadoop is a workaround for a fundamental architectural mismatch.</p>
+</div>
+
+<div class="notes-section" id="mapreduce">
+  <h2>8. MapReduce</h2>
+  <h3>Concept</h3>
+  <div class="key-point">
+    MapReduce stems from <strong>functional programming</strong>: <em>map</em> applies a function to every element of a list; <em>reduce</em> aggregates a list to a scalar. In Hadoop, it operates over <strong>(key, value) pairs</strong>. Map tasks can run fully in parallel; reduce tasks run in parallel per key group after a shuffle phase that co-locates all values for the same key.
+  </div>
+
+  <h3>MapReduce Pipeline</h3>
+  <ol>
+    <li><strong>Input split:</strong> Input data divided into (key, value) pairs assigned to mappers.</li>
+    <li><strong>Map:</strong> Each mapper applies the map function → emits zero or more (key, value) output pairs.</li>
+    <li><strong>Shuffle &amp; Sort:</strong> All outputs with the same key are routed to the same reducer node.</li>
+    <li><strong>Reduce:</strong> Each reducer applies the reduce function to all values for its key → emits final (key, value) pairs.</li>
+  </ol>
+
+  <h3>Word Count Example</h3>
+  <div class="example-box">
+    <strong>Map:</strong> <code>map("two plus two does not equal three") → [(two,1),(plus,1),(two,1),...]</code><br>
+    <strong>Shuffle:</strong> All (two, 1) pairs routed to same reducer.<br>
+    <strong>Reduce:</strong> <code>reduce(two, [1,1,1,1]) → [(two, 4)]</code>
+  </div>
+
+  <h3>The Averaging Pitfall — Associativity Requirement</h3>
+  <div class="warning-box">
+    ⚠ The reduce function must be <strong>associative and produce the same output structure as the map function</strong> — because reduce may be called multiple times on partial results (e.g., when a late mapper finishes). A naive running average fails this: <code>avg(avg(100,200), 300) ≠ avg(100,200,300)</code>. The fix: carry a (sum, count) pair as the value, not just the average.
+  </div>
+  <div class="example-box">
+    <strong>Correct pattern:</strong><br>
+    Map: <code>(genre, nrPages) → (genre, (nrPages, 1))</code><br>
+    Reduce: <code>(key, [(s1,c1),(s2,c2),...]) → (key, (Σsi*ci / Σci, Σci))</code><br>
+    This allows correct re-aggregation of partial results at any point.
+  </div>
+
+  <h3>MapReduce Limitations</h3>
+  <ul>
+    <li>Hard to program — most tutorials don't go beyond word count.</li>
+    <li>Slow: every intermediate result is written to HDFS disk → massive I/O overhead.</li>
+    <li>Java-native (Python bindings exist but are cumbersome).</li>
+    <li>Not suited for iterative algorithms (ML) — each iteration requires a full MapReduce cycle.</li>
+    <li>"Big does not mean fast" — MapReduce cluster latency often exceeds simple in-memory solutions.</li>
+  </ul>
+
+  <h3>YARN</h3>
+  <div class="key-point">
+    YARN (Hadoop 2+) separates cluster resource management from the MapReduce execution model. It allows other execution frameworks (Spark, Tez, Flink) to share the same cluster resources without being tied to the MapReduce paradigm.
+  </div>
+</div>
+
+<div class="notes-section" id="spark">
+  <h2>9. Apache Spark</h2>
+  <div class="key-point">
+    "2015 was the year of Apache Spark." Spark addresses MapReduce's key weaknesses: <strong>10–100× faster</strong> (in-memory vs. disk I/O), easier to program, and natively suited to ML workloads. It replaces the MapReduce execution model with a <strong>DAG execution engine</strong> supporting cyclic data flow and in-memory computing.
+  </div>
+
+  <h3>What Spark Keeps vs. Replaces</h3>
+  <table>
+    <thead><tr><th>Component</th><th>Spark's relationship</th></tr></thead>
+    <tbody>
+      <tr><td>HDFS</td><td>Can use HDFS, but also S3, GCS, Cassandra, Hive, flat files — storage-agnostic</td></tr>
+      <tr><td>YARN</td><td>Can run on YARN, Mesos, Kubernetes, or standalone</td></tr>
+      <tr><td>MapReduce</td><td><strong>Replaced</strong> — DAG engine is fundamentally different</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Resilient Distributed Datasets (RDDs)</h3>
+  <div class="key-point">
+    RDDs are Spark's foundational abstraction: an <strong>immutable, distributed collection of elements</strong> partitioned across cluster nodes. Key properties: fault-tolerant (lineage tracking), lazily evaluated (transformations computed only when an action demands it), in-memory preferred.
+  </div>
+  <table>
+    <thead><tr><th>Transformations (lazy)</th><th>Actions (trigger execution)</th></tr></thead>
+    <tbody>
+      <tr><td>map, filter, flatMap, union, groupByKey, reduceByKey, join, distinct, sortByKey</td><td>reduce, count, first, take(n), collect, saveAsTextFile, foreach, countByKey</td></tr>
+    </tbody>
+  </table>
+
+  <h3>SparkSQL, DataFrames &amp; Datasets</h3>
+  <div class="key-point">
+    SparkSQL introduces <strong>DataFrames</strong> (distributed collections of named-column rows, similar to pandas) on top of RDDs. The <strong>Catalyst query optimiser</strong> rewrites queries for maximum efficiency. Since Spark 2.0, DataFrames/Datasets are the primary API — RDDs are low-level and rarely used directly.
+  </div>
+  <table>
+    <thead><tr><th>Abstraction</th><th>Type safety</th><th>Language support</th></tr></thead>
+    <tbody>
+      <tr><td>RDD</td><td>None — untyped elements</td><td>Scala, Java, Python, R</td></tr>
+      <tr><td>DataFrame (= Dataset[Row])</td><td>Runtime only</td><td>All four languages</td></tr>
+      <tr><td>Dataset[T]</td><td>Compile-time (static)</td><td>Scala and Java only</td></tr>
+    </tbody>
+  </table>
+
+  <h3>MLlib</h3>
+  <div class="key-point">
+    MLlib is Spark's ML library — "scikit-learn on Spark." Primary API (since Spark 2.0) is the DataFrame-based <code>spark.ml</code> package. Provides algorithms, featurisation, pipelines, and persistence. Since Spark 3, the old RDD-based <code>spark.mllib</code> is in maintenance mode only.
+  </div>
+
+  <h3>H2O &amp; Sparkling Water</h3>
+  <div class="key-point">
+    H2O is an open-source, in-memory, distributed ML platform. Its "Flow" web UI, strong algorithm support, and production focus ("Sparkling Water") — integrating with Spark — made it a popular alternative/complement to MLlib. H2O was early to recognise the benefits of combining Spark SQL with H2O's ML algorithms.
+  </div>
+</div>
+
+<div class="notes-section" id="streaming">
+  <h2>10. Streaming Analytics</h2>
+  <h3>Three Distinct Streaming Concerns</h3>
+  <table>
+    <thead><tr><th>Concern</th><th>Definition</th><th>Reality check</th></tr></thead>
+    <tbody>
+      <tr><td>Streaming data</td><td>Data source emits a continuous stream of events</td><td>Often the real requirement — store it and convert to batches</td></tr>
+      <tr><td>Streaming training</td><td>Model must train continuously on live data</td><td>Rarely needed; very hard; most models retrain offline periodically</td></tr>
+      <tr><td>Streaming prediction</td><td>Trained model scores events in real-time as they arrive</td><td>Often just a deployment pattern (Push API); model itself is static</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">⚠ Do you actually have a streaming problem? Netflix: 9M events/second. LinkedIn: 500B events/day. Most organisations have far lower volumes that can be handled with micro-batching or scheduled batch jobs. Assess before building a complex streaming pipeline.</div>
+
+  <h3>The Streaming Stack</h3>
+  <table>
+    <thead><tr><th>Layer</th><th>Purpose</th><th>Tools</th></tr></thead>
+    <tbody>
+      <tr><td>Event collectors</td><td>Gather &amp; centralise events (logs, sensor data)</td><td>Apache Flume, Apache NiFi</td></tr>
+      <tr><td>Event brokers / message queues</td><td>Decouple producers from consumers; buffer &amp; route messages reliably</td><td>Apache Kafka, RabbitMQ, Redis Streams</td></tr>
+      <tr><td>Event processors (analytics)</td><td>Transform, aggregate, and score streams</td><td>Spark Streaming, Spark Structured Streaming, Apache Flink</td></tr>
+      <tr><td>Event indexers &amp; dashboards</td><td>Real-time search, monitoring, visualisation</td><td>Splunk, Kibana / Elasticsearch</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Spark Streaming vs. Structured Streaming</h3>
+  <table>
+    <thead><tr><th></th><th>Spark Streaming (legacy)</th><th>Spark Structured Streaming (current)</th></tr></thead>
+    <tbody>
+      <tr><td>Core abstraction</td><td>DStream — sequence of RDDs</td><td>Unbounded DataFrame/Table — appended continuously</td></tr>
+      <tr><td>API</td><td>RDD-level transformations</td><td>Same SQL/DataFrame API as batch; engine handles incremental execution</td></tr>
+      <tr><td>Late data handling</td><td>Complex; requires manual state management</td><td>Watermarking and windowing built-in</td></tr>
+      <tr><td>Recommendation</td><td>Legacy; avoid for new projects</td><td>Preferred; fully integrated with SparkSQL</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Spark Structured Streaming key idea:</strong> Treat a live data stream as a table being continuously appended. Express streaming computation identically to batch computation — the Spark SQL engine runs it incrementally. Late-arriving data is handled via event-time <strong>watermarks</strong>.
+  </div>
+
+  <h3>Apache Kafka</h3>
+  <div class="key-point">
+    Kafka is a distributed, durable, high-throughput event broker — not an analytics engine itself. It decouples data producers (apps, sensors) from consumers (Spark, Flink, databases) and provides a historical log that can be replayed. Common pattern: mobile apps → Kafka → Spark Structured Streaming → data lake.
+  </div>
+
+  <h3>Key Takeaways on the Big Data Landscape</h3>
+  <div class="key-point">
+    The "big data" hype peaked 2011–2014 and has stabilised. The modern architecture depends on the use case: (1) start with Polars/DuckDB; (2) only add distributed computing if you genuinely need it; (3) cloud-managed warehouses (Snowflake, ClickHouse, Dremio) handle the storage/query layer; (4) Spark remains relevant in enterprise settings; (5) <strong>insights matter more than infrastructure</strong>.
+  </div>
+</div>
+
+<!-- ===================== MCQ ===================== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">↺ Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ===================== SHORT ANSWER ===================== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (10)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">↺ Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  // ── SECTION 1: In-Memory & Ecosystems ──
+  {
+    q: "The lecture argues that for most organisations, jumping straight to a Hadoop/Spark cluster when data 'does not fit in pandas' is premature. What is the recommended intermediate step?",
+    opts: ["A) Move immediately to cloud-based Spark (e.g., Databricks)", "B) Investigate on-disk or out-of-core libraries such as Polars, Dask, or DuckDB on a single well-specced machine", "C) Switch the analysis language from Python to Java", "D) Reduce the dataset by random sampling until it fits in memory"],
+    ans: "B",
+    exp: "The lecture explicitly states most organisations jumping to Spark 'would have been better off' with on-disk libraries. Polars, Dask, and DuckDB use DAG execution and column orientation to process datasets far larger than RAM on a single machine."
+  },
+  {
+    q: "True or False: The success of Python and R for data science is primarily due to their superior language syntax and runtime performance compared to alternatives like Julia.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "The lecture stresses that the language itself is 'just an interface.' Python and R succeed because of their enormous ecosystem of data science packages, not intrinsic language quality. Julia has better performance but lags in adoption due to ecosystem size."
+  },
+  {
+    q: "Which Python library is described as providing 'the fundamental package for scientific computing' and specifically focuses on fast N-dimensional array operations?",
+    opts: ["A) pandas", "B) scikit-learn", "C) NumPy", "D) matplotlib"],
+    ans: "C",
+    exp: "NumPy is the foundational layer of the SciPy ecosystem — its N-dimensional array object and broadcasting functions underpin pandas, scikit-learn, and most other scientific Python libraries."
+  },
+  {
+    q: "True or False: scikit-learn intentionally excludes deep learning and reinforcement learning from its design scope.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "The lecture quotes directly: 'neither of these fit within the design constraints of scikit-learn' — deep learning requires GPU support and a richer architecture vocabulary; RL requires its own framework. Use PyTorch/TensorFlow instead."
+  },
+  {
+    q: "Polars differs from pandas primarily because it:",
+    opts: ["A) Is written in R and interfaces with Python through wrappers", "B) Uses a DAG execution engine and Apache Arrow memory format, enabling significantly faster processing especially on large data", "C) Requires a distributed cluster to run and cannot operate on a single machine", "D) Only supports integer and float columns, not strings or dates"],
+    ans: "B",
+    exp: "Polars is implemented in Rust, uses Apache Arrow natively, and applies lazy DAG execution — this makes it substantially faster than pandas for many workloads, while running on a single machine."
+  },
+  // ── SECTION 2: Notebooks ──
+  {
+    q: "What is the primary architectural reason Jupyter notebooks create version control problems with Git?",
+    opts: ["A) Jupyter does not support Git integration at all", "B) Notebooks are stored as large JSON files that include both code and output, producing large and difficult-to-diff commits", "C) Git cannot handle files larger than 10 MB, which notebooks routinely exceed", "D) Jupyter uses a proprietary binary format incompatible with text-based version control"],
+    ans: "B",
+    exp: "Jupyter stores notebooks as JSON including all cell outputs (images, data tables, etc.). Every re-run produces a different JSON even if the code is unchanged, creating massive uninformative diffs and making meaningful version history nearly impossible."
+  },
+  {
+    q: "True or False: Netflix uses a tool called papermill to parameterise, execute, and schedule Jupyter Notebooks as production data pipelines.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "The lecture explicitly cites Netflix's use of papermill to directly execute and schedule notebooks — demonstrating that with the right tooling, notebooks can be used responsibly in production, not just for exploration."
+  },
+  {
+    q: "The 'hidden state and out-of-order execution' problem in Jupyter notebooks refers to:",
+    opts: ["A) The fact that notebooks hide the Python kernel from the user", "B) The ability to execute cells in any order, leaving stale variables in memory that silently affect later cells", "C) Jupyter's inability to display the current state of all variables", "D) The overhead caused by running a web server to serve the notebook interface"],
+    ans: "B",
+    exp: "Users can run cell 5 before cell 3, or re-run cell 2 after cell 7, leaving the kernel in a state inconsistent with a top-to-bottom reading of the notebook. This is the most fundamental reproducibility problem with notebooks."
+  },
+  {
+    q: "Which notebook alternative is described as 'a next-generation Python notebook where every program is also an interactive web app'?",
+    opts: ["A) Apache Zeppelin", "B) Observable HQ", "C) Marimo", "D) Pluto.jl"],
+    ans: "C",
+    exp: "Marimo (marimo.io) is the tool described this way in the lecture. It aims to address many of Jupyter's shortcomings with a reactive execution model where changing a cell automatically updates dependent cells."
+  },
+  {
+    q: "True or False: JupyterLab is best described as an IDE that builds on top of Jupyter, adding a panel layout, file browser, and multi-document interface.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "JupyterLab extends the classic Jupyter Notebook interface with an IDE-like layout — side-by-side panels, a file system browser, terminal access, and support for multiple document types alongside notebooks."
+  },
+  // ── SECTION 3: File Formats ──
+  {
+    q: "Apache Parquet is a column-oriented format. Which query pattern benefits most from columnar storage?",
+    opts: ["A) SELECT * FROM table WHERE id = 12345 (single full-row lookup)", "B) SELECT avg(salary), department FROM employees GROUP BY department (aggregation over specific columns)", "C) INSERT INTO table VALUES (...) (frequent single-row inserts)", "D) UPDATE table SET status = 'active' WHERE id = 42 (random row updates)"],
+    ans: "B",
+    exp: "Columnar formats store all values of a single column contiguously. Analytical queries that aggregate specific columns (GROUP BY, SUM, AVG) read only the relevant column(s) — skipping all other columns entirely. Row formats must read every field of every qualifying row."
+  },
+  {
+    q: "True or False: Apache Arrow is a file format specification like Parquet, designed for persistent on-disk storage of analytical datasets.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Apache Arrow is specifically an in-memory columnar representation specification — not a file format. Its design is optimised for zero-copy interchange between systems in memory. Feather is the on-disk format powered by Arrow."
+  },
+  {
+    q: "A data engineer needs to design a pipeline where a mobile app streams user events to a message broker and the data is then analysed historically. Which combination of formats is most appropriate?",
+    opts: ["A) CSV for streaming ingestion, HDF5 for historical analysis", "B) AVRO for streaming/ingestion (fast write, schema evolution), Parquet for the analytical data lake layer (fast columnar reads)", "C) JSON for all layers — human readable and easy to debug", "D) ORC for streaming, Sequence files for analytics"],
+    ans: "B",
+    exp: "AVRO is the standard choice for streaming/Kafka ingestion (compact binary, row-oriented, schema evolution). Parquet is the standard for the analytical layer (columnar, fast reads for aggregations). This hybrid is explicitly described in the lecture as best practice."
+  },
+  {
+    q: "Which file format is specifically noted as still popular for storing trained deep learning model weights?",
+    opts: ["A) Apache Parquet", "B) Feather", "C) HDF5", "D) Apache AVRO"],
+    ans: "C",
+    exp: "HDF5 (Hierarchical Data Format) is designed for complex, hierarchical data structures — ideal for storing neural network weight tensors of varying shapes. Keras (TensorFlow) and other frameworks have historically used HDF5 as their model serialisation format."
+  },
+  {
+    q: "True or False: CSV remains one of the most common data exchange formats in practice, despite being bulky and inefficient to query.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "The lecture explicitly states CSV is 'still one of the most common formats.' Despite its inefficiencies — no schema enforcement, no compression, requires reading entirely into memory before querying — its human readability and universal tool support keep it dominant for data exchange."
+  },
+  // ── SECTION 4: Packaging & Versioning ──
+  {
+    q: "The lecture's current recommendation for Python package and environment management is:",
+    opts: ["A) conda — the most comprehensive cross-language environment manager", "B) pip + virtualenv — the oldest and most stable combination", "C) uv — 10–100× faster than pip, replaces multiple tools in one", "D) Poetry — deterministic lockfiles and integrated dependency management"],
+    ans: "C",
+    exp: "The lecture explicitly states 'Recommendation nowadays is to just use uv.' It replaces pip, pip-tools, pyenv, virtualenv, and more in a single tool, with speed improvements of 10–100× over pip."
+  },
+  {
+    q: "True or False: The primary purpose of a virtual environment is to make the development environment reproducible by isolating per-project package dependencies.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "Virtual environments create isolated per-project package sets, preventing version conflicts between projects and allowing the exact same environment to be recreated on any machine — addressing the 'runs on my machine' problem."
+  },
+  {
+    q: "Active learning in the context of data labelling means:",
+    opts: ["A) The model actively learns in real time as new labelled data arrives during production", "B) Label some data → train a model → identify the most uncertain predictions → ask humans to label those next, iterating to maximise information per label", "C) Using an LLM to automatically generate all labels without any human involvement", "D) Having data labellers actively monitor and correct model predictions during inference"],
+    ans: "B",
+    exp: "Active learning uses model uncertainty to prioritise which unlabelled examples humans should label next. By focusing labelling effort on the most informative examples, it can dramatically reduce the total number of labels required to achieve good model performance."
+  },
+  {
+    q: "Git was originally created by:",
+    opts: ["A) Douglas Cutting at Yahoo! for the Hadoop project", "B) Guido van Rossum as part of the Python development workflow", "C) Linus Torvalds in 2005 for development of the Linux kernel", "D) The Apache Software Foundation as a distributed version control system for Java projects"],
+    ans: "C",
+    exp: "Git was created by Linus Torvalds (creator of Linux) in 2005 specifically to manage the Linux kernel source code after a licensing dispute with the previously used BitKeeper VCS."
+  },
+  {
+    q: "Snorkel's approach to the labelling problem is described as:",
+    opts: ["A) Manual labelling of every training example by domain experts", "B) Weak supervision — programmatic labelling functions that produce noisy labels, combined by a generative model to produce probabilistic training labels", "C) Active learning — iteratively querying the most uncertain examples", "D) Transfer learning — using labels from a related task"],
+    ans: "B",
+    exp: "Snorkel introduces 'weak supervision': instead of labelling each example, domain experts write labelling functions (heuristics, rules, distant supervision signals). A generative model combines these noisy functions into probabilistic training labels, avoiding the need to hand-label every example."
+  },
+  // ── SECTION 5: Model Deployment ──
+  {
+    q: "True or False: Concept drift refers to the phenomenon where a deployed ML model silently continues to produce predictions even as its accuracy degrades due to changes in the real world.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "Models do not 'know' when the world has changed relative to their training distribution. They continue scoring new inputs with the same confidence, even if those inputs are now out-of-distribution. Without monitoring, this degradation is invisible — hence 'silent failure.'"
+  },
+  {
+    q: "A 'canary' or 'shadow' deployment pattern involves:",
+    opts: ["A) Replacing the old model version immediately with the new version in a single deployment", "B) Running the updated model silently alongside the current production model to compare outputs before switching traffic", "C) Deploying the model only to a subset of users while the rest receive rule-based predictions", "D) Using a small canary dataset to test the model before full deployment"],
+    ans: "B",
+    exp: "Shadow/canary deployments run the new model in parallel with the production model, comparing outputs without exposing the new model to live users. This allows safe validation of performance and edge-case behaviour before a full cutover."
+  },
+  {
+    q: "In the 'push vs. pull' deployment pattern, a 'pull' deployment means:",
+    opts: ["A) The model runs on a scheduled cron job and pushes results to a database table", "B) The model is deployed as an API or microservice that downstream consumers query on demand", "C) The model pulls training data from the data lake before each prediction", "D) The model results are pulled from HDFS by a BI dashboard on a nightly basis"],
+    ans: "B",
+    exp: "Pull (API/microservice) deployment exposes the model as an endpoint — web apps, mobile apps, and BI tools query it in real-time. Push (batch) deployment runs the model on a schedule and writes results to a data store for later consumption."
+  },
+  {
+    q: "True or False: Docker containers provide full virtualisation — each container runs its own operating system kernel, completely isolated from the host.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Docker containers share the host OS kernel — they provide process and file system isolation above a shared OS layer. Full virtualisation (VMs) isolates at the hardware level and runs a complete separate OS stack. Containers are lighter-weight and faster to start."
+  },
+  {
+    q: "The Sculley et al. (2015) 'hidden technical debt' paper argues that in real-world ML systems:",
+    opts: ["A) The ML model code itself represents the largest maintenance burden", "B) Only a small fraction of the code is actual ML — the surrounding infrastructure (data pipelines, monitoring, serving) is the dominant concern", "C) Technical debt in ML systems can be fully eliminated through automated testing", "D) ML systems have lower technical debt than traditional software systems because model weights update automatically"],
+    ans: "B",
+    exp: "The paper's key insight — explicitly cited in the lecture — is that ML code is a small fraction of production ML systems. Data management, serving infrastructure, monitoring, and the surrounding 'plumbing' dominate both code volume and maintenance burden."
+  },
+  // ── SECTION 6: Hadoop ──
+  {
+    q: "HDFS stores files as blocks of a fixed size. What is the typical block size used in HDFS?",
+    opts: ["A) 4 KB (same as a standard OS filesystem block)", "B) 1 MB", "C) 64 MB", "D) 1 GB"],
+    ans: "C",
+    exp: "The lecture states the typical HDFS block size is 64 MB. This large block size is designed for efficient sequential access to large files — small files create excessive namenode metadata overhead and are generally problematic in HDFS."
+  },
+  {
+    q: "True or False: In HDFS, the 'name node' physically holds the data blocks, while 'data nodes' maintain the metadata about which blocks belong to which file.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "It is the reverse: the name node maintains all metadata (file-to-block mappings, block locations) and makes all replication decisions. Data nodes are the workers that physically store the actual data blocks."
+  },
+  {
+    q: "Apache Hive was created to address what major gap in Hadoop's capabilities?",
+    opts: ["A) The lack of a distributed file system in early Hadoop releases", "B) The absence of a SQL query interface — allowing analysts to query HDFS data without writing Java MapReduce code", "C) The inability of Hadoop to handle streaming data", "D) The need for a machine learning library integrated with HDFS"],
+    ans: "B",
+    exp: "Hive (2008) translated SQL queries into MapReduce jobs, providing the SQL-on-Hadoop capability that business analysts and data engineers expected. Despite its slowness (MapReduce overhead), it became the de facto standard for ad-hoc queries on Hadoop clusters."
+  },
+  {
+    q: "Which of the following most accurately characterises the current status of Hadoop in the industry according to the lecture?",
+    opts: ["A) Hadoop remains the dominant big data platform and continues to grow in adoption", "B) The hype around Hadoop has passed; cloud warehouses and Spark have largely replaced it for most use cases", "C) Hadoop was a failed experiment and all installations have been decommissioned", "D) Hadoop is now primarily used for real-time streaming analytics"],
+    ans: "B",
+    exp: "The lecture states directly: 'Today, the hype around Hadoop has passed.' Cloud-managed warehouses (Snowflake, ClickHouse, Redshift) and Spark have taken over the query and analytics layers. Hadoop's HDFS still exists in legacy enterprise environments."
+  },
+  {
+    q: "True or False: HDFS automatically enables distributed computation over stored data — any file stored in HDFS can be processed in parallel across all cluster nodes without additional configuration.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "HDFS provides distributed storage only. Distributing computation requires a separate framework — MapReduce, Spark, or similar. The lecture explicitly states: 'Distributed storage, not yet computing!' Reading a large file naively from HDFS into a single client still causes the same memory problems."
+  },
+  // ── SECTION 7: MapReduce ──
+  {
+    q: "In a MapReduce word count job, after the Map phase, what does the Shuffle and Sort phase accomplish?",
+    opts: ["A) It sorts the final output alphabetically for presentation", "B) It routes all (key, value) pairs with the same key to the same reducer node, ensuring each reducer sees all values for its key", "C) It combines multiple map outputs into a single large file on HDFS before reduction", "D) It filters out stop words and applies stemming to all keys"],
+    ans: "B",
+    exp: "The shuffle phase is the 'secret sauce' of MapReduce: it guarantees that all mapper outputs sharing the same key are co-located on the same reducer. This is essential — reduce(key, [values]) requires all values for a given key to be present simultaneously."
+  },
+  {
+    q: "Why must the MapReduce reduce function be associative and produce the same output structure as the map function?",
+    opts: ["A) Because Java requires all methods in a MapReduce program to share the same signature", "B) Because reduce may be called multiple times on partial results (e.g., when mappers finish at different times), and incorrect associativity produces wrong final answers", "C) Because HDFS blocks must have the same schema as the map output", "D) Because YARN requires all tasks to produce outputs of identical structure for scheduling"],
+    ans: "B",
+    exp: "If reduce is called on partial results (before all mappers finish) and the result differs from applying reduce to the full list, the answer is wrong. The averaging example in the lecture shows exactly this: avg(avg(100,200), 300) = 175 ≠ avg(100,200,300) = 200."
+  },
+  {
+    q: "True or False: MapReduce is considered well-suited for iterative machine learning algorithms because each MapReduce job efficiently chains its output as input to the next.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "MapReduce is poorly suited to iterative algorithms because each iteration writes its intermediate output to HDFS, and the next iteration reads it back from disk — massive I/O overhead. This is a key reason Spark (in-memory, DAG) was developed and is 10–100× faster for ML."
+  },
+  {
+    q: "In Hadoop, YARN's primary role is to:",
+    opts: ["A) Provide the distributed file system for storing data blocks", "B) Manage cluster resources — scheduling tasks across nodes and handling resource requests from multiple applications", "C) Translate SQL queries into MapReduce jobs", "D) Replicate HDFS data blocks for fault tolerance"],
+    ans: "B",
+    exp: "YARN (Yet Another Resource Negotiator) separates resource management from the execution model. It allows Spark, Tez, Flink, and MapReduce to all run on the same cluster, each requesting CPU/memory resources through YARN."
+  },
+  {
+    q: "The lecture notes that MapReduce programming is notoriously difficult. Which of the following best illustrates this point?",
+    opts: ["A) Even experienced engineers require specialised hardware to run MapReduce jobs", "B) The standard teaching example (word count) is about as complex as most tutorials get — real-world tasks like correctly averaging require careful design around associativity constraints", "C) MapReduce can only be programmed in Java, excluding Python data scientists", "D) MapReduce jobs take days to complete, making iteration impractical"],
+    ans: "B",
+    exp: "The lecture states: 'There's a reason why most tutorials don't go much further than counting words.' Even the simple task of computing a group average — shown in detail — requires subtle design choices around partial reduction associativity."
+  },
+  // ── SECTION 8: Spark ──
+  {
+    q: "Spark's RDD transformations are described as 'lazily evaluated.' This means:",
+    opts: ["A) Transformations are slow because they run on commodity hardware without GPU acceleration", "B) Transformations are not executed immediately — they build up a logical execution plan (DAG) that only runs when an action is called", "C) Transformations cannot be used in real-time streaming applications", "D) Transformations require manual memory management by the programmer"],
+    ans: "B",
+    exp: "Lazy evaluation allows Spark to optimise the entire chain of transformations before executing anything. Only when an action (count, collect, save) is triggered does Spark execute the DAG — often applying optimisations like predicate pushdown and stage merging."
+  },
+  {
+    q: "True or False: In Spark, a DataFrame is simply a type alias for an RDD — there is no functional difference between the two.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "DataFrames impose schema (named typed columns) on top of RDDs and are processed by the Catalyst query optimiser, enabling automatic query optimisation. RDDs are untyped, unstructured collections without any schema — the optimiser cannot reason about their contents."
+  },
+  {
+    q: "What does the 'Resilient' in Resilient Distributed Dataset (RDD) refer to?",
+    opts: ["A) RDDs can handle any data type without type checking", "B) RDDs automatically resize to accommodate larger datasets", "C) RDDs are fault-tolerant: lost partitions can be recomputed by replaying the recorded lineage of transformations from the original data", "D) RDDs are stored redundantly across multiple nodes with 3× replication like HDFS"],
+    ans: "C",
+    exp: "Resilience in RDDs comes from lineage tracking, not data replication. If a node fails and a partition is lost, Spark replays the recorded sequence of transformations on the original source data to recompute only the lost partition."
+  },
+  {
+    q: "Which Spark component is responsible for optimising SQL and DataFrame queries before execution?",
+    opts: ["A) YARN", "B) The Catalyst query optimiser", "C) MLlib", "D) The SparkContext"],
+    ans: "B",
+    exp: "Catalyst is SparkSQL's rule-based and cost-based query optimiser. It analyses the logical plan of a DataFrame operation, applies transformation rules (predicate pushdown, constant folding, join reordering), and generates an optimised physical execution plan."
+  },
+  {
+    q: "True or False: In Python and R, Spark Datasets[T] provide compile-time type safety, just as they do in Scala.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Dataset[T] type safety requires static typing, which Python and R do not have. In Python and R, only the untyped DataFrame API is available. Type-safe Datasets are a Scala and Java feature only."
+  },
+  {
+    q: "MLlib's primary machine learning API since Spark 2.0 is based on:",
+    opts: ["A) The RDD-based spark.mllib package", "B) The DataFrame-based spark.ml package", "C) Direct integration with scikit-learn via a compatibility layer", "D) H2O's distributed ML engine via Sparkling Water"],
+    ans: "B",
+    exp: "Since Spark 2.0, spark.ml (DataFrame-based) is the primary API. The old spark.mllib (RDD-based) is in maintenance mode as of Spark 3. The DataFrame-based API is more intuitive, better optimised, and supports Pipelines natively."
+  },
+  // ── SECTION 9: Streaming ──
+  {
+    q: "Apache Kafka is best described as:",
+    opts: ["A) A stream processing engine that applies ML models to events in real-time", "B) A distributed event broker that durably buffers and routes high-throughput streams of events between producers and consumers", "C) A SQL-on-streaming engine similar to Spark Structured Streaming", "D) A replacement for HDFS designed specifically for streaming data"],
+    ans: "B",
+    exp: "Kafka is a durable, distributed message/event broker — it decouples producers (apps, sensors) from consumers (Spark, Flink, databases). It does not perform analytics itself, but enables reliable, scalable event transport. Analytics happen downstream in Spark or Flink."
+  },
+  {
+    q: "True or False: Spark Structured Streaming treats a live data stream as an unbounded table being continuously appended, allowing streaming queries to be expressed using the same DataFrame/SQL API as batch queries.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "This is the central design principle of Structured Streaming: the abstraction of an unbounded append-only table. The same select, groupBy, join operations work for both batch and streaming — the Spark SQL engine handles the incremental execution internally."
+  },
+  {
+    q: "In Spark Streaming (legacy DStream API), a DStream internally is represented as:",
+    opts: ["A) A single large RDD partitioned by event timestamp", "B) A continuous series of small RDDs, each covering a configured time interval (micro-batch)", "C) A Kafka topic topic that Spark reads directly", "D) A DataFrame with a special streaming flag enabled"],
+    ans: "B",
+    exp: "A DStream is a sequence of RDDs, each covering one micro-batch interval. This is why Spark Streaming inherited most RDD transformations — each DStream operation is applied to each mini-batch RDD as it arrives."
+  },
+  {
+    q: "The lecture distinguishes 'streaming data,' 'streaming training,' and 'streaming prediction.' For most organisations, which of these is the most common genuine requirement?",
+    opts: ["A) Streaming training — models must be continuously retrained on the live data stream", "B) Streaming data — handling a continuous input stream, while training can remain offline and prediction just needs a deployed endpoint", "C) All three are equally required in most production ML pipelines", "D) Streaming prediction requires the most engineering complexity and is the rarest"],
+    ans: "B",
+    exp: "The lecture emphasises that streaming training is very hard and rarely needed ('in many cases: perhaps not'). Most organisations need to handle streaming data (Kafka ingest) and streaming prediction (fast model API), while training remains a periodic offline batch process."
+  },
+  {
+    q: "True or False: The lecture recommends that every organisation with more than a few gigabytes of data should adopt a streaming architecture like Kafka + Flink to remain competitive.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "The lecture explicitly cautions against this: 'Be honest: do you have big data? What do you mean with real time, streaming? Make an informed decision.' It uses Netflix (9M events/second) as context — most organisations have far lower volumes. Over-engineering is a common and costly mistake."
+  },
+  // ── INTEGRATIVE / ADVANCED ──
+  {
+    q: "A company is building a real-time fraud detection system. Events arrive via Kafka, scores must be produced within 200ms, and the model retrains weekly on historical data. Which architecture best fits?",
+    opts: ["A) Kafka → Spark Structured Streaming (scores events online using pre-trained model) + weekly offline retraining with Spark MLlib", "B) Hadoop MapReduce → HDFS → Hive query for each incoming event", "C) Jupyter notebook runs every time an event arrives to score it", "D) Model is retrained on every event using online gradient descent via Spark Streaming"],
+    ans: "A",
+    exp: "This is the canonical streaming prediction pattern: Kafka as the event broker, Spark Structured Streaming for low-latency scoring using a static pre-trained model loaded at startup, and a separate weekly batch retraining job. Online retraining per event (D) is extremely complex and almost never needed."
+  },
+  {
+    q: "Which of the following describes the DAG (Directed Acyclic Graph) execution engine approach that makes Spark faster than MapReduce?",
+    opts: ["A) DAG allows multiple output files to be written in parallel, increasing HDFS write throughput", "B) DAG represents the full chain of operations as a graph, enabling optimisations like stage fusion and keeping intermediate results in memory instead of writing each step to disk", "C) DAG replaces the shuffle phase entirely, eliminating network communication between cluster nodes", "D) DAG uses GPU acceleration for all mathematical operations in the execution plan"],
+    ans: "B",
+    exp: "The DAG engine analyses the entire computation graph before executing. Multiple transformations can be 'pipelined' (fused) into a single stage without intermediate HDFS writes. Intermediate RDDs stay in memory. This is the key difference from MapReduce's disk-centric pipeline."
+  },
+  {
+    q: "True or False: The lecture's overall conclusion is that 'insights matter more than infrastructure' — a small dataset with a well-posed business question can deliver more value than a large data lake used to run dashboards.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "The lecture ends with exactly this message: 'One use case with small data can lead to much more value than a data lake filled with stuff. People and process matters. Right governance, thinking about deployment, maintenance, monitoring, and most of all: the business question.'"
+  },
+  {
+    q: "A data science team is arguing whether to use Jupyter notebooks or a proper IDE for their ML project that will go to production. The most defensible recommendation from the lecture is:",
+    opts: ["A) Use Jupyter notebooks throughout — all modern cloud providers support them natively and the issues can be resolved with the right tooling", "B) Use IDEs exclusively from the start — notebooks should never be used in any professional context", "C) Use notebooks for exploration and prototyping phases; migrate to properly structured, version-controlled Python modules for production code with CI/CD pipelines", "D) Use R with tidymodels — this avoids the Jupyter notebook problem entirely"],
+    ans: "C",
+    exp: "The lecture concludes notebooks 'remain great tools for exploration, experimentation, development phase of data science, even for showing results in report form — but additional processes / skills / governance required.' The hybrid approach (notebooks for exploration, modules for production) is the mainstream best practice."
+  },
+  {
+    q: "An analytics engineer argues: 'We should store all our data in CSV on an S3 bucket — it's simple, human-readable, and everyone can open it.' What is the strongest counterargument from the lecture?",
+    opts: ["A) CSV is proprietary and incompatible with most analytics tools", "B) CSV requires a database server to query, making cloud storage impractical", "C) CSV is bulky, has no schema enforcement or type information, is inefficient to query (requires reading the whole file), and has known security vulnerabilities including CSV injection", "D) CSV cannot store more than 1 million rows, making it unsuitable for large datasets"],
+    ans: "C",
+    exp: "The lecture lists CSV's weaknesses: bulky, slow to query without reading everything into memory, hard to infer schema, compression at file level only. It also highlights CSV injection (=IMPORTXML(...) as a cell value) as a real security vulnerability. Parquet or Feather are strongly preferred for analytics."
+  }
+];
+
+const saData = [
+  {
+    q: "The lecture argues that most organisations that adopted Hadoop/Spark 'would have been better off' with on-disk intermediate solutions. Critically evaluate this claim. Under what conditions is each approach (on-disk intermediate vs. distributed Spark) genuinely the right choice, and what decision criteria should guide the assessment?",
+    a: "<strong>The lecture's claim is largely well-founded for most organisations, but the decision is genuinely context-dependent.</strong><br><br><strong>When on-disk/intermediate solutions (Polars, DuckDB, Dask) are the right choice:</strong><br>• Data volume: single-machine solutions with enough RAM or NVMe storage can handle datasets well into the terabytes with tools like DuckDB or Vaex.<br>• Team skills: SQL and Python are universal; Spark requires JVM-aware engineers and cluster operations knowledge.<br>• Cost: a well-specced single server (512GB RAM, NVMe) is often cheaper than a managed Spark cluster (EMR, Databricks) at moderate data volumes.<br>• Iteration speed: local execution is faster to debug, test, and iterate on than distributed jobs with cluster startup times.<br>• DAG efficiency: Polars and DuckDB use the same DAG execution principles as Spark — for many workloads, the 'distributed' overhead of Spark outweighs its parallelism benefits.<br><br><strong>When Spark/distributed computing is genuinely justified:</strong><br>• Data truly exceeds what a single machine can store even with out-of-core techniques (petabyte scale).<br>• The computation itself is embarrassingly parallel and can be split across hundreds of nodes (e.g., training on billions of records, joining multi-TB datasets).<br>• Fault tolerance requirements are strict — long-running jobs that cannot restart from scratch on failure benefit from Spark's RDD lineage-based resilience.<br>• The organisation already has a managed cluster or cloud platform (Databricks, Synapse) — the operational overhead is absorbed.<br>• Streaming at high volume with low latency (Kafka + Spark Structured Streaming) requires distributed processing.<br><br><strong>Decision criteria:</strong> (1) Actual data volume now and 3 years forward. (2) Engineering team's existing skills. (3) Budget for managed vs. self-operated infrastructure. (4) Latency requirements (batch vs. real-time). (5) Perform a proof-of-concept benchmark with the simpler solution first."
+  },
+  {
+    q: "Explain the MapReduce averaging problem from the lecture. Why does a naive running average fail in MapReduce, and what is the correct solution? Connect this to a broader principle about distributed computation.",
+    a: "<strong>The problem:</strong> In MapReduce, reducers may be called multiple times on partial results — because mappers can finish at different times, and the system may reduce partial outputs before all mappers complete.<br><br><strong>Why naive averaging fails:</strong> Suppose mappers produce (drama, 100) and (drama, 200). A reducer computes avg(100, 200) = 150 and emits (drama, 150). Later, a slow mapper emits (drama, 300). Now the reducer sees (drama, 150) and (drama, 300) and computes avg(150, 300) = 225. But the correct answer is avg(100, 200, 300) = 200. The naive running average is not associative: avg(avg(a,b), c) ≠ avg(a, b, c) in general.<br><br><strong>The correct solution:</strong> Carry both the sum and count as the value, not just the average:<br>• Map emits: (genre, (nrPages, 1))<br>• Reduce: sum_i = Σ(nrPages_i × count_i), count_total = Σcount_i → emits (genre, (sum_i / count_total, count_total))<br>Now: reduce((150, 2), (300, 1)) = ((150×2 + 300×1) / (2+1), 3) = (200, 3). Correct!<br><br><strong>Broader principle — commutativity and associativity in distributed aggregation:</strong> Any operation applied distributedly (including in Spark's reduceByKey, SQL GROUP BY, and streaming window aggregations) must be mathematically associative to produce correct results when applied to partial groups. This is why Spark and most distributed systems expose aggregate functions like sum, count, min, max — which are all naturally associative — while complex aggregations like median or mode require special treatment (e.g., approximate algorithms like HyperLogLog for count-distinct, or T-Digest for quantiles). Always design distributed aggregations to be decomposable into partial aggregates."
+  },
+  {
+    q: "Compare Spark's RDD abstraction with the DataFrame/SparkSQL abstraction. Why did Spark shift its primary API from RDDs to DataFrames, and what are the remaining legitimate use cases for raw RDDs?",
+    a: "<strong>RDD (Resilient Distributed Dataset):</strong> Spark's original abstraction — an immutable, fault-tolerant, distributed collection of arbitrary elements (any Python/Scala object). Operations are expressed as functional transformations (map, filter, reduceByKey). The engine has no knowledge of the element structure — it sees opaque objects.<br><br><strong>DataFrame:</strong> A distributed collection of rows with named, typed columns — schema-aware. Built on top of RDDs but processed by the Catalyst query optimiser, which can analyse the logical structure and apply rule-based and cost-based optimisations: predicate pushdown, projection pruning, join reordering, constant folding. DataFrames map directly to structured data scientists' mental model (like pandas).<br><br><strong>Why the shift to DataFrames:</strong><br>• Performance: Catalyst generates optimised physical plans — often 5–10× faster than equivalent RDD code because the engine can see inside the data structure and optimise across operations.<br>• Usability: DataFrame API (select, filter, groupBy, join) is familiar to SQL users and pandas users — far lower barrier to entry.<br>• Interoperability: DataFrames integrate seamlessly with SparkSQL, Hive, Parquet, and other structured data sources.<br>• Code safety: schema enforcement catches type errors early.<br><br><strong>Remaining legitimate use cases for raw RDDs:</strong><br>• Truly unstructured data: processing raw text, images, custom binary formats where imposing a schema is meaningless.<br>• Custom partitioning logic: fine-grained control over how data is partitioned across nodes for specialised join strategies.<br>• Functional programming patterns: operations like aggregateByKey, combineByKey, mapPartitions that have no direct DataFrame equivalent.<br>• Interoperability with libraries that expect RDDs rather than DataFrames.<br>• Understanding performance bottlenecks: debugging physical execution plans sometimes requires dropping to RDD level."
+  },
+  {
+    q: "A colleague proposes the following data architecture for a new analytics platform: all raw data ingested as CSV, stored in HDFS, queried via Apache Hive, and analysed in Jupyter notebooks. Critically evaluate each component and propose a more defensible modern alternative.",
+    a: "<strong>CSV for ingestion/storage:</strong> Weak choice. CSV is human-readable but bulky (no compression per column), schema-less (type inference is fragile), slow to query (full file scan required), and has known security vulnerabilities (CSV injection). Better: use <strong>AVRO</strong> for streaming/ingestion (compact, fast writes, schema included in file, excellent schema evolution) and <strong>Parquet</strong> for the analytics layer (columnar, fast reads for aggregations, per-column compression).<br><br><strong>HDFS for storage:</strong> An unnecessarily complex distributed file system unless data volumes genuinely exceed single-machine capacity. HDFS requires a cluster (NameNode + DataNodes), ongoing maintenance, and a Java ecosystem. Better: use <strong>cloud object storage</strong> (S3, Azure Blob, GCS) which provides durable, scalable, cheap storage without operational overhead — the de facto standard today ('don't do it yourself'). For truly local analytics, even a well-managed NVMe disk with DuckDB outperforms HDFS for most analytical workloads.<br><br><strong>Apache Hive for querying:</strong> Hive translates SQL to MapReduce — introducing enormous latency even for simple queries. The lecture explicitly notes Hive's 'main drawback was its lack of speed.' Better: use <strong>DuckDB</strong> (in-process analytical SQL engine, extremely fast, no server needed) for local analytics, or <strong>Snowflake / ClickHouse / Dremio</strong> for a cloud-managed analytical warehouse at scale. These provide true columnar execution without MapReduce overhead.<br><br><strong>Jupyter notebooks without governance:</strong> Jupyter is excellent for exploration but problematic for production: hidden state, no version control, not modular, hard to test. Better: use notebooks for exploration and prototyping, then migrate production code to version-controlled Python modules with CI/CD (GitHub Actions), proper testing (pytest), and orchestration (Airflow or Prefect).<br><br><strong>Proposed modern stack:</strong> Kafka (event ingestion) → Parquet on S3 (storage) → DuckDB or Snowflake (analytical queries) → Python + Polars/pandas for data science → JupyterLab for exploration, VS Code + Git for production code."
+  },
+  {
+    q: "Describe the five main categories of model deployment issues identified in the lecture. For each, give a concrete real-world consequence of getting it wrong and a specific mitigation strategy.",
+    a: "<strong>1. Data lineage &amp; metadata management</strong><br>Consequence: A model trained on a data source that is no longer available at prediction time (e.g., a one-off extract from an external vendor) cannot be retrained, and its predictions rely on features that may be computed differently in production — 'training-serving skew' causes subtle accuracy degradation.<br>Mitigation: Establish a unified data layer; document all data sources in a data dictionary with GDPR and availability metadata; ensure every preprocessing step is part of the shared data layer, not ad-hoc model code.<br><br><strong>2. Deployment context mismatch</strong><br>Consequence: A model developed in a Jupyter/Anaconda environment uses Python 3.9 with specific package versions; the production IT system runs Java/.NET and cannot execute Python at all — model cannot be deployed without a full re-implementation.<br>Mitigation: Agree on a common environment (e.g., Docker container with pinned dependencies) used in both development and production; use semantic API versioning (/v1/, /v2/) for model endpoints.<br><br><strong>3. Development governance</strong><br>Consequence: The data scientist who trained the model leaves the company; no one can reproduce the training results or retrain the model when drift occurs — it remains in production degrading silently.<br>Mitigation: Version all training code in Git; enforce CI/CD pipelines that reproduce model builds; use uv/Poetry for environment lockfiles; document training procedures in the repository.<br><br><strong>4. Model governance</strong><br>Consequence: Multiple model versions are in production simultaneously with no versioning; an A/B test is impossible; a buggy model version cannot be rolled back quickly; model lineage (what data trained what model) is unknown, making regulatory compliance (GDPR right-to-explanation) impossible.<br>Mitigation: Model registry with version tracking; canary/shadow deployments before full cutover; versioned data tables for model outputs; maintained metadata (training date, data version, performance scores).<br><br><strong>5. Monitoring, logging, and alerting</strong><br>Consequence: A credit scoring model's input feature 'employment_sector' gains a new category ('gig_economy') after deployment; the model maps it to a default encoding and continues scoring silently — but its predictions for this new category are systematically wrong, causing incorrect credit decisions for months before anyone notices.<br>Mitigation: Monitor input feature distributions (detect new categories, distribution shift); track output probability distributions over time; alert on System Stability Index (SSI) changes; implement regular backtesting against a held-out test set."
+  },
+  {
+    q: "Explain the distinction between Spark Streaming (DStream API) and Spark Structured Streaming. Why is Structured Streaming preferred for new projects, and what specific capability does watermarking provide?",
+    a: "<strong>Spark Streaming (legacy DStream API):</strong> The original streaming framework, released with early Spark versions. Operates in micro-batch mode by dividing the input stream into small time intervals; each interval produces an RDD. The DStream is internally a sequence of RDDs. Developers write RDD-level transformations (map, reduceByKey, window operations) — essentially MapReduce-style programming applied to mini-batches. Integrates with Kafka, Kinesis, and socket sources.<br><br><strong>Spark Structured Streaming (current):</strong> Built on top of the Spark SQL engine (same as DataFrames/Datasets). The key abstraction: a live data stream is a table being continuously appended. Streaming computations are expressed using the same DataFrame/SQL API as batch computations — groupBy, join, select, filter — and the engine handles incremental execution automatically. No new API to learn if you already know SparkSQL.<br><br><strong>Why Structured Streaming is preferred:</strong><br>• Same API as batch: streaming and batch code look identical; code reuse is natural.<br>• Better optimisation: Catalyst optimiser applies to streaming queries just as to batch queries.<br>• End-to-end exactly-once semantics: guaranteed correct results even on node failures.<br>• Richer windowing and state management: built-in support for event-time windows and late-data handling.<br>• Kafka integration: native, well-maintained Kafka source/sink.<br>• DStream API heavy reliance on RDDs makes it cumbersome and harder to optimise.<br><br><strong>Watermarking:</strong> In event-time streaming, events can arrive late (network delays, mobile apps reconnecting). Without watermarks, the engine must maintain state for all possible event-time windows indefinitely. A watermark defines a threshold: 'events with event-time more than W minutes behind the current max event-time will be dropped.' This allows the engine to (1) correctly aggregate late-arriving data within the watermark bound, (2) safely evict state for old windows beyond the watermark, and (3) bound memory usage. Example: watermark of 10 minutes means events up to 10 minutes late are correctly included in window aggregations; later events are dropped and state is freed."
+  },
+  {
+    q: "The lecture discusses data labelling extensively, including weak supervision via Snorkel. Compare manual labelling, active learning, and weak supervision as strategies for building a labelled training set for a medical text classification task. What are the tradeoffs and when would you choose each?",
+    a: "<strong>Manual labelling by domain experts:</strong><br>• Process: Physicians review each clinical note and assign a label (e.g., diagnosis category).<br>• Strengths: Highest label quality; ground truth for the task; necessary for final evaluation set regardless of training strategy.<br>• Weaknesses: Extremely expensive (physician time costs $300+/hour); slow; does not scale; cannot label millions of records.<br>• When to choose: Always needed for the gold-standard test/validation set. Appropriate for training when the dataset is small (hundreds to low thousands) and label quality is paramount (e.g., regulatory submission).<br><br><strong>Active learning:</strong><br>• Process: Label a small seed set → train model → identify records the model is most uncertain about → send those for expert labelling → retrain → repeat.<br>• Strengths: Dramatically reduces labels needed by focusing expert effort on the most informative examples. Shown to achieve competitive performance with 50–80% fewer labels than random selection in many settings.<br>• Weaknesses: Requires an iterative human-in-the-loop pipeline (complex to set up); initial model quality determines which examples are chosen (bootstrapping problem); uncertain examples may be rare edge cases that frustrate labellers.<br>• When to choose: When expert labelling budget is limited but you have time for an iterative pipeline. Particularly effective when the model quickly learns the easy cases and uncertainty concentrates on genuinely hard/ambiguous examples.<br><br><strong>Weak supervision (Snorkel):</strong><br>• Process: Domain experts write labelling functions (Python heuristics: 'if ICD code 250.x present → diabetes'; 'if NEGEX detects negation → not present'). These noisy functions are combined by a generative model that estimates their accuracies and correlations, producing probabilistic training labels.<br>• Strengths: Scales to millions of records without per-example human labelling; labelling functions are inspectable and debuggable; new labelling functions can be added incrementally; particularly powerful when rules are readily available (clinical coding guidelines, ontologies).<br>• Weaknesses: Label quality is lower than expert labels; requires careful selection of labelling functions to avoid systematic biases; the generative model requires tuning; harder to audit individual labels.<br>• When to choose: When you have millions of unlabelled records and rich domain knowledge that can be codified as rules. Strong fit for medical text where clinical coding guidelines, ICD codes, and structured queries provide natural labelling functions.<br><br><strong>Recommendation for medical text classification:</strong> Use a <em>combined strategy</em>: weak supervision with clinical labelling functions to label the bulk training set (millions of notes), active learning to identify uncertain examples for expert review (efficiently expanding the high-quality subset), and manual labelling for the gold-standard evaluation set (500–2000 examples). Foundation models (clinical LLMs like ClinicalBERT) can be used to pre-label data, dramatically reducing labelling function complexity."
+  },
+  {
+    q: "Explain the role of Apache Arrow in the modern data stack. Why is it described as an 'in-memory representation specification' rather than a file format, and how does it enable interoperability between tools like Python, R, Spark, and DuckDB?",
+    a: "<strong>What Apache Arrow is:</strong> Apache Arrow defines a language-independent, columnar, in-memory data format specification. It specifies exactly how to lay out data types (integers, floats, strings, nested types, nulls) in contiguous memory buffers — including alignment, padding, and binary encoding. It is not a serialisation format (like Parquet or AVRO) — it defines how data looks in RAM, not on disk.<br><br><strong>Why 'specification' not 'file format':</strong> A file format defines how data is stored on disk (compressed, encoded, with headers and metadata). Arrow defines how data is arranged in memory for processing. The key property is that the Arrow memory layout is designed to be used directly by CPUs without any deserialisation step — there is no 'parsing' phase. A program in Python and a program in R can both hold their data in Arrow-format memory buffers, and passing data between them requires only sharing a memory pointer (zero-copy), not serialising and deserialising through an intermediate representation.<br><br><strong>How it enables interoperability:</strong><br>• <em>Python (PyArrow / pandas 2.0):</em> pandas' Arrow backend replaces NumPy arrays with Arrow buffers. Operations on Arrow-backed DataFrames are faster due to better memory layout for analytics.<br>• <em>R (Arrow package):</em> R can read/write Arrow format directly. The same Arrow buffer can be accessed from both Python and R in the same process without copying.<br>• <em>Spark:</em> Spark uses Arrow for efficient data transfer between JVM (Spark cluster) and Python (PySpark) — the 'spark-pandas' integration uses Arrow to avoid slow JVM ↔ Python serialisation for each row. Spark also uses Arrow internally for vectorised execution in SparkSQL.<br>• <em>DuckDB:</em> DuckDB can directly query Arrow buffers without copying data — it treats an Arrow table as a virtual table. This enables DuckDB to run SQL on a pandas/Polars DataFrame with zero data movement.<br>• <em>Feather:</em> Arrow on disk — a thin wrapper that serialises an Arrow buffer to a file for fast I/O, with read/write speeds typically near the disk bandwidth limit.<br><br><strong>Bottom line:</strong> Arrow solves the 'N × M integration problem' — without a standard, every pair of tools needs a custom serialisation bridge. With Arrow as the common in-memory standard, any tool that speaks Arrow can exchange data with any other Arrow-compatible tool at near-zero cost."
+  },
+  {
+    q: "The lecture describes 'concept drift' as a key challenge in deployed ML systems. Define concept drift, explain its causes, distinguish it from data drift, and outline a comprehensive monitoring strategy to detect and respond to it.",
+    a: "<strong>Definition of concept drift:</strong> Concept drift occurs when the statistical relationship between features X and the target variable Y changes over time: P(Y|X) at time t ≠ P(Y|X) at training time t₀. The model's learned decision boundary is no longer optimal for the current data distribution. Critically, models degrade silently — they continue to produce predictions without 'knowing' the underlying relationship has changed.<br><br><strong>Causes of concept drift:</strong><br>• <em>Gradual drift:</em> Slow economic changes affect credit risk patterns; consumer behaviour evolves with cultural shifts.<br>• <em>Sudden drift:</em> COVID-19 instantly changed travel booking, fraud patterns, and healthcare utilisation — all models in these domains became instantly outdated in March 2020.<br>• <em>Cyclical drift:</em> Seasonal patterns (fraud increases during holiday season; flu diagnosis patterns change by month).<br>• <em>Feedback loops:</em> Model predictions change user behaviour, which changes the next period's data distribution (e.g., a fraud model blocks certain patterns → fraudsters adapt → new patterns emerge that the model has never seen).<br><br><strong>Distinction from data drift (covariate shift):</strong> Data drift / covariate shift occurs when P(X) changes — the input feature distribution changes — but P(Y|X) remains the same. For example, if a model trained on desktop traffic is suddenly receiving mobile traffic, the feature distributions (screen resolution, user agent) change but the underlying response variable relationship may be similar. Data drift can cause prediction failure even without concept drift if the model was not exposed to the new feature distribution during training. Monitoring both is necessary.<br><br><strong>Comprehensive monitoring strategy:</strong><br>1. <em>Input feature monitoring:</em> Track statistical summaries (mean, std, quantiles) and category distributions for every input feature daily. Compute the System Stability Index (SSI) or Population Stability Index (PSI) to flag significant shifts. Alert when new categories appear in categorical features.<br>2. <em>Output distribution monitoring:</em> Track the distribution of prediction scores/probabilities over time. A shift in the score distribution (e.g., average predicted fraud probability drops from 3% to 0.5%) signals potential drift before labels are even available.<br>3. <em>Ground truth monitoring (where available):</em> For tasks with delayed labels (e.g., loan default — outcome known after 90 days), implement a feedback loop that tags predictions with their eventual outcomes and measures actual vs. predicted accuracy over time.<br>4. <em>Backtesting:</em> Regularly apply the current model to a fixed holdout test set from the training period and compare performance to baseline. Alternatively, implement 'champion vs. challenger' deployments.<br>5. <em>Alerting and response:</em> Set thresholds for PSI, distribution shift metrics, and latency. Automatic alerts trigger human review. For severe drift, trigger emergency model retraining. For gradual drift, schedule a planned retraining cycle. The retraining frequency should be driven by how fast the feature space changes, not how fast data arrives."
+  },
+  {
+    q: "The lecture ends with 'Focus on what matters' and 'Insights > infra.' Synthesise the key principles from the entire lecture for deciding when a data science team should and should not invest in complex big data infrastructure.",
+    a: "<strong>Core principle:</strong> Infrastructure is a means to an end — the end being business value from data insights. The decision to invest in complex infrastructure should be driven by a genuine, quantified need, not by hype, fear of missing out, or cargo-culting what hyperscalers do.<br><br><strong>When to invest in complex big data infrastructure:</strong><br>• <em>Genuine volume:</em> Data volumes genuinely exceed what can be processed on well-specced single machines even with efficient tools (Polars, DuckDB, Vaex). This typically means tens to hundreds of terabytes of data that must be processed in aggregate, not just stored.<br>• <em>Genuine velocity:</em> Events arrive at rates (millions/second) that require distributed ingestion buffers (Kafka) and stream processing (Flink/Spark Structured Streaming). Not 'we get 1000 transactions per minute.'<br>• <em>Genuine variety requiring distributed ML:</em> Training deep learning models on billions of examples requires distributed training across GPU clusters — single-machine training is intractable.<br>• <em>Organisational scale:</em> Multiple teams, dozens of data scientists, hundreds of models in production — at this point, a shared platform (data lake, model registry, feature store) creates genuine leverage.<br><br><strong>When NOT to invest (most organisations):</strong><br>• If Polars, DuckDB, or a well-indexed PostgreSQL database can handle the query load — use them. They are dramatically simpler to operate and faster to iterate on.<br>• If 'real-time' means 'within 5 minutes' — a scheduled micro-batch job is real-time enough.<br>• If the team has no distributed systems expertise — the operational burden of Hadoop/Spark clusters overwhelms the analytical value.<br>• If the business question is unclear — no amount of infrastructure makes a poorly-posed question answerable.<br><br><strong>Synthesised decision framework:</strong><br>1. Define the business question precisely — what decision will this model/analysis inform?<br>2. Estimate actual data volume, velocity, and variety with real numbers.<br>3. Prototype with the simplest tool that could work (pandas → Polars → DuckDB → Spark).<br>4. Measure: if the simple approach fails, measure why and choose infrastructure that specifically addresses the bottleneck.<br>5. Assess team skills and operational capacity honestly — an unoperatable Spark cluster is worse than a well-run DuckDB instance.<br>6. Prioritise: deployment, monitoring, and governance of a simple model provide more long-term value than a complex infrastructure that never reaches production.<br><br>The lecture's benchmark: McSherry et al. showed that a single thread on a laptop could outperform massive Hadoop clusters on several graph processing benchmarks from published papers — because the Hadoop solutions were solving the wrong problem with the wrong tools. The algorithms are the same everywhere. Choose infrastructure that serves the algorithm, not the other way around."
+  }
+];
+
+// ─────────────────────────────────────────────────
+// RENDER MCQ
+// ─────────────────────────────────────────────────
+let mcqState = {};
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-card-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Question ${idx + 1} of ${mcqData.length}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.dataset.idx = idx;
+      btn.dataset.oi = oi;
+      btn.onclick = () => handleMCQ(idx, oi, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = `fb-${idx}`;
+    fb.style.display = 'none';
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+  updateScore();
+}
+
+function handleMCQ(idx, oi, btn, card, item) {
+  if (mcqState[idx] !== undefined) return;
+  mcqState[idx] = oi;
+
+  const opts = card.querySelectorAll('.option-btn');
+  opts.forEach(b => b.disabled = true);
+
+  const selectedLabel = item.opts[oi];
+  const correctLabel  = item.ans;
+
+  const correctIdx = item.opts.findIndex(o => {
+    if (item.opts.length === 2) return o === correctLabel;
+    return o.startsWith(correctLabel + ')');
+  });
+
+  const isCorrect = item.opts.length === 2
+    ? selectedLabel === correctLabel
+    : selectedLabel.startsWith(correctLabel + ')');
+
+  opts[oi].className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect && correctIdx >= 0) opts[correctIdx].className = 'option-btn reveal-correct';
+
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+
+  updateScore();
+}
+
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const sel = item.opts[mcqState[idx]];
+    const ok  = item.opts.length === 2 ? sel === item.ans : sel.startsWith(item.ans + ')');
+    if (ok) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+
+function resetMCQ() {
+  mcqState = {};
+  renderMCQ();
+}
+
+// ─────────────────────────────────────────────────
+// RENDER SA
+// ─────────────────────────────────────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer ${idx + 1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    panel.style.display = 'none';
+
+    btn.onclick = () => {
+      const visible = panel.style.display !== 'none';
+      panel.style.display = visible ? 'none' : 'block';
+      btn.textContent = visible ? 'Reveal Answer' : 'Hide Answer';
+      if (!visible && window.MathJax) MathJax.typesetPromise([panel]);
+    };
+
+    card.appendChild(btn);
+    card.appendChild(panel);
+    container.appendChild(card);
+  });
+}
+
+function resetSA() { renderSA(); }
+
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

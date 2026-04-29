@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Analytics – Deep Learning II: Text & Recurrency Review Notes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+    border-radius: 12px;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 { color: #1a3a5c; font-size: 1.25em; font-weight: 700; border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0; }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin-top: 20px; }
+  .key-point    { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box  { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box  { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box  { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .formula-box  { background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px; padding: 14px 20px; margin: 14px 0; text-align: center; font-size: 1.05em; }
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* MCQ */
+  .mcq-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; border-bottom: 2px solid #fff3cd; padding-bottom: 8px; margin-top: 0; }
+  .score-display { background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px; padding: 5px 18px; font-weight: 700; color: #856404; display: inline-block; font-size: 0.95em; }
+  .mcq-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .reset-btn-mcq { background: #2e6da4; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .reset-btn-mcq:hover { background: #1a3a5c; }
+  .mcq-card { background: #f9fafb; border: 1px solid #e5e9f2; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .mcq-card .question-label { font-size: 0.8em; font-weight: 700; color: #2e6da4; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .mcq-card .question-stem  { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+  .option-btn { display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea; border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left; cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s; font-family: inherit; }
+  .option-btn:hover:not(:disabled) { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected       { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct        { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; }
+  .option-btn.incorrect      { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; }
+  .option-btn:disabled { cursor: default; }
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* Short Answer */
+  .sa-section { background-color: #ffffff; border-radius: 12px; padding: 28px 36px; margin-bottom: 28px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section h2 { color: #4a148c; font-size: 1.2em; border-bottom: 2px solid #e8d5ff; padding-bottom: 8px; margin-top: 0; }
+  .sa-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .sa-card { background: #faf9ff; border: 1px solid #e2dcf5; border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .sa-card .question-label { color: #6f42c1; font-size: 0.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+  .sa-card .question-stem  { font-weight: 600; color: #1a1a2e; margin: 8px 0 14px 0; font-size: 1.0em; }
+  .reveal-btn { background: #6f42c1; color: #ffffff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel { background: #f3f0ff; border: 1px solid #d4c8f5; border-radius: 8px; padding: 18px 22px; margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none; }
+  .answer-panel strong { color: #4a148c; }
+  .reset-btn-sa { background: #6f42c1; color: #fff; border: none; border-radius: 20px; padding: 7px 22px; font-size: 0.88em; font-weight: 600; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+  .reset-btn-sa:hover { background: #5a32a3; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin-bottom: 4px; }
+  code { background: #eef2fb; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Advanced Analytics in Business</h1>
+  <div class="subtitle">Chapter 6: Deep Learning II — Text &amp; Recurrency — Exam Review Notes</div>
+</div>
+
+<div class="nav-bar">
+  <a href="#featurization">Text Featurization</a>
+  <a href="#tfidf">TF-IDF &amp; BM25</a>
+  <a href="#nlp">NLP Tasks</a>
+  <a href="#embeddings">Word Embeddings</a>
+  <a href="#word2vec">word2vec</a>
+  <a href="#rnn">RNNs</a>
+  <a href="#lstm">LSTM &amp; GRU</a>
+  <a href="#seq2seq">Seq2Seq &amp; Attention</a>
+  <a href="#transformers">Transformers</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa"  class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ===================== STUDY NOTES ===================== -->
+
+<div class="notes-section" id="featurization">
+  <h2>1. Text as Data — The Featurization Challenge</h2>
+  <div class="key-point">
+    <strong>Goal:</strong> Convert a collection of free-form text documents (a <em>corpus</em>) into numeric feature vectors that machine learning algorithms can consume. Each document is one instance; each word (token) is a potential feature dimension.
+  </div>
+  <h3>Why Text is Hard</h3>
+  <ul>
+    <li>No natural feature-vector representation — text is variable length and unstructured.</li>
+    <li>Linguistic structure: word order, negations, sarcasm, context, ambiguity.</li>
+    <li>Dirty data: spelling errors, abbreviations, homographs, informal grammar.</li>
+    <li>High dimensionality: a typical vocabulary runs into hundreds of thousands of words.</li>
+  </ul>
+
+  <h3>Bag of Words (BoW)</h3>
+  <div class="key-point">
+    Each document is represented by a binary vector indicating which words from the vocabulary appear. Word order and grammar are <strong>completely ignored</strong>.
+  </div>
+  <div class="example-box">
+    <strong>Example:</strong><br>
+    Vocabulary: [this, is, an, a, example, second]<br>
+    "This is an example" → [1, 1, 1, 0, 1, 0]<br>
+    "This is a second example" → [1, 1, 0, 1, 1, 1]
+  </div>
+
+  <h3>Text Preprocessing Pipeline</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Purpose</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Case normalisation</td><td>Unify surface forms</td><td>Running → running</td></tr>
+      <tr><td>Stop-word removal</td><td>Remove very common, uninformative words</td><td>Remove "the", "and", "of"</td></tr>
+      <tr><td>Stemming (Porter)</td><td>Strip suffixes to root form</td><td>jumped, jumping → jump</td></tr>
+      <tr><td>Lemmatisation</td><td>Context-aware normalisation to dictionary form</td><td>better → good; flies → fly</td></tr>
+      <tr><td>PoS tagging</td><td>Tag each token with grammatical role</td><td>Apple (PROPN), is (VERB)</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ Stemming is fast but crude (suffix-stripping). Lemmatisation is more accurate but requires a parser and dictionary. Choose based on downstream task requirements.</div>
+
+  <h3>N-gram Sequences</h3>
+  <div class="key-point">
+    To capture word order, use <strong>n-grams</strong>: sequences of n adjacent tokens. Bi-grams (n=2) are most common.
+    "The quick brown fox" → bi-grams: {quick_brown, brown_fox}. Greatly increases feature dimensionality.
+  </div>
+</div>
+
+<div class="notes-section" id="tfidf">
+  <h2>2. TF-IDF and BM25</h2>
+  <h3>Term Frequency (TF)</h3>
+  <div class="formula-box">
+    \[\text{TF}(t_i, d) = \frac{f(t_i, d)}{|d|}\]
+    Number of occurrences of term \(t_i\) in document \(d\), divided by total document length.
+  </div>
+
+  <h3>Inverse Document Frequency (IDF)</h3>
+  <div class="formula-box">
+    \[\text{IDF}(t_i) = 1 + \log\!\left(\frac{|c|}{|\{d \in c : t_i \in d\}|}\right)\]
+    Penalises terms that appear in many documents (common → less informative). Higher IDF = rarer term.
+  </div>
+
+  <h3>TF-IDF</h3>
+  <div class="formula-box">
+    \[\text{TFIDF}(t_i, d) = \text{TF}(t_i, d) \times \text{IDF}(t_i)\]
+    Each document becomes a weight vector \(d = [w_1, w_2, \ldots, w_m]\) where \(w_i = \text{TFIDF}(t_i, d)\).
+  </div>
+  <div class="key-point">
+    TF-IDF <strong>rewards</strong> terms frequent in a document but <strong>penalises</strong> terms that are frequent across the whole corpus. This surfaces discriminative terms.
+  </div>
+
+  <h3>BM25 (Okapi Best Matching 25)</h3>
+  <div class="formula-box">
+    \[\text{BM25}(q,d) = \sum_{i=1}^{n} \text{IDF}(q_i) \cdot \frac{f(q_i, d)\cdot(k_1+1)}{f(q_i, d) + k_1\!\left(1 - b + b\cdot\frac{|d|}{\text{avgdl}}\right)}\]
+    Typical values: \(k_1 \in [1.2, 2.0]\), \(b = 0.75\).
+  </div>
+  <table>
+    <thead><tr><th>Feature</th><th>TF-IDF</th><th>BM25</th></tr></thead>
+    <tbody>
+      <tr><td>Term frequency saturation</td><td>Linear — repeated terms scale unboundedly</td><td>Saturates — 100× a word ≠ 100× more important</td></tr>
+      <tr><td>Document length normalisation</td><td>Division by |d|</td><td>Parametric via \(b\) — more flexible</td></tr>
+      <tr><td>Typical use</td><td>Feature matrix for ML</td><td>Query-document scoring, retrieval</td></tr>
+      <tr><td>Performance</td><td>Strong baseline</td><td>Often better than TF-IDF; sometimes beats embeddings</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Dealing with High Dimensionality</h3>
+  <ul>
+    <li>Feature selection (chi-squared, mutual information)</li>
+    <li>Hashing trick: collapse vocab to n hashed features</li>
+    <li>Dimensionality reduction: t-SNE, UMAP, PCA</li>
+    <li>Scalable models: Naive Bayes, linear SVM (proven effective for text)</li>
+  </ul>
+</div>
+
+<div class="notes-section" id="nlp">
+  <h2>3. Classical NLP Tasks</h2>
+  <div class="key-point">
+    NLP uses ML and statistical methods to learn language from data — capturing context, negations, and ambiguity that bag-of-words misses. These tasks are now predominantly solved by deep learning.
+  </div>
+  <table>
+    <thead><tr><th>Task</th><th>Description</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>PoS Tagging</td><td>Assign grammatical role to each token</td><td>Apple → PROPN, is → VERB</td></tr>
+      <tr><td>Named Entity Recognition (NER)</td><td>Identify and classify named entities</td><td>Person, Organisation, Location, Date</td></tr>
+      <tr><td>Topic Modelling (LDA, LSA)</td><td>Discover latent thematic structure across documents</td><td>Per-document topic proportions + per-topic word distributions</td></tr>
+      <tr><td>Sentiment Analysis</td><td>Detect polarity or emotion in text</td><td>"This camera sucks" = negative; "vacuum cleaner sucks" = positive</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ Context is everything: "This camera sucks" vs "This vacuum cleaner really sucks" — the same word carries opposite sentiment depending on context. BoW completely misses this.</div>
+</div>
+
+<div class="notes-section" id="embeddings">
+  <h2>4. Representational Learning &amp; Word Embeddings</h2>
+  <h3>From Sparse to Dense Representations</h3>
+  <div class="key-point">
+    BoW and TF-IDF produce <strong>very high-dimensional, sparse</strong> vectors (one dimension per vocabulary word). Word embeddings map each word to a <strong>dense, low-dimensional</strong> continuous vector — typically 50–1000 dimensions — that captures semantic meaning.
+  </div>
+  <p>Distance metrics (cosine, Euclidean) in embedding space approximate <strong>semantic similarity</strong>. The famous analogy: <em>[king] − [man] + [woman] ≈ [queen]</em> demonstrates that arithmetic in embedding space reflects linguistic relationships.</p>
+
+  <h3>What Makes a Good Embedding?</h3>
+  <ul>
+    <li>Semantically similar words cluster together in vector space.</li>
+    <li>Analogical relationships encoded as consistent vector offsets (male-female, country-capital, verb tense).</li>
+    <li>Reusable across downstream tasks (transfer learning).</li>
+    <li>Dense and low-dimensional — reduces overfitting vs. sparse BoW.</li>
+  </ul>
+
+  <h3>Embedding Bias</h3>
+  <div class="warning-box">⚠ Embeddings learned from real-world text inherit societal biases. The Word-Embedding Association Test (WEAT) found that "man" associates with "programmer" and "woman" with "homemaker" — reflecting biases in training corpora, not objective truth. Always audit embeddings before deployment in sensitive contexts.</div>
+
+  <h3>Generalised Embeddings</h3>
+  <div class="key-point">
+    The embedding principle extends beyond text: <strong>categorical embeddings</strong> map high-cardinality variables (e.g., day of week, product IDs) to continuous vectors. A simple NN with input → embedding → outcome learns task-relevant representations. Recommended embedding size: approximately \(1.6 \cdot |categories|^{0.56}\).
+  </div>
+  <p>Similarly, <strong>node2vec</strong> applies the same idea to graph nodes, <strong>doc2vec</strong> to entire documents, and <strong>listing2vec</strong> (Airbnb) to product listings.</p>
+</div>
+
+<div class="notes-section" id="word2vec">
+  <h2>5. word2vec</h2>
+  <div class="key-point">
+    Released by Google in 2013 (Mikolov et al.). Core idea: <strong>a word is defined by its context</strong>. The model learns embeddings by training on a self-supervised task — predicting words from context or context from words. After training, the network is discarded and only the weight matrix is kept as the embedding table.
+  </div>
+
+  <h3>Two Learning Methods</h3>
+  <table>
+    <thead><tr><th></th><th>CBOW (Continuous Bag-of-Words)</th><th>CSG (Continuous Skip-Gram)</th></tr></thead>
+    <tbody>
+      <tr><td>Input</td><td>Context words (surrounding tokens)</td><td>Focus word (centre token)</td></tr>
+      <tr><td>Prediction target</td><td>Focus word</td><td>Context words</td></tr>
+      <tr><td>Hidden activation</td><td>Weighted average of context embeddings</td><td>Pass-through (no activation)</td></tr>
+      <tr><td>Word order sensitivity</td><td>None — context treated as bag</td><td>None — context words fed one-by-one</td></tr>
+      <tr><td>Data efficiency</td><td>Better — averaging provides smoothing</td><td>More training data required</td></tr>
+      <tr><td>Embedding quality</td><td>Good for frequent words</td><td>Better quality; captures rare words well</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Architecture Details (CBOW)</h3>
+  <div class="key-point">
+    Input: C context words, each one-hot encoded with vocabulary size V.<br>
+    Weight matrix W (V×N): each row is the embedding for one word.<br>
+    Hidden layer: average of C context embeddings → N-dimensional vector.<br>
+    Output: softmax over V vocabulary → predicts focus word.<br>
+    After training: W is the embedding lookup table.
+  </div>
+
+  <h3>Practical Optimisations</h3>
+  <ul>
+    <li><strong>Negative sampling:</strong> Instead of updating all V output weights, only update a small number of "negative" (non-target) examples — much faster.</li>
+    <li><strong>Subsampling:</strong> Frequent words (e.g., "the") are subsampled during training — they contribute less information per occurrence.</li>
+    <li><strong>Random context window:</strong> Window size is sampled randomly per instance.</li>
+    <li><strong>Visualisation:</strong> High-dimensional embeddings (e.g., 1000-d) projected to 2D via PCA or t-SNE for inspection.</li>
+  </ul>
+
+  <h3>Related Embedding Models</h3>
+  <table>
+    <thead><tr><th>Model</th><th>Key idea</th><th>Advantage</th></tr></thead>
+    <tbody>
+      <tr><td>GloVe</td><td>Factorises global word co-occurrence matrix</td><td>Combines local (word2vec-like) and global statistics</td></tr>
+      <tr><td>fastText (Facebook)</td><td>Character n-gram sub-word embeddings</td><td>Handles misspellings and out-of-vocabulary words</td></tr>
+      <tr><td>doc2vec / par2vec</td><td>Adds a document-level paragraph vector to CBOW</td><td>Direct document-level representations</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="rnn">
+  <h2>6. Recurrent Neural Networks (RNNs)</h2>
+  <div class="key-point">
+    RNNs process sequential data by maintaining a <strong>hidden state</strong> — a compact summary of all past inputs. The same weights are applied at every time step (weight sharing across time). This allows the model to handle sequences of variable length.
+  </div>
+
+  <h3>Core Equations</h3>
+  <div class="formula-box">
+    Hidden state: \(a^{\langle t \rangle} = \tanh(W_{ax} x^{\langle t \rangle} + W_{aa} a^{\langle t-1 \rangle} + b_a)\)<br><br>
+    Output: \(\hat{y}^{\langle t \rangle} = \text{softmax}(W_{ya} a^{\langle t \rangle} + b_y)\)
+  </div>
+
+  <h3>Key Properties</h3>
+  <table>
+    <thead><tr><th>Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Weight sharing</td><td>Same W applied at every time step — model size does not grow with sequence length</td></tr>
+      <tr><td>State dependency</td><td>State at t depends on state at t−1, which depends on t−2, etc. — implicit memory of full history</td></tr>
+      <tr><td>Training algorithm</td><td>Backpropagation Through Time (BPTT) — unrolls the RNN in time and applies standard backprop</td></tr>
+      <tr><td>Practical limitation</td><td>Vanishing/exploding gradients make it hard to learn long-range dependencies in practice</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">⚠ RNN training is hard: all challenges of deep networks (vanishing gradients, sensitivity to initialisation) are compounded by the non-linear dynamical system nature — weight changes can destabilise the system entirely.</div>
+
+  <h3>Bidirectional RNNs</h3>
+  <div class="key-point">
+    A bidirectional RNN runs two RNNs over the sequence — one forward, one backward — and concatenates their hidden states. This allows each position to attend to both past and future context. <strong>Not the same as looking at the future during inference</strong> — the full sequence must already be available (not suitable for real-time generation).
+  </div>
+</div>
+
+<div class="notes-section" id="lstm">
+  <h2>7. LSTMs and GRUs</h2>
+  <h3>The Long-Range Dependency Problem</h3>
+  <div class="key-point">
+    Simple RNNs struggle to remember events from many time steps back. In language, we often need to remember a distant context: "a bracket opened 50 words ago — I still need to close it." Gating mechanisms address this.
+  </div>
+
+  <h3>LSTM (Long Short-Term Memory — Hochreiter &amp; Schmidhuber, 1997)</h3>
+  <div class="key-point">
+    Two values pass between time steps: the <strong>hidden state</strong> \(h_t\) (short-term memory) and the <strong>cell state</strong> \(C_t\) (long-term memory highway). Three gates control information flow:
+  </div>
+  <table>
+    <thead><tr><th>Gate</th><th>Symbol</th><th>Function</th></tr></thead>
+    <tbody>
+      <tr><td>Forget gate</td><td>\(f_t\)</td><td>Decides what fraction of the previous cell state to discard (sigmoid → 0 to 1)</td></tr>
+      <tr><td>Input gate</td><td>\(i_t\)</td><td>Decides which new information to write to the cell state</td></tr>
+      <tr><td>Output gate</td><td>\(o_t\)</td><td>Decides what part of the cell state to expose as the hidden state</td></tr>
+    </tbody>
+  </table>
+
+  <h3>GRU (Gated Recurrent Unit — Cho et al., 2014)</h3>
+  <div class="key-point">
+    Simplification of LSTM: merges forget and input gates into a single <strong>update gate</strong> and eliminates the separate cell state. Only one value passes between time steps.
+  </div>
+  <table>
+    <thead><tr><th></th><th>LSTM</th><th>GRU</th></tr></thead>
+    <tbody>
+      <tr><td>Gates</td><td>3 (forget, input, output)</td><td>2 (update, reset)</td></tr>
+      <tr><td>Passed values</td><td>2 (\(h_t\) and \(C_t\))</td><td>1 (\(h_t\))</td></tr>
+      <tr><td>Parameters</td><td>More</td><td>Fewer</td></tr>
+      <tr><td>Training speed</td><td>Slower</td><td>Faster</td></tr>
+      <tr><td>Small data performance</td><td>Can overfit more easily</td><td>Often better with less data</td></tr>
+      <tr><td>Long-range memory</td><td>Theoretically better</td><td>Slightly weaker</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">⚠ In practice, GRUs and LSTMs perform similarly across many tasks. The recommendation is to try both — GRUs are a reasonable starting default due to lower computational cost.</div>
+</div>
+
+<div class="notes-section" id="seq2seq">
+  <h2>8. Sequence-to-Sequence Models &amp; Attention</h2>
+  <h3>Seq2Seq Architecture</h3>
+  <div class="key-point">
+    An <strong>encoder</strong> RNN/LSTM compresses the entire input sequence into a fixed-length <strong>context vector</strong>. A <strong>decoder</strong> RNN/LSTM is initialised with this vector and generates the output sequence one token at a time. Used for machine translation, text summarisation, dialogue.
+  </div>
+  <div class="warning-box">⚠ The fixed-length context vector is a bottleneck: for long input sequences, it cannot carry all necessary information. Performance on long sequences degrades significantly.</div>
+
+  <h3>Attention Mechanism (Bahdanau, 2015)</h3>
+  <div class="key-point">
+    Instead of compressing all encoder information into one vector, attention allows the decoder to <strong>selectively focus</strong> on different encoder hidden states at each decoding step. The decoder computes a score for each encoder hidden state, softmaxes the scores into weights, and takes a weighted sum of encoder states as the dynamic context vector.
+  </div>
+  <div class="formula-box">
+    Softmaxed attention score: \(\text{Softmax}\!\left(\frac{Q^T K}{\sqrt{n}}\right)\) &nbsp;&nbsp; Weighted value: \(\text{score} \times V\)
+  </div>
+
+  <h3>Query / Key / Value Framework</h3>
+  <table>
+    <thead><tr><th>Component</th><th>In seq2seq attention</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Query (Q)</td><td>Decoder hidden state at current step</td><td>"What information do I need now?"</td></tr>
+      <tr><td>Keys (K)</td><td>All encoder hidden states</td><td>"What information is available?"</td></tr>
+      <tr><td>Values (V)</td><td>All encoder hidden states</td><td>"What to retrieve based on match?"</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Attention Score Functions</h3>
+  <table>
+    <thead><tr><th>Name</th><th>Formula</th><th>Paper</th></tr></thead>
+    <tbody>
+      <tr><td>Additive (Bahdanau)</td><td>\(v_a^T \tanh(W_a[s_t; h_i])\)</td><td>2015</td></tr>
+      <tr><td>Dot-Product (Luong)</td><td>\(s_t^T h_i\)</td><td>2015</td></tr>
+      <tr><td>Scaled Dot-Product</td><td>\(s_t^T h_i / \sqrt{n}\)</td><td>Vaswani 2017</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="transformers">
+  <h2>9. Transformers</h2>
+  <div class="key-point">
+    <em>Attention is All You Need</em> (Vaswani et al., 2017). The Transformer replaces recurrence entirely with <strong>self-attention</strong>. Q, K, and V all come from the same input sequence — each token attends to every other token simultaneously. This enables full parallelism during training (unlike RNNs which are sequential).
+  </div>
+
+  <h3>Transformer Architecture (Decoder-Only — GPT style)</h3>
+  <ol>
+    <li><strong>Token embedding:</strong> Map each input token to an N-dimensional embedding vector.</li>
+    <li><strong>Positional encoding:</strong> Add a position-dependent vector to inject word order information (self-attention itself is permutation-invariant).</li>
+    <li><strong>N Decoder blocks:</strong> each containing (a) Masked Multi-Head Self-Attention, (b) Add &amp; Norm (residual connection + layer normalisation), (c) Feed-Forward Network, (d) Add &amp; Norm.</li>
+    <li><strong>Linear + Softmax head:</strong> Project final representations to vocabulary logits: \(\text{logits} = X W_{vocab}\).</li>
+  </ol>
+
+  <h3>Self-Attention Mechanism</h3>
+  <div class="formula-box">
+    \[Z = \text{Softmax}\!\left(\frac{Q K^T}{\sqrt{d_k}}\right) V\]
+    where \(Q = X W^Q\), \(K = X W^K\), \(V = X W^V\) are linear projections of the same input \(X\).
+  </div>
+  <div class="key-point">
+    The attention matrix is <strong>masked</strong> (lower-triangular) so each token can only attend to previous tokens. This causal masking enables autoregressive generation at inference time.
+  </div>
+
+  <h3>Multi-Head Attention</h3>
+  <div class="key-point">
+    Run h parallel attention heads, each with independent W<sup>Q</sup>, W<sup>K</sup>, W<sup>V</sup> matrices. Concatenate all h output matrices and project with W<sup>O</sup>. Multiple heads allow the model to attend to different aspects of context simultaneously (e.g., syntactic vs. semantic relationships).
+  </div>
+
+  <h3>Positional Encoding</h3>
+  <div class="key-point">
+    Self-attention is <em>permutation-invariant</em> — it sees a set, not a sequence. Positional encodings (sinusoidal in the original paper, or learned in GPT) are added to token embeddings to inject position information.
+  </div>
+
+  <h3>Transformer Family Overview</h3>
+  <table>
+    <thead><tr><th>Architecture type</th><th>Examples</th><th>Trained for</th></tr></thead>
+    <tbody>
+      <tr><td>Encoder-only</td><td>BERT, RoBERTa, ALBERT, DistilBERT</td><td>Classification, NER, QA (bidirectional context)</td></tr>
+      <tr><td>Decoder-only</td><td>GPT-1/2/3/4, LLaMA, Mistral</td><td>Text generation, completion (causal/autoregressive)</td></tr>
+      <tr><td>Encoder-Decoder</td><td>T5, BART, mT5</td><td>Translation, summarisation, seq2seq tasks</td></tr>
+    </tbody>
+  </table>
+
+  <h3>GPT and RLHF</h3>
+  <div class="key-point">
+    GPT models are decoder-only Transformers pretrained on next-token prediction. Modern improvements include Byte Pair Encoding (BPE) tokenisation, sparse attention, better positional encodings, Mixture of Experts (MoE), and reasoning tokens. <strong>RLHF</strong> (Reinforcement Learning from Human Feedback) fine-tunes the model to align with human preferences — the basis of InstructGPT and ChatGPT.
+  </div>
+
+  <h3>Transformer vs. RNN: The Complexity Trade-off</h3>
+  <table>
+    <thead><tr><th></th><th>Transformer</th><th>RNN/LSTM</th></tr></thead>
+    <tbody>
+      <tr><td>Training parallelism</td><td>Full (all tokens processed simultaneously)</td><td>Sequential — cannot parallelise across time</td></tr>
+      <tr><td>Inference complexity</td><td>O(L²) — must re-attend to full sequence per token</td><td>O(L) — only needs previous hidden state</td></tr>
+      <tr><td>Long-range dependencies</td><td>Excellent — direct token-to-token attention</td><td>Weak — gradients vanish over long sequences</td></tr>
+      <tr><td>Context window</td><td>Fixed (but very large: 128K+ tokens in recent models)</td><td>Theoretically infinite; practically limited by gradient issues</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Non-Transformer Alternatives</h3>
+  <div class="key-point">
+    <strong>State Space Models (SSMs)</strong> like Mamba address the O(L²) attention bottleneck by recasting sequence modelling as a linear recurrence — O(L) inference, parallelisable training. <strong>xLSTM</strong> revisits LSTM with modern improvements. <strong>Diffusion LLMs</strong> apply denoising diffusion to text but have historically lagged transformers in quality.
+  </div>
+</div>
+
+<!-- ===================== MCQ ===================== -->
+<div class="mcq-section" id="mcq">
+  <div class="mcq-header">
+    <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+    <div>
+      <span class="score-display" id="mcq-score">Score: 0 / 50</span>
+      &nbsp;
+      <button class="reset-btn-mcq" onclick="resetMCQ()">↺ Reset Quiz</button>
+    </div>
+  </div>
+  <div id="mcq-container"></div>
+</div>
+
+<!-- ===================== SHORT ANSWER ===================== -->
+<div class="sa-section" id="sa">
+  <div class="sa-header">
+    <h2>Short Answer Questions (10)</h2>
+    <button class="reset-btn-sa" onclick="resetSA()">↺ Reset Answers</button>
+  </div>
+  <div id="sa-container"></div>
+</div>
+
+<script>
+const mcqData = [
+  // ── SECTION 1: Text Featurization ──
+  {
+    q: "In a Bag-of-Words representation, which of the following is preserved?",
+    opts: ["A) Word order within sentences", "B) Grammatical structure", "C) Presence or count of individual tokens", "D) Syntactic dependencies between words"],
+    ans: "C",
+    exp: "BoW only tracks which words (tokens) appear — or how many times — ignoring order, grammar, and all syntactic structure."
+  },
+  {
+    q: "Porter's stemming algorithm works by:",
+    opts: ["A) Mapping words to their dictionary base form using a parser", "B) Stripping common suffixes from words", "C) Applying part-of-speech tagging before normalisation", "D) Encoding words as character n-grams"],
+    ans: "B",
+    exp: "Porter's algorithm is a suffix-stripping heuristic. Lemmatisation (not stemming) uses parsers to recover true base forms."
+  },
+  {
+    q: "True or False: Stop-word removal always improves downstream model performance.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Stop-words are generally removed to reduce noise, but in some tasks (e.g., sentiment analysis of 'not good') removing 'not' destroys crucial negation information. There is no universal improvement guarantee."
+  },
+  {
+    q: "Which preprocessing step converts 'better' to 'good' and 'flies' to 'fly'?",
+    opts: ["A) Stemming", "B) Lemmatisation", "C) Stop-word removal", "D) Case normalisation"],
+    ans: "B",
+    exp: "Lemmatisation uses linguistic knowledge to map words to their canonical dictionary form, capturing irregular morphology. Stemming would not produce these mappings."
+  },
+  {
+    q: "Using bi-grams instead of uni-grams as features primarily:",
+    opts: ["A) Reduces the feature dimensionality", "B) Captures some word-order information at the cost of a much larger feature space", "C) Eliminates the need for stop-word removal", "D) Enables the model to handle negation completely"],
+    ans: "B",
+    exp: "N-grams encode adjacent word sequences, capturing local order. However, the feature space grows combinatorially — bi-grams alone can produce millions of features on realistic corpora."
+  },
+  // ── SECTION 2: TF-IDF & BM25 ──
+  {
+    q: "A term appears in every document in the corpus. Its IDF score (using the formula from the lecture) will be:",
+    opts: ["A) 0", "B) 1", "C) Very large", "D) Undefined"],
+    ans: "B",
+    exp: "IDF = 1 + log(|c| / |{d: t ∈ d}|). If t appears in all |c| documents, log(|c|/|c|) = log(1) = 0, so IDF = 1 + 0 = 1 — the minimum non-zero value."
+  },
+  {
+    q: "True or False: TF-IDF is calculated at the term-document level, while IDF alone is calculated at the term-corpus level.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "TF(t, d) depends on both the specific term and the specific document. IDF(t) depends only on how many documents in the corpus contain the term, not on any single document."
+  },
+  {
+    q: "BM25 saturates term frequency. This means that in BM25, repeating a keyword 50 times in a document compared to 5 times:",
+    opts: ["A) Gives exactly 10× the weight", "B) Gives a disproportionately high weight due to linear scaling", "C) Gives only a modest additional weight — the gain diminishes rapidly", "D) Gives zero additional weight beyond the first occurrence"],
+    ans: "C",
+    exp: "BM25 uses a non-linear term frequency component that saturates — additional occurrences beyond the first few contribute progressively less to the score."
+  },
+  {
+    q: "Which technique addresses the problem that previously unseen words at inference time have no TF-IDF feature?",
+    opts: ["A) Lemmatisation", "B) The hashing trick", "C) IDF smoothing", "D) Negative sampling"],
+    ans: "B",
+    exp: "The hashing trick maps all words (including unseen ones) to a fixed-size hash space, avoiding out-of-vocabulary issues without a fixed vocabulary."
+  },
+  {
+    q: "True or False: In TF-IDF, a very common word like 'the' will receive a high TF-IDF weight in any document that contains it frequently.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Although TF would be high, IDF would be near 1 (or log ≈ 0) because 'the' appears in nearly every document. The product TF × IDF therefore remains very low."
+  },
+  // ── SECTION 3: Word Embeddings ──
+  {
+    q: "The key advantage of word embeddings over TF-IDF vectors for machine learning is:",
+    opts: ["A) Embeddings are always computed faster", "B) Embeddings produce dense, low-dimensional representations where semantic similarity corresponds to vector proximity", "C) Embeddings eliminate the need for any preprocessing", "D) Embeddings always outperform TF-IDF on classification tasks"],
+    ans: "B",
+    exp: "Embeddings are dense (not sparse) and low-dimensional, encoding semantic similarity geometrically. TF-IDF produces very high-dimensional sparse vectors with no semantic structure."
+  },
+  {
+    q: "The analogy [king] − [man] + [woman] ≈ [queen] demonstrates that word embeddings can encode:",
+    opts: ["A) Syntactic parsing trees", "B) Consistent linear relational structure across semantic dimensions", "C) The full grammar of a language", "D) Topic distributions across a corpus"],
+    ans: "B",
+    exp: "The vector arithmetic works because the embedding space captures consistent directional offsets for relationships like gender, tense, and country-capital — a property of context-based training."
+  },
+  {
+    q: "True or False: fastText can generate meaningful embeddings for misspelled or out-of-vocabulary words.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "fastText builds word vectors from sub-word character n-gram embeddings, so even unseen words or typos can be represented as the sum of their character n-gram vectors."
+  },
+  {
+    q: "GloVe improves on word2vec by:",
+    opts: ["A) Using character-level n-grams instead of whole words", "B) Exploiting global co-occurrence statistics across the entire corpus, not just local context windows", "C) Removing the need for a neural network entirely", "D) Processing documents rather than individual words"],
+    ans: "B",
+    exp: "GloVe (Pennington et al.) factorises the global word co-occurrence matrix, combining benefits of matrix factorisation methods and local context-based learning."
+  },
+  {
+    q: "In the embedding literature, a categorical embedding for 'day of the week' is useful because it:",
+    opts: ["A) Always produces a lower-dimensional representation than one-hot encoding", "B) Automatically assigns semantically similar categories to similar vectors, and reduces the feature space compared to one-hot", "C) Is required for all neural networks", "D) Guarantees higher accuracy than one-hot encoding on any dataset"],
+    ans: "B",
+    exp: "Categorical embeddings learn task-relevant continuous representations. Weekend days may cluster together; they reduce dimensionality vs. one-hot while encoding similarity structure."
+  },
+  // ── SECTION 4: word2vec ──
+  {
+    q: "In CBOW, the hidden layer activation function is:",
+    opts: ["A) ReLU", "B) Sigmoid", "C) A weighted average of context word embeddings", "D) Softmax"],
+    ans: "C",
+    exp: "CBOW averages (or sums and divides by C) the embeddings of all context words. This averaging is the hidden activation — there is no nonlinearity in the hidden layer."
+  },
+  {
+    q: "True or False: In CBOW, the order of context words matters for computing the hidden layer activation.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "CBOW treats context as a bag — it averages all context embeddings regardless of order. This is why it's called Continuous *Bag*-of-Words."
+  },
+  {
+    q: "After training word2vec, to retrieve the embedding for a specific word, we:",
+    opts: ["A) Run the full network forward pass with a one-hot input and read the softmax output", "B) Look up the corresponding row in the input weight matrix W (VxN)", "C) Average all word embeddings in the vocabulary", "D) Rerun training with that word as the sole context"],
+    ans: "B",
+    exp: "After training, the weight matrix W serves as the embedding table. Each row corresponds to one vocabulary word's embedding vector — a one-hot input simply selects the corresponding row."
+  },
+  {
+    q: "Compared to CBOW, Continuous Skip-Gram (CSG) typically:",
+    opts: ["A) Trains faster because it uses averaged context", "B) Requires less training data to achieve good embeddings", "C) Produces higher-quality embeddings but requires more training data", "D) Uses a softmax hidden layer instead of a pass-through"],
+    ans: "C",
+    exp: "CSG trains context prediction for each focus word individually — more training pairs per word, less smoothing, better quality especially for rare words. But it needs more data and computation."
+  },
+  {
+    q: "The word2vec training objective can be described as a form of self-supervised learning because:",
+    opts: ["A) It requires human-annotated labels for every word", "B) The supervision signal (predicting words from context) is derived automatically from raw unannotated text", "C) It uses reinforcement learning with human feedback", "D) It requires a pre-built ontology of word meanings"],
+    ans: "B",
+    exp: "Self-supervision generates labels from the data itself — no manual annotation needed. The task of predicting surrounding words from a focus word creates unlimited training signal from raw text."
+  },
+  // ── SECTION 5: RNNs ──
+  {
+    q: "In an RNN, what is the purpose of maintaining a hidden state?",
+    opts: ["A) To store the full sequence in memory without compression", "B) To carry a compact summary of all previously seen inputs relevant to predicting the next output", "C) To enable parallel processing of all time steps simultaneously", "D) To replace the need for word embeddings as input"],
+    ans: "B",
+    exp: "The hidden state is a learned, compressed representation of past inputs. It allows the network to make output decisions that depend on arbitrarily distant past inputs — at least in principle."
+  },
+  {
+    q: "True or False: Backpropagation Through Time (BPTT) is essentially the same as standard backpropagation applied to the time-unrolled RNN computational graph with weight sharing across time steps.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "BPTT unrolls the RNN in time (creating a very deep feedforward network) and applies standard backprop. Weight sharing means gradients are accumulated across all time steps for each shared parameter."
+  },
+  {
+    q: "The primary reason simple RNNs struggle with long-range dependencies is:",
+    opts: ["A) They use too many parameters", "B) Gradients decay exponentially as they flow back through many time steps, making early inputs have negligible influence on late outputs", "C) They cannot process inputs longer than a fixed window size", "D) They require attention scores that become undefined for long sequences"],
+    ans: "B",
+    exp: "Vanishing gradients in BPTT mean that the gradient signal from the output layer barely reaches the weights that process inputs many time steps back — the network effectively 'forgets.'"
+  },
+  {
+    q: "A bidirectional RNN differs from a standard RNN in that:",
+    opts: ["A) It processes the sequence twice: once forward and once backward, concatenating both hidden states", "B) It processes future tokens before past tokens during inference", "C) It uses attention instead of recurrence", "D) It applies BPTT in both gradient directions simultaneously"],
+    ans: "A",
+    exp: "Two independent RNNs process the sequence in opposite directions. Their hidden states are concatenated at each position, giving every token access to both past and future context. This requires the full sequence upfront."
+  },
+  {
+    q: "True or False: RNNs and CNNs are often combined for tasks like object detection in video (e.g., Mask R-CNN).",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "CNN-RNN hybrids are common: CNNs extract spatial features from images/frames while RNNs model temporal dependencies. Mask R-CNN and similar architectures follow this pattern."
+  },
+  // ── SECTION 6: LSTM & GRU ──
+  {
+    q: "In an LSTM, the cell state C_t is primarily responsible for:",
+    opts: ["A) Computing the output prediction at each time step", "B) Carrying long-term information forward with minimal interference — the 'memory highway'", "C) Deciding which context words to attend to", "D) Encoding positional information about tokens"],
+    ans: "B",
+    exp: "The cell state flows through the LSTM with only multiplicative (gate) interactions — designed to preserve information over many time steps without the additive corruption that degrades simple RNN states."
+  },
+  {
+    q: "The forget gate in an LSTM decides:",
+    opts: ["A) What new information to write into the cell state", "B) What fraction of the current cell state to retain for the next time step", "C) What part of the cell state to expose as the hidden state", "D) Whether to use CBOW or skip-gram updates"],
+    ans: "B",
+    exp: "f_t = sigmoid(W_f [h_{t-1}, x_t] + b_f). Values near 0 mean 'forget'; near 1 means 'keep.' This allows the network to selectively reset long-term memory."
+  },
+  {
+    q: "True or False: A GRU uses three gates (forget, input, output) just like an LSTM but with a simplified cell state.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "A GRU uses only two gates (update and reset) and eliminates the separate cell state entirely — one hidden state carries both short-term and long-term information."
+  },
+  {
+    q: "Which of the following is TRUE about GRUs compared to LSTMs?",
+    opts: ["A) GRUs have more parameters and train more slowly", "B) GRUs generally outperform LSTMs on tasks requiring very long-range dependencies", "C) GRUs train faster and often perform comparably or better on smaller datasets", "D) GRUs always perform worse because they have less expressiveness"],
+    ans: "C",
+    exp: "Fewer parameters means faster training and less overfitting risk on small data. On tasks with very long dependencies, LSTMs may theoretically have an edge, but results are highly dataset-dependent."
+  },
+  {
+    q: "LSTM gating can be thought of as analogous to:",
+    opts: ["A) The softmax function in classification", "B) Residual (skip) connections in CNNs — allowing gradients to flow unimpeded", "C) The attention mechanism in Transformers", "D) Feature selection in traditional ML"],
+    ans: "B",
+    exp: "Both LSTM cell state paths and residual connections allow gradients to bypass nonlinear transformations, mitigating vanishing gradients. This analogy motivates why both architectures can learn from deep/long sequences."
+  },
+  // ── SECTION 7: Seq2Seq & Attention ──
+  {
+    q: "In a basic sequence-to-sequence model (without attention), the decoder is initialised with:",
+    opts: ["A) The average of all encoder hidden states", "B) The last encoder hidden state (context vector)", "C) A random vector that is fine-tuned during decoding", "D) The softmax output of the encoder's final layer"],
+    ans: "B",
+    exp: "In the original seq2seq design, only the final encoder hidden state is passed to the decoder as the initial hidden state — a fixed-length bottleneck summarising the entire input sequence."
+  },
+  {
+    q: "True or False: The fixed-length context vector bottleneck in basic seq2seq is particularly problematic for translating short sentences.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "Short sentences are generally well-encoded in a fixed-length vector. The bottleneck is most problematic for long sentences, where the encoder must compress far more information into the same vector size."
+  },
+  {
+    q: "In seq2seq with attention, at each decoder step, the context vector is:",
+    opts: ["A) Always the same final encoder hidden state", "B) A dynamically computed weighted sum of all encoder hidden states, with weights determined by a score function", "C) The average of all encoder hidden states", "D) The concatenation of all encoder hidden states fed directly to the decoder"],
+    ans: "B",
+    exp: "Attention computes a score between the current decoder state (query) and each encoder state (key), softmaxes these scores into weights, and uses them to weight-sum the encoder states (values) — a different context vector per decoder step."
+  },
+  {
+    q: "Scaled dot-product attention divides the dot product Q^T K by √n (square root of the key dimension) primarily to:",
+    opts: ["A) Normalise attention weights to sum to 1", "B) Prevent dot products from growing so large that softmax gradients vanish", "C) Ensure that keys and queries have the same magnitude", "D) Apply weight sharing across attention heads"],
+    ans: "B",
+    exp: "For large d_k, dot products can have very large magnitude, pushing softmax into regions of near-zero gradient. Dividing by √d_k keeps the variance of the dot product ~1 and stabilises training."
+  },
+  {
+    q: "True or False: An attention matrix visualised as a heatmap between source and target sequence positions can provide interpretable insight into which source tokens the model focuses on when generating each target token.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "Attention heatmaps show the alignment between input and output positions — e.g., which English words are attended to when generating each French word. These are interpretable, though not perfect explanations of model behaviour."
+  },
+  // ── SECTION 8: Transformers ──
+  {
+    q: "Self-attention differs from seq2seq attention in that:",
+    opts: ["A) Self-attention uses separate encoder and decoder hidden states", "B) In self-attention, Q, K, and V are all derived from the same input sequence", "C) Self-attention does not use softmax", "D) Self-attention can only be applied to fixed-length sequences"],
+    ans: "B",
+    exp: "In self-attention, the Query, Key, and Value matrices all come from the same input token embeddings. This allows every token to attend to every other token in the same sequence."
+  },
+  {
+    q: "Why does the Transformer require positional encoding?",
+    opts: ["A) Because the embedding layer does not support variable-length inputs", "B) Because self-attention is permutation-invariant — it treats input as a set, not a sequence", "C) Because the feed-forward layers cannot model token dependencies", "D) Because multi-head attention always produces the same output regardless of input order"],
+    ans: "B",
+    exp: "Self-attention computes the same result regardless of the order tokens are presented. Positional encodings inject position-dependent signals so the model can distinguish 'first word' from 'last word.'"
+  },
+  {
+    q: "True or False: In a decoder-only Transformer (e.g., GPT), the attention matrix is masked so each token can attend to all subsequent tokens in the sequence.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "The causal (lower-triangular) mask prevents each token from attending to future tokens — only previous tokens are visible. This enables autoregressive generation where the model predicts tokens one at a time."
+  },
+  {
+    q: "Multi-head attention, compared to single-head attention, allows the model to:",
+    opts: ["A) Attend to longer sequences without additional computation", "B) Eliminate the need for positional encoding", "C) Represent multiple distinct attention patterns simultaneously, capturing different aspects of the input", "D) Reduce the number of parameters in the attention layer"],
+    ans: "C",
+    exp: "Different heads can specialise in different relationship types (syntax, semantics, coreference). Concatenating their outputs gives the model richer representational power than a single attention head."
+  },
+  {
+    q: "After attention, each token passes through a feed-forward network (FFN). This FFN is applied:",
+    opts: ["A) Once to the entire sequence collectively", "B) Independently and identically to each token position", "C) Only to the first and last tokens in the sequence", "D) Only during training, not at inference"],
+    ans: "B",
+    exp: "The same FFN weights are applied position-wise (each token independently). Attention mixes information between tokens; the FFN processes each token's representation individually — a form of weight sharing."
+  },
+  {
+    q: "True or False: GPT-style models use an encoder-decoder Transformer architecture.",
+    opts: ["True", "False"],
+    ans: "False",
+    exp: "GPT uses a decoder-only architecture — no encoder. The full (masked) self-attention decoder stack takes tokens as input and produces next-token probabilities autoregressively."
+  },
+  {
+    q: "Byte Pair Encoding (BPE) tokenisation is used in GPT primarily to:",
+    opts: ["A) Remove all out-of-vocabulary words by converting to ASCII", "B) Split rare words into frequent sub-word units, balancing vocabulary size with coverage of unseen words", "C) Apply stemming automatically before embedding", "D) Compress the embedding matrix by merging synonyms"],
+    ans: "B",
+    exp: "BPE iteratively merges the most frequent adjacent byte pairs into sub-word tokens. This handles rare/unseen words gracefully by decomposing them into known sub-units."
+  },
+  {
+    q: "The quadratic complexity O(L²) of Transformer self-attention (where L = sequence length) arises because:",
+    opts: ["A) The feed-forward layers have quadratic weight matrices", "B) Each of the L tokens must compute attention scores against every other L token", "C) Positional encodings require L² sinusoidal computations", "D) The embedding layer produces L² output values"],
+    ans: "B",
+    exp: "Computing the full L×L attention matrix (scores between every pair of tokens) requires O(L²) time and memory. For long sequences (e.g., books), this becomes prohibitively expensive."
+  },
+  {
+    q: "True or False: RLHF (Reinforcement Learning from Human Feedback) is used to align language models with human preferences after initial pretraining on raw text.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "After pretraining on next-token prediction, RLHF fine-tunes the model using a reward model trained on human preference data. This produced InstructGPT and underpins ChatGPT's conversational quality."
+  },
+  {
+    q: "State Space Models (SSMs) like Mamba offer what advantage over Transformers for long-sequence inference?",
+    opts: ["A) They use attention to process sequences in parallel", "B) They have O(L) inference complexity instead of O(L²) and can theoretically handle unlimited context", "C) They eliminate the need for training data entirely", "D) They replace embeddings with direct character-level representations"],
+    ans: "B",
+    exp: "SSMs recur over the sequence like RNNs (O(L) inference) but can be parallelised during training via a convolution-equivalent formulation. This makes them attractive for very long sequences where O(L²) attention is infeasible."
+  },
+  // ── ADVANCED / INTEGRATIVE ──
+  {
+    q: "A data scientist applies k-means to TF-IDF vectors of 100,000 documents. Compared to applying k-means to word2vec document embeddings (averaged word embeddings), the TF-IDF approach will likely:",
+    opts: ["A) Produce clusters based on semantic meaning just as effectively", "B) Be slower due to denser representations", "C) Operate in a much higher-dimensional, sparser space and may miss semantic similarities between synonymous terms", "D) Always produce better clusters because TF-IDF weights discriminative terms more strongly"],
+    ans: "C",
+    exp: "TF-IDF spaces are extremely high-dimensional and sparse. 'Car' and 'automobile' are orthogonal — no similarity. Word embeddings map synonyms to nearby vectors, enabling semantically meaningful clustering."
+  },
+  {
+    q: "True or False: A Transformer trained for text generation uses the same token representation at the output as at the input (i.e., the vocabulary embedding matrix W_vocab is shared with the input embedding matrix).",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "Many Transformer implementations tie the input embedding matrix and the output projection matrix (W_vocab). This weight tying reduces parameters and regularises the model by ensuring the same embedding space is used for both encoding and decoding."
+  },
+  {
+    q: "Which scenario would benefit MOST from a bidirectional LSTM rather than a unidirectional LSTM?",
+    opts: ["A) Real-time speech recognition where outputs must be produced token-by-token as audio arrives", "B) Named Entity Recognition over a fixed text where the full sentence is available", "C) Language model pretraining where the next token must be predicted autoregressively", "D) Chatbot response generation where the full user message is unknown"],
+    ans: "B",
+    exp: "NER benefits from right context — 'London' in 'London Eye' vs. 'London, Ontario' needs future context. When the full sequence is available, bidirectional LSTMs utilise both past and future context optimally."
+  },
+  {
+    q: "True or False: In word2vec, the context window size is a hyperparameter that affects what relationships the embedding encodes — smaller windows tend to capture syntactic patterns, larger windows semantic/topical ones.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "This is an empirically established finding: smaller context windows make the model focus on nearby, often syntactically related words; larger windows expose the model to topically related words that may not be adjacent."
+  },
+  {
+    q: "When a seq2seq attention model translates 'I like cats' to French, the attention scores at each decoding step:",
+    opts: ["A) Are fixed values determined by the encoder weights before decoding begins", "B) Are computed dynamically based on the current decoder hidden state and all encoder hidden states", "C) Are uniformly distributed across all encoder positions", "D) Only attend to the last encoder hidden state"],
+    ans: "B",
+    exp: "At each decoder step, the decoder's current hidden state (query) is compared to all encoder hidden states (keys). The resulting scores are softmaxed to produce dynamic, position-sensitive attention weights."
+  },
+  {
+    q: "True or False: Combining a CNN (for feature extraction) and an RNN (for sequence modelling) is a valid and commonly used architecture for tasks like video classification and image captioning.",
+    opts: ["True", "False"],
+    ans: "True",
+    exp: "CNN-RNN hybrids are standard: CNNs extract per-frame spatial features; RNNs model temporal dynamics across frames. For captioning, a CNN encodes the image; an LSTM decodes it into a text sequence."
+  }
+];
+
+const saData = [
+  {
+    q: "Explain the conceptual difference between TF-IDF and BM25. Why does BM25 often outperform TF-IDF in information retrieval tasks, and under what conditions might a practitioner still prefer TF-IDF?",
+    a: "<strong>TF-IDF:</strong> Scores each term by multiplying its within-document frequency (TF, normalised by document length) with a global penalisation for corpus-wide commonness (IDF). The TF component scales linearly — repeating a word 100 times earns 100× the TF of one occurrence.<br><br><strong>BM25:</strong> Extends TF-IDF with two key improvements: (1) <strong>Term frequency saturation</strong> — the BM25 TF component is a rational function that increases rapidly for the first few occurrences and then saturates; a word repeated 100 times does not score 100× higher. (2) <strong>Better length normalisation</strong> — document length is normalised parametrically via b (default 0.75), allowing tuning of how much short/long documents are penalised relative to average.<br><br><strong>Why BM25 often wins:</strong> Saturating TF prevents keyword-stuffed documents from dominating results. Flexible length normalisation avoids over-penalising naturally longer documents (e.g., book chapters vs. tweets).<br><br><strong>When TF-IDF may be preferred:</strong> (1) As a feature matrix for ML classifiers — BM25 is a scalar scoring function but TF-IDF produces a natural document-term matrix usable directly as features. (2) Simplicity and interpretability in contexts where the practitioners need to explain the feature construction. (3) When the task involves supervised classification rather than unsupervised retrieval ranking, and a simple linear model on TF-IDF features is the baseline."
+  },
+  {
+    q: "Compare CBOW and Skip-Gram (CSG) word2vec architectures in terms of architecture, training objective, data efficiency, and the type of embeddings each produces. Give a concrete reason why a practitioner would choose one over the other.",
+    a: "<strong>CBOW (Continuous Bag-of-Words):</strong><br>• <em>Input:</em> C surrounding context words, each one-hot encoded.<br>• <em>Target:</em> Predict the focus (centre) word.<br>• <em>Hidden activation:</em> Average of context word embeddings — smooths out noise.<br>• <em>Data efficiency:</em> Better — averaging provides built-in regularisation; one training instance uses C context words.<br>• <em>Embedding quality:</em> Good for frequent words; averaging can wash out subtle word-specific information.<br><br><strong>CSG (Continuous Skip-Gram):</strong><br>• <em>Input:</em> Focus word, one-hot encoded.<br>• <em>Target:</em> Predict each surrounding context word individually.<br>• <em>Hidden activation:</em> Pass-through (no averaging).<br>• <em>Data efficiency:</em> Worse — generates C training pairs per focus word, each used independently; needs more data.<br>• <em>Embedding quality:</em> Generally better, especially for rare words, because each word must independently produce useful context predictions without benefit of averaging.<br><br><strong>Practical choice:</strong> Choose <strong>CBOW</strong> when training data is limited or training speed is the priority (e.g., domain-specific corpus of a few million words). Choose <strong>CSG</strong> when high-quality embeddings for rare or specialised terms are needed and large data is available (e.g., pretraining general-purpose embeddings on Wikipedia + Common Crawl)."
+  },
+  {
+    q: "Describe the vanishing gradient problem in RNNs and explain mechanically how LSTM gating addresses it. Why does the LSTM cell state act as a 'gradient highway'?",
+    a: "<strong>Vanishing gradient in RNNs:</strong> During BPTT, the gradient of the loss with respect to early hidden states involves products of Jacobian matrices across many time steps. If the spectral radius of the recurrent weight matrix W_aa is less than 1 (which is common with tanh activations), repeated matrix multiplication causes the gradient magnitude to decay exponentially with sequence length. By the time gradients reach time step t−50, they are essentially zero — the network cannot learn to use information from 50 steps ago.<br><br><strong>How LSTM gating helps:</strong><br>• The <strong>cell state C_t</strong> is updated as: C_t = f_t ⊙ C_{t-1} + i_t ⊙ g_t. This is a <em>linear, additive</em> update to C — not a repeated matrix multiplication through tanh. During backpropagation, the gradient of C_t with respect to C_{t-1} is simply f_t (the forget gate vector).<br>• If the forget gate is near 1 (keep), the gradient passes through with minimal change — the cell state acts as a <strong>gradient highway</strong>, allowing gradients to flow back many steps without exponential decay.<br>• When the forget gate is near 0 (forget), the network selectively blocks gradient flow, preventing irrelevant historical information from interfering.<br>• The <strong>input gate</strong> controls what new information enters the cell; the <strong>output gate</strong> controls what is exposed to the network — together these provide fine-grained control over memory without forcing gradients through repeated tanh squashing.<br><br><strong>Residual connection analogy:</strong> The cell state additive update is conceptually similar to ResNets — both allow gradient magnitude to be preserved across many 'layers' (or time steps) by providing a direct, unimpeded path."
+  },
+  {
+    q: "A colleague proposes the following pipeline for NLP classification: (1) compute TF-IDF, (2) run t-SNE on the TF-IDF vectors to reduce to 2D, (3) train a k-NN classifier on the 2D coordinates. Critically evaluate this approach and propose a more defensible alternative.",
+    a: "<strong>Problems with the proposed pipeline:</strong><br><br><strong>1. t-SNE distorts distances:</strong> t-SNE is a non-linear dimensionality reduction technique that preserves only <em>local</em> neighbourhood structure. Global distances (between well-separated clusters) are meaningless in the 2D t-SNE output. A k-NN classifier on 2D t-SNE coordinates implicitly trusts Euclidean distances between all points — including points that may have been arbitrarily repositioned relative to each other by t-SNE's stress function.<br><br><strong>2. Information loss:</strong> Compressing thousands of TF-IDF dimensions to exactly 2 discards enormous amounts of discriminative information. Two documents with the same 2D coordinates might have very different class memberships in the original space.<br><br><strong>3. t-SNE is stochastic and perplexity-sensitive:</strong> Different runs or perplexity values produce different 2D layouts. The downstream classifier performance is therefore non-reproducible and poorly calibrated.<br><br><strong>4. Classification uses transformed test data incorrectly:</strong> t-SNE cannot transform new test documents to the same space as training documents — it must be rerun on the combined dataset, which leaks test data information (data leakage).<br><br><strong>More defensible alternative:</strong><br>• Apply TF-IDF correctly (fit on train only, transform test).<br>• Optionally reduce dimensions with <strong>TruncatedSVD (LSA)</strong> or <strong>UMAP</strong> (which supports a supervised transform of new points).<br>• Train a linear SVM or logistic regression on the reduced features — proven effective for high-dimensional text.<br>• Use t-SNE only for <em>visualisation</em> after model evaluation, not as a preprocessing step for classification."
+  },
+  {
+    q: "Explain the sequence-to-sequence model with attention mechanism step-by-step for machine translation. Why is the attention decoder more effective than the basic context-vector decoder, particularly for long sentences?",
+    a: "<strong>Basic seq2seq (without attention):</strong> The encoder LSTM processes the full source sentence and its final hidden state becomes the single context vector c. The decoder is initialised with c and generates the target sequence one token at a time. All source information must be compressed into the fixed-length c — a severe bottleneck for long sentences.<br><br><strong>Seq2seq with attention — step by step:</strong><br><strong>1. Encode:</strong> Run the encoder LSTM over all source tokens; save all encoder hidden states (h_1, h_2, ..., h_T_x), not just the last one.<br><strong>2. Decode — step i:</strong> The decoder maintains its own hidden state s_i.<br><strong>3. Compute alignment scores:</strong> For each encoder state h_j, compute a score e_{i,j} = score(s_i, h_j) using a score function (additive, dot-product, or scaled dot-product).<br><strong>4. Softmax to attention weights:</strong> α_{i,j} = softmax(e_{i,j}) — these sum to 1 and represent how much focus to place on source position j when generating target position i.<br><strong>5. Compute context vector:</strong> c_i = Σ_j α_{i,j} h_j — a weighted combination of all encoder states, dynamically tailored for this decoding step.<br><strong>6. Generate output token:</strong> s_i = LSTM(s_{i-1}, [y_{i-1}; c_i]) → ŷ_i = softmax(W s_i + b).<br><br><strong>Why attention wins for long sentences:</strong><br>• Different parts of a long source sentence are relevant at different decoding steps — attention allows dynamic retrieval of the most relevant source context at each step.<br>• The encoder hidden states are never compressed into a fixed bottleneck; the decoder can access the full encoder history.<br>• Empirically, attention alignment matrices reveal linguistically meaningful correspondences (e.g., 'économique' aligns to 'Economic') — confirming the mechanism works as intended.<br>• An observed trick — reversing the source sequence improves basic seq2seq because it shortens the path between first source and first target tokens — attention removes the need for this hack entirely."
+  },
+  {
+    q: "Walk through the complete data flow in a decoder-only Transformer (GPT-style) for a 4-token input sequence. Your explanation should cover: token embeddings, positional encoding, masked self-attention, the feed-forward network, and how the output probabilities are generated.",
+    a: "<strong>Input:</strong> Token sequence [t_1, t_2, t_3, t_4] (e.g., 'I like cats now').<br><br><strong>Step 1 — Token Embedding:</strong> Each token index is looked up in an embedding matrix E ∈ ℝ^{V×d} to produce 4 vectors of dimension d (e.g., 768). We have input matrix X ∈ ℝ^{4×d}.<br><br><strong>Step 2 — Positional Encoding:</strong> Add position-dependent vectors P ∈ ℝ^{4×d} to X. These are sinusoidal (original Transformer) or learned (GPT). Now X ← X + P encodes both meaning and position.<br><br><strong>Step 3 — Masked Multi-Head Self-Attention (per decoder block):</strong><br>• Compute Q = XW^Q, K = XW^K, V = XW^V (linear projections, d_k = d/h per head).<br>• Compute attention scores: A = QK^T / √d_k ∈ ℝ^{4×4}.<br>• Apply causal mask: set A[i,j] = −∞ for all j > i (token i cannot see tokens after it).<br>• Softmax rows: Ã = softmax(A).<br>• Weighted values: Z = ÃV ∈ ℝ^{4×d_k}.<br>• Repeat for h heads; concatenate; project: Z_out = Concat(Z_1,...,Z_h) W^O.<br>• Add residual connection + layer normalise: X ← LayerNorm(X + Z_out).<br><br><strong>Step 4 — Feed-Forward Network (per token, identically):</strong><br>• For each of the 4 token representations independently: FFN(x) = ReLU(xW_1 + b_1)W_2 + b_2.<br>• Add residual connection + layer normalise: X ← LayerNorm(X + FFN(X)).<br><br><strong>Steps 3–4 repeat N times</strong> (e.g., N=12 for GPT-2 small).<br><br><strong>Step 5 — Output Head:</strong><br>• Logits = X W_{vocab} ∈ ℝ^{4×V} — project to vocabulary size V.<br>• For each of the 4 positions, softmax produces a probability distribution over V tokens.<br>• During training: use all 4 positions (each predicts the next token). During inference: only the last position's distribution is sampled; its output is appended and the process repeats.<br><br><strong>Key insight:</strong> Training is parallelised across all 4 positions simultaneously (teacher forcing). Inference is sequential — one token generated per forward pass."
+  },
+  {
+    q: "Critically compare word embeddings (e.g., word2vec, GloVe) with contextual embeddings (as used in modern Transformers like BERT or GPT). What limitation of static word embeddings do contextual embeddings address, and what cost do they introduce?",
+    a: "<strong>Static word embeddings (word2vec, GloVe):</strong> Each word in the vocabulary receives a single, fixed embedding vector regardless of context. 'Bank' (financial institution) and 'bank' (river bank) are represented by the same vector — the model cannot distinguish polysemy or context-dependent meaning.<br><br><strong>How Transformers produce contextual embeddings:</strong> In BERT, GPT, and similar models, the embedding for a word is computed dynamically by passing the full sentence through multiple self-attention layers. The output representation for token t is influenced by every other token in the sequence through the attention mechanism. 'Bank' in 'river bank' and 'bank' in 'Central Bank' produce different vectors because the surrounding context (river vs. Central) shapes the attention-weighted representation.<br><br><strong>Limitation addressed:</strong><br>• <em>Polysemy:</em> Same word form, different meaning → different contextual vector. Static embeddings average over all contexts the word appears in during training.<br>• <em>Morphological compositionality:</em> Complex phrases ('New York') get appropriate representations as part of their context, not just as independently embedded words summed.<br>• <em>Long-range dependencies:</em> Attention across the full sentence can directly encode coreference and argument structure.<br><br><strong>Costs introduced:</strong><br>• <em>Computational cost:</em> Generating contextual embeddings requires a full forward pass through a large model — inference is orders of magnitude slower than a simple embedding lookup.<br>• <em>Memory:</em> BERT-base has 110M parameters; GPT-3 has 175B. Static embeddings may have just 100M parameters total but lookup is O(1).<br>• <em>Complexity:</em> Fine-tuning contextual models on downstream tasks requires careful hyperparameter tuning, large GPU memory, and can overfit on small datasets.<br>• <em>Interpretability:</em> It is harder to understand what information a contextual embedding encodes compared to inspecting nearest neighbours in a static embedding space."
+  },
+  {
+    q: "Explain how word embedding bias arises, why it is problematic for real-world NLP applications, and what mitigation strategies exist. Use the WEAT framework in your answer.",
+    a: "<strong>How bias arises:</strong> Word embeddings are learned from large text corpora (web pages, books, Wikipedia). These corpora reflect historical human-generated text which encodes societal biases — occupational stereotypes, gender associations, racial connotations. The self-supervised training objective (predict context) picks up these statistical regularities. If 'programmer' co-occurs more often with male pronouns in training text, the 'programmer' embedding lands closer to 'man' than 'woman' in vector space.<br><br><strong>The Word-Embedding Association Test (WEAT):</strong> Developed by Caliskan et al., WEAT operationalises the Implicit Association Test from social psychology for embeddings. It measures the relative cosine similarity of two sets of target words (e.g., career vs. family words) against two sets of attribute words (e.g., male vs. female names). A significant WEAT effect for {programmer, engineer, scientist} → {male names} vs. {female names} demonstrates embedded gender bias. Famous finding: 'Man is to Computer Programmer as Woman is to Homemaker.'<br><br><strong>Why it is problematic:</strong><br>• Embeddings are used in hiring tools (CV screening), loan approval, medical diagnosis assistance, and legal systems — all high-stakes.<br>• Biased embeddings lead to discriminatory outcomes: a CV embedding algorithm may rank women lower for engineering roles simply because their resumes mention female-coded words that the embedding associates with lower-status occupations.<br>• The bias is latent and not obviously visible — it requires probing to surface.<br><br><strong>Mitigation strategies:</strong><br>• <em>Hard debiasing (Bolukbasi et al.):</em> Identify the 'gender subspace' in embedding space and project out the gender direction from occupational words. Evaluates well but may hide rather than remove bias.<br>• <em>Training data curation:</em> Balance the corpus to reduce representation disparities, though completely eliminating bias from large corpora is practically infeasible.<br>• <em>Contextual models with RLHF:</em> Modern LLMs fine-tuned with RLHF attempt to reduce harmful stereotyping, though they do not eliminate all bias.<br>• <em>Bias auditing:</em> Apply WEAT and similar tests before deploying any embedding-based system in sensitive domains; document findings and limitations."
+  },
+  {
+    q: "A business analyst wants to build a real-time document search engine over 10 million internal company documents. Compare TF-IDF + BM25, static word embeddings (averaged word2vec), and Transformer-based dense retrieval (e.g., a sentence-BERT bi-encoder) for this use case. Consider accuracy, latency, scalability, and maintenance.",
+    a: "<strong>TF-IDF / BM25 (Sparse Retrieval):</strong><br>• <em>Accuracy:</em> Strong baseline for keyword-heavy queries; fails on paraphrasing ('automobile' vs. 'car'), semantic queries ('show me documents about financial risk' without those exact words).<br>• <em>Latency:</em> Extremely fast — inverted index lookup is sub-millisecond; no neural computation at query time.<br>• <em>Scalability:</em> Excellent — sparse vectors scale to billions of documents with efficient inverted indices (e.g., Elasticsearch, BM25F).<br>• <em>Maintenance:</em> Low — no GPU required; deterministic and interpretable results.<br><br><strong>Averaged word2vec (Dense Retrieval, Static Embeddings):</strong><br>• <em>Accuracy:</em> Better than BM25 for semantic similarity; 'automobile' and 'car' are now nearby. But averaging word vectors loses important phrase-level meaning and ignores word order.<br>• <em>Latency:</em> Requires approximate nearest-neighbour search (FAISS/ScaNN) over 10M dense vectors — fast (5–20ms) but needs careful index construction.<br>• <em>Scalability:</em> Good — FAISS enables billion-scale dense retrieval on GPU.<br>• <em>Maintenance:</em> Moderate — embedding model is fixed; documents must be pre-embedded and indexed; updates require re-embedding new documents.<br><br><strong>Sentence-BERT / Dense Bi-Encoder (Contextual Dense Retrieval):</strong><br>• <em>Accuracy:</em> State-of-the-art for semantic search — captures polysemy, negation, and complex query intent.<br>• <em>Latency:</em> Query encoding adds ~10–50ms (one forward pass through a BERT-size model). Document retrieval via ANN index is still fast. Total pipeline: ~50–100ms.<br>• <em>Scalability:</em> Good with ANN indexing; embedding 10M documents requires significant GPU compute up-front and for updates.<br>• <em>Maintenance:</em> High — requires GPU infrastructure, model updates/fine-tuning on domain data, and monitoring for drift.<br><br><strong>Recommendation for this use case:</strong> A hybrid approach. Use BM25 as a fast first-stage retriever (retrieve top-100 candidates) followed by a cross-encoder or bi-encoder re-ranker for precision. This combines BM25's speed and coverage with semantic model accuracy — the de facto industry standard for enterprise search (e.g., Elasticsearch + reranker)."
+  },
+  {
+    q: "The lecture states that 'the Transformer's training is parallelisable but inference scales as O(L²).' Explain why inference has this complexity, what practical implications this has for very long documents, and what architectural alternatives (from the lecture) attempt to address this.",
+    a: "<strong>Why O(L²) inference:</strong> At each decoding step, the Transformer must compute attention over all L previously generated tokens — producing an L×L attention matrix. Specifically, for step i, computing Q_i K^T (dot product of the new query with all i previous keys) costs O(i·d) time and the KV-cache stores O(i·d) memory. Over L total generation steps, total computation is O(L²·d) and memory is O(L·d) per layer. For moderate sequence lengths (L~4096 tokens) and large models (96 layers, d=12288), KV-cache alone can require tens of GB of GPU memory.<br><br><strong>Practical implications:</strong><br>• <em>Context window limits:</em> Older models (GPT-2: 1024 tokens) had very short windows; modern models (GPT-4: 128K tokens, Gemini: 1M tokens) required significant engineering effort and architecture modifications (e.g., grouped query attention, sliding window attention) to push limits up.<br>• <em>Long-document tasks:</em> Summarising a 100,000-word book requires either chunking (losing global context) or extremely expensive attention computation.<br>• <em>Memory bandwidth bottleneck:</em> At inference, loading the KV-cache from HBM to compute attention is memory-bandwidth-bound — the GPU spends more time on memory transfers than actual computation.<br><br><strong>Architectural alternatives discussed in the lecture:</strong><br>• <em>State Space Models (Mamba, Gu & Dao 2023):</em> Replace attention with a selective linear recurrence. Inference is O(L) — only the compressed state is needed at each step, not the full history. Training can still be parallelised via a convolutional formulation. Disadvantage: may sacrifice some recall of specific distant tokens.<br>• <em>xLSTM (Beck et al., 2024):</em> Extended LSTM with improved gating that is more competitive with Transformers while retaining RNN-style O(L) inference.<br>• <em>Diffusion LLMs:</em> Non-autoregressive parallel generation — potentially O(1) decoding steps for a fixed number of denoising passes, but quality has historically lagged.<br><br><strong>Industry trend:</strong> Hybrid architectures mixing attention layers with SSM or linear attention layers (e.g., Jamba, Mamba-2) attempt to get the best of both — long-context efficiency from SSMs and the full-context recall of attention for critical layers."
+  }
+];
+
+// ─────────────────────────────────────────────────
+// RENDER MCQ
+// ─────────────────────────────────────────────────
+let mcqState = {};
+
+function renderMCQ() {
+  const container = document.getElementById('mcq-container');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-card-${idx}`;
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Question ${idx+1} of ${mcqData.length}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    item.opts.forEach((opt, oi) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = opt;
+      btn.dataset.idx = idx;
+      btn.dataset.oi = oi;
+      btn.onclick = () => handleMCQ(idx, oi, btn, card, item);
+      card.appendChild(btn);
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback-bar';
+    fb.id = `fb-${idx}`;
+    fb.style.display = 'none';
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+  updateScore();
+}
+
+function handleMCQ(idx, oi, btn, card, item) {
+  if (mcqState[idx] !== undefined) return;
+  mcqState[idx] = oi;
+
+  const opts = card.querySelectorAll('.option-btn');
+  opts.forEach(b => b.disabled = true);
+
+  const selectedLabel = item.opts[oi];
+  const correctLabel  = item.ans;
+
+  const correctIdx = item.opts.findIndex(o => {
+    if (item.opts.length === 2) return o === correctLabel;
+    return o.startsWith(correctLabel + ')');
+  });
+
+  const isCorrect = item.opts.length === 2
+    ? selectedLabel === correctLabel
+    : selectedLabel.startsWith(correctLabel + ')');
+
+  opts[oi].className = 'option-btn ' + (isCorrect ? 'correct' : 'incorrect');
+  if (!isCorrect && correctIdx >= 0) opts[correctIdx].className = 'option-btn reveal-correct';
+
+  const fb = document.getElementById(`fb-${idx}`);
+  fb.style.display = 'block';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  fb.textContent = (isCorrect ? '✅ Correct! ' : '❌ Incorrect. ') + item.exp;
+
+  updateScore();
+}
+
+function updateScore() {
+  let correct = 0;
+  mcqData.forEach((item, idx) => {
+    if (mcqState[idx] === undefined) return;
+    const sel = item.opts[mcqState[idx]];
+    const ok  = item.opts.length === 2 ? sel === item.ans : sel.startsWith(item.ans + ')');
+    if (ok) correct++;
+  });
+  document.getElementById('mcq-score').textContent = `Score: ${correct} / ${mcqData.length}`;
+}
+
+function resetMCQ() {
+  mcqState = {};
+  renderMCQ();
+}
+
+// ─────────────────────────────────────────────────
+// RENDER SA
+// ─────────────────────────────────────────────────
+function renderSA() {
+  const container = document.getElementById('sa-container');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Short Answer ${idx+1}`;
+    card.appendChild(label);
+
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.textContent = item.q;
+    card.appendChild(stem);
+
+    const btn = document.createElement('button');
+    btn.className = 'reveal-btn';
+    btn.textContent = 'Reveal Answer';
+
+    const panel = document.createElement('div');
+    panel.className = 'answer-panel';
+    panel.innerHTML = item.a;
+    panel.style.display = 'none';
+
+    btn.onclick = () => {
+      const visible = panel.style.display !== 'none';
+      panel.style.display = visible ? 'none' : 'block';
+      btn.textContent = visible ? 'Reveal Answer' : 'Hide Answer';
+      if (!visible && window.MathJax) MathJax.typesetPromise([panel]);
+    };
+
+    card.appendChild(btn);
+    card.appendChild(panel);
+    container.appendChild(card);
+  });
+}
+
+function resetSA() { renderSA(); }
+
+// Init
+renderMCQ();
+renderSA();
+</script>
+</body>
+</html>

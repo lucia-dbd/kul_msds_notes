@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression I – Chapter 4 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() { console.log('MathJax ready'); });
+    }
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c3a;
+    max-width: 960px; margin: 0 auto; padding: 24px 16px 60px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff; border-radius: 14px; padding: 28px 36px;
+    margin-bottom: 24px; box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff; border: 1px solid #dde3ef;
+    padding: 10px 18px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px;
+    margin-top: 0; margin-bottom: 16px; font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin: 20px 0 8px; }
+  .notes-section p { margin-bottom: 10px; }
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:0.95em; margin-bottom:20px; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+  .option-btn {
+    display:block; width:100%; background:#ffffff; border:1.5px solid #d0d8ea;
+    border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section > h2 { color:#4a148c; font-size:1.2em; font-weight:700; margin-bottom:20px; font-family:'Crimson Pro', Georgia, serif; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn { background:#6f42c1; color:#ffffff; border:none; border-radius:20px; padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; font-family:inherit; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block { background:#fff8e1; border-left:3px solid #ffc107; padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0; font-size:0.92em; }
+  .followup-block strong { color:#7c5800; }
+  .reset-btn { background:#1a3a5c; color:#fff; border:none; border-radius:20px; padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:20px; transition:background 0.2s; font-family:inherit; }
+  .reset-btn:hover { background:#2e6da4; }
+  @media(max-width:600px){ .notes-section, .mcq-section, .sa-section { padding:18px 14px; } .page-header { padding:20px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Logistic Regression I — Chapter 4</h1>
+  <div class="subtitle">Binary Outcomes · Logit &amp; Expit · MLE via Newton-Raphson · Odds &amp; Odds Ratios · Hypothesis Testing · Interval Estimation · Donner Party Case Study · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#motivation">Motivation</a>
+  <a href="#problem">The Linear Model Problem</a>
+  <a href="#logit">Logit &amp; Expit</a>
+  <a href="#model">The Logistic Model</a>
+  <a href="#mle">MLE &amp; Score Equations</a>
+  <a href="#hessian">Hessian &amp; Uniqueness</a>
+  <a href="#newton">Newton-Raphson</a>
+  <a href="#testing">Hypothesis Testing</a>
+  <a href="#intervals">Interval Estimation</a>
+  <a href="#odds">Odds &amp; Odds Ratios</a>
+  <a href="#interp">Coefficient Interpretation</a>
+  <a href="#prediction">Prediction</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ══════════════════════════ NOTES ══════════════════════════ -->
+
+<!-- 1. Motivation -->
+<div class="notes-section" id="motivation">
+  <h2>1. Why Logistic Regression? Motivation &amp; the Donner Party</h2>
+
+  <p>Linear regression models a continuous response $y$ as a linear function of predictors. But many outcomes of scientific interest are <strong>binary</strong>: survived/died, diseased/healthy, success/failure. We need a model that:</p>
+
+  <div class="key-point">
+    (1) Keeps the predicted probability $P(y=1 \mid \mathbf{x})$ strictly between 0 and 1.<br>
+    (2) Allows flexible modelling of how predictors relate to probability.<br>
+    (3) Is estimable by Maximum Likelihood from a Binomial/Bernoulli likelihood.
+  </div>
+
+  <div class="example-box">
+    <strong>The Donner Party (1846–1847):</strong> 88 members of the Donner and Reed families set out from Illinois to California. Stranded by snowstorms in the Sierra Nevada, 40 died before rescue in April 1847. Data collected: age, sex, survival (0/1). Scientific question: <em>controlling for age, do women have higher survival odds than men?</em> This is the running case study for Chapter 4.
+  </div>
+
+  <p>Three canonical examples of linear regression from the lectures motivate the need for alternatives when $y$ is binary:</p>
+  <table>
+    <thead><tr><th>Context</th><th>Response $y$</th><th>Model</th></tr></thead>
+    <tbody>
+      <tr><td>Hubble's law</td><td>Galaxy velocity (continuous)</td><td>Linear regression ✓</td></tr>
+      <tr><td>Lung cancer vs. smoking (rates)</td><td>Proportion (continuous 0–1)</td><td>Linear regression (approximate)</td></tr>
+      <tr><td>Donner party survival</td><td>Survived (0/1) — binary</td><td>Logistic regression ✓</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 2. The Problem with Linear Model -->
+<div class="notes-section" id="problem">
+  <h2>2. The Problem with the Linear Probability Model</h2>
+
+  <div class="key-point">
+    For a binary outcome, $E(y \mid \mathbf{x}) = P(y=1 \mid \mathbf{x})$, a probability. The linear model would require:
+    $$P(y=1 \mid \mathbf{x}) = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p$$
+    but a linear function $\eta(\mathbf{x}) = \mathbf{x}^T\boldsymbol{\beta}$ is <strong>unbounded</strong> — it ranges over $(-\infty, +\infty)$, while a probability is constrained to $[0,1]$.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Concrete failure example:</strong> Suppose $P(y=1 \mid \text{fem}) = 0.5 - \text{fem}$ (linear model with $\beta_0 = 0.5$, $\beta_1 = -1$). For women ($\text{fem}=1$): $P(y=1) = 0.5 - 1 = -0.5$ — a negative probability! Logistic regression fixes this by mapping the linear predictor through a function that is always in $(0,1)$.
+  </div>
+
+  <div class="example-box">
+    <strong>Animal experiment (morbidity vs. dose):</strong> 20 mice were exposed to doses from 0–20 mg. The observed proportions show a sigmoid pattern. A linear fit at 20 mg predicts a proportion above 1, which is impossible. The logistic curve tracks the data far better and stays within $[0,1]$ throughout.
+  </div>
+</div>
+
+<!-- 3. Logit & Expit -->
+<div class="notes-section" id="logit">
+  <h2>3. The Logit Transform and the Expit (Logistic) Function</h2>
+
+  <h3>From probability to log-odds: the logit</h3>
+  <div class="theorem-box">
+    <strong>Logit (log-odds) transform:</strong>
+    $$\text{logit}[\pi] = \ln\left(\frac{\pi}{1-\pi}\right) = \ln\left(\frac{P(y=1)}{P(y=0)}\right)$$
+    Range: $-\infty \leq \text{logit}[\pi] \leq +\infty$ for $\pi \in (0,1)$.
+  </div>
+
+  <p>Since the logit ranges over all of $\mathbb{R}$, it is valid to write:</p>
+  <div class="formula-box">
+    $$\text{logit}[P(y=1 \mid \mathbf{x})] = \eta(\mathbf{x}) = \mathbf{x}^T\boldsymbol{\beta} = \beta_0 + \beta_1 x_1 + \cdots + \beta_p x_p$$
+  </div>
+
+  <h3>Back to probability: the expit (inverse logit)</h3>
+  <div class="theorem-box">
+    <strong>Expit (logistic) function — inverting the logit:</strong>
+    $$P(y=1 \mid \mathbf{x}) = \frac{e^{\eta(\mathbf{x})}}{1 + e^{\eta(\mathbf{x})}} = \frac{e^{\mathbf{x}^T\boldsymbol{\beta}}}{1 + e^{\mathbf{x}^T\boldsymbol{\beta}}}$$
+    This is always in $(0,1)$ for any finite $\eta$, solving the range problem.
+  </div>
+
+  <h3>Shape of the expit function</h3>
+  <div class="key-point">
+    The expit is an S-shaped (sigmoid) curve. Key features:<br>
+    — $\beta_0$ shifts the curve left/right (where $P = 0.5$ occurs at $\eta = 0$, i.e., $x = -\beta_0/\beta_1$).<br>
+    — $|\beta_1|$ controls the steepness: larger $|\beta_1|$ = steeper curve.<br>
+    — $\beta_1 > 0$: probability increases with $x$; $\beta_1 < 0$: probability decreases with $x$.<br>
+    — As $\eta \to +\infty$, $P \to 1$; as $\eta \to -\infty$, $P \to 0$.
+  </div>
+</div>
+
+<!-- 4. The Logistic Regression Model -->
+<div class="notes-section" id="model">
+  <h2>4. The Logistic Regression Model: Two Parts</h2>
+
+  <p>Every GLM has two components — the logistic regression model is no exception:</p>
+
+  <table>
+    <thead><tr><th>Part</th><th>Name</th><th>Formula</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Systematic</strong></td><td>Linear predictor + link</td><td>$\text{logit}[\pi_i(\boldsymbol{\beta})] = \mathbf{x}_i^T\boldsymbol{\beta}$</td><td>How the mean probability relates to predictors</td></tr>
+      <tr><td><strong>Distribution</strong></td><td>Random component</td><td>$y_i \sim \text{Bern}[\pi_i(\boldsymbol{\beta})]$ or $y_i \sim \text{Bin}[n_i, \pi_i(\boldsymbol{\beta})]$</td><td>Distribution of the response around its mean</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Bernoulli case</strong> (ungrouped, individual-level data, $n_i = 1$, $N = n$):<br>
+    Each $y_i \in \{0,1\}$, and $y_i \sim \text{Bern}[\pi_i(\boldsymbol{\beta})]$ where $\text{logit}[\pi_i(\boldsymbol{\beta})] = \mathbf{x}_i^T\boldsymbol{\beta}$.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Binomial case</strong> (grouped data, $N$ groups with $n_i$ replicates):<br>
+    $y_i = \sum_{j=1}^{n_i} y_{ij}$ is the number of successes in group $i$, and $y_i \sim \text{Bin}[n_i, \pi_i(\boldsymbol{\beta})]$ where $\text{logit}[\pi_i(\boldsymbol{\beta})] = \mathbf{x}_i^T\boldsymbol{\beta}$.<br>
+    <em>This arises in designed experiments with categorical predictors.</em>
+  </div>
+
+  <div class="key-point">
+    <strong>Simple vs. Multiple logistic regression:</strong><br>
+    — Simple: 1 predictor (e.g., $\text{logit}[\pi] = \beta_0 + \beta_1 \text{age}$).<br>
+    — Multiple: $p-1$ predictors (e.g., $\text{logit}[\pi] = \beta_0 + \beta_1 \text{age} + \beta_2 \text{fem}$).<br>
+    The structure is identical; only the dimension of $\mathbf{x}$ differs.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Why OLS fails for binary $y$:</strong> Ordinary Least Squares minimises $\sum(y_i - \hat y_i)^2$ and assumes homoscedastic normal errors. For binary $y_i \in \{0,1\}$, the variance is $\pi_i(1-\pi_i)$ which depends on $\mathbf{x}$ (heteroscedastic), the errors are far from normal, and the predicted values can leave $[0,1]$. Maximum Likelihood with a Bernoulli/Binomial likelihood is the correct approach.
+  </div>
+</div>
+
+<!-- 5. MLE -->
+<div class="notes-section" id="mle">
+  <h2>5. Maximum Likelihood Estimation</h2>
+
+  <h3>Likelihood and log-likelihood (Binomial case)</h3>
+  <div class="formula-box">
+    $$L(\boldsymbol{\beta}) \propto \prod_{i=1}^N \pi_i(\boldsymbol{\beta})^{y_i} [1 - \pi_i(\boldsymbol{\beta})]^{n_i - y_i}$$
+    $$\ell(\boldsymbol{\beta}) = \sum_{i=1}^N \left[y_i \mathbf{x}_i^T\boldsymbol{\beta} - n_i \log\left(1 + \exp(\mathbf{x}_i^T\boldsymbol{\beta})\right)\right]$$
+  </div>
+
+  <p>Equivalently (highlighting the logit form):</p>
+  <div class="formula-box">
+    $$\ell(\boldsymbol{\beta}) = \sum_{i=1}^N \left[y_i \log\frac{\pi_i(\boldsymbol{\beta})}{1-\pi_i(\boldsymbol{\beta})} + n_i \log(1-\pi_i(\boldsymbol{\beta}))\right]$$
+  </div>
+
+  <h3>Score equations</h3>
+  <div class="theorem-box">
+    <strong>Score vector</strong> (gradient of $\ell$ w.r.t. $\boldsymbol{\beta}$):
+    $$\mathbf{S}(\boldsymbol{\beta}) = \frac{\partial \ell}{\partial \boldsymbol{\beta}} = \sum_{i=1}^N \mathbf{x}_i\left(y_i - n_i \frac{e^{\mathbf{x}_i^T\boldsymbol{\beta}}}{1+e^{\mathbf{x}_i^T\boldsymbol{\beta}}}\right) = \mathbf{X}^T(\mathbf{y} - \boldsymbol{\mu})$$
+    where $\mathbf{X}$ is the design matrix, $\mathbf{y} = (y_i)^T$, and $\boldsymbol{\mu} = E(\mathbf{y}) = (n_i \pi_i(\boldsymbol{\beta}))^T$.
+  </div>
+
+  <p>Setting $\mathbf{S}(\boldsymbol{\beta}) = \mathbf{0}$ gives the <strong>normal equations</strong> for logistic regression:</p>
+  <div class="formula-box">
+    Intercept: $\sum_{i=1}^N [y_i - n_i\pi_i(\boldsymbol{\beta})] = 0$<br>
+    Regressor $x_k$: $\sum_{i=1}^N x_{ki}[y_i - n_i\pi_i(\boldsymbol{\beta})] = 0$ for $k=1,\ldots,p-1$
+  </div>
+
+  <div class="key-point">
+    The score equations require that the <em>observed counts</em> equal the <em>fitted expected counts</em> (summed over the appropriate margin). This is analogous to the OLS normal equations $\sum e_i = 0$ and $\sum x_{ki} e_i = 0$ in linear regression.
+  </div>
+</div>
+
+<!-- 6. Hessian -->
+<div class="notes-section" id="hessian">
+  <h2>6. Hessian Matrix and Uniqueness of the MLE</h2>
+
+  <div class="theorem-box">
+    <strong>Hessian matrix of $\ell$:</strong>
+    $$\mathbf{H}(\boldsymbol{\beta}) = \frac{\partial^2 \ell}{\partial \boldsymbol{\beta} \partial \boldsymbol{\beta}^T} = -\mathbf{X}^T \mathbf{V} \mathbf{X}$$
+    where $\mathbf{V} = \text{diag}[n_1\pi_1(1-\pi_1), \ldots, n_N\pi_N(1-\pi_N)]$.
+  </div>
+
+  <div class="key-point">
+    <strong>Remarkable property (canonical link):</strong> For the logistic regression model (logit = canonical link for Binomial), $\mathbf{V}$ does not depend on $\mathbf{y}$, only on $\boldsymbol{\beta}$ through $\pi_i(\boldsymbol{\beta})$. Therefore:
+    $$\mathbf{I}(\boldsymbol{\beta}) = -E[\mathbf{H}(\boldsymbol{\beta})] = -\mathbf{H}(\boldsymbol{\beta}) = \mathbf{X}^T\mathbf{V}\mathbf{X}$$
+    The expected and observed information matrices are equal. Newton-Raphson = Fisher Scoring.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Concavity and uniqueness:</strong> When $\mathbf{X}$ has full column rank and $\hat{\mathbf{V}}$ has no zero diagonal elements (i.e., $0 < \hat\pi_i < 1$ for all $i$), $\mathbf{H}(\hat{\boldsymbol{\beta}})$ is <em>negative definite</em>. The log-likelihood is therefore <strong>strictly concave</strong>, guaranteeing a <strong>unique global maximum</strong>.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ When MLE does not exist — perfect (complete) separation:</strong> If a hyperplane in predictor space perfectly separates all $y=0$ observations from all $y=1$ observations, then $\hat{\boldsymbol{\beta}} \to \pm\infty$ along certain directions (the log-likelihood has no finite maximum). This occurs with small samples or very strong predictors. Software may warn of non-convergence or produce absurdly large coefficient estimates with enormous standard errors.
+  </div>
+
+  <div class="key-point">
+    <strong>Estimated covariance matrix of $\hat{\boldsymbol{\beta}}$:</strong>
+    $$\widehat{\text{Cov}}(\hat{\boldsymbol{\beta}}) = \left(\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X}\right)^{-1}$$
+    This is the inverse of the observed Fisher information evaluated at $\hat{\boldsymbol{\beta}}$.
+  </div>
+</div>
+
+<!-- 7. Newton-Raphson -->
+<div class="notes-section" id="newton">
+  <h2>7. Computing the MLE: Newton-Raphson / Fisher Scoring</h2>
+
+  <p>Unlike linear regression (where OLS has a closed-form solution), logistic regression MLE requires <strong>iterative optimisation</strong>.</p>
+
+  <div class="theorem-box">
+    <strong>Newton-Raphson update:</strong>
+    $$\boldsymbol{\beta}^{(t+1)} = \boldsymbol{\beta}^{(t)} - \left[\frac{\partial^2 \ell}{\partial\boldsymbol{\beta}\partial\boldsymbol{\beta}^T}\bigg|_{\boldsymbol{\beta}^{(t)}}\right]^{-1} \mathbf{S}(\boldsymbol{\beta}^{(t)}), \quad t = 0, 1, 2, \ldots$$
+    The algorithm stops when $\|\boldsymbol{\beta}^{(t+1)} - \boldsymbol{\beta}^{(t)}\| / \|\boldsymbol{\beta}^{(t)}\| \leq \varepsilon$.
+  </div>
+
+  <div class="key-point">
+    Since $\mathbf{I}(\boldsymbol{\beta}) = -\mathbf{H}(\boldsymbol{\beta})$ for the logit (canonical link), Newton-Raphson and <strong>Fisher Scoring</strong> give identical updates. This also means the algorithm is equivalent to Iteratively Reweighted Least Squares (IRLS) — a form of weighted OLS with weights $w_i = n_i\pi_i(1-\pi_i)$ that change at each iteration. R reports the number of "Fisher Scoring iterations".
+  </div>
+
+  <div class="example-box">
+    <strong>R output for Donner party model:</strong><br>
+    <code>glm(Outcome ~ Age + fem, family=binomial(link="logit"))</code><br>
+    Converged in 4 Fisher Scoring iterations.<br>
+    $\hat\beta_0 = 0.554$, $\hat\beta_1 = -0.0356$ (Age), $\hat\beta_2 = 1.068$ (fem).<br>
+    Null deviance: 120.86 (88 df) | Residual deviance: 108.87 (85 df) | AIC: 114.87.
+  </div>
+</div>
+
+<!-- 8. Hypothesis Testing -->
+<div class="notes-section" id="testing">
+  <h2>8. Hypothesis Testing: The Holy Trinity in Logistic Regression</h2>
+
+  <p>The three large-sample tests from Chapter 2 all apply. For $H_0: \mathbf{C}\boldsymbol{\beta} = \mathbf{d}$ (e.g., $H_0: \beta_k = 0$):</p>
+
+  <table>
+    <thead><tr><th>Test</th><th>Statistic</th><th>Evaluated at</th><th>Null distribution</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LR (Deviance)</strong></td><td>$G^2 = -2[\ell^{(0)} - \ell^{(1)}]$</td><td>Both $\hat{\boldsymbol{\beta}}_0$ and $\hat{\boldsymbol{\beta}}$</td><td>$\chi^2(r)$</td></tr>
+      <tr><td><strong>Wald</strong></td><td>$(\hat{\boldsymbol{\beta}}_* )^T(-\mathbf{H}_{**})^{-1}\hat{\boldsymbol{\beta}}_*$</td><td>$\hat{\boldsymbol{\beta}}$ (unrestricted MLE)</td><td>$\chi^2(p_*)$</td></tr>
+      <tr><td><strong>Score (Rao)</strong></td><td>$\mathbf{S}(\hat{\boldsymbol{\beta}}_0)^T[-\mathbf{H}(\hat{\boldsymbol{\beta}}_0)]^{-1}\mathbf{S}(\hat{\boldsymbol{\beta}}_0)$</td><td>$\hat{\boldsymbol{\beta}}_0$ (null MLE)</td><td>$\chi^2(r)$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    All three tests are <strong>asymptotically equivalent under $H_0$</strong> and are implemented in R:<br>
+    — LR: <code>anova(model0, model1, test='Chisq')</code><br>
+    — Wald: z-values in <code>summary()</code> or <code>wald.test()</code> from <code>aod</code><br>
+    — Score: <code>anova(model0, model1, test='Rao')</code>
+  </div>
+
+  <div class="example-box">
+    <strong>Donner party — testing $H_0: \beta_2 = 0$ (no gender effect):</strong><br>
+    LR: $G^2 = 5.15$, $p = 0.023$ * | Wald: $W = 4.9$, $p = 0.027$ * | Score: $\text{Rao} = 5.07$, $p = 0.024$ *<br>
+    All three tests agree: there is significant evidence that gender affects survival, adjusted for age. The LR test has the best finite-sample properties.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ The z-test in R output is a Wald test:</strong> The coefficient table shows $z = \hat\beta_k / se(\hat\beta_k)$ which is a Wald z-statistic (asymptotically $\mathcal{N}(0,1)$ under $H_0$, so $z^2 \sim \chi^2(1)$). Note: in linear regression, R uses a t-test (exact); in logistic regression, it uses a Wald z-test (asymptotic only), because no exact distributional result is available.
+  </div>
+</div>
+
+<!-- 9. Interval Estimation -->
+<div class="notes-section" id="intervals">
+  <h2>9. Interval Estimation: Wald vs. Profile-Likelihood CIs</h2>
+
+  <h3>Wald CI for $\beta_k$</h3>
+  <div class="formula-box">
+    $$\hat\beta_k \pm z_{1-\alpha/2}\; se(\hat\beta_k), \qquad se(\hat\beta_k) = \sqrt{\hat{\mathbf{I}}_{kk}^{-1}}$$
+    CI for $OR = e^{\beta_k}$: $\left(e^{\hat\beta_k - z_{1-\alpha/2}\cdot se(\hat\beta_k)},\; e^{\hat\beta_k + z_{1-\alpha/2}\cdot se(\hat\beta_k)}\right)$
+  </div>
+
+  <h3>Profile-likelihood CI (preferred)</h3>
+  <div class="key-point">
+    The profile-likelihood CI inverts the LR test: it consists of all values $\beta_{k0}$ for which $H_0: \beta_k = \beta_{k0}$ is not rejected at level $\alpha$:
+    $$G^2 = 2[\ell_1(\hat\beta_k) - \ell_1(\beta_{k0})] \leq \chi^2_{1,1-\alpha}$$
+    where $\ell_1(\beta_k) = \max_{\boldsymbol{\beta}_{-k}} \ell(\beta_k, \boldsymbol{\beta}_{-k})$ is the profile log-likelihood.
+  </div>
+
+  <table>
+    <thead><tr><th>Method</th><th>R command</th><th>Advantage</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Wald</strong></td><td><code>confint.default(model)</code></td><td>Fast, simple</td><td>Symmetric on $\beta$ scale; poor for small $n$; not invariant</td></tr>
+      <tr><td><strong>Profile-LR</strong></td><td><code>confint(model)</code></td><td>Better coverage; invariant to reparametrisation</td><td>Computationally heavier (refits model)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Donner party — 95% CI for gender effect ($\beta_2$):</strong><br>
+    Profile-LR: $(0.144,\; 2.048)$ → OR CI: $(e^{0.144}, e^{2.048}) = (1.154,\; 7.753)$<br>
+    Wald: $(0.123,\; 2.013)$ → OR CI: $(1.131,\; 7.488)$<br>
+    Both exclude OR = 1, confirming the significant gender effect. The profile-LR CI is slightly wider and asymmetric on the OR scale — more appropriate for this small dataset.
+  </div>
+
+  <div class="key-point">
+    <strong>CI for predicted probability $\pi(\mathbf{x})$:</strong> If $(L, U)$ is a CI for $\mathbf{x}^T\boldsymbol{\beta}$, then the CI for $\pi(\mathbf{x})$ is:
+    $$\left(\frac{1}{1+e^{-L}},\; \frac{1}{1+e^{-U}}\right)$$
+    This correctly respects the $(0,1)$ constraint for probabilities.
+  </div>
+</div>
+
+<!-- 10. Odds & Odds Ratios -->
+<div class="notes-section" id="odds">
+  <h2>10. Odds and Odds Ratios</h2>
+
+  <h3>Odds</h3>
+  <div class="theorem-box">
+    <strong>Odds of "success":</strong>
+    $$\Theta = \frac{P(y=1)}{P(y=0)} = \frac{\pi}{1-\pi}$$
+    Range: $0 < \Theta < \infty$. If $\pi = 2/3$: $\Theta = 2$ ("2 to 1 in favour"). If $\pi = 1/3$: $\Theta = 1/2$ ("1 to 2 against").
+  </div>
+
+  <h3>Odds Ratio (OR)</h3>
+  <div class="theorem-box">
+    <strong>Odds Ratio — the fundamental measure of association in logistic regression:</strong>
+    $$OR = \frac{\Theta_{y=1 \mid x=1}}{\Theta_{y=1 \mid x=0}} = \frac{P(y=1\mid x=1)/P(y=0\mid x=1)}{P(y=1\mid x=0)/P(y=0\mid x=0)}$$
+    Properties: $OR > 0$; $OR = 1 \Leftrightarrow$ independence; $OR > 1 \Leftrightarrow$ positive association; $OR < 1 \Leftrightarrow$ negative association.
+  </div>
+
+  <div class="key-point">
+    <strong>The fundamental connection between $\beta_1$ and the OR (binary predictor):</strong>
+    Substituting the logistic model expressions for $P(y=1\mid x=0)$ and $P(y=1\mid x=1)$:
+    $$OR = e^{\beta_1} \qquad \Longleftrightarrow \qquad \beta_1 = \ln(OR)$$
+    The regression coefficient on the logit scale is the log-odds ratio. This holds exactly for binary predictors and approximately (as the change in log-odds per unit increase) for continuous predictors.
+  </div>
+
+  <div class="example-box">
+    <strong>Hypothetical 2×2 table:</strong> Women: $P(\text{survive}) = 2/3$, $\Theta_{\text{women}} = 2$. Men: $P(\text{survive}) = 1/3$, $\Theta_{\text{men}} = 1/2$.<br>
+    $OR = 2 / (1/2) = 4$ — women's survival odds are 4 times men's odds.<br>
+    If instead both have $P(\text{survive}) = 2/3$: $OR = 2/2 = 1$ — no association.
+  </div>
+</div>
+
+<!-- 11. Interpretation -->
+<div class="notes-section" id="interp">
+  <h2>11. Interpretation of Logistic Regression Coefficients</h2>
+
+  <table>
+    <thead><tr><th>Predictor type</th><th>$\beta_k$ meaning</th><th>$e^{\beta_k}$ meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Binary ($x_k \in \{0,1\}$)</td><td>Log-OR comparing $x_k=1$ vs $x_k=0$, holding other predictors fixed</td><td>OR: multiplicative factor for the odds when $x_k$ changes from 0 to 1</td></tr>
+      <tr><td>Continuous $x_k$</td><td>Change in log-odds per unit increase in $x_k$, all other predictors held fixed</td><td>OR: multiplicative factor for the odds per unit increase in $x_k$</td></tr>
+      <tr><td>Continuous $x_k$, $c$-unit change</td><td>$c \cdot \beta_k$: change in log-odds</td><td>$e^{c\beta_k}$: OR for a $c$-unit increase in $x_k$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Donner party interpretations:</strong><br>
+    Estimated model: $\text{logit}[\hat P(y=1 \mid \text{age, fem})] = 0.553 - 0.035\cdot\text{age} + 1.067\cdot\text{fem}$<br><br>
+    <strong>Gender ($\hat\beta_2 = 1.067$):</strong> $\widehat{OR} = e^{1.067} \approx 2.91$. The odds of survival for a woman are approximately 3 times the odds for a man of the <em>same age</em>. This adjusted OR does not depend on age (the OR is constant across all ages — a key property of logistic regression with no interaction term).<br><br>
+    <strong>Age ($\hat\beta_1 = -0.0356$):</strong> $\widehat{OR} = e^{-0.0356} \approx 0.965$. Each additional year of age is associated with a 3.5% decrease in the survival odds for both men and women (adjusted).<br><br>
+    <strong>10-year age increase:</strong> $\widehat{OR} = e^{-0.0356 \times 10} = e^{-0.356} \approx 0.70$. A 10-year age increase is associated with a 30% decrease in survival odds.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Common interpretation errors:</strong><br>
+    ✗ "$\beta_1 = -0.035$ means each year older reduces survival probability by 3.5%." Wrong — this is the effect on the <em>log-odds</em>, not the probability. The effect on probability is non-constant (depends on the current probability level).<br>
+    ✗ "OR = 3 means women are 3× more likely to survive." Wrong — OR is not a relative risk. The OR exaggerates the relative risk when events are common. OR = relative risk only when $\pi \approx 0$ (rare disease).<br>
+    ✓ Correct: "The odds of survival for women are about 3 times the odds for men of the same age."
+  </div>
+</div>
+
+<!-- 12. Prediction -->
+<div class="notes-section" id="prediction">
+  <h2>12. Predicting Survival Probabilities</h2>
+
+  <p>The fitted logistic model can predict the probability of "success" for any covariate pattern $\mathbf{x}$:</p>
+  <div class="formula-box">
+    $$\hat P(y=1 \mid \mathbf{x}) = \frac{e^{\mathbf{x}^T\hat{\boldsymbol{\beta}}}}{1 + e^{\mathbf{x}^T\hat{\boldsymbol{\beta}}}}$$
+  </div>
+
+  <div class="example-box">
+    <strong>Donner party predictions (average age 20.22 years):</strong><br>
+    a) Man, age 20.22: $\hat\eta = 0.553 - 0.035(20.22) + 1.067(0) = -0.155$<br>
+    $\hat P = e^{-0.155}/(1+e^{-0.155}) = 0.856/1.856 = 0.461$<br><br>
+    b) Woman, age 20.22: $\hat\eta = 0.553 - 0.035(20.22) + 1.067(1) = 0.912$<br>
+    $\hat P = e^{0.912}/(1+e^{0.912}) = 2.49/3.49 = 0.713$<br><br>
+    At average age, a woman had about a 71% predicted survival probability vs. 46% for a man.
+  </div>
+
+  <div class="key-point">
+    In R: <code>predict(model, newdata=..., type="response")</code> returns predicted probabilities directly. <code>type="link"</code> returns predicted log-odds ($\mathbf{x}^T\hat{\boldsymbol{\beta}}$).
+  </div>
+</div>
+
+<!-- ══════════════════════════ MCQ ══════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+  <div class="score-display" id="scoreDisplay">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+  <div id="mcqContainer"></div>
+</div>
+
+<!-- ══════════════════════════ SHORT ANSWER ══════════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Oral Exam Short Answer Questions (10)</h2>
+  <div id="saContainer"></div>
+</div>
+
+<script>
+const mcqData = [
+  // ─── TRUE / FALSE (20) ───
+  {type:'tf', q:"True or False: The logistic regression model is linear in the parameters $\\boldsymbol{\\beta}$, even though the relationship between $P(y=1\\mid\\mathbf{x})$ and $\\mathbf{x}$ is nonlinear.",
+   correct:"True",
+   explain:"The logit $\\text{logit}[\\pi(\\mathbf{x})] = \\mathbf{x}^T\\boldsymbol{\\beta}$ is linear in $\\boldsymbol{\\beta}$. The function that maps $\\mathbf{x}$ to the probability $\\pi(\\mathbf{x}) = e^{\\mathbf{x}^T\\boldsymbol{\\beta}}/(1+e^{\\mathbf{x}^T\\boldsymbol{\\beta}})$ is nonlinear in both $\\mathbf{x}$ and $\\boldsymbol{\\beta}$, but it is a member of the Generalized Linear Model (GLM) family because the logit link is linear in $\\boldsymbol{\\beta}$."},
+
+  {type:'tf', q:"True or False: In logistic regression, OLS (minimising $\\sum(y_i - \\hat\\pi_i)^2$) is an appropriate estimation method when the sample size is large.",
+   correct:"False",
+   explain:"OLS is inappropriate for binary outcomes regardless of sample size. The errors $y_i - \\pi_i$ are heteroscedastic (variance $= \\pi_i(1-\\pi_i)$ depends on $\\mathbf{x}_i$), far from normal, and OLS can predict probabilities outside $[0,1]$. Maximum Likelihood with a Bernoulli/Binomial likelihood is always the correct approach. For large $n$, MLE is asymptotically efficient (minimum variance among all consistent estimators)."},
+
+  {type:'tf', q:"True or False: The log-likelihood function of a logistic regression model is always concave, ensuring a unique global maximum for the MLE, provided the data are not perfectly separated.",
+   correct:"True",
+   explain:"The Hessian $\\mathbf{H}(\\boldsymbol{\\beta}) = -\\mathbf{X}^T\\mathbf{V}\\mathbf{X}$ is negative semi-definite (since $\\mathbf{V}$ has positive diagonal entries $n_i\\pi_i(1-\\pi_i)$). When $\\mathbf{X}$ has full rank and $0 < \\hat\\pi_i < 1$ (no perfect separation), $\\mathbf{H}$ is strictly negative definite, making the log-likelihood strictly concave with a unique global maximum."},
+
+  {type:'tf', q:"True or False: In logistic regression, $\\beta_k = \\ln(OR)$ where OR is the odds ratio for a one-unit increase in $x_k$, regardless of whether $x_k$ is binary or continuous.",
+   correct:"True",
+   explain:"For any predictor $x_k$ (binary or continuous), the odds ratio for a one-unit increase in $x_k$ (holding others fixed) is $OR = e^{\\beta_k}$, so $\\beta_k = \\ln(OR)$. For a binary predictor this is the OR comparing the two groups. For a continuous predictor this is the OR per unit increase. For a $c$-unit increase: $OR = e^{c\\beta_k}$."},
+
+  {type:'tf', q:"True or False: An odds ratio of 1 implies that the predictor and outcome are independent.",
+   correct:"True",
+   explain:"$OR = \\Theta_{y=1\\mid x=1}/\\Theta_{y=1\\mid x=0} = 1$ means the odds of success are the same whether $x=0$ or $x=1$, i.e., $\\beta_1 = \\ln(1) = 0$, indicating statistical independence between $x$ and $y$. This is entirely analogous to a zero slope in linear regression indicating no linear relationship."},
+
+  {type:'tf', q:"True or False: For logistic regression with the logit link, Newton-Raphson and Fisher Scoring produce identical updates at each iteration.",
+   correct:"True",
+   explain:"Fisher Scoring uses the expected information $\\mathbf{I}(\\boldsymbol{\\beta}) = -E[\\mathbf{H}(\\boldsymbol{\\beta})]$; Newton-Raphson uses the observed Hessian $\\mathbf{H}(\\boldsymbol{\\beta})$. For logistic regression with the canonical logit link, $\\mathbf{V} = \\text{diag}[n_i\\pi_i(1-\\pi_i)]$ does not depend on $\\mathbf{y}$, so $\\mathbf{I}(\\boldsymbol{\\beta}) = -\\mathbf{H}(\\boldsymbol{\\beta})$ exactly. Hence the two algorithms are identical."},
+
+  {type:'tf', q:"True or False: The profile-likelihood confidence interval for $\\beta_k$ is always symmetric around $\\hat\\beta_k$.",
+   correct:"False",
+   explain:"The Wald CI $\\hat\\beta_k \\pm z_{1-\\alpha/2}\\cdot se(\\hat\\beta_k)$ is symmetric by construction. The profile-likelihood CI is obtained by inverting the LR test and traces the contour of the log-likelihood surface — it is generally <em>asymmetric</em>. This asymmetry becomes particularly visible on the OR scale $(e^L, e^U)$, where the CI is never symmetric around $e^{\\hat\\beta_k}$."},
+
+  {type:'tf', q:"True or False: In the Donner party model, the OR for gender is approximately the same for all ages, because the model includes no interaction between age and gender.",
+   correct:"True",
+   explain:"The fitted model is $\\text{logit}[P] = \\hat\\beta_0 + \\hat\\beta_1\\text{age} + \\hat\\beta_2\\text{fem}$. The OR for gender at any fixed age is $e^{\\hat\\beta_2} \\approx 2.91$, which does not depend on age. This is a property of the additive logistic model — the OR is constant across all covariate patterns of the other predictors. An interaction term $\\beta_3 \\cdot \\text{age} \\times \\text{fem}$ would allow the OR to vary with age."},
+
+  {type:'tf', q:"True or False: If a logistic regression model has perfect discrimination (MLE at $\\pm\\infty$), the standard errors in the R output will typically be very large, not very small.",
+   correct:"True",
+   explain:"Under perfect separation, the MLE $\\hat{\\boldsymbol{\\beta}}$ diverges to $\\pm\\infty$ along certain directions. The Hessian $\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X}$ becomes nearly singular because $\\hat\\pi_i \\to 0$ or $1$ for all observations, making the diagonal entries of $\\hat{\\mathbf{V}}$ near zero. The estimated covariance $(\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X})^{-1}$ thus becomes huge — giving enormous standard errors. This is the diagnostic symptom, not tiny standard errors."},
+
+  {type:'tf', q:"True or False: The odds ratio is always a good approximation to the relative risk (risk ratio) for common outcomes.",
+   correct:"False",
+   explain:"The OR approximates the relative risk (RR) only when the outcome is <em>rare</em> in both groups ($\\pi \\approx 0$, so $1-\\pi \\approx 1$ and $OR = \\pi_1(1-\\pi_0)/[\\pi_0(1-\\pi_1)] \\approx \\pi_1/\\pi_0 = RR$). For common outcomes, the OR overestimates the RR when $OR > 1$ and underestimates it when $OR < 1$. This is the 'rare disease assumption'. In the Donner party, survival was common ($\\approx 55\\%$), so the OR of 2.91 substantially overstates the relative risk of survival for women."},
+
+  {type:'tf', q:"True or False: The expit function $f(\\eta) = e^\\eta/(1+e^\\eta)$ satisfies $f(-\\eta) = 1 - f(\\eta)$, making it symmetric about the point $(0, 0.5)$.",
+   correct:"True",
+   explain:"$f(-\\eta) = e^{-\\eta}/(1+e^{-\\eta})$. Multiply numerator and denominator by $e^\\eta$: $= 1/(e^\\eta + 1) = 1 - e^\\eta/(1+e^\\eta) = 1 - f(\\eta)$. ✓ This symmetry means the logistic curve is symmetric around the inflection point $(0, 0.5)$, i.e., the probability equals 0.5 when $\\eta = 0$."},
+
+  {type:'tf', q:"True or False: In a logistic regression, $e^{\\hat\\beta_0}$ (the exponentiated intercept) is interpretable as the estimated odds of success when all predictors equal zero.",
+   correct:"True",
+   explain:"When $\\mathbf{x} = \\mathbf{0}$ (all predictors are zero), $\\text{logit}[\\pi] = \\beta_0$, so $\\pi = e^{\\beta_0}/(1+e^{\\beta_0})$ and the odds are $\\pi/(1-\\pi) = e^{\\beta_0}$. Thus $e^{\\hat\\beta_0}$ is the estimated baseline odds. However, as with linear regression, this is only meaningful if $\\mathbf{x} = \\mathbf{0}$ is a plausible covariate pattern (e.g., age = 0 is not plausible in the Donner party context)."},
+
+  {type:'tf', q:"True or False: The score test for $H_0: \\beta_k = 0$ in logistic regression only requires fitting the null model (without $x_k$), not the full model.",
+   correct:"True",
+   explain:"The score test statistic is $\\mathbf{S}(\\hat{\\boldsymbol{\\beta}}_0)^T[-\\mathbf{H}(\\hat{\\boldsymbol{\\beta}}_0)]^{-1}\\mathbf{S}(\\hat{\\boldsymbol{\\beta}}_0)$ evaluated at the null MLE $\\hat{\\boldsymbol{\\beta}}_0$. This requires only fitting the restricted (null) model. This computational advantage — fitting only one model — is precisely why the score test is useful when the full model is expensive to fit (important in GLMs and survival models)."},
+
+  {type:'tf', q:"True or False: A logistic regression model can be used to obtain predicted probabilities for any covariate combination, including those not observed in the data, as long as the model is correctly specified.",
+   correct:"True",
+   explain:"The logistic model $\\hat\\pi(\\mathbf{x}) = e^{\\mathbf{x}^T\\hat{\\boldsymbol{\\beta}}}/(1+e^{\\mathbf{x}^T\\hat{\\boldsymbol{\\beta}}})$ can be evaluated at any $\\mathbf{x}$, since $\\hat{\\boldsymbol{\\beta}}$ is estimated from the data. The predictions are valid if the model structure (linearity on the logit scale, distributional assumptions) holds. Extrapolation far outside the observed covariate range carries the same risks as in linear regression."},
+
+  {type:'tf', q:"True or False: In R, the deviance displayed in the output of a logistic regression model using <code>glm()</code> is $-2\\ell(\\hat{\\boldsymbol{\\beta}})$ evaluated at the fitted model.",
+   correct:"False",
+   explain:"In R's GLM output, the <strong>residual deviance</strong> is $-2[\\ell(\\hat{\\boldsymbol{\\beta}}) - \\ell(\\hat{\\boldsymbol{\\beta}}_\\text{sat})]$, where $\\hat{\\boldsymbol{\\beta}}_\\text{sat}$ is the MLE of the <em>saturated model</em> (one parameter per observation, perfect fit). It is twice the log-likelihood ratio of the fitted model vs. the saturated model. The <strong>null deviance</strong> uses the intercept-only model instead of the fitted model."},
+
+  {type:'tf', q:"True or False: Because $e^{\\hat\\beta_k}$ is the estimated OR, a 95% confidence interval for the OR is simply $(e^{\\hat\\beta_k - 1.96\\cdot se(\\hat\\beta_k)}, e^{\\hat\\beta_k + 1.96\\cdot se(\\hat\\beta_k)})$ for the Wald method.",
+   correct:"True",
+   explain:"The Wald CI for $\\beta_k$ is $\\hat\\beta_k \\pm z_{0.975}\\cdot se(\\hat\\beta_k)$. Exponentiating both endpoints gives the CI for $OR = e^{\\beta_k}$: $(e^{\\hat\\beta_k - 1.96\\cdot se}, e^{\\hat\\beta_k + 1.96\\cdot se})$. This is always positive (since exponentials are positive) and correctly respects $OR > 0$. However, because the Wald interval on the $\\beta$ scale can have poor coverage, the profile-likelihood approach is preferred."},
+
+  {type:'tf', q:"True or False: The Donner party analysis shows that men were more likely to survive than women, after adjusting for age.",
+   correct:"False",
+   explain:"The estimated coefficient for gender is $\\hat\\beta_2 = 1.067 > 0$ for women (fem=1), with $\\widehat{OR} = e^{1.067} \\approx 2.91$. This means women had higher survival odds — approximately 3 times the odds of men of the same age. The $p$-value for this gender effect is significant at 5% level ($p \\approx 0.027$). So women were more likely to survive, not men."},
+
+  {type:'tf', q:"True or False: In the logistic regression score equations, $\\sum_{i=1}^N [y_i - n_i \\hat\\pi_i] = 0$, meaning the sum of observed counts equals the sum of fitted expected counts.",
+   correct:"True",
+   explain:"This follows directly from the score equation for the intercept. Setting $\\partial\\ell/\\partial\\beta_0 = 0$: $\\sum_i (y_i - n_i\\pi_i(\\boldsymbol{\\beta})) = 0$ at $\\hat{\\boldsymbol{\\beta}}$. This is analogous to $\\sum e_i = 0$ in OLS (which follows from the intercept normal equation). It guarantees that the total predicted events equals the total observed events."},
+
+  {type:'tf', q:"True or False: The odds ratio is symmetric: if the OR for exposure vs. non-exposure is $\\theta$, then the OR for non-exposure vs. exposure is $1/\\theta$.",
+   correct:"True",
+   explain:"$OR_{\\text{exposed vs. unexposed}} = \\Theta_1/\\Theta_0 = e^{\\beta_1}$. Reversing the comparison: $OR_{\\text{unexposed vs. exposed}} = \\Theta_0/\\Theta_1 = 1/e^{\\beta_1} = e^{-\\beta_1}$. This symmetry is useful in case-control studies: the OR for disease given exposure equals the OR for exposure given disease (Bayes' theorem for 2×2 tables). No such symmetry holds for the relative risk."},
+
+  {type:'tf', q:"True or False: Larger $|\\beta_1|$ in the logistic model $P(y=1\\mid x) = e^{\\beta_0+\\beta_1 x}/(1+e^{\\beta_0+\\beta_1 x})$ corresponds to a steeper S-curve (faster transition from 0 to 1).",
+   correct:"True",
+   explain:"The slope of the expit function at its inflection point ($\\eta = 0$, i.e., $\\pi = 0.5$) is $\\beta_1/4$. Larger $|\\beta_1|$ means the probability changes more rapidly per unit increase in $x$. As $|\\beta_1| \\to \\infty$, the expit approaches a step function. As $\\beta_1 \\to 0$, the curve flattens to a horizontal line at $\\pi = e^{\\beta_0}/(1+e^{\\beta_0})$."},
+
+  // ─── MULTIPLE CHOICE (30) ───
+  {type:'mc', q:"In the Donner party logistic regression, the estimated survival probability for a woman aged 20.22 is approximately 0.711. If instead you used a linear probability model and obtained $\\hat P = 0.711$ for the same woman, what key limitation would you encounter when predicting for an older woman aged 80?",
+   options:["A. The linear model would give a probability above 1","B. The linear model would give a negative log-odds","C. The linear model standard errors would be too small","D. The linear model would have higher $R^2$ than the logistic model"],
+   correct:"A. The linear model would give a probability above 1",
+   explain:"With $\\hat\\beta_1 = -0.035$ for age, each year of age reduces the predicted probability by 0.035 in a linear model. At age 80 for a woman: $0.711 + (-0.035)(80-20.22) \\approx 0.711 - 2.09 = -1.38$ — a large negative value, violating the constraint $P \\in [0,1]$. The logistic model's expit function guarantees predicted probabilities stay in $(0,1)$ for any covariate value."},
+
+  {type:'mc', q:"The logit of a probability $\\pi$ is defined as $\\ln[\\pi/(1-\\pi)]$. If $\\pi = 0.8$, what is the logit?",
+   options:["A. $\\ln(0.8) \\approx -0.22$","B. $\\ln(4) \\approx 1.39$","C. $\\ln(0.25) \\approx -1.39$","D. $0.8$"],
+   correct:"B. $\\ln(4) \\approx 1.39$",
+   explain:"$\\text{logit}(0.8) = \\ln[0.8/0.2] = \\ln(4) \\approx 1.386$. The odds of success when $\\pi = 0.8$ are $0.8/0.2 = 4$, and the log-odds (logit) is $\\ln(4) \\approx 1.39$. Note: the logit is positive for $\\pi > 0.5$, zero for $\\pi = 0.5$, and negative for $\\pi < 0.5$."},
+
+  {type:'mc', q:"In the Donner party model $\\text{logit}[\\hat P] = 0.553 - 0.035\\cdot\\text{age} + 1.067\\cdot\\text{fem}$, what is the estimated OR for a 10-year increase in age?",
+   options:["A. $e^{-0.035} \\approx 0.97$","B. $e^{-0.35} \\approx 0.70$","C. $e^{0.35} \\approx 1.42$","D. $-0.35$"],
+   correct:"B. $e^{-0.35} \\approx 0.70$",
+   explain:"For a $c = 10$ unit increase in age: $OR = e^{10 \\times \\hat\\beta_1} = e^{10 \\times (-0.0356)} = e^{-0.356} \\approx 0.70$. This means a 10-year age increase is associated with a 30% decrease in the odds of survival (holding gender fixed). This is more interpretable than the per-year OR of $e^{-0.0356} \\approx 0.965$ (3.5% decrease per year)."},
+
+  {type:'mc', q:"The logistic regression Hessian is $\\mathbf{H}(\\boldsymbol{\\beta}) = -\\mathbf{X}^T\\mathbf{V}\\mathbf{X}$ where $\\mathbf{V} = \\text{diag}[n_i\\pi_i(1-\\pi_i)]$. What happens to the weights $n_i\\pi_i(1-\\pi_i)$ when $\\pi_i \\to 0$ or $\\pi_i \\to 1$?",
+   options:["A. They approach 1","B. They approach 0","C. They approach $n_i/4$","D. They become undefined"],
+   correct:"B. They approach 0",
+   explain:"$n_i\\pi_i(1-\\pi_i)$ is maximised when $\\pi_i = 0.5$ (giving $n_i/4$) and approaches 0 as $\\pi_i \\to 0$ or $\\pi_i \\to 1$. Under perfect separation, all $\\hat\\pi_i \\to 0$ or $1$, making all weights approach 0 and $\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X}$ singular. The covariance $(\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X})^{-1}$ blows up — this is why standard errors are enormous under separation."},
+
+  {type:'mc', q:"A medical researcher fits a logistic regression and reports OR = 2.5 for a binary exposure variable. Which statement is the most precise interpretation?",
+   options:["A. Exposed subjects are 2.5 times more likely to develop the disease","B. The odds of disease for exposed subjects are 2.5 times the odds for unexposed subjects","C. The disease is 2.5 times more common in exposed subjects","D. The relative risk of disease is 2.5 in the exposed group"],
+   correct:"B. The odds of disease for exposed subjects are 2.5 times the odds for unexposed subjects",
+   explain:"The OR is a ratio of odds, not of probabilities or risks. 'Times more likely' (A) and 'more common' (C) conflate OR with relative risk. 'Relative risk = 2.5' (D) is only approximately true when disease is rare. Option B is the exact, correct interpretation. The OR = relative risk (RR) only when the outcome prevalence is near zero in both groups ('rare disease assumption')."},
+
+  {type:'mc', q:"In R, <code>glm(y ~ x, family=binomial(link='logit'))</code> is fitted. The summary shows: Intercept: 1.2 (se=0.3), x: -0.8 (se=0.2). What is the estimated probability of success when $x = 2$?",
+   options:["A. $e^{0.4}/(1+e^{0.4}) \\approx 0.60$","B. $e^{-0.4}/(1+e^{-0.4}) \\approx 0.40$","C. $1.2 - 0.8(2) = -0.4$","D. $e^{1.2 - 0.8(2)} = e^{-0.4} \\approx 0.67$"],
+   correct:"B. $e^{-0.4}/(1+e^{-0.4}) \\approx 0.40$",
+   explain:"$\\hat\\eta = 1.2 - 0.8(2) = 1.2 - 1.6 = -0.4$. $\\hat\\pi = e^{-0.4}/(1+e^{-0.4}) = 0.670/(1+0.670) = 0.670/1.670 \\approx 0.401$. Option C gives the logit (not the probability) and D confuses $e^\\eta$ with $e^\\eta/(1+e^\\eta)$. Always apply the expit to convert from logit to probability."},
+
+  {type:'mc', q:"Which of the following is NOT a reason to prefer the profile-likelihood confidence interval over the Wald interval in logistic regression?",
+   options:["A. The profile-LR CI is invariant to reparametrisation of the model","B. The profile-LR CI is always symmetric around $\\hat\\beta_k$","C. The profile-LR CI has better coverage in small samples","D. The profile-LR CI is based on inverting the LR test, which has better finite-sample properties than the Wald test"],
+   correct:"B. The profile-LR CI is always symmetric around $\\hat\\beta_k$",
+   explain:"The profile-LR CI is generally <em>asymmetric</em> — this is a feature, not a bug, as it correctly reflects the asymmetry of the log-likelihood surface. The Wald CI is symmetric by construction but may have poor coverage in small samples. Options A, C, and D are all valid advantages of the profile-LR approach."},
+
+  {type:'mc', q:"The score equations for logistic regression require $\\sum_{i=1}^N x_{ki}[y_i - n_i\\hat\\pi_i] = 0$ for each predictor $k$. What is the direct analogy in OLS linear regression?",
+   options:["A. $\\sum e_i^2 = 0$","B. $\\sum x_{ki} e_i = 0$ (the normal equations)","C. $\\hat\\beta_k = SS_{xy}/SS_{xx}$","D. $MSE = SSE/(n-2)$"],
+   correct:"B. $\\sum x_{ki} e_i = 0$ (the normal equations)",
+   explain:"In OLS, the normal equations set $\\sum e_i = 0$ (for intercept) and $\\sum x_{ki}e_i = 0$ (for each slope), where $e_i = y_i - \\hat y_i$ are residuals. In logistic regression, the score equations similarly set $\\sum [y_i - n_i\\hat\\pi_i] = 0$ and $\\sum x_{ki}[y_i - n_i\\hat\\pi_i] = 0$, where $y_i - n_i\\hat\\pi_i$ plays the role of residuals (Pearson-type residuals). The structure of both sets of equations is the same: observed = fitted, weighted by the predictor."},
+
+  {type:'mc', q:"In a 2×2 table with $P(y=1 \\mid x=1) = 0.6$ and $P(y=1 \\mid x=0) = 0.4$, what is the odds ratio $OR$?",
+   options:["A. $0.6/0.4 = 1.5$ (relative risk)","B. $(0.6/0.4) \\div (0.4/0.6) = 2.25$","C. $(0.6 \\times 0.6) / (0.4 \\times 0.4) = 2.25$","D. $0.6 - 0.4 = 0.2$ (risk difference)"],
+   correct:"B. $(0.6/0.4) \\div (0.4/0.6) = 2.25$",
+   explain:"$\\Theta_1 = P(y=1\\mid x=1)/P(y=0\\mid x=1) = 0.6/0.4 = 1.5$. $\\Theta_0 = P(y=1\\mid x=0)/P(y=0\\mid x=0) = 0.4/0.6 = 0.667$. $OR = \\Theta_1/\\Theta_0 = 1.5/0.667 = 2.25$. Also $= (0.6 \\times 0.6)/(0.4 \\times 0.4) = 0.36/0.16 = 2.25$. The relative risk = $0.6/0.4 = 1.5$, which is less than OR = 2.25 because the outcome is common — illustrating that OR overestimates RR for common outcomes."},
+
+  {type:'mc', q:"Which test statistic in logistic regression requires fitting <em>both</em> the full model and the null model?",
+   options:["A. Wald test only","B. Score (Rao) test only","C. Likelihood Ratio test only","D. Both the Score and Wald tests"],
+   correct:"C. Likelihood Ratio test only",
+   explain:"The LR test statistic $G^2 = -2[\\ell(\\hat{\\boldsymbol{\\beta}}_0) - \\ell(\\hat{\\boldsymbol{\\beta}})]$ requires the maximised log-likelihoods under both $H_0$ (null/restricted model) and $H_1$ (full model) — two model fits. The Wald test only needs $\\hat{\\boldsymbol{\\beta}}$ (full model). The Score test only needs $\\hat{\\boldsymbol{\\beta}}_0$ (null model). This is the computational tradeoff described in Chapter 2 (Holy Trinity)."},
+
+  {type:'mc', q:"What is the maximum value of the weight $n_i\\pi_i(1-\\pi_i)$ in the logistic regression Hessian, and at what probability $\\pi_i$ does it occur?",
+   options:["A. $n_i/4$ at $\\pi_i = 0.5$","B. $n_i$ at $\\pi_i = 1$","C. $n_i/2$ at $\\pi_i = 0.5$","D. $n_i/3$ at $\\pi_i = 1/3$"],
+   correct:"A. $n_i/4$ at $\\pi_i = 0.5$",
+   explain:"$f(\\pi) = \\pi(1-\\pi)$ is maximised at $\\pi = 0.5$ where $f(0.5) = 0.25 = 1/4$. Multiplying by $n_i$: maximum weight is $n_i/4$. This means the Fisher information (and hence the precision of $\\hat{\\boldsymbol{\\beta}}$) is greatest when $\\pi_i = 0.5$ and smallest near $\\pi_i = 0$ or $1$. In experimental design, this suggests collecting data at covariate values that make $\\pi \\approx 0.5$ to maximise information."},
+
+  {type:'mc', q:"A researcher fits a logistic regression with three predictors and reports AIC = 120 for the full model and AIC = 125 for a model with one predictor removed. What should they conclude?",
+   options:["A. The full model is preferred because it has lower AIC","B. The reduced model is preferred because it is more parsimonious","C. Neither model is adequate because AIC > 100","D. The LR test must be consulted; AIC alone is insufficient"],
+   correct:"A. The full model is preferred because it has lower AIC",
+   explain:"AIC = $-2\\ell(\\hat{\\boldsymbol{\\beta}}) + 2p$ (where $p$ = number of parameters) penalises model complexity. Lower AIC indicates a better balance of fit and parsimony. AIC = 120 < AIC = 125, so the full model is preferred. AIC is used for model selection (not hypothesis testing), and the absolute value has no meaningful threshold — only relative comparisons matter."},
+
+  {type:'mc', q:"In logistic regression, what does the 'null deviance' represent in R's glm summary output?",
+   options:["A. $-2\\ell(\\hat{\\boldsymbol{\\beta}})$ for the fitted model","B. $-2[\\ell_{\\text{intercept-only}} - \\ell_{\\text{saturated}}]$: deviance of the intercept-only model","C. $-2[\\ell_{\\text{fitted}} - \\ell_{\\text{intercept-only}}]$: improvement of the fitted model over baseline","D. The total sum of squares analogous to SSTO in linear regression"],
+   correct:"B. $-2[\\ell_{\\text{intercept-only}} - \\ell_{\\text{saturated}}]$: deviance of the intercept-only model",
+   explain:"The null deviance is the deviance of the intercept-only (null) model against the saturated model. The residual deviance is the deviance of the fitted model against the saturated model. Their difference = $-2[\\ell_{\\text{intercept-only}} - \\ell_{\\text{fitted}}]$ is the LR test statistic for $H_0$: all slopes are zero. The 'degrees of freedom' shown alongside each deviance refer to the number of observations minus the number of parameters."},
+
+  {type:'mc', q:"If $P(y=1 \\mid x) = e^{-2+0.5x}/(1+e^{-2+0.5x})$, at what value of $x$ does the probability equal 0.5?",
+   options:["A. $x = 0$","B. $x = 2$","C. $x = 4$","D. $x = -4$"],
+   correct:"C. $x = 4$",
+   explain:"$P = 0.5$ when $\\eta = 0$, i.e., $-2 + 0.5x = 0 \\Rightarrow x = 4$. This is sometimes called the 'LD50' (lethal dose for 50%) in toxicology or the 'cutpoint' of the logistic curve. Generally, $P(y=1) = 0.5$ when $\\eta = \\mathbf{x}^T\\boldsymbol{\\beta} = 0$, i.e., when $\\beta_0 + \\beta_1 x = 0 \\Rightarrow x = -\\beta_0/\\beta_1 = 2/0.5 = 4$."},
+
+  {type:'mc', q:"The covariance matrix $\\widehat{\\text{Cov}}(\\hat{\\boldsymbol{\\beta}}) = (\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X})^{-1}$ in logistic regression corresponds to which quantity in ordinary linear regression?",
+   options:["A. $MSE \\cdot (\\mathbf{X}^T\\mathbf{X})^{-1}$","B. $(\\mathbf{X}^T\\mathbf{X})^{-1}$","C. $\\sigma^2 \\cdot \\mathbf{I}_p$","D. $MSE$"],
+   correct:"A. $MSE \\cdot (\\mathbf{X}^T\\mathbf{X})^{-1}$",
+   explain:"In linear regression, $\\text{Cov}(\\hat{\\boldsymbol{\\beta}}) = \\sigma^2(\\mathbf{X}^T\\mathbf{X})^{-1}$, estimated by $MSE(\\mathbf{X}^T\\mathbf{X})^{-1}$. In logistic regression, $(\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X})^{-1}$ plays the same role, with $\\hat{\\mathbf{V}} = \\text{diag}[n_i\\hat\\pi_i(1-\\hat\\pi_i)]$ incorporating the heteroscedastic binomial variances. When $n_i = 1$ and $\\hat\\pi_i = 0.5$ for all $i$, $\\hat{\\mathbf{V}} = \\mathbf{I}/4$ and $(\\mathbf{X}^T\\hat{\\mathbf{V}}\\mathbf{X})^{-1} = 4(\\mathbf{X}^T\\mathbf{X})^{-1}$."},
+
+  {type:'mc', q:"Which of the following correctly describes the relationship between the logistic regression model and the linear probability model (LPM)?",
+   options:["A. The LPM is a special case of logistic regression when $n$ is large","B. Logistic regression uses a logit link to constrain predictions to $(0,1)$; the LPM uses the identity link and can give predictions outside $(0,1)$","C. Both models produce identical parameter estimates when fitted by MLE","D. The LPM is preferred for rare outcomes; logistic regression for common outcomes"],
+   correct:"B. Logistic regression uses a logit link to constrain predictions to $(0,1)$; the LPM uses the identity link and can give predictions outside $(0,1)$",
+   explain:"The linear probability model $P(y=1\\mid\\mathbf{x}) = \\mathbf{x}^T\\boldsymbol{\\beta}$ uses the identity link — it directly models the probability as a linear function. While easy to interpret (slopes = changes in probability), it can produce predicted probabilities below 0 or above 1. Logistic regression uses the logit link to guarantee $(0,1)$ predictions and assumes a more natural distributional form (Bernoulli/Binomial). The two models are not special cases of each other."},
+
+  {type:'mc', q:"What is the interpretation of the z-statistic (e.g., $z = 2.21$ for gender in the Donner party R output) in the context of logistic regression?",
+   options:["A. It follows a t-distribution with $n-p$ degrees of freedom exactly","B. It is a Wald test statistic: $\\hat\\beta_k/se(\\hat\\beta_k)$, approximately $\\mathcal{N}(0,1)$ under $H_0: \\beta_k = 0$","C. It is the square root of the LR test statistic","D. It measures the number of standard deviations between the OR and 1"],
+   correct:"B. It is a Wald test statistic: $\\hat\\beta_k/se(\\hat\\beta_k)$, approximately $\\mathcal{N}(0,1)$ under $H_0: \\beta_k = 0$",
+   explain:"Unlike linear regression (where t-tests are exact under normality), logistic regression has no exact distributional result for $\\hat{\\boldsymbol{\\beta}}$. The z-statistic $\\hat\\beta_k/se(\\hat\\beta_k)$ is an asymptotic Wald test: under $H_0$, it converges to $\\mathcal{N}(0,1)$ as $n\\to\\infty$. R uses $z$, not $t$, because the asymptotic normal approximation is appropriate (no exact t-distribution exists for non-normal likelihoods). For large $n$, $z$ and $t$ give nearly identical results."},
+
+  {type:'mc', q:"In the morbidity dose-response experiment, the logistic model fits better than the linear model because:",
+   options:["A. The logistic model has more parameters","B. The logistic model ensures predicted proportions stay in $[0,1]$ and captures the S-shaped dose-response pattern","C. The linear model violates the independence assumption","D. The logistic model minimises the sum of squared residuals more effectively"],
+   correct:"B. The logistic model ensures predicted proportions stay in $[0,1]$ and captures the S-shaped dose-response pattern",
+   explain:"At high doses (20 mg), the observed proportion is $19/20 = 0.95$, but the linear fit gives a predicted proportion above 1. The logistic model: (1) guarantees predictions in $(0,1)$, and (2) correctly models the S-shape of dose-response relationships (sigmoid curve). The linear model has the same number of free parameters, doesn't violate independence, and minimises a different objective (weighted deviance for logistic vs. sum of squares for OLS)."},
+
+  {type:'mc', q:"A logistic regression model has $\\hat\\beta_0 = 0.4$ and $\\hat\\beta_1 = -1.2$ for a continuous predictor $x$. By how much does the log-odds change if $x$ increases from 2 to 5?",
+   options:["A. Increases by $3 \\times 1.2 = 3.6$","B. Decreases by $3 \\times 1.2 = 3.6$","C. Decreases by $1.2$","D. Increases by $1.2$"],
+   correct:"B. Decreases by $3 \\times 1.2 = 3.6$",
+   explain:"The change in log-odds = $\\hat\\beta_1 \\times (x_{\\text{new}} - x_{\\text{old}}) = (-1.2)(5-2) = -3.6$. Since $\\hat\\beta_1 < 0$, the log-odds decrease as $x$ increases. The corresponding change in OR is $e^{-3.6} \\approx 0.027$ — the odds at $x=5$ are only about 2.7% of the odds at $x=2$, a dramatic reduction."},
+
+  {type:'mc', q:"In a logistic regression with both a continuous predictor (age) and a binary predictor (gender), the estimated OR for gender is interpreted as:",
+   options:["A. The OR comparing women to men at the mean age","B. The OR comparing women to men at any fixed age (the adjusted OR, constant across all ages)","C. The OR comparing women to men in the population regardless of age","D. The ratio of the probabilities of survival for women versus men"],
+   correct:"B. The OR comparing women to men at any fixed age (the adjusted OR, constant across all ages)",
+   explain:"In a logistic model without an interaction term $\\text{logit}[\\pi] = \\beta_0 + \\beta_1\\text{age} + \\beta_2\\text{fem}$, the OR for gender is $e^{\\beta_2}$, which does not depend on age. This is the gender OR 'adjusted for' (controlling for) age, and it is constant across all ages. Adding an interaction term $\\beta_3 \\cdot \\text{age} \\times \\text{fem}$ would allow the OR to vary with age. Option A (mean age) is not wrong per se, but B is the complete and correct answer."},
+
+  {type:'mc', q:"Why is the OR preferred over the relative risk (RR) as the measure of association in case-control studies?",
+   options:["A. OR is easier to calculate from logistic regression","B. In case-control studies, disease prevalence in the sample doesn't reflect the population; OR is unaffected by the sampling scheme while RR is not","C. OR is always larger than RR, making effects seem more dramatic","D. RR requires knowing absolute risks which are available in case-control studies"],
+   correct:"B. In case-control studies, disease prevalence in the sample doesn't reflect the population; OR is unaffected by the sampling scheme while RR is not",
+   explain:"In a case-control study, cases and controls are selected by investigators — the proportion of cases does not reflect population prevalence. The RR requires knowing $P(\\text{disease}\\mid\\text{exposed})$ and $P(\\text{disease}\\mid\\text{unexposed})$ which are not estimable from case-control data (because sampling is by outcome, not exposure). However, the OR is identical whether you condition on exposure or disease status (Bayes theorem for 2×2 tables) — so OR is the appropriate measure for case-control designs."},
+
+  {type:'mc', q:"Given the Donner party R output: Residual deviance = 108.87 on 85 df; Null deviance = 120.86 on 87 df. What does the difference in deviances (11.99) with 2 df test?",
+   options:["A. $H_0$: both age and gender have no effect (all slopes = 0)","B. $H_0$: only gender has no effect (gender = 0)","C. $H_0$: the model fits as well as the saturated model","D. $H_0$: age has no effect (age = 0) after controlling for gender"],
+   correct:"A. $H_0$: both age and gender have no effect (all slopes = 0)",
+   explain:"The null deviance corresponds to the intercept-only model (0 predictors, 87 df = 88 - 1 parameter). The residual deviance corresponds to the fitted model with age + gender (85 df = 88 - 3 parameters). The difference $120.86 - 108.87 = 11.99$ with $87 - 85 = 2$ df is the LR test of $H_0: \\beta_1 = \\beta_2 = 0$ (both slopes are zero). Under $H_0$, this follows $\\chi^2(2)$; $p\\text{-value} = P(\\chi^2_2 > 11.99) \\approx 0.0025$ — strong evidence against the null."},
+
+  {type:'mc', q:"In logistic regression, the Bernoulli case (individual-level binary data) and the Binomial case (grouped count data) are related. Which statement is correct?",
+   options:["A. They always give different MLE for $\\boldsymbol{\\beta}$ because the likelihoods differ","B. They give the same MLE for $\\boldsymbol{\\beta}$ when the data are consistent (same covariate patterns grouped together)","C. The Bernoulli case has more parameters than the Binomial case","D. The Binomial case is only valid for designed experiments with equal group sizes"],
+   correct:"B. They give the same MLE for $\\boldsymbol{\\beta}$ when the data are consistent (same covariate patterns grouped together)",
+   explain:"The Binomial case arises when multiple observations share the same covariate pattern $\\mathbf{x}_i$, so they can be grouped: $y_i = \\sum_j y_{ij} \\sim \\text{Bin}(n_i, \\pi_i)$. The Bernoulli case has $n_i = 1$ for each observation. The log-likelihood for both cases, when evaluated at the same parameter values, gives identical $\\hat{\\boldsymbol{\\beta}}$ (the Bernoulli likelihood is a special case of Binomial with $n_i = 1$). Goodness-of-fit tests (deviance, Pearson) do differ between the two formulations."},
+
+  {type:'mc', q:"True or False: The estimated odds ratio $\\widehat{OR} = e^{\\hat\\beta_k}$ is a consistent estimator of the true OR as $n \\to \\infty$.",
+   options:["True","False"],
+   correct:"True",
+   explain:"The MLE $\\hat{\\boldsymbol{\\beta}} \\xrightarrow{p} \\boldsymbol{\\beta}$ as $n \\to \\infty$ (consistency of MLE under regularity conditions). Since the exponential function is continuous, by the continuous mapping theorem $e^{\\hat\\beta_k} \\xrightarrow{p} e^{\\beta_k} = OR$. So $\\widehat{OR}$ is a consistent (and efficient, by the invariance of MLE) estimator of the true OR."},
+];
+
+const saData = [
+  {q:"Explain why the linear probability model is inadequate for binary outcomes, and derive the logistic regression model as a solution. Why is the logit the natural link function for Bernoulli/Binomial data?",
+   followups:[
+     "What other link functions could be used for binary outcomes, and when might they be preferred over the logit?",
+     "What is the 'canonical link' for the Binomial family, and why is it important for computation?",
+     "If $P(y=1\\mid x) = 0.5 + 0.3x$ is fitted by OLS, at what value of $x$ does the model become nonsensical?"
+   ],
+   a:"<strong>Problem with linear probability model:</strong> For binary $y_i \\in \\{0,1\\}$, $E(y_i \\mid \\mathbf{x}_i) = P(y_i=1 \\mid \\mathbf{x}_i) = \\pi_i \\in [0,1]$. A linear model $\\pi_i = \\mathbf{x}_i^T\\boldsymbol{\\beta}$ is unbounded: for extreme $\\mathbf{x}$, predictions fall outside $[0,1]$. Additionally, $\\text{Var}(y_i \\mid \\mathbf{x}_i) = \\pi_i(1-\\pi_i)$ depends on $\\mathbf{x}_i$ (heteroscedastic), violating OLS assumptions. Error distribution is Bernoulli, not normal.<br><br><strong>Solution — use a link function:</strong> We need $g: [0,1] \\to \\mathbb{R}$ such that $g(\\pi_i) = \\mathbf{x}_i^T\\boldsymbol{\\beta}$ is unrestricted. The <em>logit</em>:<br>$$g(\\pi) = \\ln\\frac{\\pi}{1-\\pi} \\in (-\\infty, +\\infty) \\text{ for } \\pi \\in (0,1)$$<br>is the canonical link for the Binomial family. Setting $\\text{logit}(\\pi_i) = \\mathbf{x}_i^T\\boldsymbol{\\beta}$ and inverting:<br>$$\\pi_i = \\frac{e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}}{1+e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}} \\in (0,1) \\text{ always}$$<br><strong>Why logit is canonical:</strong> The Binomial PMF belongs to the exponential family: $\\pi^y(1-\\pi)^{n-y} = (1-\\pi)^n \\exp[y\\cdot\\ln(\\pi/(1-\\pi))]$. The natural parameter is $\\theta = \\ln(\\pi/(1-\\pi)) = \\text{logit}(\\pi)$. Setting $\\theta = \\mathbf{x}^T\\boldsymbol{\\beta}$ (the canonical link) makes $\\mathbf{I}(\\boldsymbol{\\beta}) = -\\mathbf{H}(\\boldsymbol{\\beta})$, so Newton-Raphson = Fisher Scoring. Alternative links: probit ($\\Phi^{-1}(\\pi)$, natural for latent normal threshold models) and complementary log-log ($\\log(-\\log(1-\\pi))$, for extreme-value distributed errors)."},
+
+  {q:"Derive the score equations for logistic regression with Bernoulli data ($n_i = 1$). Show that solving these equations is equivalent to matching observed and fitted totals, and explain why iterative methods are required.",
+   followups:[
+     "How do the logistic regression score equations differ from the OLS normal equations in linear regression?",
+     "What is the Newton-Raphson algorithm, and why does it coincide with Fisher Scoring for logistic regression?",
+     "What computational warning signs indicate that the MLE does not exist (perfect separation)?"
+   ],
+   a:"<strong>Setup:</strong> $y_i \\sim \\text{Bern}(\\pi_i)$ where $\\pi_i = \\pi_i(\\boldsymbol{\\beta}) = e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}/(1+e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}})$. Log-likelihood:<br>$$\\ell(\\boldsymbol{\\beta}) = \\sum_{i=1}^n [y_i \\mathbf{x}_i^T\\boldsymbol{\\beta} - \\log(1+e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}})]$$<br><strong>Score equations:</strong> $\\frac{\\partial\\ell}{\\partial\\boldsymbol{\\beta}} = \\sum_i \\mathbf{x}_i\\left(y_i - \\frac{e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}}{1+e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}}\\right) = \\sum_i \\mathbf{x}_i(y_i - \\pi_i) = \\mathbf{X}^T(\\mathbf{y} - \\boldsymbol{\\pi}) = \\mathbf{0}$<br><strong>Interpretation:</strong><br>• $k=0$ (intercept): $\\sum_i (y_i - \\hat\\pi_i) = 0$ → sum of fitted probabilities = number of observed successes.<br>• $k=1,\\ldots,p-1$: $\\sum_i x_{ki}(y_i - \\hat\\pi_i) = 0$ → weighted residuals sum to zero.<br><strong>Why iterative?</strong> $\\pi_i(\\boldsymbol{\\beta}) = e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}}/(1+e^{\\mathbf{x}_i^T\\boldsymbol{\\beta}})$ is nonlinear in $\\boldsymbol{\\beta}$, so the equations $\\mathbf{X}^T(\\mathbf{y}-\\boldsymbol{\\pi}(\\boldsymbol{\\beta})) = \\mathbf{0}$ have no closed form. Newton-Raphson iterates: $\\boldsymbol{\\beta}^{(t+1)} = \\boldsymbol{\\beta}^{(t)} + (\\mathbf{X}^T\\mathbf{V}^{(t)}\\mathbf{X})^{-1}\\mathbf{X}^T(\\mathbf{y}-\\boldsymbol{\\pi}^{(t)})$. Each iteration is weighted OLS with weights $V_{ii}^{(t)} = \\pi_i^{(t)}(1-\\pi_i^{(t)})$."},
+
+  {q:"Explain the concept of the odds ratio (OR) in logistic regression. Prove algebraically that $OR = e^{\\beta_1}$ for a binary predictor. Why is the OR constant across all covariate patterns in a logistic model without interactions?",
+   followups:[
+     "If OR = 2.91 for gender, does this mean women are 2.91 times more likely to survive? Why or why not?",
+     "Under what condition (the 'rare disease assumption') does OR ≈ RR?",
+     "How would you test whether the OR for gender differs across age groups?"
+   ],
+   a:"<strong>Odds and OR definition:</strong><br>Odds: $\\Theta = \\pi/(1-\\pi)$. For binary predictor $x \\in \\{0,1\\}$:<br>$OR = \\Theta_{x=1}/\\Theta_{x=0}$<br><br><strong>Algebraic proof that $OR = e^{\\beta_1}$:</strong><br>$\\pi_1 = P(y=1\\mid x=1) = e^{\\beta_0+\\beta_1}/(1+e^{\\beta_0+\\beta_1})$, $\\quad 1-\\pi_1 = 1/(1+e^{\\beta_0+\\beta_1})$<br>$\\Theta_1 = \\pi_1/(1-\\pi_1) = e^{\\beta_0+\\beta_1}$<br>$\\pi_0 = e^{\\beta_0}/(1+e^{\\beta_0})$, $\\quad \\Theta_0 = e^{\\beta_0}$<br>$OR = \\Theta_1/\\Theta_0 = e^{\\beta_0+\\beta_1}/e^{\\beta_0} = e^{\\beta_1}$. ∎<br><br><strong>Constancy of OR:</strong> In $\\text{logit}[\\pi] = \\beta_0 + \\beta_1 x_1 + \\beta_2 x_2$ (no interaction), the gender OR at any fixed age $x_2 = a$ is:<br>$\\Theta_{\\text{fem}=1, age=a}/\\Theta_{\\text{fem}=0, age=a} = e^{\\beta_0+\\beta_1\\cdot 1 + \\beta_2 a}/e^{\\beta_0+\\beta_1\\cdot 0+\\beta_2 a} = e^{\\beta_1}$.<br>The age factor $e^{\\beta_2 a}$ cancels. The OR is $e^{\\beta_1}$ regardless of $a$. Adding an interaction $\\beta_3 x_1 x_2$ introduces $e^{\\beta_3 a}$ into the OR, making it age-dependent."},
+
+  {q:"Compare and contrast the three hypothesis tests (Wald, LR, Score) for $H_0: \\beta_k = 0$ in logistic regression. Discuss their relative merits in finite samples and their computational requirements.",
+   followups:[
+     "Why does the Wald test suffer from the invariance problem? Give a concrete logistic regression example.",
+     "In the Donner party data, all three tests agree. When would they disagree, and which should you trust?",
+     "In R, where does each of the three tests appear in standard logistic regression output?"
+   ],
+   a:"<strong>Summary table:</strong><br><table style='font-size:0.9em;margin:10px 0'><tr><th>Test</th><th>Fits needed</th><th>Statistic</th><th>Null dist.</th></tr><tr><td>Wald</td><td>Full model only</td><td>$\\hat\\beta_k^2/\\text{Var}(\\hat\\beta_k)$</td><td>$\\chi^2(1)$</td></tr><tr><td>LR</td><td>Full + null model</td><td>$-2[\\ell_0 - \\ell_1]$</td><td>$\\chi^2(1)$</td></tr><tr><td>Score</td><td>Null model only</td><td>$S^2/\\text{Var}(S)$ at null MLE</td><td>$\\chi^2(1)$</td></tr></table><br><strong>Finite-sample properties:</strong><br>• LR: generally best; based on the profile of the likelihood surface; invariant to reparametrisation; has best coverage for CIs when inverted.<br>• Wald: simplest; only needs one model fit; but not invariant to reparametrisation (as shown by the Chapter 2 $\\theta^{25}$ example) and can have poor coverage for small $n$.<br>• Score: only needs the null model — computationally attractive when the full model is expensive to fit; good properties similar to LR asymptotically.<br><strong>Donner party results:</strong> LR $G^2=5.15$ ($p=0.023$), Wald $W=4.9$ ($p=0.027$), Score $=5.07$ ($p=0.024$) — all agree. Disagreement occurs more in small samples or with sparse data, where Wald tends to be least reliable."},
+
+  {q:"Explain the profile-likelihood confidence interval and why it is preferred over the Wald interval in logistic regression. Describe how it is computed and how it is used to construct a CI for the odds ratio.",
+   followups:[
+     "What does it mean for a CI to be 'obtained by inverting a test'?",
+     "If the Wald 95% CI for $\\beta_k$ is $(-0.2, 1.8)$ and the profile-LR CI is $(0.1, 2.1)$, which would you trust more and why?",
+     "Can the profile-LR CI ever be narrower than the Wald CI? Under what circumstances?"
+   ],
+   a:"<strong>Concept:</strong> By the CI-test duality (Chapter 2), a 95% CI for $\\beta_k$ consists of all values $\\beta_{k0}$ for which $H_0: \\beta_k = \\beta_{k0}$ is not rejected at 5%.<br><br><strong>Profile log-likelihood:</strong> $\\ell_1(\\beta_k) = \\max_{\\boldsymbol{\\beta}_{-k}} \\ell(\\beta_k, \\boldsymbol{\\beta}_{-k})$ — maximise over all other parameters at each fixed value of $\\beta_k$.<br><br><strong>Profile-LR CI:</strong> $\\{\\beta_{k0}: G^2 = 2[\\ell_1(\\hat\\beta_k) - \\ell_1(\\beta_{k0})] \\leq \\chi^2_{1,0.95}\\}$<br>This traces the 'slice' of the log-likelihood surface for $\\beta_k$ and identifies all plausible values.<br><br><strong>Advantages over Wald:</strong> (1) Invariant to reparametrisation — exponentiating the CI for $\\beta_k$ gives the correct CI for $OR = e^{\\beta_k}$. (2) Better coverage in small samples. (3) Correctly reflects the asymmetry of the likelihood. (4) Based on the LR test, which has better finite-sample properties than the Wald test.<br><br><strong>CI for OR:</strong> If $(L, U)$ is the profile-LR CI for $\\beta_k$, then $(e^L, e^U)$ is the CI for $OR$. For Donner: $\\beta_2 \\in (0.144, 2.048)$ → $OR \\in (1.15, 7.75)$. Since this excludes 1, gender effect is significant at 5%."},
+
+  {q:"Discuss the problem of complete (perfect) separation in logistic regression. What causes it, what are the statistical consequences, and how can it be detected and addressed in practice?",
+   followups:[
+     "If a clinical trial has a very effective treatment with almost all treated patients surviving and almost all controls dying, will standard logistic regression work? What happens?",
+     "What is the Firth penalised likelihood method, and how does it address separation?",
+     "Does perfect separation always cause problems, or only in certain directions of $\\boldsymbol{\\beta}$?"
+   ],
+   a:"<strong>Definition:</strong> Perfect (complete) separation occurs when there exists a hyperplane $\\mathbf{c}^T\\mathbf{x} = 0$ such that $y_i = 1$ for all $\\mathbf{x}_i$ with $\\mathbf{c}^T\\mathbf{x}_i > 0$ and $y_i = 0$ for all $\\mathbf{x}_i$ with $\\mathbf{c}^T\\mathbf{x}_i < 0$. The data are perfectly classifiable.<br><br><strong>Statistical consequences:</strong> The MLE diverges to $\\pm\\infty$ in the direction of $\\mathbf{c}$. The log-likelihood has no finite maximum — it is monotonically increasing along $\\mathbf{c}$. The Hessian becomes singular ($\\hat\\pi_i \\to 0$ or 1, so $\\hat\\pi_i(1-\\hat\\pi_i) \\to 0$).<br><br><strong>Symptoms in R output:</strong> (1) Huge coefficient estimates (e.g., $|\\hat\\beta_k| > 10$); (2) Enormous standard errors; (3) Non-convergence warning; (4) Fitted probabilities exactly 0 or 1.<br><br><strong>Remedies:</strong><br>• Firth's penalised MLE: adds a Jeffreys prior penalty $-\\frac{1}{2}\\log|\\mathbf{I}(\\boldsymbol{\\beta})|$ to the log-likelihood. This yields finite estimates even under separation. Available in R as <code>logistf()</code>.<br>• Exact logistic regression: for very small samples.<br>• Bayesian approaches with informative priors.<br>• Collect more data (especially in the sparse cells).<br>• Collapse categories or remove the perfectly discriminating variable if it is not of scientific interest."},
+
+  {q:"In the Donner party analysis, explain step by step how to compute and interpret the predicted survival probability for a 35-year-old woman. Then construct an approximate 95% CI for this predicted probability.",
+   followups:[
+     "Is the predicted probability of 0.59 for a 35-year-old woman the same as saying she had a 59% chance of survival?",
+     "Why is the CI for $\\pi(\\mathbf{x})$ constructed via the logit scale rather than directly on the probability scale?",
+     "How would you obtain a CI for the probability using R?"
+   ],
+   a:"<strong>Step 1 — Linear predictor:</strong><br>$\\hat\\eta = \\hat\\beta_0 + \\hat\\beta_1 \\times 35 + \\hat\\beta_2 \\times 1 = 0.553 + (-0.0356)(35) + 1.067(1) = 0.553 - 1.246 + 1.067 = 0.374$<br><br><strong>Step 2 — Predicted probability (expit):</strong><br>$\\hat\\pi = e^{0.374}/(1+e^{0.374}) = 1.454/2.454 \\approx 0.592$<br><br><strong>Step 3 — Variance of $\\hat\\eta$:</strong><br>$\\mathbf{x}^T = (1, 35, 1)$. $\\text{Var}(\\hat\\eta) = \\mathbf{x}^T\\widehat{\\text{Cov}}(\\hat{\\boldsymbol{\\beta}})\\mathbf{x}$. Using the covariance matrix from R: approximately $\\text{Var}(\\hat\\eta) \\approx 0.0867$, $se(\\hat\\eta) \\approx 0.295$.<br><br><strong>Step 4 — 95% Wald CI on logit scale:</strong><br>$0.374 \\pm 1.96 \\times 0.295 = 0.374 \\pm 0.578 = (-0.204,\\; 0.952)$<br><br><strong>Step 5 — Back-transform to probability scale:</strong><br>$\\left(\\frac{1}{1+e^{0.204}},\\; \\frac{1}{1+e^{-0.952}}\\right) = (1/1.226,\\; e^{0.952}/1.952) = (0.449,\\; 0.722)$<br><br>Interpretation: a 35-year-old woman has an estimated 59% survival probability, with an approximate 95% CI of (45%, 72%). The transformation through the logit scale ensures the CI bounds respect the $(0,1)$ constraint."},
+
+  {q:"Explain the structural similarity and key differences between logistic regression and linear regression. Focus on the role of the link function, the likelihood, the estimation method, and the inference framework.",
+   followups:[
+     "In which sense are logistic regression estimates 'plug-in' maximum likelihood estimates and not best linear unbiased estimators?",
+     "How does the interpretation of coefficients differ fundamentally between linear and logistic regression?",
+     "If you had a continuous outcome in [0,1] (e.g., a proportion), would logistic regression be appropriate? What alternative might you consider?"
+   ],
+   a:"<table style='font-size:0.9em;margin:10px 0'><tr><th>Feature</th><th>Linear Regression</th><th>Logistic Regression</th></tr><tr><td>Response</td><td>Continuous $y \\in (-\\infty,\\infty)$</td><td>Binary $y \\in \\{0,1\\}$ or count $y \\in \\{0,\\ldots,n\\}$</td></tr><tr><td>Link</td><td>Identity: $E(y) = \\mathbf{x}^T\\boldsymbol{\\beta}$</td><td>Logit: $\\text{logit}[E(y)] = \\mathbf{x}^T\\boldsymbol{\\beta}$</td></tr><tr><td>Distribution</td><td>$y \\sim \\mathcal{N}(\\mathbf{x}^T\\boldsymbol{\\beta}, \\sigma^2)$</td><td>$y \\sim \\text{Bern}(\\pi)$ or $\\text{Bin}(n,\\pi)$</td></tr><tr><td>Estimation</td><td>OLS = MLE (under normality); closed form</td><td>MLE only; iterative (Newton-Raphson)</td></tr><tr><td>$\\beta_k$ meaning</td><td>Change in $E(y)$ per unit $x_k$</td><td>Change in log-odds per unit $x_k$; $e^{\\beta_k}$ = OR</td></tr><tr><td>Inference</td><td>Exact t/F-tests (under normality)</td><td>Asymptotic Wald/LR/Score ($\\chi^2$, z)</td></tr><tr><td>Uniqueness of estimate</td><td>Always unique (if $X$ full rank)</td><td>Unique iff no perfect separation</td></tr></table><br>The coefficient $\\beta_k$ in logistic regression cannot be interpreted as a change in probability — it is a change in log-odds. The effect on probability depends on the current level of $\\pi$ (nonlinear). Both models belong to the GLM framework, with logistic regression using the Binomial family and logit link."},
+
+  {q:"Ariel Alonso states: 'ML is rather general and can be used with data that are not normally distributed (Generalized Linear Models, GLM).' Explain how logistic regression fits into the GLM framework, and why this connection to the Holy Trinity of tests from Chapter 2 is important for Chapters 5–9.",
+   followups:[
+     "What are the three components of a GLM, and how do they specialise to logistic regression and linear regression?",
+     "How does the connection between the score equations and the normal equations suggest that IRLS is just a form of weighted OLS?",
+     "Why can the Wald, LR, and Score tests from Chapter 2 be directly applied to all GLMs?"
+   ],
+   a:"<strong>GLM Framework:</strong> Any GLM has three components:<br>1. <em>Random component:</em> $y_i$ from an exponential family distribution (Normal, Binomial, Poisson, Gamma…).<br>2. <em>Systematic component:</em> Linear predictor $\\eta_i = \\mathbf{x}_i^T\\boldsymbol{\\beta}$.<br>3. <em>Link function:</em> $g(\\mu_i) = \\eta_i$, connecting the mean $\\mu_i = E(y_i)$ to $\\eta_i$.<br><br><strong>Logistic regression as GLM:</strong> Random = Binomial, Link = logit (canonical), $\\mu_i = n_i\\pi_i$.<br><strong>Linear regression as GLM:</strong> Random = Normal, Link = identity (canonical), $\\mu_i = \\mathbf{x}_i^T\\boldsymbol{\\beta}$.<br><br><strong>Why Chapter 2 tests apply to all GLMs:</strong> All GLMs are estimated by MLE. The score vector $\\mathbf{S}(\\boldsymbol{\\beta})$, Hessian $\\mathbf{H}(\\boldsymbol{\\beta})$, and Fisher information $\\mathbf{I}(\\boldsymbol{\\beta})$ are defined for any GLM. The asymptotic theory of MLE (Chapter 2) guarantees that Wald, LR, and Score tests all have $\\chi^2$ null distributions for large $n$ regardless of the specific distribution. This is why the same test infrastructure works for logistic (Chapter 4–7), Poisson (Chapter 8), and all GLMs (Chapter 9).<br><br><strong>IRLS connection:</strong> The Newton-Raphson update $\\boldsymbol{\\beta}^{(t+1)} = (\\mathbf{X}^T\\mathbf{V}^{(t)}\\mathbf{X})^{-1}\\mathbf{X}^T\\mathbf{V}^{(t)}\\mathbf{z}^{(t)}$ where $z_i^{(t)} = \\hat\\eta_i^{(t)} + (y_i - \\hat\\mu_i^{(t)})/v_i^{(t)}$ is working response. This is exactly weighted OLS of $\\mathbf{z}^{(t)}$ on $\\mathbf{X}$ with weights $\\mathbf{V}^{(t)}$ — a weighted least squares problem, solved exactly at each step."},
+
+  {q:"Consider a hypothetical 2×2 table where 80 out of 100 women survived and 50 out of 100 men survived in the Donner party. Compute the OR manually, fit a simple logistic regression model (gender only), and verify that $\\hat\\beta_1 = \\ln(OR)$.",
+   followups:[
+     "How would a Wald test for $H_0: \\beta_1 = 0$ proceed using this OR and its standard error?",
+     "What is the standard error of $\\hat\\beta_1$ in terms of the cell counts in a 2×2 table?",
+     "If survival rates were instead 95% for women and 50% for men, would you expect OR to be larger or smaller than in the original example?"
+   ],
+   a:"<strong>Data:</strong> Women: 80/100 survive, 20/100 die. Men: 50/100 survive, 50/100 die.<br><br><strong>Step 1 — Odds:</strong><br>$\\Theta_W = 80/20 = 4$ (odds for women), $\\Theta_M = 50/50 = 1$ (odds for men).<br>$OR = \\Theta_W/\\Theta_M = 4/1 = 4$.<br><br><strong>Step 2 — Logistic model with binary predictor:</strong><br>$\\text{logit}[P(y=1\\mid\\text{fem})] = \\beta_0 + \\beta_1\\cdot\\text{fem}$<br>When fem=0: $\\text{logit}[\\pi_\\text{men}] = \\beta_0 \\Rightarrow \\hat\\beta_0 = \\ln(\\Theta_M) = \\ln(1) = 0$<br>When fem=1: $\\text{logit}[\\pi_\\text{women}] = \\beta_0 + \\beta_1 \\Rightarrow \\hat\\beta_0 + \\hat\\beta_1 = \\ln(\\Theta_W) = \\ln(4)$<br>$\\hat\\beta_1 = \\ln(4) - \\ln(1) = \\ln(4) \\approx 1.386$. ✓ $e^{\\hat\\beta_1} = 4 = OR$.<br><br><strong>Standard error for 2×2 table:</strong> $se(\\hat\\beta_1) = \\sqrt{1/a + 1/b + 1/c + 1/d}$ where $a=80, b=20, c=50, d=50$.<br>$se = \\sqrt{1/80 + 1/20 + 1/50 + 1/50} = \\sqrt{0.0125 + 0.05 + 0.02 + 0.02} = \\sqrt{0.1025} \\approx 0.320$.<br><br><strong>Wald test:</strong> $z = \\hat\\beta_1/se = 1.386/0.320 \\approx 4.33 \\Rightarrow p \\approx 0.00001$ (extremely significant). 95% CI for OR: $(e^{1.386 - 1.96 \\times 0.320}, e^{1.386 + 1.96 \\times 0.320}) = (e^{0.759}, e^{2.013}) \\approx (2.14, 7.49)$."}
+];
+
+let answeredCount = 0, correctCount = 0;
+
+function renderMCQ() {
+  const container = document.getElementById('mcqContainer');
+  container.innerHTML = '';
+  mcqData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'mcq-card';
+    card.id = `mcq-${idx}`;
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = item.type === 'tf' ? `Q${idx+1} — True / False` : `Q${idx+1} — Multiple Choice`;
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+    card.appendChild(label);
+    card.appendChild(stem);
+    const opts = item.type === 'tf' ? ['True','False'] : item.options;
+    opts.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = opt;
+      btn.setAttribute('data-opt', opt);
+      btn.onclick = () => handleAnswer(idx, opt, btn, card, item);
+      card.appendChild(btn);
+    });
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback-bar';
+    feedback.id = `fb-${idx}`;
+    feedback.style.display = 'none';
+    card.appendChild(feedback);
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+}
+
+function handleAnswer(idx, chosen, btn, card, item) {
+  const allBtns = card.querySelectorAll('.option-btn');
+  const fb = document.getElementById(`fb-${idx}`);
+  if (btn.disabled) return;
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.getAttribute('data-opt') === item.correct) b.classList.add('reveal-correct');
+  });
+  btn.classList.remove('reveal-correct');
+  answeredCount++;
+  if (chosen === item.correct) {
+    btn.classList.add('correct');
+    correctCount++;
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ Correct! ${item.explain}`;
+  } else {
+    btn.classList.add('incorrect');
+    fb.className = 'feedback-bar incorrect';
+    fb.innerHTML = `❌ Incorrect. The correct answer is <strong>${item.correct}</strong>. ${item.explain}`;
+  }
+  fb.style.display = 'block';
+  updateScore();
+  if (window.MathJax) MathJax.typesetPromise([fb]);
+}
+
+function updateScore() {
+  document.getElementById('scoreDisplay').textContent = `Score: ${correctCount} / ${answeredCount}`;
+}
+
+function resetAll() {
+  answeredCount = 0; correctCount = 0;
+  updateScore();
+  renderMCQ();
+}
+
+function renderSA() {
+  const container = document.getElementById('saContainer');
+  container.innerHTML = '';
+  saData.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'sa-card';
+    const label = document.createElement('div');
+    label.className = 'question-label';
+    label.textContent = `Oral Exam Q${idx+1}`;
+    const stem = document.createElement('div');
+    stem.className = 'question-stem';
+    stem.innerHTML = item.q;
+    card.appendChild(label);
+    card.appendChild(stem);
+    if (item.followups && item.followups.length > 0) {
+      const fuDiv = document.createElement('div');
+      fuDiv.className = 'followup-block';
+      fuDiv.innerHTML = '<strong>🎓 Likely follow-up questions:</strong><ol style="margin:6px 0 0 18px;">' +
+        item.followups.map(f => `<li style="margin-bottom:4px;">${f}</li>`).join('') + '</ol>';
+      card.appendChild(fuDiv);
+    }
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-btn';
+    revealBtn.textContent = 'Reveal Model Answer';
+    const ansPanel = document.createElement('div');
+    ansPanel.className = 'answer-panel';
+    ansPanel.innerHTML = item.a;
+    revealBtn.onclick = () => {
+      const shown = ansPanel.style.display === 'block';
+      ansPanel.style.display = shown ? 'none' : 'block';
+      revealBtn.textContent = shown ? 'Reveal Model Answer' : 'Hide Answer';
+      if (!shown && window.MathJax) MathJax.typesetPromise([ansPanel]);
+    };
+    card.appendChild(revealBtn);
+    card.appendChild(ansPanel);
+    container.appendChild(card);
+  });
+  if (window.MathJax) MathJax.typesetPromise([container]);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderMCQ();
+  renderSA();
+});
+</script>
+</body>
+</html>
