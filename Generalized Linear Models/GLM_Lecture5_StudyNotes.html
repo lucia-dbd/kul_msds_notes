@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression II – Chapter 5 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() { console.log('MathJax ready'); });
+    }
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c3a;
+    max-width: 960px; margin: 0 auto; padding: 24px 16px 60px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff; border-radius: 14px; padding: 28px 36px;
+    margin-bottom: 24px; box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff; border: 1px solid #dde3ef;
+    padding: 10px 18px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px;
+    margin-top: 0; margin-bottom: 16px; font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin: 20px 0 8px; }
+  .notes-section p { margin-bottom: 10px; }
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  pre {
+    background:#1e2435; color:#e8eaf0; border-radius:8px;
+    padding:14px 18px; font-family:'JetBrains Mono', monospace;
+    font-size:0.82em; line-height:1.6; overflow-x:auto; margin:14px 0;
+  }
+  code { font-family:'JetBrains Mono', monospace; font-size:0.88em; background:#f0f4fb; padding:1px 5px; border-radius:3px; color:#1a3a5c; }
+  /* MCQ */
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:0.95em; margin-bottom:20px; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+  .option-btn {
+    display:block; width:100%; background:#ffffff; border:1.5px solid #d0d8ea;
+    border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  /* Short Answer */
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section > h2 { color:#4a148c; font-size:1.2em; font-weight:700; margin-bottom:20px; font-family:'Crimson Pro', Georgia, serif; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn { background:#6f42c1; color:#ffffff; border:none; border-radius:20px; padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; font-family:inherit; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block { background:#fff8e1; border-left:3px solid #ffc107; padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0; font-size:0.92em; }
+  .followup-block strong { color:#7c5800; }
+  .reset-btn { background:#1a3a5c; color:#fff; border:none; border-radius:20px; padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:20px; transition:background 0.2s; font-family:inherit; }
+  .reset-btn:hover { background:#2e6da4; }
+  @media(max-width:600px){ .notes-section, .mcq-section, .sa-section { padding:18px 14px; } .page-header { padding:20px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Logistic Regression II — Chapter 5</h1>
+  <div class="subtitle">Effective Dose · Sigmoidal Links · Bootstrap CI · Goodness-of-Fit · Residuals · Diagnostics · Cook's Distance · Donner Party Case Study · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#animal">Animal Experiment</a>
+  <a href="#ld50">LD50 &amp; Effective Dose</a>
+  <a href="#bootstrap">Bootstrap CI</a>
+  <a href="#links">Sigmoidal Links</a>
+  <a href="#symmetry">Symmetry</a>
+  <a href="#gof">Goodness-of-Fit</a>
+  <a href="#pearson-test">Pearson χ²</a>
+  <a href="#deviance-test">Deviance Test</a>
+  <a href="#hl">Hosmer-Lemeshow</a>
+  <a href="#residuals">Residuals</a>
+  <a href="#influence">Influential Obs.</a>
+  <a href="#cooks">Cook's Distance</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ═══════════════════════ NOTES ═══════════════════════ -->
+
+<!-- 1. Animal Experiment -->
+<div class="notes-section" id="animal">
+  <h2>1. Motivating Example: Morbidity vs. Dose</h2>
+
+  <p>The running example in this chapter is a controlled animal experiment. 20 mice were exposed to an experimental drug at 11 dose levels (0 to 20 mg, in increments of 2 mg). After 14 days, the number of sick animals was recorded.</p>
+
+  <div class="example-box">
+    <strong>Data summary:</strong>
+    <table style="margin-top:10px">
+      <thead><tr><th>Dose (mg)</th><th>0</th><th>2</th><th>4</th><th>6</th><th>8</th><th>10</th><th>12</th><th>14</th><th>16</th><th>18</th><th>20</th></tr></thead>
+      <tbody><tr><td>Sick / 20</td><td>2</td><td>6</td><td>9</td><td>11</td><td>17</td><td>14</td><td>17</td><td>18</td><td>18</td><td>20</td><td>19</td></tr></tbody>
+    </table>
+  </div>
+
+  <p>The key issue: a <strong>linear fit</strong> predicts proportions above 1 at high doses — clearly impossible. The logistic model, fitted via <code>glm(..., family=binomial(link="logit"))</code> in R using the binomial response <code>cbind(sick, trial-sick)</code>, naturally constrains predictions to $(0,1)$.</p>
+
+  <div class="key-point">
+    <strong>R output (logistic model):</strong><br>
+    Intercept: $\hat\beta_0 = -1.40353$, Dose: $\hat\beta_1 = 0.26429$<br>
+    Both highly significant ($p \ll 0.001$). Residual deviance: 8.096 on 9 df.
+  </div>
+
+  <h3>Interpreting Odds Ratios from the Output</h3>
+  <p>Since the predictor is continuous (dose in mg), we exponentiate the coefficient to get odds ratios for specific increments:</p>
+
+  <table>
+    <thead><tr><th>Increment</th><th>OR formula</th><th>Estimated OR</th><th>95% CI</th></tr></thead>
+    <tbody>
+      <tr><td>1 mg</td><td>$e^{\hat\beta_1}$</td><td>1.302</td><td>(1.216, 1.409)</td></tr>
+      <tr><td>2 mg</td><td>$e^{2\hat\beta_1}$</td><td>1.697</td><td>(1.479, 1.985)</td></tr>
+      <tr><td>5 mg</td><td>$e^{5\hat\beta_1}$</td><td>3.749</td><td>(2.661, 5.549)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="computation-note">
+    <strong>How R computes the CI for a scaled OR:</strong> The profile likelihood CI for $k \cdot \hat\beta_1$ is simply $k$ times the CI for $\hat\beta_1$. So <code>confint(mod)[2,]*5</code> gives the log-scale CI, then <code>exp()</code> gives the OR CI. This is exact (profile-based), not a Wald approximation.
+  </div>
+</div>
+
+<!-- 2. LD50 -->
+<div class="notes-section" id="ld50">
+  <h2>2. Pharmacology: Effective Dose and LD50</h2>
+
+  <p>In dose-response modeling, we often care about the dose at which a specific proportion of the population is affected.</p>
+
+  <div class="theorem-box">
+    <strong>Effective Level (EL):</strong> The dose $x$ that produces a quantal (all-or-nothing) effect in a given fraction of the population.<br><br>
+    <strong>EL50 (Median Effective Level) / LD50 (Lethal Dose 50%):</strong> The dose at which $\pi(x) = 0.5$, i.e., 50% of the population is affected.<br><br>
+    Under the logit model $\text{logit}[\pi(x)] = \beta_0 + \beta_1 x$, setting $\pi = 0.5$ means $\text{logit}(0.5)=0$, so:
+    $$LD_{50} = -\frac{\beta_0}{\beta_1}$$
+    The steepest slope of the logistic curve occurs exactly at this point.
+  </div>
+
+  <p>For the animal experiment: $\widehat{LD}_{50} = -(-1.40353)/0.26429 = 5.311$ mg.</p>
+
+  <h3>Estimating LD50 — Inference Methods</h3>
+  <p>Three approaches are available in R:</p>
+
+  <table>
+    <thead><tr><th>Method</th><th>R tool</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Wald CI (delta method)</td><td><code>msm::deltamethod</code></td><td>Uses $g(\boldsymbol\beta) = -\beta_1/\beta_2$; asymptotically valid</td></tr>
+      <tr><td>Profile likelihood CI</td><td><code>MASS::dose.p</code></td><td>More accurate than Wald for nonlinear functions</td></tr>
+      <tr><td>Bootstrap CI</td><td><code>boot::boot</code> + <code>boot.ci</code></td><td>No distributional assumptions on the statistic</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Wald result:</strong> $\widehat{LD}_{50} = 5.311$ mg, SE $= 0.715$, 95% Wald CI: $(3.91, 6.71)$.<br>
+    <strong>Delta method key formula:</strong> $\text{Var}(g(\hat{\boldsymbol\beta})) \approx \nabla g(\hat{\boldsymbol\beta})^T \hat{V} \nabla g(\hat{\boldsymbol\beta})$, where $\hat{V} = \widehat{\text{Var}}(\hat{\boldsymbol\beta})$.
+  </div>
+</div>
+
+<!-- 3. Bootstrap -->
+<div class="notes-section" id="bootstrap">
+  <h2>3. Bootstrap Confidence Intervals</h2>
+
+  <p>Bootstrap is a general, nonparametric resampling framework for constructing confidence intervals when the sampling distribution of a statistic is unknown or intractable.</p>
+
+  <div class="theorem-box">
+    <strong>Bootstrap Algorithm:</strong> Given i.i.d. sample $\mathbf{y} = \{y_1,\ldots,y_N\}$ from $p(y|\theta)$:
+    <ol style="margin-top:8px;margin-left:20px">
+      <li>Repeat $R$ times: sample <em>with replacement</em> $N$ elements from $\mathbf{y}$ to get $\mathbf{y}^*_i$.</li>
+      <li>Compute statistic $T_i = t(\mathbf{y}^*_i)$ on the resample.</li>
+      <li>Use the empirical distribution $T_1,\ldots,T_R$ to construct a CI for $\theta$.</li>
+    </ol>
+  </div>
+
+  <p>In R: <code>boot(data, statistic_fn, R=1000)</code> followed by <code>boot.ci(..., type="all")</code>.</p>
+
+  <h3>Types of Bootstrap CIs (from <code>boot.ci</code>)</h3>
+
+  <table>
+    <thead><tr><th>Type</th><th>Key Idea</th><th>Strengths / Weaknesses</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Normal (norm)</strong></td><td>Wald CI using bootstrap SE, bias-corrected</td><td>Simple; assumes approximate normality of $T$</td></tr>
+      <tr><td><strong>Basic (basic)</strong></td><td>Pivotal / empirical CI: uses $2\hat\theta - T^*_{(r)}$ as bounds</td><td>Robust to non-normal, skewed distributions; preferred</td></tr>
+      <tr><td><strong>Percentile (perc)</strong></td><td>Uses $\alpha/2$ and $1-\alpha/2$ quantiles of bootstrap distribution</td><td>Intuitive but poor for asymmetric/heavy-tailed distributions</td></tr>
+      <tr><td><strong>BCa</strong></td><td>Bias-corrected accelerated; adjusts for bias &amp; skewness</td><td>Can be unstable if extreme percentiles are needed</td></tr>
+      <tr><td><strong>Studentized (stud)</strong></td><td>Uses bootstrap variance estimate per resample</td><td>Most accurate if variance estimate is reliable; needs extra computation</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Practical note:</strong> The <strong>basic (pivotal) CI</strong> is generally more robust than the percentile CI for skewed or non-normal bootstrap distributions. The BCa CI can be unstable when the bias-correction factor requires extreme percentiles of the bootstrap sample. The studentized CI requires a within-bootstrap variance estimate — omitting it triggers R's warning message.
+  </div>
+
+  <div class="example-box">
+    <strong>Animal experiment — bootstrap output for LD50 (R=1000):</strong><br>
+    Normal 95% CI: (3.825, 6.990) &nbsp;|&nbsp; Basic: (4.216, 7.195)<br>
+    Percentile: (3.426, 6.406) &nbsp;|&nbsp; BCa: (3.353, 6.364)<br><br>
+    The QQ-plot and histogram of 1000 bootstrap LD50 values show right-skewed distribution — this is precisely why the basic CI is preferable to the percentile CI here.
+  </div>
+</div>
+
+<!-- 4. Sigmoidal Links -->
+<div class="notes-section" id="links">
+  <h2>4. Sigmoidal Response Functions and Link Functions</h2>
+
+  <p>Three (actually four) S-shaped response functions are commonly used for binary outcomes. All are bounded in $(0,1)$, S-shaped, and asymptotically approach 0 and 1. They arise naturally from <strong>dichotomizing a latent continuous variable</strong> $\tilde{y}_i = -\mathbf{x}_i^T\boldsymbol\beta_c + \varepsilon_i$, where the distribution of $\varepsilon_i$ determines the link function.</p>
+
+  <table>
+    <thead><tr><th>Link</th><th>Error Distribution $\varepsilon$</th><th>$\pi(\mathbf{x})$</th><th>GLM call in R</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Logit</strong></td><td>Logistic ($\sigma = \pi/\sqrt{3}$)</td><td>$\frac{e^{\mathbf{x}^T\boldsymbol\beta}}{1+e^{\mathbf{x}^T\boldsymbol\beta}}$</td><td><code>binomial("logit")</code></td></tr>
+      <tr><td><strong>Probit</strong></td><td>Normal $N(0,\sigma^2)$</td><td>$\Phi(\mathbf{x}^T\boldsymbol\beta_P)$</td><td><code>binomial("probit")</code></td></tr>
+      <tr><td><strong>Cloglog</strong></td><td>Gumbel (extreme value)</td><td>$1 - \exp[-\exp(\mathbf{x}^T\boldsymbol\beta_G)]$</td><td><code>binomial(cloglog)</code></td></tr>
+      <tr><td><strong>Loglog</strong></td><td>Reversed Gumbel</td><td>$\exp[-\exp(\mathbf{x}^T\boldsymbol\beta)]$</td><td>Custom link function in R</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Latent Variable Derivation — Probit</h3>
+  <div class="theorem-box">
+    If $\varepsilon_i \sim N(0,\sigma^2)$ and $y_i = \mathbf{1}[\tilde{y}_i \leq 0]$, then:
+    $$\pi_i = P(y_i=1|\mathbf{x}_i) = P\!\left(\frac{\varepsilon_i}{\sigma} \leq \frac{\mathbf{x}_i^T\boldsymbol\beta_c}{\sigma}\right) = \Phi(\mathbf{x}_i^T\boldsymbol\beta_P)$$
+    where $\boldsymbol\beta_P = \boldsymbol\beta_c/\sigma$. Note: neither $\boldsymbol\beta_c$ nor $\sigma$ is individually identifiable — only their ratio is.
+  </div>
+
+  <h3>Latent Variable Derivation — Logit</h3>
+  <div class="theorem-box">
+    If $\varepsilon_i$ follows a logistic distribution with CDF $F(\varepsilon)=e^\varepsilon/(1+e^\varepsilon)$ and $\sigma = \pi/\sqrt{3}$, then:
+    $$\pi_i = \frac{e^{\mathbf{x}_i^T\boldsymbol\beta_L}}{1+e^{\mathbf{x}_i^T\boldsymbol\beta_L}}, \quad \text{where } \boldsymbol\beta_L = \frac{\pi}{\sqrt{3}}\boldsymbol\beta_P \approx 1.814\,\boldsymbol\beta_P$$
+    This is why logit coefficients are approximately $\pi/\sqrt{3} \approx 1.814$ times the probit coefficients.
+  </div>
+
+  <div class="key-point">
+    <strong>Identifiability constraint:</strong> In all latent variable formulations, neither $\boldsymbol\beta_c$ nor $\sigma$ is separately identifiable — only the ratio $\boldsymbol\beta_P = \boldsymbol\beta_c/\sigma$ can be estimated. This is why GLMs directly model the scaled ratio.
+  </div>
+</div>
+
+<!-- 5. Symmetry -->
+<div class="notes-section" id="symmetry">
+  <h2>5. Symmetry Property of Link Functions</h2>
+
+  <div class="key-point">
+    <strong>Symmetry:</strong> A response function $\pi(x)$ is symmetric if the curve has a symmetric appearance about the point where $\pi(x)=0.5$. This means $\pi(x)$ approaches 0 at the same rate it approaches 1.
+  </div>
+
+  <table>
+    <thead><tr><th>Link</th><th>Symmetric?</th><th>$\pi(x) \to 0$</th><th>$\pi(x) \to 1$</th><th>When to use</th></tr></thead>
+    <tbody>
+      <tr><td>Logit</td><td>✓ Yes</td><td>Moderate rate</td><td>Moderate rate</td><td>Default; most common</td></tr>
+      <tr><td>Probit</td><td>✓ Yes</td><td>Moderate rate</td><td>Moderate rate</td><td>Latent normal variable models</td></tr>
+      <tr><td>Cloglog</td><td>✗ No</td><td>Slowly</td><td>Sharply</td><td>When $\pi \to 1$ rapidly; survival/extreme value</td></tr>
+      <tr><td>Loglog</td><td>✗ No</td><td>Sharply</td><td>Slowly</td><td>When $\pi \to 0$ rapidly (not in base R glm)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Symmetry consequence:</strong> If the response variable is recoded as $y'_i = 1 - y_i$ (swapping 0s and 1s), symmetric links (logit, probit) simply reverse the signs of all coefficients. This follows from $\Phi(z) = 1 - \Phi(-z)$ for probit, and the logistic symmetry for logit. Asymmetric links (cloglog, loglog) do not have this property.
+  </div>
+
+  <div class="example-box">
+    <strong>Animal experiment — comparing fitted curves:</strong> In the morbidity-dose example, all four links give visually similar fitted curves in the central range of proportions but diverge at the tails. The loglog link approaches 1 slowly, while cloglog approaches 1 sharply. Because the data are fairly symmetric, the logit and probit fits are nearly indistinguishable, and both provide excellent fit (Pearson $\chi^2$ p-values $> 0.60$).
+  </div>
+</div>
+
+<!-- 6. GOF overview -->
+<div class="notes-section" id="gof">
+  <h2>6. Goodness-of-Fit Tests — Overview</h2>
+
+  <p>After fitting a logistic regression model, we must assess whether it adequately describes the data. <strong>Goodness-of-fit (GOF) tests</strong> provide an overall measure of model adequacy. They test:</p>
+
+  <div class="formula-box">
+    $H_0$: The logistic model is correctly specified &nbsp; vs. &nbsp; $H_1$: The saturated model fits better.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Important limitation:</strong> GOF tests are not sensitive to departures that affect only a few observations. One must distinguish between:
+    <ul style="margin-top:6px;margin-left:20px">
+      <li><strong>Replicated data:</strong> Multiple observations at the same covariate pattern $\mathbf{x}_i$ (e.g., grouped binary data). Pearson $\chi^2$ and Deviance test are appropriate.</li>
+      <li><strong>Unreplicated / continuous covariates:</strong> Each subject has a unique covariate pattern. Use the Hosmer-Lemeshow test.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 7. Pearson Chi-Square -->
+<div class="notes-section" id="pearson-test">
+  <h2>7. Pearson Chi-Square Goodness-of-Fit Test</h2>
+
+  <p>Suppose we have $N$ distinct covariate patterns $\mathbf{x}_1,\ldots,\mathbf{x}_N$ (groups), each with $n_i$ replications, and $y_i = \sum_{j=1}^{n_i} y_{ij}$ successes. Then $y_i \sim \text{Bin}(n_i, \pi_i(\boldsymbol\beta))$.</p>
+
+  <div class="theorem-box">
+    <strong>Pearson Chi-Square Statistic:</strong>
+    $$X^2 = \sum_{i=1}^{N} \sum_{k=0}^{1} \frac{(O_{ik} - E_{ik})^2}{E_{ik}} = \sum_{i=1}^{N} \frac{(y_i - n_i\hat\pi_i)^2}{n_i\hat\pi_i(1-\hat\pi_i)}$$
+    where $O_{i1} = y_i$, $O_{i0} = n_i - y_i$, $E_{i1} = n_i\hat\pi_i$, $E_{i0} = n_i(1-\hat\pi_i)$.
+  </div>
+
+  <div class="key-point">
+    <strong>Asymptotic distribution:</strong> Under $H_0$, when $N$ is fixed and $n_i \to \infty$:
+    $$X^2 \xrightarrow{d} \chi^2(N-p)$$
+    where $p = \dim(\boldsymbol\beta)$. The degrees of freedom equal the number of groups minus the number of estimated parameters.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Conditions:</strong> This test is only valid when there are <strong>categorical regressors only</strong> (so that $N$ is finite and each $n_i \to \infty$). With continuous predictors, $N$ grows with sample size and the chi-square approximation breaks down. Rule of thumb: all $E_{ik} \geq 1$, and at least 80% of cells should have $E_{ik} \geq 5$.
+  </div>
+
+  <div class="example-box">
+    <strong>R output for animal experiment:</strong>
+    <pre>## Log-log model
+X2s = 5.294,  df = 9,  p-value = 0.808
+
+## Logit model  
+X2s = 7.225,  df = 9,  p-value = 0.614</pre>
+    Both p-values are large → no evidence of lack of fit for either model. The log-log model actually fits slightly better by this criterion.
+  </div>
+</div>
+
+<!-- 8. Deviance Test -->
+<div class="notes-section" id="deviance-test">
+  <h2>8. Deviance Goodness-of-Fit Test</h2>
+
+  <p>The deviance test is the logistic-regression analogue of the F-test for lack of fit in linear regression. It compares the fitted model to the <strong>saturated model</strong> (one parameter per covariate pattern).</p>
+
+  <div class="theorem-box">
+    <strong>Deviance (Likelihood Ratio Test statistic):</strong>
+    $$D = -2\big[\ell(\hat{\boldsymbol\pi}) - \ell(\tilde{\boldsymbol\pi})\big] = -2\sum_{i=1}^{N}\left[y_i \log\!\left(\frac{\hat\pi_i}{\tilde\pi_i}\right) + (n_i - y_i)\log\!\left(\frac{n_i - n_i\hat\pi_i}{n_i - n_i\tilde\pi_i}\right)\right]$$
+    where $\tilde\pi_i = y_i/n_i$ (saturated model MLE) and $\hat\pi_i$ is the fitted model MLE.
+  </div>
+
+  <div class="key-point">
+    <strong>Key properties:</strong><br>
+    • $D \geq 0$ always; $D = 0$ iff the model fits perfectly.<br>
+    • Under $H_0$ with $N$ fixed, $n_i \to \infty$: $D \xrightarrow{d} \chi^2(N-p)$.<br>
+    • Only valid for <strong>categorical predictors only</strong> (same condition as Pearson $\chi^2$).<br>
+    • $D$ is a generalization of the SSE from linear regression.<br>
+    • R labels it "Residual deviance"; "Null deviance" $D_0$ uses only an intercept (analogous to total SS).
+  </div>
+
+  <table>
+    <thead><tr><th>Quantity</th><th>Logistic Analogy</th><th>Linear Regression Analogy</th></tr></thead>
+    <tbody>
+      <tr><td>Deviance $D$</td><td>$-2[\ell(\hat\pi) - \ell(\tilde\pi)]$</td><td>SSE (residual sum of squares)</td></tr>
+      <tr><td>Null Deviance $D_0$</td><td>$-2[\ell(\hat\pi_0) - \ell(\tilde\pi)]$</td><td>Total SS</td></tr>
+      <tr><td>$D_0 - D$</td><td>Improvement from adding predictors</td><td>Regression SS</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>R output (animal experiment):</strong>
+    <pre>## Logit model
+res.deviance = 8.096,  df = 9,  p = 0.525
+
+## Log-log model
+res.deviance = 6.250,  df = 9,  p = 0.715</pre>
+    Both p-values large → adequate fit. The Null deviance is 88.983 for both (same data) — a massive drop to 8.1 and 6.3 demonstrates the dose predictor explains almost all the variation.
+  </div>
+</div>
+
+<!-- 9. Hosmer-Lemeshow -->
+<div class="notes-section" id="hl">
+  <h2>9. Hosmer-Lemeshow Test</h2>
+
+  <p>When predictors are continuous, each observation has a unique covariate pattern → $N$ grows → the Pearson and Deviance chi-square approximations are invalid. The Hosmer-Lemeshow (HL) test solves this by grouping observations into $g$ (usually 10) strata based on estimated probabilities.</p>
+
+  <div class="theorem-box">
+    <strong>Two grouping strategies:</strong><br>
+    <strong>Strategy 1 (default):</strong> Group by quantiles of $\hat\pi_i$ — group $k$ contains the $n/g$ observations with the $k$-th smallest predicted probabilities.<br>
+    <strong>Strategy 2:</strong> Group by equal intervals of $\hat\pi_i$ — group $k$ contains observations with $\hat\pi_i \in ((k-1)/g,\, k/g]$.<br><br>
+    Within each group $k$: observed counts $O_{k1}, O_{k0}$ vs. expected $E_{k1} = \sum \hat\pi_i$, $E_{k0} = \sum(1-\hat\pi_i)$.
+    $$\hat{C} = \sum_{k=1}^{g}\frac{(O_{k1}-E_{k1})^2}{E_{k1}} + \frac{(O_{k0}-E_{k0})^2}{E_{k0}} \xrightarrow{d} \chi^2(g-2)$$
+    Simulations show Strategy 1 gives the better chi-square approximation.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Limitations:</strong> The HL test loses 2 degrees of freedom (hence $\chi^2(g-2)$). Power depends heavily on the choice of $g$. It may miss localized departures from fit that don't affect overall groupings. Use alongside residual plots.
+  </div>
+
+  <div class="example-box">
+    <strong>Donner Party — main effects model:</strong>
+    <pre>Chisq = 16.008,  p-value = 0.0423  (g=10)</pre>
+    $p = 0.042 < 0.05$ — marginal evidence of lack of fit. This motivates exploring a quadratic age term.
+    <br><br>
+    <strong>Quadratic model with interaction:</strong>
+    <pre>Chisq = 3.758,  p-value = 0.878</pre>
+    The much larger p-value confirms the quadratic-interaction model fits well.
+  </div>
+</div>
+
+<!-- 10. Residuals -->
+<div class="notes-section" id="residuals">
+  <h2>10. Logistic Regression Residuals</h2>
+
+  <p>For Bernoulli data ($n_i=1$, $N=n$), the ordinary residual $e_i = y_i - \hat\pi_i$ takes only two values:</p>
+  <div class="formula-box">
+    $e_i = \begin{cases} 1 - \hat\pi_i & \text{if } y_i = 1 \\ -\hat\pi_i & \text{if } y_i = 0 \end{cases}$
+  </div>
+
+  <p>This binary structure makes raw residuals uninformative individually. Three standardized residuals are used instead.</p>
+
+  <h3>Pearson Residuals</h3>
+  <div class="theorem-box">
+    $$e_{P_i} = \frac{y_i - \hat\pi_i}{\sqrt{\hat\pi_i(1-\hat\pi_i)}}$$
+    Divides raw residual by the estimated SD of $y_i$. Note: $X^2 = \sum_{i=1}^n e_{P_i}^2$ (the Pearson chi-square statistic).
+  </div>
+
+  <h3>Studentized Pearson Residuals</h3>
+  <div class="theorem-box">
+    $$e_{sP_i} = \frac{e_{P_i}}{\sqrt{1-\hat{h}_{ii}}}$$
+    where $\hat{h}_{ii} = \hat\pi_i(1-\hat\pi_i)\,\mathbf{x}_i^T(\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X})^{-1}\mathbf{x}_i$ are diagonal elements of the hat matrix $\hat{\mathbf{H}} = \hat{\mathbf{V}}^{1/2}\mathbf{X}(\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X})^{-1}\mathbf{X}^T\hat{\mathbf{V}}^{1/2}$, satisfying $\sum \hat{h}_{ii} = p$.
+    <br><br>
+    For replicated data (large $n_i$): $e_{sP_i} \approx N(0,1)$ → values $|e_{sP_i}|>2$ or $3$ suggest lack of fit.
+  </div>
+
+  <h3>Deviance Residuals</h3>
+  <div class="theorem-box">
+    $$D_i = \text{sign}(y_i - \hat\pi_i)\sqrt{-2\big[y_i\log(\hat\pi_i) + (1-y_i)\log(1-\hat\pi_i)\big]}$$
+    Note: $D = \sum D_i^2$. Each $D_i^2$ measures one observation's contribution to the deviance statistic.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Crucial caveat:</strong> For binary data without replicates ($n_i=1$), neither $X^2 = \sum e_{P_i}^2$ nor $D = \sum D_i^2$ follows a chi-square distribution. The chi-square approximations only hold when there are replications ($n_i \to \infty$). Residual plots are used for pattern detection rather than formal inference.
+  </div>
+
+  <h3>Residual Plots</h3>
+  <div class="key-point">
+    Plot residuals vs. the <strong>linear predictor</strong> $\hat\eta_i$ or estimated probabilities $\hat\pi_i$. A <strong>lowess smooth</strong> should be approximately horizontal at zero if the model is correct. A systematic curve indicates misspecification (e.g., a missing quadratic term).
+  </div>
+
+  <div class="example-box">
+    <strong>Donner Party — key findings from residual plots:</strong><br>
+    • Deviance residuals vs. linear predictor: lowess roughly flat → no gross misspecification.<br>
+    • Deviance residuals vs. <em>Age</em>: lowess clearly deviates from zero → a quadratic age term is needed.<br>
+    • After adding <code>poly(Age,2)*fem</code>: residual plot vs. age is much flatter.
+  </div>
+</div>
+
+<!-- 11. Influential Observations -->
+<div class="notes-section" id="influence">
+  <h2>11. Detection of Influential Observations</h2>
+
+  <p>Even without residual patterns, individual observations can have outsized influence on the model. Three influence measures are used in logistic regression.</p>
+
+  <h3>Δ Chi-Square ($\Delta X^2_i$)</h3>
+  <div class="theorem-box">
+    Exact definition: $\Delta X^2_i = X^2 - X^2_{(i)}$ (change in Pearson statistic when case $i$ is deleted).<br>
+    One-step approximation:
+    $$\Delta X^2_i \approx e_{sP_i}^2$$
+  </div>
+
+  <h3>Δ Deviance ($\Delta D_i$)</h3>
+  <div class="theorem-box">
+    Exact definition: $\Delta D_i = D - D_{(i)}$ (change in deviance when case $i$ is deleted).<br>
+    One-step approximation:
+    $$\Delta D_i \approx D_i^2 + \hat{h}_{ii}\, e_{sP_i}^2$$
+  </div>
+
+  <div class="key-point">
+    These approximations avoid $n$ separate model refits. Large values of $\Delta X^2_i$ or $\Delta D_i$ — especially "spikes" when plotted against case number — flag influential observations.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Interpretation difficulty:</strong> No reference distribution exists for $\Delta X^2_i$ or $\Delta D_i$ — cut-offs must be determined subjectively by inspecting plots. Extreme values appear as spikes vs. case number, or outliers in upper corners of plots vs. the estimated linear predictor.
+  </div>
+
+  <div class="example-box">
+    <strong>Donner Party findings:</strong> Cases 6, 26, 49, 55, 64, 68 appeared as spikes in both $\Delta X^2$ and $\Delta D$ plots for the main-effects model. In the quadratic model, cases 5, 6, 24 were most influential.
+  </div>
+</div>
+
+<!-- 12. Cook's Distance -->
+<div class="notes-section" id="cooks">
+  <h2>12. Cook's Distance for Logistic Regression</h2>
+
+  <p>Cook's distance measures the influence of the $i$-th case on the <em>fitted linear predictor</em> (the logistic analogue of its role in linear regression, where it measures the change in fitted values).</p>
+
+  <div class="theorem-box">
+    <strong>One-step approximation:</strong>
+    $$C_i = \frac{e_{P_i}^2\,\hat{h}_{ii}}{p\,(1-\hat{h}_{ii})^2}$$
+    where $p$ is the number of parameters in the linear predictor. Larger $C_i$ → more influential observation.
+  </div>
+
+  <div class="key-point">
+    Unlike in linear regression, no universal threshold (like $C_i > 1$ or $C_i > 4/n$) is established for logistic regression. Plots of $C_i$ vs. case number are evaluated subjectively — look for observations that stand clearly apart from the bulk.
+  </div>
+
+  <h3>Summary: Relationship Between Influence Measures</h3>
+  <table>
+    <thead><tr><th>Measure</th><th>What it captures</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>$e_{P_i}$</td><td>Pearson residual (raw misfit)</td><td>$(y_i - \hat\pi_i)/\sqrt{\hat\pi_i(1-\hat\pi_i)}$</td></tr>
+      <tr><td>$e_{sP_i}$</td><td>Studentized Pearson (accounts for leverage)</td><td>$e_{P_i}/\sqrt{1-\hat{h}_{ii}}$</td></tr>
+      <tr><td>$D_i$</td><td>Deviance residual (likelihood contribution)</td><td>$\text{sign}(y_i-\hat\pi_i)\sqrt{-2[\cdots]}$</td></tr>
+      <tr><td>$\Delta X^2_i$</td><td>Change in Pearson $\chi^2$ if $i$ deleted</td><td>$\approx e_{sP_i}^2$</td></tr>
+      <tr><td>$\Delta D_i$</td><td>Change in deviance if $i$ deleted</td><td>$\approx D_i^2 + \hat{h}_{ii}e_{sP_i}^2$</td></tr>
+      <tr><td>$C_i$</td><td>Change in linear predictor if $i$ deleted</td><td>$e_{P_i}^2\hat{h}_{ii}/[p(1-\hat{h}_{ii})^2]$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Practical summary from the lecture:</strong><br>
+    • Residuals and diagnostic tools are less informative for logistic than linear regression — individual 0/1 outcomes inherently limit residual variation.<br>
+    • Influential observations are just as relevant conceptually, but harder to detect.<br>
+    • If influential observations are found, understand <em>why</em> before deciding to remove or accommodate them.
+  </div>
+</div>
+
+<!-- ═══════════════════════ MCQ ═══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True / False — 50 Questions</h2>
+  <p style="margin-bottom:10px;font-size:0.93em;color:#555;">Click an option to check your answer. Use the reset button to try again.</p>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Calculation</div>
+    <div class="question-stem">In the animal experiment, $\hat\beta_0 = -1.40353$ and $\hat\beta_1 = 0.26429$. What is the estimated LD50 (in mg)?</div>
+    <button class="option-btn" onclick="answer(this,'q1',false)">A. 3.91 mg</button>
+    <button class="option-btn" onclick="answer(this,'q1',true)">B. 5.31 mg</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">C. 6.71 mg</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">D. 0.265 mg</button>
+    <div class="feedback-bar" id="fb-q1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Concept</div>
+    <div class="question-stem">The LD50 corresponds to the point on the logistic dose-response curve where:</div>
+    <button class="option-btn" onclick="answer(this,'q2',false)">A. The slope of the curve is zero</button>
+    <button class="option-btn" onclick="answer(this,'q2',true)">B. The slope of the curve is steepest</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">C. The deviance is minimised</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">D. The odds ratio equals 1</button>
+    <div class="feedback-bar" id="fb-q2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · R Output</div>
+    <div class="question-stem">From the R output: <code>exp(dose.sick.mod2$coefficients[2]*5)</code> gives 3.749. This is the estimated odds ratio for:</div>
+    <button class="option-btn" onclick="answer(this,'q3',false)">A. A 1 mg increase in dose</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">B. A 2 mg increase in dose</button>
+    <button class="option-btn" onclick="answer(this,'q3',true)">C. A 5 mg increase in dose</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">D. The intercept odds</button>
+    <div class="feedback-bar" id="fb-q3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In the bootstrap procedure, samples are drawn <em>without</em> replacement from the original data.</div>
+    <button class="option-btn" onclick="answer(this,'q4',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q4',true)">False</button>
+    <div class="feedback-bar" id="fb-q4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · Bootstrap</div>
+    <div class="question-stem">Which bootstrap CI type is generally most robust when the bootstrap distribution is skewed or has heavy tails?</div>
+    <button class="option-btn" onclick="answer(this,'q5',false)">A. Normal (norm)</button>
+    <button class="option-btn" onclick="answer(this,'q5',true)">B. Basic (pivotal)</button>
+    <button class="option-btn" onclick="answer(this,'q5',false)">C. Percentile</button>
+    <button class="option-btn" onclick="answer(this,'q5',false)">D. BCa</button>
+    <div class="feedback-bar" id="fb-q5"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Bootstrap</div>
+    <div class="question-stem">The BCa (bias-corrected accelerated) bootstrap CI can be unstable because:</div>
+    <button class="option-btn" onclick="answer(this,'q6',false)">A. It assumes normality of the statistic</button>
+    <button class="option-btn" onclick="answer(this,'q6',true)">B. It may require extreme percentiles of the bootstrap distribution, possibly outliers</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">C. It requires 10,000 bootstrap replicates to converge</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">D. It is only valid for linear statistics</button>
+    <div class="feedback-bar" id="fb-q6"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Links</div>
+    <div class="question-stem">The probit link function $\pi(x) = \Phi(\mathbf{x}^T\boldsymbol\beta_P)$ arises from a latent variable model where $\varepsilon_i$ follows a:</div>
+    <button class="option-btn" onclick="answer(this,'q7',false)">A. Logistic distribution</button>
+    <button class="option-btn" onclick="answer(this,'q7',true)">B. Normal distribution</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">C. Gumbel (extreme value) distribution</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">D. Uniform distribution</button>
+    <div class="feedback-bar" id="fb-q7"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In the latent variable formulation of the probit model, both $\boldsymbol\beta_c$ (the latent slope) and $\sigma$ (the error SD) are individually identifiable from binary outcome data.</div>
+    <button class="option-btn" onclick="answer(this,'q8',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q8',true)">False</button>
+    <div class="feedback-bar" id="fb-q8"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · Calculation</div>
+    <div class="question-stem">Given that logit coefficients $\approx 1.814 \times$ probit coefficients, if the probit coefficient for dose is $\hat\beta_P = 0.150$, what would you expect the logit coefficient to be approximately?</div>
+    <button class="option-btn" onclick="answer(this,'q9',false)">A. 0.083</button>
+    <button class="option-btn" onclick="answer(this,'q9',true)">B. 0.272</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">C. 0.150</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">D. 1.814</button>
+    <div class="feedback-bar" id="fb-q9"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · Links</div>
+    <div class="question-stem">The complementary log-log (cloglog) link produces which type of asymmetric response curve?</div>
+    <button class="option-btn" onclick="answer(this,'q10',false)">A. $\pi(x)$ approaches 0 sharply but approaches 1 slowly</button>
+    <button class="option-btn" onclick="answer(this,'q10',true)">B. $\pi(x)$ approaches 0 slowly but approaches 1 sharply</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">C. $\pi(x)$ is symmetric around $\pi = 0.5$</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">D. $\pi(x)$ is always greater than 0.5</button>
+    <div class="feedback-bar" id="fb-q10"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: If the response variable is recoded as $y'_i = 1 - y_i$, the signs of all coefficients are reversed for both the logit and the complementary log-log link functions.</div>
+    <button class="option-btn" onclick="answer(this,'q11',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q11',true)">False</button>
+    <div class="feedback-bar" id="fb-q11"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · GOF</div>
+    <div class="question-stem">The Pearson chi-square GOF test for logistic regression is only asymptotically valid (i.e., $X^2 \xrightarrow{d} \chi^2(N-p)$) when:</div>
+    <button class="option-btn" onclick="answer(this,'q12',false)">A. The sample size $n$ is large, regardless of predictor type</button>
+    <button class="option-btn" onclick="answer(this,'q12',true)">B. There are only categorical predictors and $n_i \to \infty$ for each group</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">C. All predictors are continuous</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">D. The model includes an interaction term</button>
+    <div class="feedback-bar" id="fb-q12"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · R Output</div>
+    <div class="question-stem">For the animal experiment logit model, R reports: Null deviance = 88.983, Residual deviance = 8.096. What does this large drop indicate?</div>
+    <button class="option-btn" onclick="answer(this,'q13',false)">A. The model is overfit</button>
+    <button class="option-btn" onclick="answer(this,'q13',true)">B. The dose predictor explains nearly all the variation in morbidity</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">C. The intercept-only model fits better</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">D. The residual degrees of freedom are too small</button>
+    <div class="feedback-bar" id="fb-q13"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Deviance</div>
+    <div class="question-stem">What does the <em>saturated model</em> in the deviance GOF test correspond to?</div>
+    <button class="option-btn" onclick="answer(this,'q14',false)">A. The intercept-only model</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">B. The model with all predictors and all interactions</button>
+    <button class="option-btn" onclick="answer(this,'q14',true)">C. A model with one free parameter per distinct covariate pattern, perfectly fitting the data</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">D. A model estimated by ordinary least squares</button>
+    <div class="feedback-bar" id="fb-q14"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The Hosmer-Lemeshow test statistic follows a $\chi^2(g)$ distribution, where $g$ is the number of groups.</div>
+    <button class="option-btn" onclick="answer(this,'q15',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q15',true)">False</button>
+    <div class="feedback-bar" id="fb-q15"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · Hosmer-Lemeshow</div>
+    <div class="question-stem">The Hosmer-Lemeshow test is preferred over the Pearson $\chi^2$ test when:</div>
+    <button class="option-btn" onclick="answer(this,'q16',false)">A. All predictors are binary</button>
+    <button class="option-btn" onclick="answer(this,'q16',true)">B. Predictors are continuous or there are few replicated covariate patterns</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">C. The sample size is very small ($n < 30$)</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">D. The link function is not logit</button>
+    <div class="feedback-bar" id="fb-q16"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · R Output Interpretation</div>
+    <div class="question-stem">For the Donner data main effects model, the Hosmer-Lemeshow test gives $\chi^2 = 16.01$, $p = 0.042$. The correct interpretation is:</div>
+    <button class="option-btn" onclick="answer(this,'q17',false)">A. The model fits perfectly</button>
+    <button class="option-btn" onclick="answer(this,'q17',true)">B. There is marginal evidence of lack of fit, suggesting the model may be misspecified</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">C. The predictors are not significant</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">D. The sample size is too small for this test</button>
+    <div class="feedback-bar" id="fb-q17"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · Residuals</div>
+    <div class="question-stem">The sum of the squared Pearson residuals $\sum_{i=1}^n e_{P_i}^2$ equals:</div>
+    <button class="option-btn" onclick="answer(this,'q18',false)">A. The model deviance $D$</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">B. The null deviance $D_0$</button>
+    <button class="option-btn" onclick="answer(this,'q18',true)">C. The Pearson chi-square statistic $X^2$</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">D. The AIC</button>
+    <div class="feedback-bar" id="fb-q18"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For binary data without replicates ($n_i=1$), the deviance $D = \sum D_i^2$ follows a $\chi^2(n-p)$ distribution under the correct model.</div>
+    <button class="option-btn" onclick="answer(this,'q19',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q19',true)">False</button>
+    <div class="feedback-bar" id="fb-q19"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · Residuals</div>
+    <div class="question-stem">The studentized Pearson residual $e_{sP_i} = e_{P_i}/\sqrt{1-\hat{h}_{ii}}$ corrects for:</div>
+    <button class="option-btn" onclick="answer(this,'q20',false)">A. The non-normality of $y_i$</button>
+    <button class="option-btn" onclick="answer(this,'q20',true)">B. The fact that $\hat\pi_i$ is an estimate of $\pi_i$, not the true value</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">C. Autocorrelation in residuals</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">D. Missing predictor variables</button>
+    <div class="feedback-bar" id="fb-q20"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · Hat Matrix</div>
+    <div class="question-stem">The diagonal elements $\hat{h}_{ii}$ of the logistic hat matrix satisfy:</div>
+    <button class="option-btn" onclick="answer(this,'q21',false)">A. $\sum_{i=1}^n \hat{h}_{ii} = n$</button>
+    <button class="option-btn" onclick="answer(this,'q21',true)">B. $\sum_{i=1}^n \hat{h}_{ii} = p$ (number of parameters)</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">C. $\hat{h}_{ii} = \hat\pi_i$ for all $i$</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">D. $\hat{h}_{ii} \in \{0,1\}$ for all $i$</button>
+    <div class="feedback-bar" id="fb-q21"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · Deviance Residuals</div>
+    <div class="question-stem">What does $D_i = \text{sign}(y_i - \hat\pi_i)\sqrt{-2[y_i\log\hat\pi_i + (1-y_i)\log(1-\hat\pi_i)]}$ equal when $y_i = 0$?</div>
+    <button class="option-btn" onclick="answer(this,'q22',false)">A. $+\sqrt{-2\log\hat\pi_i}$</button>
+    <button class="option-btn" onclick="answer(this,'q22',true)">B. $-\sqrt{-2\log(1-\hat\pi_i)}$</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">C. $\sqrt{-2\log\hat\pi_i}$</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">D. $0$</button>
+    <div class="feedback-bar" id="fb-q22"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Influence</div>
+    <div class="question-stem">The one-step approximation for $\Delta X^2_i$ (change in Pearson $\chi^2$ when case $i$ is deleted) is:</div>
+    <button class="option-btn" onclick="answer(this,'q23',false)">A. $D_i^2$</button>
+    <button class="option-btn" onclick="answer(this,'q23',true)">B. $e_{sP_i}^2$</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">C. $C_i$</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">D. $\hat{h}_{ii}/(1-\hat{h}_{ii})$</button>
+    <div class="feedback-bar" id="fb-q23"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · Cook's Distance</div>
+    <div class="question-stem">Cook's distance in logistic regression measures the standardized change in:</div>
+    <button class="option-btn" onclick="answer(this,'q24',false)">A. The Pearson chi-square statistic</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">B. The AIC when the $i$-th case is deleted</button>
+    <button class="option-btn" onclick="answer(this,'q24',true)">C. The fitted linear predictor when the $i$-th case is deleted</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">D. The log-likelihood at convergence</button>
+    <div class="feedback-bar" id="fb-q24"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: GOF tests in logistic regression are very sensitive to lack of fit that affects only a small number of observations.</div>
+    <button class="option-btn" onclick="answer(this,'q25',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q25',true)">False</button>
+    <div class="feedback-bar" id="fb-q25"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · Residual Plots</div>
+    <div class="question-stem">When plotting deviance residuals against a continuous predictor with a lowess smooth, what pattern suggests a missing quadratic term?</div>
+    <button class="option-btn" onclick="answer(this,'q26',false)">A. A horizontal line near zero</button>
+    <button class="option-btn" onclick="answer(this,'q26',true)">B. A curved, inverted-U or U-shape deviating from zero</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">C. Two parallel vertical strips</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">D. Residuals uniformly above zero</button>
+    <div class="feedback-bar" id="fb-q26"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For Bernoulli data ($n_i = 1$), residual plots consisting of two parallel lines of dots are fully informative for detecting lack of fit.</div>
+    <button class="option-btn" onclick="answer(this,'q27',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q27',true)">False</button>
+    <div class="feedback-bar" id="fb-q27"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · Donner Case Study</div>
+    <div class="question-stem">What did the LRT comparing the main effects model ($\text{Outcome} \sim \text{Age} + \text{fem}$) to the quadratic-interaction model reveal?</div>
+    <button class="option-btn" onclick="answer(this,'q28',false)">A. No significant improvement; the simpler model was kept</button>
+    <button class="option-btn" onclick="answer(this,'q28',true)">B. Significant improvement ($p = 0.004$); the complex model fits better</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">C. The models were equivalent by AIC</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">D. The quadratic model converged to the same coefficients</button>
+    <div class="feedback-bar" id="fb-q28"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · R Calculation</div>
+    <div class="question-stem">In R, <code>sum(residuals(mod, type="pearson")^2)</code> computes which quantity?</div>
+    <button class="option-btn" onclick="answer(this,'q29',false)">A. The deviance $D$</button>
+    <button class="option-btn" onclick="answer(this,'q29',true)">B. The Pearson $\chi^2$ statistic $X^2$</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">C. The AIC</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">D. The log-likelihood</button>
+    <div class="feedback-bar" id="fb-q29"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In R, the function <code>glm()</code> does not have a built-in log-log link, requiring a custom link function to be programmed.</div>
+    <button class="option-btn" onclick="answer(this,'q30',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">False</button>
+    <div class="feedback-bar" id="fb-q30"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Deviance Analogy</div>
+    <div class="question-stem">The null deviance $D_0$ in logistic regression is the analogue of which quantity in linear regression?</div>
+    <button class="option-btn" onclick="answer(this,'q31',false)">A. Residual sum of squares (SSE)</button>
+    <button class="option-btn" onclick="answer(this,'q31',true)">B. Total sum of squares (SSTO)</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">C. Regression sum of squares (SSR)</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">D. Mean square error (MSE)</button>
+    <div class="feedback-bar" id="fb-q31"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · Concept</div>
+    <div class="question-stem">A logistic regression model yields $X^2 = 7.22$, df = 9, $p = 0.61$. The correct conclusion is:</div>
+    <button class="option-btn" onclick="answer(this,'q32',false)">A. The model is a perfect fit</button>
+    <button class="option-btn" onclick="answer(this,'q32',false)">B. There is strong evidence of lack of fit</button>
+    <button class="option-btn" onclick="answer(this,'q32',true)">C. There is no significant evidence of lack of fit</button>
+    <button class="option-btn" onclick="answer(this,'q32',false)">D. The predictors are jointly non-significant</button>
+    <div class="feedback-bar" id="fb-q32"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · Links</div>
+    <div class="question-stem">The relationship between logit and probit coefficients is approximately: $\hat\beta_L \approx$</div>
+    <button class="option-btn" onclick="answer(this,'q33',false)">A. $0.55\,\hat\beta_P$</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">B. $\hat\beta_P$</button>
+    <button class="option-btn" onclick="answer(this,'q33',true)">C. $1.814\,\hat\beta_P$</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">D. $\pi\,\hat\beta_P$</button>
+    <div class="feedback-bar" id="fb-q33"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For the studentized Pearson residual, absolute values larger than 2 or 3 provide evidence of lack of fit only when repeated measurements are available ($n_i > 1$).</div>
+    <button class="option-btn" onclick="answer(this,'q34',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q34',false)">False</button>
+    <div class="feedback-bar" id="fb-q34"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · Delta Method</div>
+    <div class="question-stem">When using the delta method to compute the SE of $\widehat{LD}_{50} = -\hat\beta_0/\hat\beta_1$, what do we need in addition to the MLEs?</div>
+    <button class="option-btn" onclick="answer(this,'q35',false)">A. Bootstrap resamples</button>
+    <button class="option-btn" onclick="answer(this,'q35',true)">B. The estimated covariance matrix $\hat{V} = \widehat{\text{Var}}(\hat{\boldsymbol\beta})$</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">C. Profile likelihood contours</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">D. The null deviance</button>
+    <div class="feedback-bar" id="fb-q35"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Cook's Distance</div>
+    <div class="question-stem">The Cook's distance formula $C_i = e_{P_i}^2 \hat{h}_{ii} / [p(1-\hat{h}_{ii})^2]$ shows that an observation with high leverage $\hat{h}_{ii}$ but small Pearson residual $e_{P_i}$:</div>
+    <button class="option-btn" onclick="answer(this,'q36',false)">A. Will always have large $C_i$</button>
+    <button class="option-btn" onclick="answer(this,'q36',true)">B. May still have moderate $C_i$ — leverage alone does not make an observation influential</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">C. Has $C_i = 0$</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">D. Should always be removed from the analysis</button>
+    <div class="feedback-bar" id="fb-q36"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: Exact computation of $\Delta X^2_i$ and $\Delta D_i$ for all $n$ cases requires fitting the model $n$ times, which motivates the use of one-step approximations.</div>
+    <button class="option-btn" onclick="answer(this,'q37',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q37',false)">False</button>
+    <div class="feedback-bar" id="fb-q37"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · Hosmer-Lemeshow</div>
+    <div class="question-stem">In the Hosmer-Lemeshow test with $g=10$ groups, the degrees of freedom for the chi-square reference distribution is:</div>
+    <button class="option-btn" onclick="answer(this,'q38',false)">A. 10</button>
+    <button class="option-btn" onclick="answer(this,'q38',true)">B. 8</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">C. 9</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">D. $n - p$</button>
+    <div class="feedback-bar" id="fb-q38"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Concept</div>
+    <div class="question-stem">In the context of the deviance, what is the significance of the fact that $D \geq 0$ always, with equality only when the fitted model is the saturated model?</div>
+    <button class="option-btn" onclick="answer(this,'q39',false)">A. It means the logistic model always has lower AIC than a linear model</button>
+    <button class="option-btn" onclick="answer(this,'q39',true)">B. It reflects that the saturated model achieves the maximum attainable log-likelihood, so any less complex model can only do worse</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">C. It proves the model cannot be improved by adding predictors</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">D. It ensures the chi-square approximation always holds</button>
+    <div class="feedback-bar" id="fb-q39"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In large logistic regression studies, individual observations almost always have a negligible effect on model estimates, unless they are truly extreme outliers.</div>
+    <button class="option-btn" onclick="answer(this,'q40',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q40',false)">False</button>
+    <div class="feedback-bar" id="fb-q40"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · R Output</div>
+    <div class="question-stem">The R output shows that for the cloglog model the intercept is $-1.1001$ and the dose coefficient is $0.1335$. Compared to the logit model (intercept $-1.404$, dose $0.264$), the cloglog coefficient for dose is smaller. This reflects:</div>
+    <button class="option-btn" onclick="answer(this,'q41',false)">A. The cloglog model is a worse fit</button>
+    <button class="option-btn" onclick="answer(this,'q41',true)">B. Different link functions produce coefficients on different scales; they cannot be directly compared for magnitude</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">C. The dose is not significant in the cloglog model</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">D. The cloglog model uses a different sample</button>
+    <div class="feedback-bar" id="fb-q41"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The Hosmer-Lemeshow test using Strategy 1 (quantile grouping) gives a better chi-square approximation than Strategy 2 (equal interval grouping), according to simulation studies.</div>
+    <button class="option-btn" onclick="answer(this,'q42',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">False</button>
+    <div class="feedback-bar" id="fb-q42"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · Calculation</div>
+    <div class="question-stem">If $\hat\pi_i = 0.8$ and $y_i = 1$, what is the Pearson residual $e_{P_i}$?</div>
+    <button class="option-btn" onclick="answer(this,'q43',false)">A. $-0.8/\sqrt{0.16} = -2.0$</button>
+    <button class="option-btn" onclick="answer(this,'q43',true)">B. $0.2/\sqrt{0.16} = 0.5$</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">C. $0.2/\sqrt{0.8} \approx 0.224$</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">D. $1/\sqrt{0.16} = 2.5$</button>
+    <div class="feedback-bar" id="fb-q43"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Concept</div>
+    <div class="question-stem">Why is residual analysis for logistic regression with binary data ($n_i=1$) less informative than for linear regression?</div>
+    <button class="option-btn" onclick="answer(this,'q44',false)">A. Because logistic regression does not have residuals</button>
+    <button class="option-btn" onclick="answer(this,'q44',true)">B. Because each residual can take only two possible values, forming two parallel lines in plots, giving limited structural information</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">C. Because the chi-square approximation is exact in this case</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">D. Because the hat matrix is the identity for binary data</button>
+    <div class="feedback-bar" id="fb-q44"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Links</div>
+    <div class="question-stem">Which of the following statements about the log-log link is CORRECT?</div>
+    <button class="option-btn" onclick="answer(this,'q45',false)">A. It is implemented directly in R's <code>glm()</code> with <code>family=binomial(loglog)</code></button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">B. It is symmetric around $\pi = 0.5$</button>
+    <button class="option-btn" onclick="answer(this,'q45',true)">C. When $\beta > 0$, the fitted curve is monotone decreasing in $x$</button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">D. It arises from a Gumbel error distribution in the latent variable model</button>
+    <div class="feedback-bar" id="fb-q45"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: When influential observations are identified in a logistic regression analysis, the standard recommendation is to always remove them from the dataset.</div>
+    <button class="option-btn" onclick="answer(this,'q46',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q46',true)">False</button>
+    <div class="feedback-bar" id="fb-q46"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · Donner Data</div>
+    <div class="question-stem">In the Donner data analysis, plotting deviance residuals vs. Age showed a lowess curve that clearly deviated from zero. The immediate diagnostic conclusion was:</div>
+    <button class="option-btn" onclick="answer(this,'q47',false)">A. Outliers should be removed</button>
+    <button class="option-btn" onclick="answer(this,'q47',true)">B. A nonlinear (quadratic) age term may be needed in the model</button>
+    <button class="option-btn" onclick="answer(this,'q47',false)">C. The gender predictor is not significant</button>
+    <button class="option-btn" onclick="answer(this,'q47',false)">D. The logit link is inappropriate and probit should be used</button>
+    <div class="feedback-bar" id="fb-q47"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · R Output</div>
+    <div class="question-stem">The R output for the bootstrap CI of LD50 reports: Normal (3.825, 6.990), Basic (4.216, 7.195), Percentile (3.426, 6.406), BCa (3.353, 6.364). The relatively narrow BCa interval compared to the Normal and Basic intervals suggests:</div>
+    <button class="option-btn" onclick="answer(this,'q48',false)">A. The BCa is always the most conservative CI</button>
+    <button class="option-btn" onclick="answer(this,'q48',true)">B. The bootstrap distribution is skewed, affecting each method differently; the BCa corrects for bias and skewness</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">C. The Normal CI underestimates the true variance</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">D. More bootstrap replicates are needed</button>
+    <div class="feedback-bar" id="fb-q48"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In the Donner data quadratic model, the Hosmer-Lemeshow test gives $p = 0.878$, suggesting the quadratic interaction model fits significantly better than the linear main effects model by this criterion.</div>
+    <button class="option-btn" onclick="answer(this,'q49',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q49',false)">False</button>
+    <div class="feedback-bar" id="fb-q49"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integration</div>
+    <div class="question-stem">A researcher fits a logistic model with continuous age as the only predictor and wishes to formally test goodness-of-fit. Which combination of methods is most appropriate?</div>
+    <button class="option-btn" onclick="answer(this,'q50',false)">A. Pearson $\chi^2$ test only, since it is the most powerful</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">B. Deviance test only, since it is equivalent to the F-test</button>
+    <button class="option-btn" onclick="answer(this,'q50',true)">C. Hosmer-Lemeshow test (for overall fit) together with residual plots (for pattern detection)</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">D. No formal GOF test is possible for continuous predictors; one must use AIC comparison only</button>
+    <div class="feedback-bar" id="fb-q50"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+
+<!-- ═══════════════════════ SHORT ANSWER ═══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Oral Exam Short Answer — 10 Questions</h2>
+  <p style="margin-bottom:20px;font-size:0.93em;color:#555;">These questions are designed for oral examination with follow-up discussion. Click "Reveal Answer" to see a model response.</p>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · LD50 Inference</div>
+    <div class="question-stem">Explain what LD50 means, how it is derived from the logistic regression model, and compare the Wald (delta method), bootstrap, and profile likelihood approaches to constructing a 95% confidence interval for it. When would you prefer one over another?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="sa1">
+      <strong>Model Answer:</strong><br>
+      The LD50 (or EL50 in general pharmacology) is the dose $x$ at which exactly 50% of the population exhibits the response of interest. Under the logistic model $\text{logit}[\pi(x)] = \beta_0 + \beta_1 x$, setting $\pi = 0.5$ gives $\text{logit}(0.5) = 0$, so $0 = \beta_0 + \beta_1 \cdot LD_{50}$, yielding $LD_{50} = -\beta_0/\beta_1$. It also corresponds to the point of steepest slope on the sigmoid curve.
+      <br><br>
+      <strong>Inference:</strong> The MLE $\widehat{LD}_{50} = -\hat\beta_0/\hat\beta_1$ is nonlinear in the MLEs.
+      <ul style="margin:8px 0 8px 20px">
+        <li><strong>Wald / delta method:</strong> Approximate SE via $\text{Var}(g(\hat{\boldsymbol\beta})) \approx \nabla g^T \hat{V} \nabla g$. Fast and closed-form, but may be inaccurate for small samples or when the ratio $\beta_0/\beta_1$ is estimated with high uncertainty.</li>
+        <li><strong>Profile likelihood CI:</strong> Inverts the LRT for $LD_{50}$ directly. More accurate than Wald, especially when the statistic's sampling distribution is skewed.</li>
+        <li><strong>Bootstrap CI:</strong> Re-fits the model on $R$ resamples and uses the empirical distribution of $\widehat{LD}_{50}^*$. The basic (pivotal) CI is preferred when the bootstrap distribution is skewed (as seen in the animal experiment). No distributional assumptions on the nonlinear statistic are needed.</li>
+      </ul>
+      In the animal experiment, the bootstrap basic CI (4.216, 7.195) was wider than the Wald CI (3.91, 6.71), reflecting the right-skewed bootstrap distribution of $\widehat{LD}_{50}$.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why does the percentile CI perform poorly for skewed bootstrap distributions?</li>
+          <li>What does it mean that BCa may be unstable in this setting?</li>
+          <li>Would the LD50 concept generalise to a probit model? What would the formula be?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Sigmoidal Link Functions</div>
+    <div class="question-stem">Describe the latent variable framework that gives rise to different sigmoidal link functions. Why are logit and probit symmetric while cloglog and loglog are not? What are the practical consequences of choosing a symmetric vs. asymmetric link?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="sa2">
+      <strong>Model Answer:</strong><br>
+      Consider a latent continuous variable $\tilde{y}_i = -\mathbf{x}_i^T\boldsymbol\beta_c + \varepsilon_i$, and define $y_i = 1$ iff $\tilde{y}_i \leq 0$. Then $\pi_i = P(y_i=1|\mathbf{x}_i) = P(\varepsilon_i \leq \mathbf{x}_i^T\boldsymbol\beta_c) = F(\mathbf{x}_i^T\boldsymbol\beta_c)$, where $F$ is the CDF of $\varepsilon$.
+      <ul style="margin:8px 0 8px 20px">
+        <li>Normal $F$ → Probit link (symmetric CDF)</li>
+        <li>Logistic $F$ → Logit link (symmetric CDF, heavier tails than normal)</li>
+        <li>Gumbel (extreme value) $F$ → Complementary log-log link (asymmetric)</li>
+        <li>Reversed Gumbel $F$ → Log-log link (asymmetric)</li>
+      </ul>
+      <strong>Symmetry:</strong> A link is symmetric if $F(z) = 1 - F(-z)$ (i.e., the CDF is symmetric around zero). Normal and logistic distributions have this property; Gumbel does not (it has a longer right tail). Symmetry implies that recoding $y'_i = 1 - y_i$ only reverses the signs of all coefficients — not the case for asymmetric links.
+      <br><br>
+      <strong>Practical consequences:</strong> If the true response curve approaches 0 and 1 at different rates (e.g., rapidly saturates at 1 but gradually rises from 0), a symmetric link will be misspecified. The cloglog is appropriate when small doses rarely cause the event but high doses almost certainly do (saturates quickly at 1). In practice, all four links often produce similar fitted curves in the middle range and differ mainly in the tails — where data are often sparse.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>How do you decide which link to use in practice?</li>
+          <li>What is the relationship between the logit and probit coefficients numerically?</li>
+          <li>What does it mean that $\boldsymbol\beta_c$ and $\sigma$ are not individually identifiable?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Goodness-of-Fit Tests</div>
+    <div class="question-stem">Explain the Pearson chi-square and deviance GOF tests for logistic regression. Under what conditions are they valid? What is the connection between the deviance and the familiar log-likelihood ratio test?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="sa3">
+      <strong>Model Answer:</strong><br>
+      Both tests compare the fitted logistic model to the <em>saturated model</em>, which has one free parameter per distinct covariate pattern and achieves the maximum attainable log-likelihood $\ell(\tilde{\boldsymbol\pi})$.
+      <br><br>
+      <strong>Pearson $\chi^2$:</strong> $X^2 = \sum_{i=1}^N (y_i - n_i\hat\pi_i)^2 / [n_i\hat\pi_i(1-\hat\pi_i)]$. This is the standard GOF statistic, comparing observed to expected counts within each covariate group.
+      <br><br>
+      <strong>Deviance:</strong> $D = -2[\ell(\hat{\boldsymbol\pi}) - \ell(\tilde{\boldsymbol\pi})]$. This is explicitly a likelihood ratio test statistic. When the model is correct, the fitted model's log-likelihood $\ell(\hat{\boldsymbol\pi})$ should be close to the saturated model's $\ell(\tilde{\boldsymbol\pi})$, so $D$ should be small. Large $D$ indicates misspecification.
+      <br><br>
+      Both $X^2$ and $D$ have the same asymptotic null distribution: $\chi^2(N-p)$, under the conditions that $N$ is fixed and $n_i \to \infty$. This requires <em>only categorical predictors</em>. With continuous predictors, $N$ grows with $n$ and the chi-square approximation fails. The deviance generalises the SSE from linear regression; the null deviance generalises the total SS.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>What happens to these tests when predictors are continuous?</li>
+          <li>Why is the Hosmer-Lemeshow test preferred in that case?</li>
+          <li>Can a large deviance always be attributed to misspecification?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · Hosmer-Lemeshow Test</div>
+    <div class="question-stem">Describe the Hosmer-Lemeshow test in detail: how is it constructed, what is its null distribution, and what are its limitations? How did it guide model building in the Donner Party analysis?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="sa4">
+      <strong>Model Answer:</strong><br>
+      The HL test addresses the failure of the Pearson $\chi^2$ and deviance tests when predictors are continuous. Instead of grouping by covariate pattern (which is unique for each observation), it groups by <em>estimated probabilities</em> $\hat\pi_1,\ldots,\hat\pi_n$.
+      <br><br>
+      <strong>Construction:</strong> Divide observations into $g$ (usually 10) strata. Strategy 1 uses quantiles of $\hat\pi_i$ (preferred by simulation); Strategy 2 uses equal intervals $[0,1/g], (1/g, 2/g],\ldots$. Within each stratum $k$, compute observed counts $O_{k1}, O_{k0}$ and expected counts $E_{k1}=\sum \hat\pi_i$, $E_{k0}=\sum(1-\hat\pi_i)$. The test statistic is the usual $X^2$ on these $2g$ cells.
+      <br><br>
+      <strong>Null distribution:</strong> By simulation, $\hat{C} \xrightarrow{d} \chi^2(g-2)$ (losing 2 df). With $g=10$, this gives $\chi^2(8)$.
+      <br><br>
+      <strong>Limitations:</strong> Power depends on $g$; the test may miss localized departures. It should always be supplemented with residual plots.
+      <br><br>
+      <strong>Donner Party:</strong> The main effects model gave $\hat{C} = 16.01$, $p = 0.042$ — marginal evidence of misspecification. This prompted adding a quadratic age term and a gender-age interaction. The extended model gave $\hat{C} = 3.76$, $p = 0.878$ — excellent fit.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why does the HL test have $g-2$ rather than $g$ degrees of freedom?</li>
+          <li>Is the HL test robust to the choice of $g$?</li>
+          <li>What would you do if the HL test rejects but residual plots show no obvious pattern?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Types of Residuals</div>
+    <div class="question-stem">Distinguish between Pearson, studentized Pearson, and deviance residuals in logistic regression. What is the relationship between each residual type and the corresponding GOF test statistic? When does each become uninformative?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="sa5">
+      <strong>Model Answer:</strong><br>
+      <strong>Pearson residuals:</strong> $e_{P_i} = (y_i - \hat\pi_i)/\sqrt{\hat\pi_i(1-\hat\pi_i)}$. Standardise the ordinary residual by the estimated SD of $y_i$. Their squares sum to $X^2$, the Pearson chi-square statistic. The problem is that $e_{P_i}$ uses $\hat\pi_i$ (an estimate) in the denominator, so its variance is not exactly 1.
+      <br><br>
+      <strong>Studentized Pearson:</strong> $e_{sP_i} = e_{P_i}/\sqrt{1-\hat{h}_{ii}}$. Divides by the estimated SD of the residual (not just of $y_i$), accounting for the fact that the fitted value $\hat\pi_i$ is estimated. With replications ($n_i$ large), $e_{sP_i} \approx N(0,1)$, so $|e_{sP_i}| > 2$ or $3$ is a useful diagnostic threshold.
+      <br><br>
+      <strong>Deviance residuals:</strong> $D_i = \text{sign}(y_i-\hat\pi_i)\sqrt{-2[y_i\log\hat\pi_i + (1-y_i)\log(1-\hat\pi_i)]}$. Their squares sum to the deviance $D$. They measure each observation's contribution to the LRT against the saturated model.
+      <br><br>
+      <strong>When uninformative:</strong> For binary data ($n_i=1$), each residual takes only two possible values (one if $y_i=1$, another if $y_i=0$), producing two parallel lines in plots. Neither $X^2$ nor $D$ follows a chi-square distribution in this case. Residual plots with a lowess smooth remain useful for detecting systematic patterns despite this limitation.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why is the studentized Pearson residual preferred over the ordinary Pearson residual?</li>
+          <li>How does the hat matrix $\hat{\mathbf{H}}$ in logistic regression differ from linear regression?</li>
+          <li>If you see two parallel horizontal bands in a residual plot, what does that tell you?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Influence Diagnostics</div>
+    <div class="question-stem">Explain the concepts of $\Delta X^2_i$, $\Delta D_i$, and Cook's distance in logistic regression. How are they approximated in practice, and why is interpreting their magnitude difficult?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa6')">Reveal Answer</button>
+    <div class="answer-panel" id="sa6">
+      <strong>Model Answer:</strong><br>
+      These measures quantify how much the $i$-th observation changes key summaries of the analysis when it is deleted.
+      <br><br>
+      <strong>$\Delta X^2_i = X^2 - X^2_{(i)}$:</strong> Change in Pearson $\chi^2$. One-step approximation: $\approx e_{sP_i}^2$. Flags observations that disproportionately drive the overall Pearson GOF statistic.
+      <br><br>
+      <strong>$\Delta D_i = D - D_{(i)}$:</strong> Change in deviance. One-step approximation: $\approx D_i^2 + \hat{h}_{ii}e_{sP_i}^2$. Note it includes both the deviance residual squared and the leverage-weighted studentized residual — both high "misfit" and high "leverage" contribute.
+      <br><br>
+      <strong>Cook's distance:</strong> $C_i = e_{P_i}^2\hat{h}_{ii}/[p(1-\hat{h}_{ii})^2]$. Measures the standardised change in the fitted linear predictor. An observation requires both substantial misfit ($e_{P_i}^2$) and substantial leverage ($\hat{h}_{ii}$) to be truly influential.
+      <br><br>
+      <strong>Interpretive difficulty:</strong> No reference distribution exists for any of these measures. Unlike linear regression (where Cook's $D > 1$ or $4/n$ is sometimes used), no universal threshold applies in logistic regression. One must rely on graphical inspection — "spikes" versus case number or clusters in the upper corners of scatter plots.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>How are the one-step approximations derived? Why do they avoid $n$ refits?</li>
+          <li>If an observation is influential, does that mean it should be removed?</li>
+          <li>What is leverage ($\hat{h}_{ii}$) measuring in logistic regression?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · Bootstrap Methodology</div>
+    <div class="question-stem">Describe the bootstrap procedure for constructing a confidence interval for a nonlinear function of logistic regression parameters, such as LD50. Contrast the normal, basic, percentile, BCa, and studentized types. In which situations does each fail?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa7')">Reveal Answer</button>
+    <div class="answer-panel" id="sa7">
+      <strong>Model Answer:</strong><br>
+      Bootstrap generates an empirical sampling distribution of a statistic $T = t(\mathbf{y})$ by resampling <em>with replacement</em> from the observed data $R$ times. For LD50, each resample fits a logistic model and computes $T^*_r = -\hat\beta_{0,r}^*/\hat\beta_{1,r}^*$.
+      <br><br>
+      <strong>Normal CI:</strong> $\hat\theta \pm z_{\alpha/2}\widehat{\text{SE}}_{boot}$, bias-corrected. Fails if $T$ is non-normal (e.g., skewed).
+      <br><br>
+      <strong>Basic (pivotal) CI:</strong> $(2\hat\theta - T^*_{(1-\alpha/2)},\; 2\hat\theta - T^*_{(\alpha/2)})$. Reflects the bootstrap distribution without assuming normality. More robust to skewness than the percentile CI.
+      <br><br>
+      <strong>Percentile CI:</strong> $(T^*_{(\alpha/2)}, T^*_{(1-\alpha/2)})$. Directly takes the empirical quantiles. Intuitive but invalid when the bootstrap distribution is asymmetrically shifted relative to the true sampling distribution.
+      <br><br>
+      <strong>BCa:</strong> Adjusts for bias and skewness by selecting modified percentiles of the bootstrap distribution. Can be unstable when the bias-correction factor $\hat{z}_0$ pushes the required quantiles into the tails, where empirical estimates are noisy.
+      <br><br>
+      <strong>Studentized:</strong> Like the basic CI but uses a pivot standardised by a within-bootstrap SE estimate. Most accurate when the additional variance estimation is reliable; failing to provide the variance estimate triggers R's warning.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why does sampling with replacement (rather than without) capture sampling variability?</li>
+          <li>How many bootstrap replicates $R$ are typically recommended?</li>
+          <li>Is the bootstrap valid for any test statistic and sample size?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · The Deviance as a Generalisation</div>
+    <div class="question-stem">Explain how the deviance in logistic regression generalises the sum of squared errors (SSE) from linear regression. What is the null deviance and what does a large drop from null to residual deviance signify? How is this related to the AIC?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa8')">Reveal Answer</button>
+    <div class="answer-panel" id="sa8">
+      <strong>Model Answer:</strong><br>
+      In linear regression, the SSE measures how far the fitted values are from the observed values. The deviance $D = -2[\ell(\hat{\boldsymbol\pi}) - \ell(\tilde{\boldsymbol\pi})]$ plays the same role in logistic regression: it measures the discrepancy between the fitted model and the best possible fit (the saturated model). The connection is exact in linear regression with normal errors, where $-2$ times the log-likelihood difference equals the scaled SSE.
+      <br><br>
+      <strong>Null deviance $D_0$:</strong> The deviance when the model contains only an intercept (worst realistic model — every observation predicted to have the same probability $\bar{y}$). This is the logistic analogue of the total SS, measuring total variability in the response.
+      <br><br>
+      <strong>Large drop $D_0 - D$:</strong> A large reduction indicates the predictors explain substantial variation in $\pi$. This is also a LRT for the joint significance of all predictors: $D_0 - D \sim \chi^2(p-1)$ under $H_0$: all slope coefficients are zero.
+      <br><br>
+      <strong>AIC connection:</strong> $\text{AIC} = -2\ell(\hat{\boldsymbol\pi}) + 2p = D + 2p - 2\ell(\tilde{\boldsymbol\pi})$. Since $\ell(\tilde{\boldsymbol\pi})$ is the same for all models on the same dataset, minimising AIC is equivalent to minimising $D + 2p$ — balancing fit and complexity.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>What is the residual deviance in R's output and how does it relate to $D$?</li>
+          <li>Can you construct a pseudo-$R^2$ from the deviance and null deviance?</li>
+          <li>What does it mean if $D >$ null deviance?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · The Donner Party Quadratic Model</div>
+    <div class="question-stem">Walk through the complete model-building process for the Donner Party data as presented in the lecture: initial fit, GOF assessment, residual diagnostics, model extension, and validation. What is the substantive interpretation of the final model?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa9')">Reveal Answer</button>
+    <div class="answer-panel" id="sa9">
+      <strong>Model Answer:</strong><br>
+      <strong>Step 1 — Initial model:</strong> Main effects logistic model: $\text{logit}[\pi] = \beta_0 + \beta_1\text{Age} + \beta_2\text{fem}$. Residual deviance = 108.87 on 85 df; AIC = 114.87.
+      <br><br>
+      <strong>Step 2 — GOF:</strong> Hosmer-Lemeshow test ($g=10$): $\hat{C} = 16.01$, $p = 0.042$ — marginal evidence of misspecification.
+      <br><br>
+      <strong>Step 3 — Residual diagnostics:</strong> Deviance residuals vs. linear predictor: roughly flat lowess (no alarm). Deviance residuals vs. Age: curved lowess departing from zero — suggests a quadratic age relationship. Loess by gender shows women maintaining high survival at young ages but declining rapidly; men show a more gradual decline across all ages.
+      <br><br>
+      <strong>Step 4 — Extended model:</strong> <code>glm(Outcome ~ fem * poly(Age,2), family=binomial("logit"))</code>. LRT vs. main effects: deviance drop = 13.24 on 3 df, $p = 0.004$ — significant improvement. New HL: $\hat{C} = 3.76$, $p = 0.878$. Delta chi-square and Cook's plots show case 24 as most influential.
+      <br><br>
+      <strong>Substantive interpretation:</strong> Survival depended on both sex and age, but with different quadratic age profiles by gender. Women had overall higher survival, with a pronounced peak around younger ages. For men, survival declined more monotonically with age. A linear age effect was insufficient for women.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why is <code>poly(Age,2)</code> used instead of <code>Age + Age^2</code>?</li>
+          <li>What would it mean if Cook's distance for case 24 was 0.30?</li>
+          <li>Is the observed proportions table a good final validation tool?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · Integrative / Critical Thinking</div>
+    <div class="question-stem">Critically evaluate the statement: "Once the Hosmer-Lemeshow test gives a non-significant p-value, the logistic regression model is adequate and no further diagnostics are needed." What are the limitations of this conclusion?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa10')">Reveal Answer</button>
+    <div class="answer-panel" id="sa10">
+      <strong>Model Answer:</strong><br>
+      The statement is an overreach. The HL test is a necessary but far from sufficient check on model adequacy. Several important limitations apply:
+      <br><br>
+      <strong>1. Power limitations:</strong> The HL test is a global summary — it averages over all $g$ groups. It may fail to detect localized departures that affect only a small number of groups or that cancel across groups.
+      <br><br>
+      <strong>2. Sensitivity to $g$:</strong> The test result can change substantially depending on the choice of number of groups $g$. A non-significant result with $g=10$ might become significant with $g=8$ or $g=12$.
+      <br><br>
+      <strong>3. Influence not addressed:</strong> A good HL p-value says nothing about whether individual influential observations are distorting the parameter estimates. Cook's distance and delta statistics can reveal problems the HL test entirely misses.
+      <br><br>
+      <strong>4. Functional form not tested:</strong> The HL test does not directly test whether the link function is appropriate, whether a predictor's effect is linear, or whether important interactions are missing.
+      <br><br>
+      <strong>5. Residual plots:</strong> Plots of deviance residuals against predictors can reveal systematic curvature or heteroscedasticity (in grouped data) that no summary statistic captures.
+      <br><br>
+      <strong>Recommendation:</strong> Use the HL test as one tool in a broader diagnostic toolkit that includes residual plots (deviance and Pearson, vs. linear predictor and vs. each covariate), influence measures ($\Delta X^2$, $\Delta D$, Cook's $D$), comparison of observed vs. predicted proportions in subgroups, and subject-matter reasoning.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>What would a perfect model look like in terms of all the diagnostics discussed?</li>
+          <li>Can a model have a good HL test but terrible predictive performance?</li>
+          <li>When is it appropriate to conclude that model fit is sufficient without formal tests?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+/* ── Score tracking ── */
+var answered = {}, correct = {};
+
+function answer(btn, qid, isCorrect) {
+  if (answered[qid]) return;
+  answered[qid] = true;
+  correct[qid] = isCorrect;
+
+  var card = document.getElementById(qid);
+  var buttons = card.querySelectorAll('.option-btn');
+  buttons.forEach(function(b) {
+    b.disabled = true;
+    if (b === btn) {
+      b.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if (b.onclick.toString().includes('true')) {
+      b.classList.add('reveal-correct');
+    }
+  });
+
+  var fb = document.getElementById('fb-' + qid);
+  if (isCorrect) {
+    fb.textContent = '✅ Correct!';
+    fb.className = 'feedback-bar correct';
+  } else {
+    fb.textContent = '❌ Incorrect — the highlighted option is correct.';
+    fb.className = 'feedback-bar incorrect';
+  }
+  updateScore();
+}
+
+function updateScore() {
+  var total = Object.keys(answered).length;
+  var corr  = Object.values(correct).filter(Boolean).length;
+  document.getElementById('score-display').textContent = 'Score: ' + corr + ' / ' + total;
+}
+
+function resetAll() {
+  answered = {}; correct = {};
+  document.querySelectorAll('.option-btn').forEach(function(b) {
+    b.disabled = false;
+    b.className = 'option-btn';
+  });
+  document.querySelectorAll('.feedback-bar').forEach(function(f) {
+    f.textContent = ''; f.className = 'feedback-bar';
+  });
+  document.getElementById('score-display').textContent = 'Score: 0 / 0';
+}
+
+/* ── Short answer reveal ── */
+function toggleAnswer(id) {
+  var panel = document.getElementById(id);
+  var btn = panel.previousElementSibling;
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.textContent = 'Reveal Answer';
+  } else {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide Answer';
+  }
+}
+</script>
+</body>
+</html>

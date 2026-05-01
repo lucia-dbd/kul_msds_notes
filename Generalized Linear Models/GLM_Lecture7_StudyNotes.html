@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poisson Regression – Chapter 7 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() { console.log('MathJax ready'); });
+    }
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c3a;
+    max-width: 960px; margin: 0 auto; padding: 24px 16px 60px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff; border-radius: 14px; padding: 28px 36px;
+    margin-bottom: 24px; box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff; border: 1px solid #dde3ef;
+    padding: 10px 18px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px;
+    margin-top: 0; margin-bottom: 16px; font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin: 20px 0 8px; }
+  .notes-section p { margin-bottom: 10px; }
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  pre {
+    background:#1e2435; color:#e8eaf0; border-radius:8px;
+    padding:14px 18px; font-family:'JetBrains Mono', monospace;
+    font-size:0.82em; line-height:1.6; overflow-x:auto; margin:14px 0;
+  }
+  code { font-family:'JetBrains Mono', monospace; font-size:0.88em; background:#f0f4fb; padding:1px 5px; border-radius:3px; color:#1a3a5c; }
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:0.95em; margin-bottom:20px; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+  .option-btn {
+    display:block; width:100%; background:#ffffff; border:1.5px solid #d0d8ea;
+    border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section > h2 { color:#4a148c; font-size:1.2em; font-weight:700; margin-bottom:20px; font-family:'Crimson Pro', Georgia, serif; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn { background:#6f42c1; color:#ffffff; border:none; border-radius:20px; padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; font-family:inherit; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block { background:#fff8e1; border-left:3px solid #ffc107; padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0; font-size:0.92em; }
+  .followup-block strong { color:#7c5800; }
+  .reset-btn { background:#1a3a5c; color:#fff; border:none; border-radius:20px; padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:20px; transition:background 0.2s; font-family:inherit; }
+  .reset-btn:hover { background:#2e6da4; }
+  @media(max-width:600px){ .notes-section, .mcq-section, .sa-section { padding:18px 14px; } .page-header { padding:20px 18px; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Poisson Regression — Chapter 7</h1>
+  <div class="subtitle">Poisson Distribution · Log-Linear Model · Offset & Rates · MLE · GOF · DHARMa Residuals · Overdispersion · Sandwich · Quasi-likelihood · Negative Binomial · Zero-Inflated Models · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<nav class="nav-bar">
+  <a href="#poisson-dist">Poisson Distribution</a>
+  <a href="#model">Log-Linear Model</a>
+  <a href="#interpretation">Interpretation</a>
+  <a href="#mle">MLE</a>
+  <a href="#offset">Offset & Rates</a>
+  <a href="#gof">GOF & Residuals</a>
+  <a href="#overdispersion">Overdispersion</a>
+  <a href="#sandwich">Sandwich SE</a>
+  <a href="#quasi">Quasi-likelihood</a>
+  <a href="#negbin">Negative Binomial</a>
+  <a href="#zip">Zero-Inflated</a>
+  <a href="#comparison">Model Comparison</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ═══════════════════════ NOTES ═══════════════════════ -->
+
+<!-- 1. Poisson Distribution -->
+<div class="notes-section" id="poisson-dist">
+  <h2>1. The Poisson Distribution</h2>
+
+  <p>The Poisson distribution is the workhorse for modelling count data — the number of times an event occurs in a fixed interval of time or space.</p>
+
+  <div class="theorem-box">
+    <strong>Definition:</strong> A discrete random variable $y$ follows a Poisson distribution with parameter $\lambda > 0$, written $y \sim \text{Poisson}(\lambda)$, if:
+    $$P(y = k) = \frac{e^{-\lambda}\lambda^k}{k!}, \quad k = 0, 1, 2, \ldots$$
+    Key property: $E(y) = \text{Var}(y) = \lambda$ — <em>mean equals variance</em>.
+  </div>
+
+  <h3>Conditions for a Poisson Process</h3>
+  <p>The Poisson distribution arises naturally from a counting process satisfying three axioms: (1) the expected number of events in any interval is proportional to the interval's length; (2) the probability of two or more simultaneous events in an infinitesimally small interval is zero; (3) events in non-overlapping intervals are independent.</p>
+
+  <h3>Real-World Examples</h3>
+  <table>
+    <thead><tr><th>Domain</th><th>Count variable</th><th>Time/space unit</th></tr></thead>
+    <tbody>
+      <tr><td>Geophysics</td><td>Meteorites &gt;1m diameter striking Earth</td><td>Per year</td></tr>
+      <tr><td>Medicine</td><td>ER patient arrivals</td><td>10–11 pm window</td></tr>
+      <tr><td>Physics</td><td>Photons hitting a detector</td><td>Fixed time interval</td></tr>
+      <tr><td>Epidemiology</td><td>Non-melanoma skin cancer cases</td><td>Per age group per city</td></tr>
+      <tr><td>Academia</td><td>Articles published by PhD biochemists</td><td>Last 3 years of PhD</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Law of Rare Events (Poisson Limit Theorem)</h3>
+  <div class="theorem-box">
+    If $y_n \sim \text{Bin}(n, p_n)$ and $np_n \to \lambda$ as $n \to \infty$, then:
+    $$\lim_{n\to\infty} P(y_n = k) = \frac{e^{-\lambda}\lambda^k}{k!}$$
+    This justifies the Poisson distribution as the limiting case of the binomial when events are rare ($p$ small) and trials are many ($n$ large).
+  </div>
+
+  <div class="key-point">
+    <strong>Why Poisson and not OLS for counts?</strong> OLS allows negative predictions and assumes constant variance — both impossible for counts. The Poisson model enforces $\lambda > 0$ via the log link and naturally links variance to the mean.
+  </div>
+</div>
+
+<!-- 2. Model -->
+<div class="notes-section" id="model">
+  <h2>2. The Poisson Regression Model (Log-Linear Model)</h2>
+
+  <p>Like logistic regression, the Poisson model has two parts:</p>
+
+  <div class="theorem-box">
+    <strong>Systematic part (log-linear):</strong>
+    $$\ln(\lambda) = \ln\!\left[E(y \mid \mathbf{x})\right] = \mathbf{x}^T\boldsymbol\beta = \beta_0 + \beta_1 x_1 + \cdots + \beta_{p-1}x_{p-1}$$
+    Equivalently, the response function is:
+    $$\lambda = \mu(\mathbf{x}, \boldsymbol\beta) = e^{\mathbf{x}^T\boldsymbol\beta}$$
+    <strong>Distribution part:</strong> $y \sim \text{Poisson}(\lambda)$
+  </div>
+
+  <p>The log link is the <em>canonical link</em> for the Poisson family. It ensures $\lambda > 0$ for all real-valued linear predictors — solving the impossible-values problem that would arise with a linear model.</p>
+
+  <div class="key-point">
+    <strong>R syntax:</strong> <code>glm(y ~ x1 + x2, family = poisson(link = "log"))</code><br>
+    For rate models with exposure: <code>glm(y ~ offset(log(n)) + x1 + x2, family = poisson(link = "log"))</code>
+  </div>
+
+  <h3>Hessian Matrix and Information</h3>
+  <p>The Hessian of the log-likelihood is:
+  $$\frac{\partial^2 \ell(\boldsymbol\beta \mid \mathbf{X}, \mathbf{y})}{\partial\boldsymbol\beta\,\partial\boldsymbol\beta^T} = -\mathbf{X}^T\mathbf{V}\mathbf{X}$$
+  where $\mathbf{V} = \text{diag}(e^{\mathbf{x}_1^T\boldsymbol\beta}, \ldots, e^{\mathbf{x}_N^T\boldsymbol\beta})$. Critically, $\mathbf{V}$ does not depend on $\mathbf{y}$, so the observed and expected information matrices are equal: $\mathbf{I}(\boldsymbol\beta) = \mathbf{H}(\boldsymbol\beta)$. This is a special property of GLMs using their canonical link.</p>
+</div>
+
+<!-- 3. Interpretation -->
+<div class="notes-section" id="interpretation">
+  <h2>3. Interpreting Poisson Regression Coefficients</h2>
+
+  <div class="key-point">
+    <strong>The exponentiated coefficients $e^{\hat\beta_j}$ are called <em>Relative Risks</em> (RR) or <em>Rate Ratios</em>.</strong>
+    <ul style="margin:8px 0 0 20px; line-height:2">
+      <li>$e^{\hat\beta_0}$: Expected count when all covariates = 0</li>
+      <li>$e^{\hat\beta_j}$ for continuous $x_j$: A 1-unit increase in $x_j$ <em>multiplies</em> the expected count by $e^{\hat\beta_j}$, holding others fixed</li>
+      <li>$e^{\hat\beta_j}$ for binary/categorical $x_j$: The expected count in group $x_j=1$ is $e^{\hat\beta_j}$ times the expected count in the reference group, holding others fixed</li>
+    </ul>
+  </div>
+
+  <h3>Skin Cancer Case Study — Reading the RR Output</h3>
+  <div class="example-box">
+    <strong>Model:</strong> <code>glm(cases ~ city + age.range + offset(log(n)), family = poisson)</code><br><br>
+    From <code>glm.RR(model.sk, 3)</code>:
+<pre>               RR    2.5 %   97.5 %
+cityDallas  2.234    2.018    2.477
+age.range15_24  0.002  0.001    0.005
+age.range75_84  0.891  0.720    1.112</pre>
+    <strong>Interpretation of cityDallas (RR = 2.234):</strong> Within each age group, the average number of non-melanoma skin cancer cases per person is 2.234 times higher in Dallas than in Minneapolis. Dallas is located further south (closer to the equator), receiving more UV radiation — consistent with a higher cancer rate.<br><br>
+    <strong>Interpretation of age.range15_24 (RR = 0.002):</strong> In each city, the average cancer rate in the 15–24 age group is only 0.2% of the rate in the reference group (85+). Skin cancer accumulates with lifetime UV exposure, so the youngest group has very low rates.<br><br>
+    <strong>age.range75_84 (RR = 0.891, 95% CI: 0.720–1.112):</strong> This CI includes 1, confirming the non-significant Wald test ($p = 0.297$) — the 75–84 and 85+ groups have statistically similar rates.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ "Relative Risk" vs "Odds Ratio":</strong> In Poisson regression, $e^{\hat\beta_j}$ is a risk ratio (ratio of rates/counts), not an odds ratio. This is a direct ratio, not an approximation — unlike logistic regression where OR approximates RR only for rare events.
+  </div>
+</div>
+
+<!-- 4. MLE -->
+<div class="notes-section" id="mle">
+  <h2>4. Maximum Likelihood Estimation</h2>
+
+  <p>Given $N$ pairs $(y_i, \mathbf{x}_i)$, the likelihood and log-likelihood are:</p>
+
+  <div class="formula-box">
+    $$L(\boldsymbol\beta \mid \mathbf{X}, \mathbf{y}) = \prod_{i=1}^N \frac{e^{y_i\mathbf{x}_i^T\boldsymbol\beta} e^{-e^{\mathbf{x}_i^T\boldsymbol\beta}}}{y_i!}$$
+    $$\ell(\boldsymbol\beta \mid \mathbf{X}, \mathbf{y}) = \sum_{i=1}^N \left(y_i\mathbf{x}_i^T\boldsymbol\beta - e^{\mathbf{x}_i^T\boldsymbol\beta} - \log(y_i!)\right) \propto \sum_{i=1}^N \left(y_i\mathbf{x}_i^T\boldsymbol\beta - e^{\mathbf{x}_i^T\boldsymbol\beta}\right)$$
+  </div>
+
+  <p>The score equations are $\frac{\partial\ell}{\partial\boldsymbol\beta} = \mathbf{X}^T(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$, where $\boldsymbol\mu = (e^{\mathbf{x}_i^T\boldsymbol\beta})^T$. These have no closed-form solution. However, the negative log-likelihood $-\ell(\boldsymbol\beta)$ is a <em>convex function</em>, guaranteeing a unique global maximum found via standard convex optimization (IWLS).</p>
+
+  <div class="key-point">
+    <strong>Contrast with logistic regression:</strong> In logistic regression, the Hessian depends on $\mathbf{y}$ through $\hat\pi_i(1-\hat\pi_i)$, so observed ≠ expected information in general. In Poisson with log link (canonical), $\mathbf{V} = \text{diag}(e^{\mathbf{x}_i^T\boldsymbol\beta})$ does not depend on $\mathbf{y}$, so $\mathbf{I}(\boldsymbol\beta) = -\mathbf{H}(\boldsymbol\beta)$ exactly. This is a property shared by all GLMs using their canonical link.
+  </div>
+</div>
+
+<!-- 5. Offset -->
+<div class="notes-section" id="offset">
+  <h2>5. Exposure and Offset</h2>
+
+  <p>Count data often involves varying observation windows — e.g., different population sizes, follow-up times, or area sizes. Six cases over one year is very different from six cases over ten years. When modelling <em>rates</em> rather than raw counts, we use an <strong>offset</strong>.</p>
+
+  <div class="theorem-box">
+    <strong>Rate model:</strong>
+    $$\ln\!\left(\frac{E(y \mid \mathbf{x})}{\text{exposure}}\right) = \mathbf{x}^T\boldsymbol\beta$$
+    This implies:
+    $$\ln(E(y \mid \mathbf{x})) = \ln(\text{exposure}) + \mathbf{x}^T\boldsymbol\beta$$
+    The term $\ln(\text{exposure})$ is called the <strong>offset</strong> — a predictor whose coefficient is constrained to 1. It is not estimated but rather fixed as part of the model structure.
+  </div>
+
+  <div class="example-box">
+    <strong>Skin Cancer Study:</strong> Cities have vastly different population sizes (e.g., Minneapolis 15–24: 172,675 vs Dallas 85+: 7,583). Without the offset, we would be comparing raw counts, not rates. The offset <code>log(n)</code> converts the model to a per-capita rate model:<br><br>
+    <code>glm(cases ~ city + age.range + offset(log(n)), family = poisson(link = "log"), data = nonmel)</code><br><br>
+    The intercept then represents the log rate for the reference group (85+ in Minneapolis): $e^{-5.4834} = 0.00415$ cases per person — i.e., ~4.15 per 1,000 persons in the oldest Minneapolis group.
+  </div>
+
+  <div class="computation-note">
+    <strong>Prediction with offset:</strong> To predict per-person rates, set <code>n = 1</code> in the new data. To predict per-1,000, set <code>n = 1000</code>. The predicted count for the actual population uses the observed <code>n</code>. All three quantities are obtained by manipulating the offset — the coefficient vector $\hat{\boldsymbol\beta}$ is the same.
+  </div>
+</div>
+
+<!-- 6. GOF -->
+<div class="notes-section" id="gof">
+  <h2>6. Goodness-of-Fit and Residuals</h2>
+
+  <h3>Pearson and Deviance Tests</h3>
+  <p>Both the Pearson $\chi^2$ and deviance test assess overall model fit for Poisson models, analogously to logistic regression:</p>
+
+  <div class="formula-box">
+    $$X^2 = \sum_{i=1}^N \frac{(y_i - \hat\mu_i)^2}{\hat\mu_i} \sim \chi^2_{N-p} \qquad \text{Deviance} = 2\sum_{i=1}^N y_i\ln\!\left(\frac{y_i}{\hat\mu_i}\right) \sim \chi^2_{N-p}$$
+  </div>
+
+  <div class="example-box">
+    <strong>Skin Cancer Study GOF:</strong>
+<pre>Pearson X²  = 8.127, df = 7, p-value = 0.321
+Deviance    = 8.259, df = 7, p-value = 0.310</pre>
+    Both tests fail to reject the null (p &gt; 0.05), indicating the model with city + age.range fits the data well. Note that the Hosmer-Lemeshow test is not applicable here — it was developed specifically for logistic regression.
+  </div>
+
+  <h3>DHARMa Residuals (Simulation-Based)</h3>
+  <p>Interpreting standard residuals in GLMs is difficult because the response is discrete. The <strong>DHARMa</strong> package provides simulation-based "scaled residuals" that are always uniform on [0,1] if the model is correct — regardless of the distributional family.</p>
+
+  <div class="theorem-box">
+    <strong>Algorithm:</strong>
+    <ol style="margin:8px 0 0 20px; line-height:2.2">
+      <li>For each observation $i$, simulate $n_{\text{sim}}$ responses $\tilde{y}_{i1}, \ldots, \tilde{y}_{in}$ from the fitted model (using the estimated $\hat\lambda_i$).</li>
+      <li>Compute the empirical CDF $\hat{F}_i$ of the simulated values.</li>
+      <li>The DHARMa residual is $r_i = \hat{F}_i(y_i^{\text{obs}})$ — the quantile of the observed value within the simulated distribution.</li>
+    </ol>
+    <strong>Interpretation:</strong> $r_i = 0$ means all simulated values exceed the observed; $r_i = 0.5$ means the observed is at the median of the simulated distribution. Under a correctly specified model, $r_i \sim \text{Uniform}(0,1)$.
+  </div>
+
+  <div class="key-point">
+    <strong>DHARMa diagnostics for the Publications model:</strong><br>
+    — <code>testUniformity</code>: KS test $D = 0.108$, $p = 1.31 \times 10^{-9}$ → residuals significantly non-uniform → model misfits<br>
+    — <code>testDispersion</code>: ratioObsSim = 1.415, $p < 2.2 \times 10^{-16}$ → significant overdispersion<br>
+    — The rootogram shows the Poisson model systematically underpredicts zeros and overpredicts mid-range counts.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Outliers in DHARMa:</strong> Observations with residuals exactly 0 or 1 are outside the simulation envelope. The probability of being classified as an outlier depends on $n_{\text{sim}}$ (default 250). Increasing to 1000 stabilizes results.
+  </div>
+</div>
+
+<!-- 7. Overdispersion -->
+<div class="notes-section" id="overdispersion">
+  <h2>7. Overdispersion</h2>
+
+  <p>The Poisson model imposes $\text{Var}(y \mid \mathbf{x}) = E(y \mid \mathbf{x}) = \lambda$. In practice, real count data often exhibit <strong>overdispersion</strong>: $\text{Var}(y \mid \mathbf{x}) > E(y \mid \mathbf{x})$.</p>
+
+  <div class="example-box">
+    <strong>Publications data:</strong> Unadjusted sample variance $\text{Var}(y) = 3.710 > 1.693 = E(y)$. The variance is more than twice the mean — clear overdispersion. Consequence: the standard Poisson model underestimates standard errors, producing artificially small $p$-values and inflated Type I error.
+  </div>
+
+  <p>Three principal approaches to handle overdispersion are discussed:</p>
+
+  <table>
+    <thead><tr><th>Approach</th><th>Key idea</th><th>Effect on estimates</th><th>Effect on SEs</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sandwich estimator</strong></td><td>Correct SEs without changing model; robust to variance misspecification</td><td>Unchanged</td><td>Larger (corrected)</td></tr>
+      <tr><td><strong>Quasi-Poisson (QL)</strong></td><td>Specify $\text{Var}(y_i) = \phi\lambda$; estimate $\phi$ from Pearson statistic</td><td>Unchanged</td><td>Multiplied by $\sqrt{\hat\phi}$</td></tr>
+      <tr><td><strong>Negative Binomial</strong></td><td>Full parametric model; $\text{Var}(y) = \mu + \frac{1}{\theta}\mu^2$</td><td>Slightly different</td><td>Larger, different formula</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 8. Sandwich -->
+<div class="notes-section" id="sandwich">
+  <h2>8. Sandwich (Robust) Variance Estimator</h2>
+
+  <p>The sandwich estimator is motivated by the theory of <em>misspecified models</em>. If the true data-generating process is $g(y \mid \mathbf{z}, \boldsymbol\gamma_0)$ but we fit $p(y \mid \mathbf{x}, \boldsymbol\theta)$, the MLE converges to $\boldsymbol\theta^*$ that minimises the Kullback-Leibler divergence:</p>
+
+  <div class="formula-box">
+    $$I(f:g,\boldsymbol\theta) = E_g\!\left[\log\frac{g(y \mid \mathbf{z},\boldsymbol\gamma_0)}{p(y \mid \mathbf{x},\boldsymbol\theta)}\right]$$
+  </div>
+
+  <p>Asymptotically: $\sqrt{n}(\hat{\boldsymbol\theta}_{\text{MLE}} - \boldsymbol\theta^*) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \mathbf{C}(\boldsymbol\theta^*))$ where the <strong>sandwich covariance</strong> is:</p>
+
+  <div class="formula-box">
+    $$\mathbf{C}(\boldsymbol\theta^*) = \mathbf{A}^{-1}(\boldsymbol\theta^*)\,\mathbf{B}(\boldsymbol\theta^*)\,\mathbf{A}^{-1}(\boldsymbol\theta^*)$$
+    $\mathbf{A}$: expected Hessian (the "bread"); $\mathbf{B}$: outer product of scores (the "meat").
+  </div>
+
+  <div class="key-point">
+    <strong>Key result for log-linear Poisson models:</strong> If the mean structure $\ln(\lambda) = \mathbf{x}^T\boldsymbol\beta_0$ is correctly specified, the MLE converges to the true $\boldsymbol\beta_0$ even when the variance is misspecified (e.g., overdispersion exists). The sandwich estimator then provides asymptotically valid inference for $\boldsymbol\beta_0$.
+  </div>
+
+  <div class="example-box">
+    <strong>Publications data — comparing SEs:</strong>
+<pre>             Poisson SE   Sandwich SE   Ratio
+(Intercept)   0.0933       0.1481       1.59×
+femWomen      0.0546       0.0717       1.31×
+marSingle     0.0614       0.0819       1.33×
+kid5          0.0401       0.0560       1.40×
+ment          0.0020       0.0038       1.90×</pre>
+    The sandwich SEs are 30–90% larger than the naive Poisson SEs. The conclusions about significance change: marSingle moves from p = 0.011 (Poisson) to p = 0.058 (sandwich) — borderline significant only under robust inference.
+  </div>
+
+  <div class="computation-note">
+    <strong>Wald test impact:</strong> Testing the joint significance of {mar, phd}:
+    <ul style="margin:8px 0 0 20px">
+      <li>Standard Poisson: $\chi^2 = 6.45$ on 2 df, $p = 0.040$ → significant</li>
+      <li>Sandwich: $\chi^2 = 3.86$ on 2 df, $p = 0.145$ → not significant</li>
+    </ul>
+    This reversal demonstrates the danger of using naive Poisson SEs under overdispersion.
+  </div>
+</div>
+
+<!-- 9. Quasi-likelihood -->
+<div class="notes-section" id="quasi">
+  <h2>9. Quasi-Likelihood (Quasi-Poisson)</h2>
+
+  <p>Quasi-likelihood models relax the full distributional specification. Instead of assuming $y \sim \text{Poisson}(\lambda)$, we only specify the mean and variance functions separately:</p>
+
+  <div class="theorem-box">
+    <strong>Poisson Overdispersion Scale Model:</strong>
+    $$E(y_i \mid \mathbf{x}_i) = \lambda = e^{\mathbf{x}_i^T\boldsymbol\beta} \qquad \text{(mean structure — must be correct)}$$
+    $$\text{Var}(y_i \mid \mathbf{x}_i) = \phi\lambda \qquad \text{(variance structure — linear in mean)}$$
+    The quasi-MLE for $\boldsymbol\beta$ solves the same score equations as standard Poisson — producing <em>identical point estimates</em>. The dispersion parameter $\hat\phi$ is estimated from the Pearson statistic: $\hat\phi = X^2 / (N - p)$.
+  </div>
+
+  <div class="key-point">
+    <strong>Why are estimates identical but SEs different?</strong><br>
+    The score equations $\mathbf{X}^T(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$ do not depend on $\phi$ — so the quasi-ML estimator of $\boldsymbol\beta$ is the same as the Poisson MLE. However, the estimated covariance matrix is $\hat\phi(\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X})^{-1}$, so all SEs are inflated by $\sqrt{\hat\phi}$.
+  </div>
+
+  <div class="example-box">
+    <strong>Publications data — quasi-Poisson:</strong> Dispersion parameter $\hat\phi = 1.829$, so SEs are multiplied by $\sqrt{1.829} \approx 1.352$ (≈35% larger). Estimates unchanged. AIC is reported as <code>NA</code> because quasi-likelihood does not have a proper likelihood function. The test statistic changes from $z$ (Poisson) to $t$ (quasi-Poisson) because $\phi$ is estimated.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Quasi-Poisson vs Negative Binomial variance functions:</strong><br>
+    Quasi-Poisson: $\text{Var}(y) = \phi\lambda$ — <em>linear</em> in the mean<br>
+    Negative Binomial: $\text{Var}(y) = \mu + \frac{1}{\theta}\mu^2$ — <em>quadratic</em> in the mean<br>
+    For the publications data, the mean-variance plot shows the NB quadratic relationship fits better at high means, suggesting NB is more appropriate than quasi-Poisson.
+  </div>
+</div>
+
+<!-- 10. Negative Binomial -->
+<div class="notes-section" id="negbin">
+  <h2>10. Negative Binomial Regression</h2>
+
+  <h3>Derivation as a Poisson-Gamma Mixture</h3>
+  <div class="theorem-box">
+    Assume $y \mid \lambda \sim \text{Poisson}(\lambda)$ with $\lambda = \lambda^* e^{\mathbf{x}^T\boldsymbol\beta}$ and $\lambda^* \sim \text{Gamma}(\theta, \theta)$.<br><br>
+    Note: $E(\lambda^*) = 1$, $\text{Var}(\lambda^*) = 1/\theta$. By the laws of total expectation and total variance:
+    $$E(y) = \mu = e^{\mathbf{x}^T\boldsymbol\beta}$$
+    $$\text{Var}(y) = E[\text{Var}(y\mid\lambda)] + \text{Var}[E(y\mid\lambda)] = \mu + \frac{1}{\theta}\mu^2$$
+    Marginalising over $\lambda$ gives the Negative Binomial distribution:
+    $$p(y \mid \theta) = \frac{\Gamma(\theta+y)}{\Gamma(\theta)\,y!}\left(\frac{\theta}{\theta+e^{-\mathbf{x}^T\boldsymbol\beta}}\right)^\theta\left(\frac{e^{-\mathbf{x}^T\boldsymbol\beta}}{\theta+e^{-\mathbf{x}^T\boldsymbol\beta}}\right)^y$$
+  </div>
+
+  <p>The parameter $\theta$ (also written $1/\alpha$ in some software) controls the degree of extra-Poisson variation. As $\theta \to \infty$, $\text{Var}(y) \to \mu$ and the NB converges to Poisson.</p>
+
+  <div class="example-box">
+    <strong>Publications data — NB fit:</strong>
+<pre>Coefficients:
+             Estimate  Std.Error  z value   p
+(Intercept)   0.407     0.126     3.233  0.001 **
+femWomen     -0.216     0.073    -2.979  0.003 **
+marSingle    -0.150     0.082    -1.833  0.067
+kid5         -0.176     0.053    -3.340  0.001 ***
+ment          0.029     0.003     9.048  &lt;2e-16 ***
+
+Theta: 2.264 (SE: 0.271)    AIC: 3135.9</pre>
+    The estimated $\hat\theta = 2.264$ (far from $\infty$) confirms substantial overdispersion. AIC = 3135.9 vs Poisson AIC = 3314.1 — a massive improvement of ~178 AIC units, overwhelmingly favouring NB.
+  </div>
+
+  <div class="key-point">
+    <strong>Mean-variance plot interpretation:</strong> By grouping observations on the linear predictor and plotting group mean vs group variance, we can visually assess whether the linear (quasi-Poisson) or quadratic (NB) variance function better describes the data. For publications data, the quadratic NB line tracks the observed points more closely at high means.
+  </div>
+</div>
+
+<!-- 11. ZIP -->
+<div class="notes-section" id="zip">
+  <h2>11. Zero-Inflated Poisson (ZIP) Models</h2>
+
+  <p>A frequent pattern with count data is excess zeros beyond what any standard count distribution predicts. In the publications data, 30.0% of scientists published zero articles, but the Poisson model predicts only 20.9% — a 9-percentage-point discrepancy.</p>
+
+  <h3>The ZIP Mixture Model</h3>
+  <div class="theorem-box">
+    The ZIP density mixes a point mass at zero with a Poisson count distribution:
+    $$f_{\text{ZIP}}(y; \mathbf{x}, \mathbf{z}, \boldsymbol\beta, \boldsymbol\gamma) = f_{\text{zero}}(0; \mathbf{z}, \boldsymbol\gamma)\cdot\mathbf{1}_{[y=0]} + [1 - f_{\text{zero}}(0; \mathbf{z}, \boldsymbol\gamma)]\cdot f_{\text{Poisson}}(y; \mathbf{x}, \boldsymbol\beta)$$
+    where $\pi = f_{\text{zero}}(0; \mathbf{z}, \boldsymbol\gamma) = g^{-1}(\mathbf{z}^T\boldsymbol\gamma)$ (modelled via a logistic regression).<br><br>
+    The mean is: $\mu = \pi \cdot 0 + (1-\pi)\cdot e^{\mathbf{x}^T\boldsymbol\beta} = (1-\pi)e^{\mathbf{x}^T\boldsymbol\beta}$
+  </div>
+
+  <p>The model has two separate components: the <em>count component</em> (who is in the Poisson group and how many events they have) and the <em>zero-inflation component</em> (probability of being a "structural zero"). The regressors $\mathbf{z}$ and $\mathbf{x}$ need not be the same.</p>
+
+  <div class="example-box">
+    <strong>ZIP with simple inflation (intercept only in zero component):</strong>
+<pre>Count model (Poisson, log link):
+ment        0.0215  (p &lt; 2e-16) ***    ← mentor's articles help
+femWomen   -0.2316  (p &lt; 0.001) ***    ← gender gap persists
+
+Zero-inflation model (logit link):
+(Intercept) -1.681  (p &lt; 2e-16) ***
+→ π = logistic(-1.681) = 0.157: ~15.7% are structural zeros</pre>
+
+    <strong>ZIP with regressors in both components:</strong> The mentor's article count (ment) is significant in the zero-inflation component ($\hat\gamma_{\text{ment}} = -0.134$, $p = 0.003$): scientists with prolific mentors are less likely to be structural non-publishers. This makes scientific sense — good mentorship helps PhD students publish.
+  </div>
+</div>
+
+<!-- 12. Model Comparison -->
+<div class="notes-section" id="comparison">
+  <h2>12. Model Comparison via AIC</h2>
+
+  <table>
+    <thead><tr><th>Model</th><th>df</th><th>AIC</th><th>ΔAIC vs NB</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Poisson</td><td>6</td><td>3314.1</td><td>+178.2</td><td style="color:#c0392b">❌ Badly fitting</td></tr>
+      <tr><td>ZIP (simple)</td><td>7</td><td>3255.6</td><td>+119.7</td><td style="color:#e67e22">⚠ Better but inadequate</td></tr>
+      <tr><td>ZIP (full)</td><td>12</td><td>3233.5</td><td>+97.6</td><td style="color:#e67e22">⚠ Better still</td></tr>
+      <tr><td><strong>Negative Binomial</strong></td><td>7</td><td><strong>3135.9</strong></td><td>0.0</td><td style="color:#27ae60">✅ Best fit</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    The Negative Binomial model wins by a very large margin (ΔAIC &gt; 97 vs all competitors). This indicates that the overdispersion — not zero-inflation — is the primary source of misfit in the publications data. The NB DHARMa diagnostics confirm: KS test p = 0.492, dispersion test p = 0.530 — both non-significant, indicating good fit.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Note on quasi-Poisson and AIC:</strong> The quasi-Poisson model does not have a proper likelihood, so AIC is reported as <code>NA</code>. It cannot be directly compared via AIC with Poisson, NB, or ZIP models. Quasi-likelihood is a tool for inference, not model comparison.
+  </div>
+
+  <h3>Summary of the Publications Study</h3>
+  <div class="example-box">
+    Under the Negative Binomial model, the significant predictors are: <strong>ment</strong> (mentor's publications, RR = $e^{0.029} \approx 1.029$ per article — the strongest positive effect), <strong>kid5</strong> (children under 6, RR ≈ 0.838 — each young child reduces publication rate by ~16%), <strong>femWomen</strong> (RR ≈ 0.805 — women publish at ~80% the rate of men), and <strong>marSingle</strong> (borderline, p = 0.067). Program prestige (phd) is consistently non-significant across all models.
+  </div>
+</div>
+
+<!-- ═══════════════════════ MCQ ═══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Poisson Distribution</div>
+    <div class="question-stem">TRUE or FALSE: For a Poisson random variable $y \sim \text{Poisson}(\lambda)$, the variance is always greater than the mean.</div>
+    <button class="option-btn" onclick="answer(this,'q1',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q1',true)">FALSE</button>
+    <div class="feedback-bar" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Poisson PMF</div>
+    <div class="question-stem">An emergency room receives on average 5 patients per hour. Assuming a Poisson process, what is the probability of receiving exactly 3 patients in the next hour?</div>
+    <button class="option-btn" onclick="answer(this,'q2',false)">A. $e^{-5} \cdot 5^3 = 0.084$ (without dividing by $3! = 6$)</button>
+    <button class="option-btn" onclick="answer(this,'q2',true)">B. $e^{-5} \cdot 5^3 / 3! = e^{-5} \cdot 125/6 \approx 0.1404$</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">C. $5^3/3! = 20.83$</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">D. $e^{-3} \cdot 3^5 / 5! = 0.101$</button>
+    <div class="feedback-bar" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · Law of Rare Events</div>
+    <div class="question-stem">The Poisson limit theorem states that $\text{Bin}(n, p_n) \to \text{Poisson}(\lambda)$ when $n \to \infty$. Which condition is required?</div>
+    <button class="option-btn" onclick="answer(this,'q3',false)">A. $p_n \to 0$ and $n \to \infty$ independently, with no constraint on their product</button>
+    <button class="option-btn" onclick="answer(this,'q3',true)">B. $np_n \to \lambda$ as $n \to \infty$, where $\lambda$ is a finite positive constant</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">C. $p_n$ must be exactly $\lambda/n$ for all finite $n$</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">D. $n \to \infty$ with $p_n$ fixed</button>
+    <div class="feedback-bar" id="q3-fb"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Log Link</div>
+    <div class="question-stem">Why is the log link used in Poisson regression rather than the identity link?</div>
+    <button class="option-btn" onclick="answer(this,'q4',false)">A. The log link produces a symmetric distribution of residuals.</button>
+    <button class="option-btn" onclick="answer(this,'q4',true)">B. The log link ensures $\lambda = e^{\mathbf{x}^T\boldsymbol\beta} > 0$ for all values of $\boldsymbol\beta$, while the identity link could yield negative predicted counts.</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">C. The log link is required by the Poisson distribution's support on negative integers.</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">D. The log link linearises the Poisson PMF so that OLS can be applied directly.</button>
+    <div class="feedback-bar" id="q4-fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · Interpretation of Coefficients</div>
+    <div class="question-stem">In a Poisson regression model, $\hat\beta_{\text{ment}} = 0.0255$. What is the correct interpretation for the continuous predictor <em>ment</em> (mentor's publications)?</div>
+    <button class="option-btn" onclick="answer(this,'q5',false)">A. For each additional article by the mentor, the expected count increases by 0.0255.</button>
+    <button class="option-btn" onclick="answer(this,'q5',true)">B. For each additional article by the mentor, the expected count is multiplied by $e^{0.0255} \approx 1.026$, i.e., increases by approximately 2.6%.</button>
+    <button class="option-btn" onclick="answer(this,'q5',false)">C. The odds of publishing at least one article increases by 2.6% per mentor article.</button>
+    <button class="option-btn" onclick="answer(this,'q5',false)">D. The log-rate increases by 2.6% per mentor article.</button>
+    <div class="feedback-bar" id="q5-fb"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Relative Risk Skin Cancer</div>
+    <div class="question-stem">The skin cancer model gives RR = 2.234 for cityDallas (95% CI: 2.018–2.477). Which interpretation is correct?</div>
+    <button class="option-btn" onclick="answer(this,'q6',false)">A. Dallas residents are 2.234 percentage points more likely to get skin cancer than Minneapolis residents.</button>
+    <button class="option-btn" onclick="answer(this,'q6',true)">B. Within each age group, the expected number of skin cancer cases per person is 2.234 times higher in Dallas than in Minneapolis.</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">C. The odds of skin cancer in Dallas are 2.234 times the odds in Minneapolis.</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">D. There are 2.234 more cases per 100 people in Dallas than in Minneapolis.</button>
+    <div class="feedback-bar" id="q6-fb"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Offset Concept</div>
+    <div class="question-stem">TRUE or FALSE: In a Poisson model with offset, the coefficient of the offset variable <code>log(n)</code> is estimated from the data along with the other regression coefficients.</div>
+    <button class="option-btn" onclick="answer(this,'q7',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q7',true)">FALSE</button>
+    <div class="feedback-bar" id="q7-fb"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · Offset Interpretation</div>
+    <div class="question-stem">The skin cancer model includes <code>offset(log(n))</code>. The intercept estimate is $\hat\beta_0 = -5.483$. What does $e^{-5.483}$ represent?</div>
+    <button class="option-btn" onclick="answer(this,'q8',false)">A. The predicted number of skin cancer cases in Minneapolis for the 85+ group.</button>
+    <button class="option-btn" onclick="answer(this,'q8',true)">B. The predicted skin cancer rate per person in the reference group (85+ age group in Minneapolis).</button>
+    <button class="option-btn" onclick="answer(this,'q8',false)">C. The probability of skin cancer for a randomly selected Minneapolis resident.</button>
+    <button class="option-btn" onclick="answer(this,'q8',false)">D. The expected number of cases per city, summed across all age groups.</button>
+    <div class="feedback-bar" id="q8-fb"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · MLE Score Equations</div>
+    <div class="question-stem">The Poisson log-likelihood score equations are $\mathbf{X}^T(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$. What do these tell us about the relationship between observed and fitted counts?</div>
+    <button class="option-btn" onclick="answer(this,'q9',false)">A. The sum of squared residuals is minimized, analogous to OLS.</button>
+    <button class="option-btn" onclick="answer(this,'q9',true)">B. The fitted values must satisfy certain moment conditions: for each predictor $x_j$, the weighted sum $\sum_i x_{ij}(y_i - \hat\mu_i) = 0$. In particular, with an intercept, $\sum_i y_i = \sum_i \hat\mu_i$ (observed total = fitted total).</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">C. The score equations have a closed-form solution because the Poisson family is in the exponential family.</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">D. The score equations guarantee that all fitted values equal their corresponding observed values.</button>
+    <div class="feedback-bar" id="q9-fb"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · Canonical Link and Information</div>
+    <div class="question-stem">TRUE or FALSE: For Poisson regression with the log link (canonical link), the observed information matrix $\mathbf{I}^*_n(\hat{\boldsymbol\beta}) = -\mathbf{H}(\hat{\boldsymbol\beta})$ equals the expected Fisher information matrix $\mathbf{I}(\hat{\boldsymbol\beta})$, because the Hessian does not depend on $\mathbf{y}$.</div>
+    <button class="option-btn" onclick="answer(this,'q10',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">FALSE</button>
+    <div class="feedback-bar" id="q10-fb"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · GOF Test</div>
+    <div class="question-stem">For the skin cancer model, the deviance GOF test gives $D = 8.259$ on $df = 7$, $p = 0.310$. What is the conclusion?</div>
+    <button class="option-btn" onclick="answer(this,'q11',false)">A. The model fits poorly because the deviance (8.26) is much larger than the df (7).</button>
+    <button class="option-btn" onclick="answer(this,'q11',true)">B. The model fits adequately — we fail to reject the null that the model is correct. The deviance only slightly exceeds its df, and $p = 0.31 > 0.05$.</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">C. The model fits perfectly since the deviance is not exactly zero.</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">D. The Hosmer-Lemeshow test confirms good fit for the skin cancer model.</button>
+    <div class="feedback-bar" id="q11-fb"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · DHARMa Residuals</div>
+    <div class="question-stem">A DHARMa residual of 0.95 for observation $i$ means:</div>
+    <button class="option-btn" onclick="answer(this,'q12',false)">A. The observation has a very large Pearson residual of 0.95.</button>
+    <button class="option-btn" onclick="answer(this,'q12',true)">B. The observed value $y_i^{\text{obs}}$ is at the 95th percentile of its simulated distribution — 95% of simulated values are smaller than the observed. This is an unusually high value suggesting potential overdispersion or outlier status.</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">C. The model predicts this observation at 95% accuracy.</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">D. The observation has a Cook's distance of 0.95, indicating high influence.</button>
+    <div class="feedback-bar" id="q12-fb"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · DHARMa Uniformity</div>
+    <div class="question-stem">The DHARMa <code>testUniformity</code> for the publications Poisson model gives KS test $p = 1.31 \times 10^{-9}$. What does this indicate?</div>
+    <button class="option-btn" onclick="answer(this,'q13',false)">A. The DHARMa residuals are uniformly distributed, confirming good model fit.</button>
+    <button class="option-btn" onclick="answer(this,'q13',true)">B. The DHARMa residuals are significantly non-uniform, indicating the Poisson model is misspecified — the observed data cannot plausibly have been generated by the fitted Poisson model.</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">C. There are too few observations for a reliable KS test.</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">D. The test result is invalid because the KS test assumes normality of residuals.</button>
+    <div class="feedback-bar" id="q13-fb"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Overdispersion Detection</div>
+    <div class="question-stem">For the publications data, $\text{Var}(y) = 3.710$ and $E(y) = 1.693$. The DHARMa dispersion test gives ratioObsSim = 1.415, $p < 2.2 \times 10^{-16}$. What is the conclusion?</div>
+    <button class="option-btn" onclick="answer(this,'q14',false)">A. The model is underdispersed because the observed variance is too large.</button>
+    <button class="option-btn" onclick="answer(this,'q14',true)">B. The data are significantly overdispersed: $\text{Var}(y) > E(y)$ and the observed residual variance exceeds what the Poisson model would predict. Standard Poisson SEs are underestimated.</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">C. No overdispersion exists because the ratio 1.415 is less than 2.</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">D. The variance-mean ratio of 3.710/1.693 = 2.19 is within acceptable limits for Poisson data.</button>
+    <div class="feedback-bar" id="q14-fb"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · Consequence of Overdispersion</div>
+    <div class="question-stem">TRUE or FALSE: When overdispersion is present, using standard Poisson SEs leads to test statistics that are too large, p-values that are too small, and inflated Type I error rates.</div>
+    <button class="option-btn" onclick="answer(this,'q15',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q15',false)">FALSE</button>
+    <div class="feedback-bar" id="q15-fb"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · Sandwich Estimator Theory</div>
+    <div class="question-stem">The sandwich covariance matrix is $\mathbf{C}(\boldsymbol\theta^*) = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-1}$. In the context of Poisson regression under a misspecified variance, what is $\mathbf{A}$?</div>
+    <button class="option-btn" onclick="answer(this,'q16',false)">A. The outer product of the score vectors (the "meat")</button>
+    <button class="option-btn" onclick="answer(this,'q16',true)">B. The negative expected Hessian (Fisher information matrix) — the "bread" of the sandwich</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">C. The variance-covariance matrix of the response $\mathbf{y}$</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">D. The design matrix $\mathbf{X}$</button>
+    <div class="feedback-bar" id="q16-fb"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · Sandwich — Key Requirement</div>
+    <div class="question-stem">The sandwich estimator provides valid inference for Poisson regression under overdispersion. What assumption must hold for this to work?</div>
+    <button class="option-btn" onclick="answer(this,'q17',false)">A. The variance function $\text{Var}(y_i \mid \mathbf{x}_i) = \lambda_i$ must be correctly specified.</button>
+    <button class="option-btn" onclick="answer(this,'q17',true)">B. The mean structure $\ln(\lambda) = \mathbf{x}^T\boldsymbol\beta$ must be correctly specified; the variance function need not be.</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">C. Both the mean and variance functions must be correctly specified.</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">D. The data must come from a Poisson distribution with no overdispersion.</button>
+    <div class="feedback-bar" id="q17-fb"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · Sandwich — marSingle</div>
+    <div class="question-stem">For the publications model, the standard Poisson gives marSingle: SE = 0.061, $p = 0.011$. The sandwich gives SE = 0.082, $p = 0.058$. What is the substantive implication?</div>
+    <button class="option-btn" onclick="answer(this,'q18',false)">A. marSingle is significant under both methods; the difference is negligible.</button>
+    <button class="option-btn" onclick="answer(this,'q18',true)">B. marSingle crosses the conventional 5% threshold — it appears significant under naive Poisson inference but is only borderline significant when SEs are corrected for overdispersion. Ignoring overdispersion leads to a false positive.</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">C. marSingle is not significant under either method; both p-values exceed 0.05 rounded appropriately.</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">D. The sandwich SE is wrong because it assumes a misspecified model.</button>
+    <div class="feedback-bar" id="q18-fb"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Quasi-Poisson Estimates</div>
+    <div class="question-stem">TRUE or FALSE: The coefficient estimates from quasi-Poisson and standard Poisson regression are identical because both solve the same score equations $\mathbf{X}^T(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$.</div>
+    <button class="option-btn" onclick="answer(this,'q19',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q19',false)">FALSE</button>
+    <div class="feedback-bar" id="q19-fb"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · Quasi-Poisson Dispersion</div>
+    <div class="question-stem">The quasi-Poisson model for publications gives dispersion parameter $\hat\phi = 1.829$. By what factor are the standard errors inflated relative to standard Poisson?</div>
+    <button class="option-btn" onclick="answer(this,'q20',false)">A. $1.829$ (the dispersion parameter directly)</button>
+    <button class="option-btn" onclick="answer(this,'q20',true)">B. $\sqrt{1.829} \approx 1.352$, i.e., approximately 35% larger</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">C. $1.829^2 = 3.345$</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">D. No inflation — only the test statistic changes from $z$ to $t$</button>
+    <div class="feedback-bar" id="q20-fb"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · Quasi-Poisson AIC</div>
+    <div class="question-stem">TRUE or FALSE: The quasi-Poisson model has AIC = NA in R because quasi-likelihood does not define a proper likelihood function, making the AIC formula inapplicable.</div>
+    <button class="option-btn" onclick="answer(this,'q21',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">FALSE</button>
+    <div class="feedback-bar" id="q21-fb"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · Quasi-Poisson vs Sandwich</div>
+    <div class="question-stem">What is the key conceptual difference between the quasi-Poisson and the sandwich estimator approaches to overdispersion?</div>
+    <button class="option-btn" onclick="answer(this,'q22',false)">A. They produce different coefficient estimates but the same standard errors.</button>
+    <button class="option-btn" onclick="answer(this,'q22',true)">B. Quasi-Poisson specifies a parametric variance function $\text{Var}(y_i) = \phi\lambda_i$ (linear in mean) and requires it to be correct for valid SEs; the sandwich estimator makes no parametric assumption about the variance and is asymptotically valid whenever the mean is correct.</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">C. The sandwich estimator modifies the coefficient estimates; quasi-Poisson does not.</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">D. Both approaches produce identical standard errors for large samples.</button>
+    <div class="feedback-bar" id="q22-fb"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Negative Binomial — Variance</div>
+    <div class="question-stem">The negative binomial variance function is $\text{Var}(y) = \mu + \frac{1}{\theta}\mu^2$. What happens as $\theta \to \infty$?</div>
+    <button class="option-btn" onclick="answer(this,'q23',false)">A. $\text{Var}(y) \to \infty$ — the model becomes underdispersed.</button>
+    <button class="option-btn" onclick="answer(this,'q23',true)">B. $\text{Var}(y) \to \mu$ — the NB model converges to the Poisson model (equidispersion).</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">C. $\text{Var}(y) \to \mu^2$ — a purely quadratic variance.</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">D. $\text{Var}(y) \to 0$ — the NB model becomes degenerate.</button>
+    <div class="feedback-bar" id="q23-fb"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · NB as Mixture</div>
+    <div class="question-stem">The negative binomial model is derived as a Poisson-Gamma mixture: $y \mid \lambda \sim \text{Poisson}(\lambda)$ with $\lambda = \lambda^* e^{\mathbf{x}^T\boldsymbol\beta}$ and $\lambda^* \sim \text{Gamma}(\theta, \theta)$. What does the random effect $\lambda^*$ represent?</div>
+    <button class="option-btn" onclick="answer(this,'q24',false)">A. Measurement error in the count variable $y$</button>
+    <button class="option-btn" onclick="answer(this,'q24',true)">B. Unobserved heterogeneity between individuals — unmeasured factors that make some individuals inherently more or less prone to the event, beyond what the covariates capture</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">C. The zero-inflation probability in the structural zero component</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">D. The dispersion parameter of the quasi-Poisson model</button>
+    <div class="feedback-bar" id="q24-fb"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · NB R Output</div>
+    <div class="question-stem">The NB model for publications reports: Theta = 2.264 (SE: 0.271), AIC = 3135.9. The Poisson model has AIC = 3314.1. What does the AIC difference of 178 tell us?</div>
+    <button class="option-btn" onclick="answer(this,'q25',false)">A. The Poisson model is slightly worse; both are plausible given model uncertainty.</button>
+    <button class="option-btn" onclick="answer(this,'q25',true)">B. The NB model is overwhelmingly preferred (ΔAIC = 178 ≫ 2). The Akaike weight of the Poisson model is essentially zero — it has no support given the data.</button>
+    <button class="option-btn" onclick="answer(this,'q25',false)">C. The AIC difference of 178 is on the log scale, so the models are actually similar.</button>
+    <button class="option-btn" onclick="answer(this,'q25',false)">D. We cannot compare Poisson and NB via AIC because they are non-nested models.</button>
+    <div class="feedback-bar" id="q25-fb"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · NB vs Quasi-Poisson Variance</div>
+    <div class="question-stem">TRUE or FALSE: The quasi-Poisson model (linear variance: $\text{Var}=\phi\mu$) and the negative binomial model (quadratic variance: $\text{Var}=\mu+\mu^2/\theta$) make the same assumptions about how variance scales with the mean.</div>
+    <button class="option-btn" onclick="answer(this,'q26',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q26',true)">FALSE</button>
+    <div class="feedback-bar" id="q26-fb"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · Zero-Inflation Detection</div>
+    <div class="question-stem">For the publications data, the Poisson model predicts 20.9% zero publications while 30.0% is observed. What does this suggest?</div>
+    <button class="option-btn" onclick="answer(this,'q27',false)">A. The model has complete separation — a structural problem requiring Firth's method.</button>
+    <button class="option-btn" onclick="answer(this,'q27',true)">B. There is zero-inflation: more zeros than a Poisson distribution predicts, suggesting a subpopulation that can never publish (structural zeros) alongside those who could publish but happened not to (sampling zeros).</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">C. The model is underdispersed, not overdispersed, because there are too many zeros.</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">D. Zero-inflation is not an issue here because the difference (9.1%) is within sampling variability for this dataset.</button>
+    <div class="feedback-bar" id="q27-fb"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · ZIP Model Structure</div>
+    <div class="question-stem">In the ZIP model, the mean is $\mu = (1-\pi) e^{\mathbf{x}^T\boldsymbol\beta}$. What happens to the expected count when $\pi \to 1$?</div>
+    <button class="option-btn" onclick="answer(this,'q28',false)">A. $\mu \to e^{\mathbf{x}^T\boldsymbol\beta}$ — the standard Poisson mean</button>
+    <button class="option-btn" onclick="answer(this,'q28',true)">B. $\mu \to 0$ — nearly all observations are structural zeros; the expected count approaches zero regardless of the covariates</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">C. $\mu \to \infty$ — the count distribution becomes degenerate</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">D. $\mu$ becomes negative because $(1-\pi) < 0$</button>
+    <div class="feedback-bar" id="q28-fb"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · ZIP Output Interpretation</div>
+    <div class="question-stem">In the ZIP model with simple inflation, the zero-inflation intercept is $\hat\gamma_0 = -1.681$ (p &lt; 2e-16). What is the estimated probability of being a structural zero?</div>
+    <button class="option-btn" onclick="answer(this,'q29',false)">A. $-1.681$ (cannot be a probability, model is wrong)</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">B. $1 - e^{-1.681} = 0.814$</button>
+    <button class="option-btn" onclick="answer(this,'q29',true)">C. $\pi = \text{logistic}(-1.681) = \frac{e^{-1.681}}{1+e^{-1.681}} \approx 0.157$ — about 15.7%</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">D. $e^{-1.681} = 0.186$</button>
+    <div class="feedback-bar" id="q29-fb"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · ZIP Full Model</div>
+    <div class="question-stem">In the ZIP model with regressors in both components, the zero-inflation coefficient for <em>ment</em> is $\hat\gamma_{\text{ment}} = -0.134$ ($p = 0.003$). What does this mean?</div>
+    <button class="option-btn" onclick="answer(this,'q30',false)">A. A more productive mentor reduces the expected number of publications.</button>
+    <button class="option-btn" onclick="answer(this,'q30',true)">B. A more productive mentor reduces the probability of a student being in the structural-zero group (never publishing). Each additional mentor article decreases the log-odds of being a structural zero by 0.134, i.e., productive mentors help students avoid permanent non-publication.</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">C. A more productive mentor increases the probability that a student publishes exactly zero articles.</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">D. The coefficient applies to the Poisson count component, not the zero-inflation component.</button>
+    <div class="feedback-bar" id="q30-fb"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Model Comparison AIC</div>
+    <div class="question-stem">AIC values: Poisson = 3314.1, ZIP(simple) = 3255.6, ZIP(full) = 3233.5, NB = 3135.9. Which model should be selected and why?</div>
+    <button class="option-btn" onclick="answer(this,'q31',false)">A. ZIP(full) because it has the most parameters and therefore captures the most complexity.</button>
+    <button class="option-btn" onclick="answer(this,'q31',true)">B. Negative Binomial — it has the lowest AIC (3135.9), with ΔAIC &gt; 97 compared to the next-best model. The NB captures overdispersion more effectively than zero-inflation adjustments.</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">C. ZIP(simple) because it adds only one parameter to the Poisson model.</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">D. Poisson, because it has the fewest parameters (df = 6) and the simplest interpretation.</button>
+    <div class="feedback-bar" id="q31-fb"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · NB DHARMa Diagnostics</div>
+    <div class="question-stem">TRUE or FALSE: After fitting the negative binomial model for publications, the DHARMa diagnostics show KS test p = 0.49 (n.s.) and dispersion test p = 0.53 (n.s.), confirming the NB model adequately fits the data.</div>
+    <button class="option-btn" onclick="answer(this,'q32',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q32',false)">FALSE</button>
+    <div class="feedback-bar" id="q32-fb"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · Prediction with Offset</div>
+    <div class="question-stem">From the skin cancer model, the predicted cases per person for Dallas age 35–44 is $9.06 \times 10^{-4}$. How many cases would you predict for a population of 100,000 in that cell?</div>
+    <button class="option-btn" onclick="answer(this,'q33',false)">A. $9.06 \times 10^{-4} \times 1000 = 0.906$ cases</button>
+    <button class="option-btn" onclick="answer(this,'q33',true)">B. $9.06 \times 10^{-4} \times 100{,}000 = 90.6$ cases</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">C. $9.06 \times 10^{-4} \times 121{,}374 = 109.98$ cases (the actual observed population)</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">D. Cannot be determined without the actual population size in that cell</button>
+    <div class="feedback-bar" id="q33-fb"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · Hosmer-Lemeshow in Poisson</div>
+    <div class="question-stem">TRUE or FALSE: The Hosmer-Lemeshow test is a valid goodness-of-fit test for Poisson regression models.</div>
+    <button class="option-btn" onclick="answer(this,'q34',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q34',true)">FALSE</button>
+    <div class="feedback-bar" id="q34-fb"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · Age Effect Skin Cancer</div>
+    <div class="question-stem">The skin cancer model gives RR = 0.891 (95% CI: 0.720–1.112) for age.range75_84 vs the reference 85+. The Wald test gives $p = 0.297$. Which conclusion is correct?</div>
+    <button class="option-btn" onclick="answer(this,'q35',false)">A. The 75–84 age group has significantly lower rates than the 85+ group.</button>
+    <button class="option-btn" onclick="answer(this,'q35',true)">B. There is no significant difference in cancer rates between the 75–84 and 85+ age groups — the CI includes 1 and $p = 0.297 > 0.05$. The reference group (85+) was wisely chosen as the most clinically relevant comparator.</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">C. The 75–84 group has 10.9% fewer cases than the 85+ group, which is statistically significant.</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">D. The CI containing 1 means the model is not significantly better than the null.</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · LRT vs Wald for age.range</div>
+    <div class="question-stem">The skin cancer model LRT for age.range gives $\chi^2 = 2560.89$ on 7 df ($p < 2.2 \times 10^{-16}$), while the Wald gives $\chi^2 = 1324.42$ on 7 df. Both are overwhelmingly significant. Why might LRT and Wald statistics differ so much?</div>
+    <button class="option-btn" onclick="answer(this,'q36',false)">A. One of the tests is incorrect — they should always give the same chi-square statistic.</button>
+    <button class="option-btn" onclick="answer(this,'q36',true)">B. The LRT and Wald test are asymptotically equivalent but finite-sample properties differ. When effects are very large (as with age groups explaining nearly all the deviance), the Wald statistic can be more conservative than the LRT because it approximates the curvature of the likelihood locally, while LRT uses the full likelihood ratio.</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">C. The LRT uses the wrong degrees of freedom (7 instead of 8).</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">D. The Wald test is for individual coefficients only and cannot be applied to multi-df tests.</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · Rootogram</div>
+    <div class="question-stem">A rootogram for the Poisson publications model shows bars hanging above the fitted line at $y = 0$ and bars hanging below the fitted line at $y = 2, 3, 4$. What does this indicate?</div>
+    <button class="option-btn" onclick="answer(this,'q37',true)">A. The model underpredicts zeros (observed zeros exceed fitted) and overpredicts counts of 2–4. This is consistent with zero-inflation and/or overdispersion.</button>
+    <button class="option-btn" onclick="answer(this,'q37',false)">B. The model fits perfectly — hanging rootogram bars should always cross the zero line.</button>
+    <button class="option-btn" onclick="answer(this,'q37',false)">C. The model overpredicts zeros and underpredicts mid-range counts.</button>
+    <button class="option-btn" onclick="answer(this,'q37',false)">D. The rootogram cannot diagnose overdispersion; only the DHARMa test can.</button>
+    <div class="feedback-bar" id="q37-fb"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · Total Law of Variance — NB</div>
+    <div class="question-stem">In the NB Poisson-Gamma mixture derivation, $\text{Var}(y) = E[\text{Var}(y\mid\lambda)] + \text{Var}[E(y\mid\lambda)]$. Identify the two terms correctly.</div>
+    <button class="option-btn" onclick="answer(this,'q38',true)">A. $E[\text{Var}(y\mid\lambda)] = E(\lambda) = \mu$ (within-group Poisson variation) and $\text{Var}[E(y\mid\lambda)] = \text{Var}(\lambda) = \frac{1}{\theta}\mu^2$ (between-group variation due to random $\lambda^*$)</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">B. $E[\text{Var}(y\mid\lambda)] = \mu^2/\theta$ and $\text{Var}[E(y\mid\lambda)] = \mu$</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">C. Both terms equal $\mu$, giving $\text{Var}(y) = 2\mu$</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">D. $E[\text{Var}(y\mid\lambda)] = \phi\mu$ (quasi-Poisson term) and $\text{Var}[E(y\mid\lambda)] = 0$</button>
+    <div class="feedback-bar" id="q38-fb"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Structural vs Sampling Zeros</div>
+    <div class="question-stem">In the ZIP model, what is the conceptual difference between a "structural zero" and a "sampling zero"?</div>
+    <button class="option-btn" onclick="answer(this,'q39',false)">A. Structural zeros occur in large samples; sampling zeros occur in small samples.</button>
+    <button class="option-btn" onclick="answer(this,'q39',true)">B. A structural zero comes from an individual who can never experience the event (e.g., a PhD student who has decided never to publish). A sampling zero comes from an individual who could publish but happened to publish zero articles in the observation window.</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">C. Structural zeros are measurement errors; sampling zeros are true zeros.</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">D. The distinction is only theoretical — in practice they are indistinguishable and the ZIP model should never be used.</button>
+    <div class="feedback-bar" id="q39-fb"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · Poisson Assumptions</div>
+    <div class="question-stem">Which of the following is NOT an assumption of the Poisson counting process?</div>
+    <button class="option-btn" onclick="answer(this,'q40',false)">A. Events in non-overlapping time intervals are independent</button>
+    <button class="option-btn" onclick="answer(this,'q40',false)">B. The probability of two simultaneous events in an infinitesimally small interval is zero</button>
+    <button class="option-btn" onclick="answer(this,'q40',false)">C. The expected number of events is proportional to the interval length</button>
+    <button class="option-btn" onclick="answer(this,'q40',true)">D. The variance of the count exceeds the mean (overdispersion)</button>
+    <div class="feedback-bar" id="q40-fb"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · Publications — Intercept Meaning</div>
+    <div class="question-stem">The publications Poisson model gives intercept $\hat\beta_0 = 0.4599$. What is the expected publication count for a male, married scientist with 0 children under 6, PhD prestige = 0, and mentor publications = 0?</div>
+    <button class="option-btn" onclick="answer(this,'q41',false)">A. 0.4599 articles</button>
+    <button class="option-btn" onclick="answer(this,'q41',true)">B. $e^{0.4599} \approx 1.584$ articles</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">C. $\ln(0.4599) \approx -0.777$ articles</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">D. The intercept has no meaningful interpretation because phd = 0 is unrealistic.</button>
+    <div class="feedback-bar" id="q41-fb"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · kid5 Coefficient</div>
+    <div class="question-stem">The publications NB model gives $\hat\beta_{\text{kid5}} = -0.176$ (p = 0.001). What is the relative risk for each additional child under age 6?</div>
+    <button class="option-btn" onclick="answer(this,'q42',false)">A. $-0.176$ (a reduction of 0.176 publications)</button>
+    <button class="option-btn" onclick="answer(this,'q42',true)">B. $e^{-0.176} \approx 0.839$ — each additional child under 6 is associated with a ~16% reduction in the expected publication rate, holding other variables constant</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">C. $e^{0.176} \approx 1.192$ — each child increases publications by ~19%</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">D. The coefficient represents the log-odds of publishing, not a rate ratio</button>
+    <div class="feedback-bar" id="q42-fb"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · phd Not Significant</div>
+    <div class="question-stem">TRUE or FALSE: In the publications study, the prestige of the PhD program (phd) is consistently non-significant across all models (Poisson, quasi-Poisson, sandwich, NB). This suggests program prestige has no association with publication output after controlling for mentor productivity.</div>
+    <button class="option-btn" onclick="answer(this,'q43',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">FALSE</button>
+    <div class="feedback-bar" id="q43-fb"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Convexity of NLL</div>
+    <div class="question-stem">TRUE or FALSE: The negative log-likelihood $-\ell(\boldsymbol\beta \mid \mathbf{X}, \mathbf{y})$ for Poisson regression is a convex function of $\boldsymbol\beta$, guaranteeing a unique global minimum (i.e., a unique MLE).</div>
+    <button class="option-btn" onclick="answer(this,'q44',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">FALSE</button>
+    <div class="feedback-bar" id="q44-fb"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · DHARMa simulation parameter n</div>
+    <div class="question-stem">The default number of simulations in DHARMa's <code>simulateResiduals</code> is n = 250. A researcher sets n = 25 to save computation time. What is the main risk?</div>
+    <button class="option-btn" onclick="answer(this,'q45',false)">A. The DHARMa residuals will become normally distributed instead of uniform.</button>
+    <button class="option-btn" onclick="answer(this,'q45',true)">B. With very small n, discretization artefacts appear and the stochastic error on residuals is large, making individual residuals unreliable. Outlier classification (residual = 0 or 1) is also more likely by chance.</button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">C. The simulation will fail because the Poisson distribution requires at least 250 samples.</button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">D. Fewer simulations always produce more conservative (lower power) tests.</button>
+    <div class="feedback-bar" id="q45-fb"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · Quasi-Poisson Test Statistic</div>
+    <div class="question-stem">In standard Poisson regression, individual coefficient tests use the $z$ statistic. In quasi-Poisson, they use the $t$ statistic. Why?</div>
+    <button class="option-btn" onclick="answer(this,'q46',false)">A. The quasi-Poisson likelihood is normal, requiring $t$ tests.</button>
+    <button class="option-btn" onclick="answer(this,'q46',true)">B. In quasi-Poisson, the dispersion parameter $\phi$ is estimated from the data (not known a priori). This introduces additional uncertainty, analogous to estimating $\sigma^2$ in linear regression, which converts the normal $z$ to a $t$ distribution.</button>
+    <button class="option-btn" onclick="answer(this,'q46',false)">C. $t$ tests are always more conservative than $z$ tests, so quasi-Poisson is preferred for safety.</button>
+    <button class="option-btn" onclick="answer(this,'q46',false)">D. The distinction between $z$ and $t$ is purely cosmetic for large samples ($n = 915$).</button>
+    <div class="feedback-bar" id="q46-fb"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · KLIC and Sandwich</div>
+    <div class="question-stem">TRUE or FALSE: Under a misspecified Poisson model (true DGP is negative binomial), the Poisson MLE converges to a vector $\boldsymbol\theta^*$ that minimises the Kullback-Leibler divergence from the fitted Poisson to the true NB distribution.</div>
+    <button class="option-btn" onclick="answer(this,'q47',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q47',false)">FALSE</button>
+    <div class="feedback-bar" id="q47-fb"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · Negative Binomial Versions</div>
+    <div class="question-stem">The lecture distinguishes two versions of the NB distribution. Which version is used for regression (the "Pascal distribution")?</div>
+    <button class="option-btn" onclick="answer(this,'q48',false)">A. Version 1: counts the number of trials until the $y$th success, with support $n \geq y$</button>
+    <button class="option-btn" onclick="answer(this,'q48',true)">B. Version 2: counts the number of failures before the $y$th success, with support $x = 0, 1, 2, \ldots$ — this is the Pascal distribution, which has support matching count data</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">C. Both versions are equivalent and used interchangeably</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">D. Neither version is used for regression — the NB in GLMs is a completely different parameterisation</button>
+    <div class="feedback-bar" id="q48-fb"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · ZIP regressors</div>
+    <div class="question-stem">TRUE or FALSE: In the ZIP model, the regressors in the zero-inflation component $\mathbf{z}$ and the count component $\mathbf{x}$ must be identical.</div>
+    <button class="option-btn" onclick="answer(this,'q49',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q49',true)">FALSE</button>
+    <div class="feedback-bar" id="q49-fb"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integrative — Model Selection</div>
+    <div class="question-stem">A researcher fits Poisson, quasi-Poisson, NB, and ZIP models. She wants to select the best model using AIC. Which statement is correct?</div>
+    <button class="option-btn" onclick="answer(this,'q50',false)">A. All four models can be compared via AIC because they are fitted to the same data.</button>
+    <button class="option-btn" onclick="answer(this,'q50',true)">B. Quasi-Poisson cannot be compared via AIC (AIC = NA). Poisson, NB, and ZIP all have proper likelihoods and can be compared. The NB model wins overwhelmingly (lowest AIC) in the publications example.</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">C. AIC cannot compare Poisson and NB because they are non-nested models.</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">D. The model with the most parameters should be selected to minimise bias.</button>
+    <div class="feedback-bar" id="q50-fb"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+<!-- ═══════════════════════ SHORT ANSWER ═══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer / Oral Exam Questions (10)</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · Core Concept</div>
+    <div class="question-stem">Explain the Poisson regression model: its systematic and distributional components, why the log link is used, and how to interpret the exponentiated coefficients as relative risks.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      The Poisson regression model has two components. The <strong>distributional part</strong> specifies $y_i \mid \mathbf{x}_i \sim \text{Poisson}(\lambda_i)$, where the count is Poisson with conditional mean $\lambda_i$. The <strong>systematic part</strong> links $\lambda_i$ to the predictors via the log link: $\ln(\lambda_i) = \mathbf{x}_i^T\boldsymbol\beta$, so $\lambda_i = e^{\mathbf{x}_i^T\boldsymbol\beta}$.<br><br>
+      <strong>Why log link?</strong> The log link enforces $\lambda_i > 0$ for all values of $\boldsymbol\beta$, since $e^{\text{anything}} > 0$. An identity link ($\lambda_i = \mathbf{x}_i^T\boldsymbol\beta$) could yield negative predictions, which are impossible for counts.<br><br>
+      <strong>Interpretation of $e^{\hat\beta_j}$:</strong> For a continuous predictor $x_j$, a 1-unit increase multiplies the expected count by $e^{\hat\beta_j}$: $E(y \mid x_j + 1) = e^{\hat\beta_j} \cdot E(y \mid x_j)$. For a binary predictor, $e^{\hat\beta_j}$ is the ratio of expected counts between the coded group and the reference group (the "relative risk" or "rate ratio"). For example, in the skin cancer study, RR = 2.234 for Dallas means Dallas has 2.234 times the skin cancer rate of Minneapolis within each age group.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How does this differ from the odds ratio interpretation in logistic regression?<br>
+        • What is the effect of a 2-unit increase in a continuous predictor?<br>
+        • How would you construct a 95% CI for the relative risk?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Offset</div>
+    <div class="question-stem">Explain the concept of an offset in Poisson regression. Why is it needed for the skin cancer dataset? Show mathematically how the offset enters the model and how it is implemented in R.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      An offset is needed whenever the observation window (population size, follow-up time, area, etc.) varies across observations, and we want to model <em>rates</em> rather than raw counts. In the skin cancer dataset, Minneapolis ages 15–24 has 172,675 people while Dallas ages 85+ has only 7,583 — comparing raw counts would be meaningless.<br><br>
+      <strong>Mathematical derivation:</strong> We model the rate $\lambda/n$ (cases per person):
+      $$\ln\!\left(\frac{E(y \mid \mathbf{x})}{n}\right) = \mathbf{x}^T\boldsymbol\beta$$
+      Rearranging: $\ln(E(y \mid \mathbf{x})) = \ln(n) + \mathbf{x}^T\boldsymbol\beta$. The term $\ln(n)$ is the offset — it enters the model as a predictor whose coefficient is constrained to 1 (not estimated).<br><br>
+      <strong>R implementation:</strong>
+      <code>glm(cases ~ city + age.range + offset(log(n)), family = poisson(link="log"))</code><br><br>
+      <strong>Predictions at different scales:</strong> Set <code>n = 1</code> for per-person rates, <code>n = 1000</code> for per-thousand rates, or use the actual population size for predicted counts.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • What if you forgot to include the offset? Would your estimates be biased?<br>
+        • Could you use exposure time (e.g., person-years) instead of population size as an offset?<br>
+        • How would you test whether the offset coefficient is actually equal to 1 (as assumed)?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Overdispersion</div>
+    <div class="question-stem">Define overdispersion in Poisson regression. How is it detected? What are the consequences of ignoring it? Describe three approaches for handling it.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Definition:</strong> Overdispersion occurs when $\text{Var}(y \mid \mathbf{x}) > E(y \mid \mathbf{x}) = \lambda$. The Poisson model assumes $\text{Var} = \lambda$; real count data often violate this.<br><br>
+      <strong>Detection:</strong> (1) Compare raw variance to mean: for publications, $\text{Var}(y) = 3.71 \gg 1.69 = E(y)$. (2) Examine DHARMa dispersion test: ratioObsSim = 1.415, $p \ll 0.001$. (3) Compare residual deviance to df: for publications, $D = 1634.4$ on $df = 909$ (ratio $\approx 1.8$ — well above 1). (4) Rootogram showing systematic misfit.<br><br>
+      <strong>Consequences of ignoring:</strong> Standard Poisson SEs are underestimated (too small) → $z$-statistics are too large → $p$-values too small → inflated Type I error. Some predictors appear significant when they are not (e.g., marSingle: $p = 0.011$ Poisson vs $p = 0.058$ sandwich).<br><br>
+      <strong>Three approaches:</strong><br>
+      (1) <em>Sandwich estimator</em>: corrects SEs without changing estimates; valid when mean structure is correct; no parametric assumption on variance.<br>
+      (2) <em>Quasi-Poisson</em>: models $\text{Var}(y) = \phi\lambda$; estimates $\hat\phi$ from data; SEs multiplied by $\sqrt{\hat\phi}$; estimates unchanged; AIC unavailable.<br>
+      (3) <em>Negative Binomial</em>: full parametric model with $\text{Var}(y) = \mu + \mu^2/\theta$; quadratic variance function; different (slightly) estimates; AIC available for model comparison; best model for publications data by AIC.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • When would you prefer quasi-Poisson over the negative binomial?<br>
+        • What is underdispersion, and how would you handle it?<br>
+        • Can zero-inflation cause overdispersion? (Yes — excess zeros increase variance beyond the Poisson mean.)
+      </div>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · Sandwich Estimator Theory</div>
+    <div class="question-stem">Explain the theoretical justification for the sandwich (robust) variance estimator in Poisson regression. Under what conditions does the Poisson MLE converge to the true parameters even when the distribution is misspecified?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Setting:</strong> Suppose the true DGP is $g(y \mid \mathbf{z}, \boldsymbol\gamma_0)$ (e.g., negative binomial), but we fit the Poisson model $p(y \mid \mathbf{x}, \boldsymbol\theta)$. The MLE converges to $\boldsymbol\theta^*$ that minimises the Kullback-Leibler divergence:
+      $$I(f:g, \boldsymbol\theta) = E_g\!\left[\log\frac{g(y \mid \mathbf{z}, \boldsymbol\gamma_0)}{p(y \mid \mathbf{x}, \boldsymbol\theta)}\right]$$
+      Equivalently, $\boldsymbol\theta^*$ solves $E_g[\mathbf{s}(\boldsymbol\theta)] = \mathbf{0}$ where $\mathbf{s}(\boldsymbol\theta) = \partial\log p / \partial\boldsymbol\theta$ is the score.<br><br>
+      <strong>Key result for log-linear Poisson:</strong> If the mean structure is correctly specified, i.e., the true $\lambda$ satisfies $\ln(\lambda) = \mathbf{x}^T\boldsymbol\beta_0$ for some $\boldsymbol\beta_0$, then $\boldsymbol\theta^* = \boldsymbol\beta_0$ — the MLE converges to the true regression parameters even if the variance is wrong. This is because the score equations depend only on the mean: $\mathbf{X}^T(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$, and if the mean is correct, these are unbiased estimating equations.<br><br>
+      <strong>Sandwich covariance:</strong> Asymptotically $\sqrt{n}(\hat{\boldsymbol\beta}_{\text{MLE}} - \boldsymbol\beta_0) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \mathbf{C})$ where $\mathbf{C} = \mathbf{A}^{-1}\mathbf{B}\mathbf{A}^{-1}$ with $\mathbf{A}$ the expected Hessian and $\mathbf{B}$ the expected outer product of scores. This sandwich formula correctly accounts for the actual variance, not the Poisson-assumed variance.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • What if the mean structure is also misspecified? Does the sandwich estimator still help?<br>
+        • What is the practical difference between using <code>coeftest(model, vcov=sandwich)</code> and using <code>waldtest(..., vcov=sandwich)</code>?<br>
+        • In large samples, how do sandwich SEs compare to quasi-Poisson SEs?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Negative Binomial Derivation</div>
+    <div class="question-stem">Derive the mean and variance of the negative binomial model from the Poisson-Gamma mixture representation. Explain what the parameter $\theta$ represents and what happens when $\theta \to \infty$.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Setup:</strong> $y \mid \lambda \sim \text{Poisson}(\lambda)$ with $\lambda = \lambda^* e^{\mathbf{x}^T\boldsymbol\beta}$, $\lambda^* \sim \text{Gamma}(\theta, \theta)$, so $E(\lambda^*) = 1$ and $\text{Var}(\lambda^*) = 1/\theta$.<br><br>
+      <strong>Mean:</strong> By the law of total expectation:
+      $$E(y) = E[E(y\mid\lambda)] = E(\lambda) = e^{\mathbf{x}^T\boldsymbol\beta} \cdot E(\lambda^*) = e^{\mathbf{x}^T\boldsymbol\beta} = \mu$$
+      <strong>Variance:</strong> By the law of total variance:
+      $$\text{Var}(y) = E[\text{Var}(y\mid\lambda)] + \text{Var}[E(y\mid\lambda)] = E(\lambda) + \text{Var}(\lambda)$$
+      $$= e^{\mathbf{x}^T\boldsymbol\beta} + \frac{1}{\theta}e^{2\mathbf{x}^T\boldsymbol\beta} = \mu + \frac{1}{\theta}\mu^2$$
+      <strong>Interpretation of $\theta$:</strong> $\theta$ is the inverse overdispersion parameter. Large $\theta$ means small $1/\theta$, so little extra-Poisson variation. $\theta = 2.264$ for publications means $\text{Var}(y) \approx \mu + 0.44\mu^2$ — substantial overdispersion at higher means.<br><br>
+      <strong>As $\theta \to \infty$:</strong> $\text{Var}(y) \to \mu$ — the NB converges to Poisson (equidispersion). Equivalently, $\lambda^* \sim \text{Gamma}(\infty, \infty)$ converges to a point mass at 1, removing the random effect.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How would you test whether the NB is significantly better than Poisson? (LRT: $-2(\ell_{\text{Poisson}} - \ell_{\text{NB}}) \sim \bar\chi^2_1$ due to boundary testing, or just compare AIC.)<br>
+        • What does $\hat\theta = 2.264$ with SE = 0.271 tell us about the precision of overdispersion estimation?<br>
+        • Is zero-inflation also possible in a negative binomial model? (Yes — ZINB model.)
+      </div>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · R Output Analysis</div>
+    <div class="question-stem">Interpret the following skin cancer R output, including: what each coefficient means substantively, what the null deviance and residual deviance tell us, and why the age.range75_84 coefficient is not significant.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Intercept ($\hat\beta_0 = -5.483$):</strong> $e^{-5.483} = 0.00415$ — the predicted skin cancer rate per person in the reference group: Minneapolis residents aged 85+. About 4.15 cases per 1,000 persons.<br><br>
+      <strong>cityDallas ($\hat\beta = 0.804$, RR = 2.234):</strong> Within each age group, Dallas has 2.234 times the skin cancer rate of Minneapolis. This is attributable to Dallas's more southerly latitude and greater UV radiation exposure.<br><br>
+      <strong>age.range15_24 ($\hat\beta = -6.174$, RR = 0.002):</strong> The 15–24 age group has only 0.2% of the cancer rate of the 85+ reference group, within each city. Skin cancer accumulates over decades of UV exposure.<br><br>
+      <strong>Null deviance = 2789.7 on 15 df:</strong> Variation explained by the intercept-only model (8 age groups × 2 cities, but no predictors). Subtracting residual deviance gives the deviance explained by city + age.range: $2789.7 - 8.26 = 2781.4$ on $15 - 7 = 8$ df — an enormous reduction, confirming city and age strongly predict cancer rates.<br><br>
+      <strong>Residual deviance = 8.26 on 7 df ($p = 0.31$):</strong> The model fits adequately — no significant lack of fit. 7 df arises from 16 cells minus 9 parameters (intercept + 1 city + 7 age dummies).<br><br>
+      <strong>age.range75_84 ($p = 0.297$):</strong> This compares 75–84 to 85+. The close proximity of these two elderly age groups means their cancer rates are not significantly different. The model cannot distinguish them — consistent with biological plausibility.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How would you compute the predicted number of cases for a specific cell (e.g., Dallas, 55–64)?<br>
+        • If you were to test whether age range matters overall, which test would you use?<br>
+        • Why was 85+ chosen as the reference category?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · DHARMa Residuals</div>
+    <div class="question-stem">Explain how DHARMa residuals are computed and interpreted. Why are they superior to standard Pearson or deviance residuals for GLM diagnostics? What does the publications model's DHARMa output tell us?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Computation:</strong> For each observation $i$: (1) Simulate $n_{\text{sim}} = 250$ replications $\tilde{y}_{ij}$ from the fitted model, using the estimated $\hat\lambda_i$. (2) Compute the empirical CDF $\hat{F}_i$ of these simulated values. (3) The DHARMa residual is $r_i = \hat{F}_i(y_i^{\text{obs}})$ — the quantile of the observed value within its simulated distribution.<br><br>
+      <strong>Why superior to Pearson/deviance residuals?</strong> Standard residuals in GLMs have non-uniform and model-specific distributions that depend on the mean. For count data, this makes detecting patterns difficult. DHARMa residuals are <em>always</em> $U[0,1]$ under a correctly specified model, regardless of the distribution family. This enables model-free diagnostic tests.<br><br>
+      <strong>Publications model output:</strong>
+      — <code>testUniformity</code>: KS $D = 0.108$, $p = 1.3 \times 10^{-9}$ → residuals are NOT uniform → Poisson model is significantly misspecified.
+      — <code>testDispersion</code>: ratio = 1.415, $p < 2.2 \times 10^{-16}$ → observed variance of residuals exceeds what a correctly specified Poisson model would produce → significant overdispersion.
+      — These findings motivate switching to the negative binomial model, which passes both tests.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • What does a DHARMa residual of exactly 0 or 1 indicate?<br>
+        • How would you use <code>plotResiduals(sim.model, ab$phd)</code> and what would you look for?<br>
+        • What is the <code>refit=TRUE</code> option in <code>simulateResiduals</code> and when would you use it?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Zero-Inflated Models</div>
+    <div class="question-stem">Explain the ZIP model: its structure, the distinction between structural and sampling zeros, and what the publications ZIP output tells us about the role of mentor productivity in determining structural non-publishing.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>ZIP structure:</strong> The ZIP model is a two-component mixture. With probability $\pi$ (the zero-inflation probability), an observation is a "structural zero" — the individual can never produce events. With probability $1-\pi$, the individual belongs to the Poisson count process. The density is:
+      $$P(y = k) = \pi\cdot\mathbf{1}_{[k=0]} + (1-\pi)\cdot\frac{e^{-\lambda}\lambda^k}{k!}$$
+      The mean is $\mu = (1-\pi)\lambda$, which is always lower than the Poisson mean.<br><br>
+      <strong>Structural vs sampling zeros:</strong> A <em>structural zero</em> is from an individual who can never experience the event (e.g., a PhD student who has permanently decided not to pursue publications — perhaps they plan a non-academic career). A <em>sampling zero</em> is from an individual who could publish but happened not to in this window.<br><br>
+      <strong>Publications ZIP(full) output:</strong> The zero-inflation component includes mentor articles (ment) with coefficient $\hat\gamma_{\text{ment}} = -0.134$ ($p = 0.003$). Negative coefficient in logit model means mentor productivity <em>reduces</em> the log-odds of being in the structural-zero group. A productive mentor keeps students engaged in the publication process, reducing the probability of permanent non-publishing.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Why does the NB model fit better than ZIP despite the zero-inflation?<br>
+        • How would you compute the probability of being a structural zero for a specific scientist?<br>
+        • What is a Zero-Inflated Negative Binomial (ZINB) and when might it be preferred?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Comparing SE Methods</div>
+    <div class="question-stem">Using the publications data, compare the four approaches to handling overdispersion (Poisson, sandwich, quasi-Poisson, NB) with respect to their point estimates and standard errors. Which approach do you recommend and why?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Point estimates:</strong> Poisson, sandwich, and quasi-Poisson all produce identical coefficient estimates (solving the same score equations). NB produces slightly different estimates (accounting for the quadratic variance in the likelihood).<br><br>
+      <strong>Standard errors:</strong> The naive Poisson SEs are smallest — they assume equidispersion and underestimate uncertainty. Sandwich SEs are 30–90% larger (e.g., ment SE: 0.0020 → 0.0038). Quasi-Poisson SEs are uniformly multiplied by $\sqrt{1.829} = 1.352$ (~35% larger). NB SEs are similar to sandwich and quasi-Poisson SEs in magnitude but arise from a different (parametric) derivation.<br><br>
+      <strong>Recommendation:</strong> The Negative Binomial model is best for this dataset for several reasons: (1) It has a proper likelihood enabling AIC comparison, and wins overwhelmingly (ΔAIC = 178). (2) Its DHARMa diagnostics are satisfactory (both tests non-significant). (3) The quadratic variance function is supported by the mean-variance plot. (4) It provides richer parameter estimates (including $\hat\theta$) that characterise the heterogeneity in the population. The quasi-Poisson or sandwich are reasonable conservative choices when the full NB is not needed or when model robustness is paramount.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Is it possible for the NB to be worse than quasi-Poisson if the quadratic variance assumption is violated?<br>
+        • How would you report results from the NB model for a medical journal audience?<br>
+        • What if the mean-variance plot showed neither linear nor quadratic relationships?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · Critical Thinking — Model Choice</div>
+    <div class="question-stem">A colleague claims: "For count data, I always use negative binomial regression because it handles overdispersion and is always better than Poisson." Critique this claim using the skin cancer and publications case studies.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      The claim is an oversimplification. While the NB is a useful tool for overdispersed count data, "always" is too strong — model choice should be data-driven and theoretically motivated.<br><br>
+      <strong>Counter-example: Skin cancer study.</strong> Here the standard Poisson model with an offset fits adequately — Pearson $\chi^2 = 8.13$ ($p = 0.32$) and Deviance $= 8.26$ ($p = 0.31$) are both non-significant. The DHARMa diagnostics also pass. Fitting a NB model would add an unnecessary parameter ($\theta$) without improving fit. The principle of parsimony (Occam's razor) argues against the NB here.<br><br>
+      <strong>Supporting example: Publications study.</strong> The Poisson model fails dramatically — DHARMa tests strongly reject it, and AIC is 178 units worse than NB. Here the NB is clearly appropriate.<br><br>
+      <strong>Additional nuances:</strong> (1) If zero-inflation is the primary issue (not general overdispersion), ZIP or ZINB may be more appropriate than NB alone. (2) NB adds a free parameter $\theta$ — if overdispersion is mild, quasi-Poisson (no extra parameters) may be sufficient. (3) The NB assumes a specific (quadratic) variance function; if the true variance function is different, NB could still misfit. (4) The NB requires estimation of $\theta$, which can be unstable with small samples.<br><br>
+      <strong>Conclusion:</strong> Always start with Poisson, check diagnostics (DHARMa, deviance/df ratio), and escalate to NB or ZIP only if evidence warrants. Model selection should be guided by AIC and diagnostic checks, not a blanket rule.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Could there be a scenario where neither Poisson, NB, nor ZIP is adequate?<br>
+        • How would you handle count data with both overdispersion and zero-inflation?<br>
+        • What is underdispersion and how would you model it?
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+var total = 0, correct = 0;
+
+function answer(btn, qid, isCorrect) {
+  var card = document.getElementById(qid);
+  var btns = card.querySelectorAll('.option-btn');
+  btns.forEach(function(b) {
+    b.disabled = true;
+    if (b === btn) {
+      b.classList.add(isCorrect ? 'correct' : 'incorrect');
+    }
+  });
+  if (!isCorrect) {
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick').includes(',true)')) {
+        b.classList.add('reveal-correct');
+      }
+    });
+  }
+  var fb = document.getElementById(qid + '-fb');
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect — see highlighted answer above.';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  total++;
+  if (isCorrect) correct++;
+  document.getElementById('score-display').textContent = 'Score: ' + correct + ' / ' + total;
+}
+
+function toggleAnswer(btn) {
+  var panel = btn.nextElementSibling;
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.textContent = 'Reveal Answer';
+  } else {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide Answer';
+  }
+}
+
+function resetAll() {
+  total = 0; correct = 0;
+  document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  document.querySelectorAll('.option-btn').forEach(function(b) {
+    b.disabled = false;
+    b.classList.remove('correct','incorrect','reveal-correct');
+  });
+  document.querySelectorAll('.feedback-bar').forEach(function(fb) {
+    fb.textContent = '';
+    fb.className = 'feedback-bar';
+  });
+  document.querySelectorAll('.answer-panel').forEach(function(p) {
+    p.style.display = 'none';
+  });
+  document.querySelectorAll('.reveal-btn').forEach(function(b) {
+    b.textContent = 'Reveal Answer';
+  });
+}
+</script>
+</body>
+</html>

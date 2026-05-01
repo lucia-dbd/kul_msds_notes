@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistic Regression III – Chapter 6 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: {
+    ready: function() {
+      MathJax.startup.defaultReady();
+      MathJax.startup.promise.then(function() { console.log('MathJax ready'); });
+    }
+  }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c3a;
+    max-width: 960px; margin: 0 auto; padding: 24px 16px 60px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff; border-radius: 14px; padding: 28px 36px;
+    margin-bottom: 24px; box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff; border: 1px solid #dde3ef;
+    padding: 10px 18px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px;
+    margin-top: 0; margin-bottom: 16px; font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin: 20px 0 8px; }
+  .notes-section p { margin-bottom: 10px; }
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  pre {
+    background:#1e2435; color:#e8eaf0; border-radius:8px;
+    padding:14px 18px; font-family:'JetBrains Mono', monospace;
+    font-size:0.82em; line-height:1.6; overflow-x:auto; margin:14px 0;
+  }
+  code { font-family:'JetBrains Mono', monospace; font-size:0.88em; background:#f0f4fb; padding:1px 5px; border-radius:3px; color:#1a3a5c; }
+  /* MCQ */
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:0.95em; margin-bottom:20px; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+  .option-btn {
+    display:block; width:100%; background:#ffffff; border:1.5px solid #d0d8ea;
+    border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  /* Short Answer */
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section > h2 { color:#4a148c; font-size:1.2em; font-weight:700; margin-bottom:20px; font-family:'Crimson Pro', Georgia, serif; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn { background:#6f42c1; color:#ffffff; border:none; border-radius:20px; padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; font-family:inherit; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block { background:#fff8e1; border-left:3px solid #ffc107; padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0; font-size:0.92em; }
+  .followup-block strong { color:#7c5800; }
+  .reset-btn { background:#1a3a5c; color:#fff; border:none; border-radius:20px; padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:20px; transition:background 0.2s; font-family:inherit; }
+  .reset-btn:hover { background:#2e6da4; }
+  @media(max-width:600px){ .notes-section, .mcq-section, .sa-section { padding:18px 14px; } .page-header { padding:20px 18px; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Logistic Regression III — Chapter 6</h1>
+  <div class="subtitle">(Quasi)Complete Separation · Firth's Penalized Likelihood · Pseudo-R² · Model Building Principles · AIC / BIC · Akaike Weights · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#separation">Separation</a>
+  <a href="#detection">Detection</a>
+  <a href="#remedies">Remedies</a>
+  <a href="#firth">Firth's Procedure</a>
+  <a href="#pseudor2">Pseudo-R²</a>
+  <a href="#modelbuilding">Model Building</a>
+  <a href="#modelselection">Model Selection</a>
+  <a href="#aic">AIC &amp; Weights</a>
+  <a href="#casestudies">Case Studies</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ═══════════════════════ NOTES ═══════════════════════ -->
+
+<!-- 1. Separation -->
+<div class="notes-section" id="separation">
+  <h2>1. (Quasi)Complete Separation</h2>
+
+  <p>(Quasi)complete separation is a fundamental problem that can arise when fitting logistic (and other binary) regression models using maximum likelihood estimation. Understanding it deeply is critical for applied and theoretical exam questions.</p>
+
+  <h3>Definition</h3>
+  <div class="theorem-box">
+    <strong>Complete Separation:</strong> A situation where the responses ($y=0$ vs $y=1$) can be <em>perfectly</em> separated by a hyperplane in the predictor space. Formally, there exists a vector $\boldsymbol\beta$ such that $\mathbf{x}_i^T\boldsymbol\beta > 0$ for all $y_i=1$ and $\mathbf{x}_i^T\boldsymbol\beta < 0$ for all $y_i=0$.<br><br>
+    <strong>Quasi-complete Separation:</strong> Perfect separation holds with the additional possibility that some observations lie exactly on the separating hyperplane (i.e., the inequality is non-strict for at least one observation).
+  </div>
+
+  <h3>Toy Example from the Lecture</h3>
+  <div class="example-box">
+    <strong>Data:</strong> $y = (0,0,0,0,1,1,1,1)$, $x_1 = (1,2,3,3,5,6,10,11)$, $x_2 = (3,2,-1,-1,2,4,1,0)$<br><br>
+    Notice that $y$ is <em>perfectly predicted</em> by $x_1$ alone:
+    $$y = \begin{cases} 1 & \text{if } x_1 > 3 \\ 0 & \text{if } x_1 \leq 3 \end{cases}$$
+    Therefore $P(y=1 \mid x_1 \leq 3) = 0$ and $P(y=1 \mid x_1 > 3) = 1$. This is a case of <strong>quasi-complete separation</strong> (obs. 3 and 4 lie exactly at the boundary $x_1 = 3$ with $y=0$).
+  </div>
+
+  <h3>Why the MLE Fails</h3>
+  <p>When complete or quasi-complete separation occurs, the likelihood function is monotone increasing in the coefficient of the separating variable — there is no finite maximum. The MLE for that coefficient is literally $+\infty$ (or $-\infty$).</p>
+
+  <div class="key-point">
+    <strong>Key consequence:</strong> The iterative IWLS algorithm does not converge in the usual sense. Software packages produce a finite number (e.g., $\hat\beta_{x_1} = 15.288$ in R or $4.4921$ in SAS) but these are <em>artifacts of the iteration limit</em>. The corresponding standard errors balloon to thousands, making Wald tests completely unreliable ($p \approx 1$).
+  </div>
+
+  <h3>Software Warnings Across Platforms</h3>
+  <table>
+    <thead><tr><th>Software</th><th>Warning / behaviour</th></tr></thead>
+    <tbody>
+      <tr><td><strong>R</strong></td><td><code>glm.fit: fitted probabilities numerically 0 or 1 occurred</code>; residual deviance ≈ 0; AIC = 6; 24 Fisher Scoring iterations</td></tr>
+      <tr><td><strong>SAS</strong></td><td>"Complete separation of data points detected. WARNING: The maximum likelihood estimate does not exist." — reports Wald p ≈ 0.94 (Wald is unreliable); LRT gives p = 0.0039 (more trustworthy)</td></tr>
+      <tr><td><strong>SPSS</strong></td><td>"The parameter covariance matrix cannot be computed. Remaining statistics will be omitted."</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Exam trap:</strong> In the SAS output with complete separation, the Wald test gives p ≈ 0.94 (non-significant!) while the Likelihood Ratio Test gives p = 0.0039. This discrepancy is diagnostic: it arises because the Wald statistic depends on the (inflated) standard error, while the LRT compares log-likelihoods directly. <em>Never trust the Wald test when separation is suspected.</em>
+  </div>
+
+  <h3>Causes of Separation in Practice</h3>
+  <p>Three main root causes appear in the lecture:</p>
+  <p>(1) <strong>Coding errors</strong> — a mislabeled predictor that is essentially a recoded version of the outcome. (2) <strong>Small or moderate sample size</strong> — with a larger sample, one would observe $y=0$ cases in the region $x_1 > 3$, breaking the separation. (3) <strong>Another version of the response included as a covariate</strong> — e.g., including a binarised version of the outcome as a predictor.</p>
+
+  <div class="key-point">
+    The lecture emphasises: "(Quasi)Complete separation does happen in practice with a non-negligible probability." It is not a rare theoretical curiosity.
+  </div>
+</div>
+
+<!-- 2. Detection -->
+<div class="notes-section" id="detection">
+  <h2>2. Detecting Separation and Infinite Estimates</h2>
+
+  <h3>Lesaffre &amp; Albert (1989) Iterative Ratio Procedure</h3>
+  <div class="theorem-box">
+    <strong>Algorithm:</strong>
+    <ol style="margin:10px 0 0 20px; line-height:2">
+      <li>Refit the model, progressively increasing the allowed number of IWLS iterations at each step.</li>
+      <li>At each step, divide the current estimated asymptotic standard errors by those from the first fit to form ratios.</li>
+      <li>If the sequence of ratios for a given parameter <em>diverges</em> (grows without bound), its MLE is $\pm\infty$.</li>
+    </ol>
+  </div>
+
+  <div class="example-box">
+    <strong>Endometrial Cancer Study — R output from <code>check_infinite_estimates(modML)</code>:</strong>
+<pre>(Intercept)          NV        PI        EH
+[1,]   1.000000 1.000000e+00  1.000000  1.000000
+[2,]   1.320822 1.710954e+00  1.352585  1.523591
+[3,]   1.410578 5.468665e+00  1.483265  1.617198
+[4,]   1.413505 3.225927e+01  1.490753  1.618462
+[5,]   1.413559 3.311464e+02  1.490923  1.618484
+[6,]   1.413560 5.786011e+03  1.490924  1.618484
+[7,]   1.413560 1.704229e+05  1.490924  1.618484
+...
+[12,]  1.413560 3.953686e+07  1.490924  1.618484</pre>
+    <strong>Interpretation:</strong> The ratios for Intercept, PI, and EH converge to finite values (~1.41, ~1.49, ~1.62 respectively). The ratio for <strong>NV</strong> explodes exponentially (from 1 → 3.95×10⁷ over 12 iterations). This unambiguously indicates that $\hat\beta_{NV} = +\infty$.
+  </div>
+
+  <h3>Konis (2007) Linear Programming Algorithm</h3>
+  <div class="key-point">
+    This is a <strong>pre-fit</strong> method implemented in the <code>brglm2</code> package via <code>method = "detect_separation"</code>. It uses linear programming to determine, <em>without fitting the model</em>, which parameters have infinite MLEs. It directly returns:
+    <ul style="margin:8px 0 0 20px">
+      <li><code>0</code> → finite MLE</li>
+      <li><code>Inf</code> → MLE is $+\infty$</li>
+      <li><code>-Inf</code> → MLE is $-\infty$</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <strong>R output for Endometrial Cancer Study:</strong>
+<pre>Separation: TRUE
+Existence of maximum likelihood estimates
+(Intercept)    NV    PI    EH
+          0   Inf     0     0</pre>
+    Then <code>theta_mle + endometrial_sep$betas</code> gives the correct (infinite) MLEs:
+<pre>(Intercept)    NV          PI          EH
+ 2.18092821   Inf  -0.01886444  -1.52576146</pre>
+    This shows the true MLE for NV is $+\infty$: NV = 1 (neovasculization present) <em>perfectly predicts</em> high-grade histology (no case with NV=1 has HG=0 in the data).
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Why does the cross-tabulation reveal this?</strong><br>
+    The table shows: HG=0, NV=1 → Freq = <strong>0</strong>. No patient without neovasculization has high-grade histology, yet all NV=1 patients do. The cell count of zero in the (NV=1, HG=0) cell creates the separation for NV.
+  </div>
+</div>
+
+<!-- 3. Remedies -->
+<div class="notes-section" id="remedies">
+  <h2>3. Remedies for (Quasi)Complete Separation</h2>
+
+  <p>Five strategies are discussed in the lecture. Understanding <em>why</em> each one is or is not satisfactory is essential for the exam.</p>
+
+  <table>
+    <thead><tr><th>#</th><th>Strategy</th><th>Verdict</th><th>Key limitation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Omit the offending variable (e.g., NV)</td>
+        <td style="color:#c0392b;font-weight:700;">❌ Inappropriate</td>
+        <td>Removes the strongest predictor from the model — scientifically unjustified</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Switch to a different model (e.g., linear probability)</td>
+        <td style="color:#e67e22;font-weight:700;">⚠ Sometimes</td>
+        <td>Parameters have different interpretations; may be less meaningful scientifically</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Ad hoc adjustment (add 0.5 to empty cells)</td>
+        <td style="color:#e67e22;font-weight:700;">⚠ Problematic</td>
+        <td>Undesirable statistical properties; arbitrary (Agresti &amp; Yang 1987)</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Exact logistic regression</td>
+        <td style="color:#e67e22;font-weight:700;">⚠ Limited</td>
+        <td>Not applicable with continuous predictors; leads to degenerate sufficient statistic distributions</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Fix $\hat\beta_{NV}$ at a "high" value (e.g., last iteration before convergence criterion)</td>
+        <td style="color:#c0392b;font-weight:700;">❌ Problematic</td>
+        <td>Arbitrary choice; extreme inflation of $\text{Var}(\hat\beta_{NV})$ → insignificant Wald test</td>
+      </tr>
+      <tr>
+        <td><strong>★</strong></td>
+        <td><strong>Firth's penalized likelihood (bias reduction)</strong></td>
+        <td style="color:#27ae60;font-weight:700;">✅ Recommended</td>
+        <td>Guarantees finite estimates; second-order unbiased; smaller variance than MLE</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 4. Firth -->
+<div class="notes-section" id="firth">
+  <h2>4. Firth's Penalized Likelihood (Bias-Reduced GLM)</h2>
+
+  <p>David Firth (1993) proposed a general solution applicable to all GLMs, motivated by the goal of reducing the $O(n^{-1})$ bias of MLEs.</p>
+
+  <h3>The Modified Score Equations</h3>
+  <div class="theorem-box">
+    Standard ML finds $\hat{\boldsymbol\beta}$ by solving $\mathbf{S}(\boldsymbol\beta) = \mathbf{0}$ (score equations).<br><br>
+    Firth's modified score function adds a penalty term:
+    $$s^*(\beta_r) = s(\beta_r) + \frac{1}{2}\,\mathrm{tr}\!\left[\mathbf{I}^{-1}(\boldsymbol\beta)\,\frac{\partial \mathbf{I}(\boldsymbol\beta)}{\partial \beta_r}\right] = 0$$
+    for $r = 1, \ldots, p$, where $\mathbf{I}(\boldsymbol\beta)$ is the Fisher information matrix.
+  </div>
+
+  <h3>Connection to Penalized Likelihood</h3>
+  <p>The modified score $\mathbf{S}^*(\boldsymbol\beta) = \mathbf{0}$ corresponds to maximising a <em>penalized</em> log-likelihood and likelihood:</p>
+  <div class="formula-box">
+    $$\ell^*(\boldsymbol\beta) = \ell(\boldsymbol\beta) + \frac{1}{2}\log|\mathbf{I}(\boldsymbol\beta)| \qquad L^*(\boldsymbol\beta) = L(\boldsymbol\beta)\,|\mathbf{I}(\boldsymbol\beta)|^{1/2}$$
+  </div>
+  <p>The penalty $|\mathbf{I}(\boldsymbol\beta)|^{1/2}$ is <strong>Jeffreys' invariant prior</strong> for this problem. Its influence is asymptotically negligible (it vanishes as $n \to \infty$), so for large samples the Firth estimator and the MLE converge.</p>
+
+  <h3>Properties of the Firth Estimator</h3>
+  <div class="key-point">
+    <ol style="margin:8px 0 0 20px; line-height:2.2">
+      <li>Always yields <strong>finite estimates</strong> — completely eliminates the separation problem.</li>
+      <li>The $O(n^{-1})$ bias of the MLE is removed (<strong>second-order unbiased</strong>).</li>
+      <li>Has <strong>smaller MSE</strong> than the MLE in finite samples (reduced variance + removed bias).</li>
+      <li>Standard errors come from the diagonal of $\mathbf{I}(\hat{\boldsymbol\beta})^{-1}$.</li>
+      <li>Inference uses <strong>LRT and profile likelihood CIs</strong> based on $\ell^*(\boldsymbol\beta)$ — <em>not</em> Wald tests.</li>
+    </ol>
+  </div>
+
+  <h3>R Implementation: <code>brglm2</code></h3>
+<pre>> modPML = glm(HG ~ NV + PI + EH, family = binomial("probit"),
++              method = "brglmFit", data = endometrial)
+> summary(modPML)
+
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)  1.91460    0.78877   2.427  0.015210 *
+NV           1.65892    0.74730   2.220  0.026427 *
+PI          -0.01520    0.02089  -0.728  0.466793
+EH          -1.37988    0.40329  -3.422  0.000623 ***</pre>
+
+  <div class="key-point">
+    <strong>Compare with ML output:</strong> Under ML, $\hat\beta_{NV} = 5.80$ (SE = 402!) giving a completely meaningless Wald test. Under Firth, $\hat\beta_{NV} = 1.66$ (SE = 0.75, $p = 0.026$) — a meaningful, finite estimate. NV is now correctly identified as a significant predictor.
+  </div>
+
+  <h3>Inference After Firth: LRT, Not Wald</h3>
+  <div class="warning-box">
+    <strong>⚠ Critical subtlety from the lecture:</strong> When using <code>Anova(modPML, test="LR", type=3)</code> in R, the function internally computes LRT as: Deviance(reduced model via ML) − Deviance(full model via Firth). This mixes two different likelihoods and can yield negative LRT statistics (as in the PI example: LR Chi-sq = −0.27). <strong>Always</strong> compare two Firth-fitted models directly:<br><br>
+<pre>modPML.nPI = glm(HG ~ NV + EH, ..., method="brglmFit")
+lrt.PI = deviance(modPML.nPI) - deviance(modPML)  # = 0.633, p = 0.426</pre>
+    This correctly tests whether PI should be retained (answer: no, $p = 0.43$).
+  </div>
+
+  <h3>Toy Examples: Separation vs No Separation</h3>
+  <div class="example-box">
+    <strong>Toy1 (no separation):</strong> Data has both $y=0$ and $y=1$ at intermediate $X$ values. <code>detect_separation</code> returns <code>FALSE</code>. ML ($\hat\beta_X = 0.230$, SE = 0.121) and Firth ($\hat\beta_X = 0.156$, SE = 0.084) give similar qualitative conclusions, but Firth is slightly shrunk toward zero.<br><br>
+    <strong>Toy2 (complete separation):</strong> $y=0$ for $X \in \{10,20\}$ and $y=1$ for $X \in \{30,40\}$, perfectly separated. <code>detect_separation</code> returns <code>Intercept = -Inf, X = Inf</code>. ML gives $\hat\beta_X = 4.927$ (SE = 11,071!) with residual deviance ≈ 0. Firth gives $\hat\beta_X = 0.329$ (SE = 0.183), a sensible finite estimate.
+  </div>
+</div>
+
+<!-- 5. Pseudo-R2 -->
+<div class="notes-section" id="pseudor2">
+  <h2>5. Pseudo-R² Measures for Binary Regression</h2>
+
+  <p>Unlike linear regression, the OLS $R^2$ cannot be meaningfully applied to binary responses — it is theoretically impossible for it to reach 1 even with a perfect fit. Several pseudo-$R^2$ measures have been proposed.</p>
+
+  <h3>McFadden (1974)</h3>
+  <div class="formula-box">
+    $$R^2_{\text{McF}} = 1 - \frac{\ell(\hat{\boldsymbol\beta})}{\ell(\hat{\boldsymbol\beta}}_0)}$$
+    where $\ell(\hat{\boldsymbol\beta}_0)$ = intercept-only log-likelihood, $\ell(\hat{\boldsymbol\beta})$ = full model log-likelihood.
+  </div>
+  <p><strong>Interpretation:</strong> The intercept-only log-likelihood plays the role of the total sum of squares. The ratio measures proportional reduction in "error variance". Note: $R^2_{\text{McF}}$ does <em>not</em> reduce to OLS $R^2$ as a special case for linear models.</p>
+
+  <h3>Cox &amp; Snell (1989) — "Generalized R²"</h3>
+  <div class="formula-box">
+    $$R^2_{CS} = 1 - \left(\frac{L(\hat{\boldsymbol\beta}_0)}{L(\hat{\boldsymbol\beta})}\right)^{2/n}$$
+  </div>
+  <p><strong>Key property:</strong> For linear models, $R^2_{CS}$ exactly equals the OLS $R^2$ — this is why it is called a "generalized" (not pseudo) $R^2$. However, its upper bound is $1 - L(\hat{\boldsymbol\beta}_0)^{2/n}$, which can be far below 1 (e.g., as low as 0.48 in some settings).</p>
+
+  <h3>Nagelkerke (1991) — Corrected Cox-Snell</h3>
+  <div class="formula-box">
+    $$R^2_{\text{Nagel}} = \frac{1 - \left(\frac{L(\hat{\boldsymbol\beta}_0)}{L(\hat{\boldsymbol\beta})}\right)^{2/n}}{1 - L(\hat{\boldsymbol\beta}_0)^{2/n}}$$
+  </div>
+  <p>Divides $R^2_{CS}$ by its maximum possible value, rescaling to $[0,1]$. This is the most commonly reported pseudo-$R^2$ in medical/social science software.</p>
+
+  <table>
+    <thead><tr><th>Measure</th><th>Range</th><th>Equals OLS R²?</th><th>Upper bound = 1?</th></tr></thead>
+    <tbody>
+      <tr><td>McFadden</td><td>[0, 1)</td><td>No</td><td>Approaches but rarely reaches 1</td></tr>
+      <tr><td>Cox-Snell</td><td>[0, max &lt; 1]</td><td>Yes (linear models)</td><td>No — bounded below 1</td></tr>
+      <tr><td>Nagelkerke</td><td>[0, 1]</td><td>No</td><td>Yes — by construction</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Donner party data (polynomial model):</strong> McFadden = 0.209, Cox-Snell = 0.249, Nagelkerke = 0.334. The animal experiment (log-log link) gives McFadden ≈ 0.930, Nagelkerke ≈ 0.9998 — reflecting near-perfect fit.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ The Nagelkerke R² can be misleading</strong> because it ranges to 1 by construction even if the model does not fit perfectly. Mittlböck and Schemper (1996) reviewed 12 pseudo-R² measures and found no single dominant choice. Use these as supplementary descriptors, not primary inferential tools.
+  </div>
+</div>
+
+<!-- 6. Model Building -->
+<div class="notes-section" id="modelbuilding">
+  <h2>6. Model Building: General Principles</h2>
+
+  <p>The overarching goal is: <em>"Find a model that fits the data reasonably well without unnecessary complexity."</em> Model building blends art and science — there are no fixed algorithmic rules, only guiding principles.</p>
+
+  <div class="key-point">
+    <strong>Two types of models:</strong> (1) <em>Mechanistic models</em> — derived from subject-matter theory (e.g., PK/PD pharmacokinetic models). (2) <em>Empirical models</em> — data-driven with simple structural restrictions (linear, factorial, etc.). Modern machine learning offers highly flexible empirical models.
+  </div>
+
+  <h3>Principles P1–P10</h3>
+  <table>
+    <thead><tr><th>Principle</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td><strong>P1</strong></td><td>Use prior scientific knowledge: research questions, theory, prior study results, common sense</td></tr>
+      <tr><td><strong>P2</strong></td><td>Include interactions only when theoretically justified; higher-order interactions require very strong rationale</td></tr>
+      <tr><td><strong>P3</strong></td><td>Prefer <em>hierarchical models</em> (principle of marginality): if an interaction $AB$ is in the model, include main effects $A$ and $B$; if $x^2$ is included, include $x$; always include intercept</td></tr>
+      <tr><td><strong>P4</strong></td><td>Distinguish observational (complex selection) from experimental studies (model construction less critical — design determines model)</td></tr>
+      <tr><td><strong>P5</strong></td><td>A single study is <em>not</em> conclusive. Replication is paramount</td></tr>
+      <tr><td><strong>P6</strong></td><td>Groups of predictors (e.g., Big Five personality factors; dummies for a categorical variable) move in and out of the model together</td></tr>
+      <tr><td><strong>P7</strong></td><td>Be aware of problems with automatic selection (stepwise, forward, backward): each test is conditional on previous tests; distributional theory incomplete; multiple comparison inflation; no model uncertainty measure</td></tr>
+      <tr><td><strong>P8</strong></td><td>Model construction is iterative and creative</td></tr>
+      <tr><td><strong>P9</strong></td><td>Post-selection inference is an active research debate — no settled consensus on how to do it correctly</td></tr>
+      <tr><td><strong>P10</strong></td><td>Prediction objectives differ from explanation objectives — model averaging may be preferred to model selection for prediction</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Explanation vs Prediction</h3>
+  <div class="theorem-box">
+    <strong>Explanation</strong> ≈ scientific research: understanding mechanisms, testing hypotheses. Multiple roughly-equivalent models may coexist; model selection is not about finding "the" best model.<br><br>
+    <strong>Prediction</strong> ≈ engineering: all that matters is predictive accuracy. Model choice should be evaluated on prediction quality. For prediction, <em>model averaging</em> (e.g., Bayesian model averaging) often outperforms selecting a single model.
+  </div>
+</div>
+
+<!-- 7. Model Selection -->
+<div class="notes-section" id="modelselection">
+  <h2>7. Model Selection Criteria</h2>
+
+  <p>After fitting competing models, formal comparison can be done via hypothesis tests (for nested models) or information criteria (for nested and non-nested models).</p>
+
+  <table>
+    <thead><tr><th>Method</th><th>Applicable to</th><th>Formula</th></tr></thead>
+    <tbody>
+      <tr><td>Wald test</td><td>Nested models</td><td>$W = \hat\beta / SE(\hat\beta)$, or quadratic form</td></tr>
+      <tr><td>LRT</td><td>Nested models</td><td>$-2[\ell(\hat{\boldsymbol\beta}_\text{reduced}) - \ell(\hat{\boldsymbol\beta}_\text{full})] \sim \chi^2_{df}$</td></tr>
+      <tr><td><strong>AIC</strong></td><td>Nested and non-nested</td><td>$-2\log(L_{\max}) + 2 \times (\text{# params})$</td></tr>
+      <tr><td><strong>BIC</strong></td><td>Nested and non-nested</td><td>$-2\log(L_{\max}) + \log(n) \times (\text{# params})$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Smaller is better</strong> for both AIC and BIC. The penalty term penalizes model complexity (Occam's razor). BIC penalizes more heavily than AIC for larger samples (since $\log(n) > 2$ when $n > 7$), favouring simpler models.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ AIC vs BIC:</strong> They optimise different targets and will not always select the same model. AIC selects the model closest to the "true" data-generating process in Kullback-Leibler divergence sense. BIC is consistent (selects the true model with probability 1 as $n \to \infty$ if it is in the candidate set). The lecturer's personal preference is AIC.
+  </div>
+</div>
+
+<!-- 8. AIC & Akaike Weights -->
+<div class="notes-section" id="aic">
+  <h2>8. AIC and Akaike Weights</h2>
+
+  <p>A single AIC value is meaningless in isolation. AIC values are only informative when compared across a set of competing models fitted to the <em>same data</em>.</p>
+
+  <h3>Akaike Weights</h3>
+  <div class="theorem-box">
+    Given $R$ candidate models, with AIC values $\text{AIC}_1, \ldots, \text{AIC}_R$:<br><br>
+    1. Find $\text{AIC}_{\min} = \min_i \text{AIC}_i$<br>
+    2. Compute $\Delta_i = \text{AIC}_i - \text{AIC}_{\min}$ for each model $i$<br>
+    3. Compute Akaike weights:
+    $$w_i = \frac{\exp(-\tfrac{1}{2}\Delta_i)}{\sum_{j=1}^R \exp(-\tfrac{1}{2}\Delta_j)}$$
+    <br>
+    $w_i$ approximates the <strong>posterior probability</strong> that model $i$ is the best Kullback-Leibler model, given the data and the candidate set.
+  </div>
+
+  <h3>Animal Experiment: Link Function Selection via AIC</h3>
+  <table>
+    <thead><tr><th>Rank</th><th>Link function</th><th>AIC</th><th>$\Delta_i$</th><th>Akaike weight $w_i$</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>log-log</td><td>40.42</td><td>0.00</td><td><strong>0.60</strong></td></tr>
+      <tr><td>2</td><td>logit</td><td>42.27</td><td>1.85</td><td>0.24</td></tr>
+      <tr><td>3</td><td>probit</td><td>43.19</td><td>2.76</td><td>0.15</td></tr>
+      <tr><td>4</td><td>complementary log-log</td><td>47.47</td><td>7.05</td><td>0.02</td></tr>
+    </tbody>
+  </table>
+
+  <div class="computation-note">
+    <strong>Calculation check:</strong><br>
+    $w_T = e^{0} + e^{-1.85/2} + e^{-2.76/2} + e^{-7.05/2} = 1 + 0.3974 + 0.2510 + 0.0294 = 1.6778$<br>
+    $w_1 = 1/1.6778 = 0.596 \approx 0.60$ ✓<br>
+    $w_2 = 0.3974/1.6778 = 0.237 \approx 0.24$ ✓
+  </div>
+
+  <div class="key-point">
+    <strong>Scientific interpretation:</strong> The log-log link has 60% posterior probability of being the "best" model. The logit model has 24% support. Together they account for 84% — indicating <em>non-negligible model uncertainty</em>. The biological question becomes: which link function is more plausible given the pharmacological mechanism? The log-log link is appropriate when the hazard of becoming sick approaches 1 sharply — consistent with strong drug toxicity.
+  </div>
+
+  <h3>Donner Party: Variable Selection via AIC</h3>
+  <table>
+    <thead><tr><th>Rank</th><th>Model</th><th>K</th><th>AICc</th><th>$\Delta_i$</th><th>$w_i$</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Sex × Poly(Age,2)</td><td>6</td><td>108.66</td><td>0.00</td><td><strong>0.82</strong></td></tr>
+      <tr><td>2</td><td>Sex + Poly(Age,2)</td><td>4</td><td>112.42</td><td>3.76</td><td>0.12</td></tr>
+      <tr><td>3</td><td>Sex + Age</td><td>3</td><td>115.15</td><td>6.49</td><td>0.03</td></tr>
+      <tr><td>4</td><td>Sex + Age + Age×Sex</td><td>4</td><td>116.95</td><td>8.29</td><td>0.01</td></tr>
+      <tr><td>5</td><td>Age only</td><td>2</td><td>118.16</td><td>9.50</td><td>0.01</td></tr>
+      <tr><td>6</td><td>Sex only</td><td>2</td><td>119.02</td><td>10.36</td><td>0.00</td></tr>
+    </tbody>
+  </table>
+  <p>The sex-stratified quadratic age model overwhelmingly dominates (82% weight). This suggests the effect of age on survival probability is non-linear and differs between males and females — consistent with historical accounts (older men fared much worse).</p>
+</div>
+
+<!-- 9. Case Studies -->
+<div class="notes-section" id="casestudies">
+  <h2>9. Case Studies Summary</h2>
+
+  <h3>Endometrial Cancer Study</h3>
+  <div class="example-box">
+    <strong>Setting:</strong> 79 endometrial cancer cases. Response: HG (histology grade 0–II vs III–IV). Predictors: NV (neovasculization, binary), PI (pulsatility index), EH (endometrium height).<br><br>
+    <strong>Problem:</strong> No patient with NV=1 has HG=0 → quasi-complete separation for NV.<br><br>
+    <strong>ML results:</strong> $\hat\beta_{NV} = 5.80$ (SE = 402.2, p ≈ 0.99) — nonsense.<br><br>
+    <strong>Firth results:</strong> $\hat\beta_{NV} = 1.66$ (SE = 0.75, p = 0.026) — NV is significantly associated with high-grade histology. EH is also significant (p = 0.0006). PI is not significant (p = 0.43 by LRT).<br><br>
+    <strong>Hessian matrix:</strong> $\mathbf{H}(\hat{\boldsymbol\beta}) = -\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X}$ where $\hat{\mathbf{V}} = \mathrm{diag}[n_i\hat\pi_i(1-\hat\pi_i)]$. The observed information is $\mathbf{I}_n^*(\hat{\boldsymbol\beta}) = \mathbf{X}^T\hat{\mathbf{V}}\mathbf{X}$ and $\widehat{\mathrm{Cov}}(\hat{\boldsymbol\beta}) = (\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X})^{-1}$.
+  </div>
+
+  <h3>Donner Party Historical Data</h3>
+  <div class="example-box">
+    <strong>Setting:</strong> 1846–47 wagon train stranded in Sierra Nevada. Outcome: survival. Predictors: age (continuous), sex (binary, female=1).<br><br>
+    <strong>Best model by AIC:</strong> <code>fem * poly(age,2)</code> — sex-stratified quadratic age effect (Akaike weight = 0.82).<br><br>
+    <strong>Nagelkerke R²:</strong> Main-effects model = 0.17; Polynomial interaction model = 0.33. Adding the non-linear sex-age interaction doubles the explained variance.<br><br>
+    <strong>McFadden R²:</strong> 0.209 for the interaction model — typically values 0.2–0.4 indicate excellent fit in logistic regression.
+  </div>
+</div>
+
+<!-- ═══════════════════════ MCQ ═══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False Questions (50)</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Separation — Concept</div>
+    <div class="question-stem">In the toy example from the lecture, R issues the warning <em>"fitted probabilities numerically 0 or 1 occurred"</em> and reports a residual deviance of approximately 4.5×10⁻¹⁰. What is the correct interpretation?</div>
+    <button class="option-btn" onclick="answer(this,'q1',false)">A. The model fits poorly because the deviance should be close to the degrees of freedom.</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">B. The model has converged correctly and the near-zero deviance confirms excellent fit.</button>
+    <button class="option-btn" onclick="answer(this,'q1',true)">C. The IWLS algorithm has not truly converged; the near-zero deviance reflects that fitted probabilities are numerically 0 or 1, not a genuine maximum of the likelihood.</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">D. The deviance near zero means the null hypothesis that all betas are zero is rejected.</button>
+    <div class="feedback-bar" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Separation — SAS Output</div>
+    <div class="question-stem">For the toy separation example in SAS, the output shows: LRT p = 0.0039 and Wald p = 0.9370. Which statement best explains this discrepancy?</div>
+    <button class="option-btn" onclick="answer(this,'q2',false)">A. The Wald test is more powerful here and should be trusted over the LRT.</button>
+    <button class="option-btn" onclick="answer(this,'q2',true)">B. The Wald statistic is inflated in denominator by the artificially large SE (due to non-convergence), giving a deflated z/chi-square value and misleadingly large p-value; the LRT compares log-likelihoods directly and is more reliable.</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">C. The p-values differ because SAS uses a different significance threshold than R.</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">D. The LRT is invalid here because the data violates the multinomial assumption.</button>
+    <div class="feedback-bar" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · True/False — Separation Definition</div>
+    <div class="question-stem">TRUE or FALSE: In quasi-complete separation, some observations lie exactly on the separating hyperplane. This is distinct from complete separation where no observation lies on the boundary.</div>
+    <button class="option-btn" onclick="answer(this,'q3',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">FALSE</button>
+    <div class="feedback-bar" id="q3-fb"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Detection — Lesaffre-Albert</div>
+    <div class="question-stem">In the Lesaffre-Albert (1989) procedure applied to the Endometrial Cancer study, the ratio sequence for NV grows from 1.0 to approximately 3.95×10⁷ across 12 iterations while ratios for EH converge to ~1.618. What does this indicate?</div>
+    <button class="option-btn" onclick="answer(this,'q4',false)">A. The model for NV is converging slowly but will eventually reach a finite MLE.</button>
+    <button class="option-btn" onclick="answer(this,'q4',true)">B. The MLE for $\beta_{NV}$ is $+\infty$; the diverging ratio sequence is diagnostic of an infinite estimate for NV only, while EH has a finite MLE.</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">C. Both NV and EH have infinite MLEs because their ratios exceed 1.</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">D. The procedure indicates a coding error in the NV variable that should be corrected by recoding.</button>
+    <div class="feedback-bar" id="q4-fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · Detection — Konis Algorithm</div>
+    <div class="question-stem">TRUE or FALSE: The Konis (2007) linear programming separation test is a <em>post-fit</em> method that requires estimating the logistic model first in order to detect separation.</div>
+    <button class="option-btn" onclick="answer(this,'q5',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q5',true)">FALSE</button>
+    <div class="feedback-bar" id="q5-fb"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · R Output Interpretation</div>
+    <div class="question-stem">The R command <code>endometrial_sep$betas</code> returns <code>(Intercept)=0, NV=Inf, PI=0, EH=0</code>. After computing <code>theta_mle + endometrial_sep$betas</code>, what is the result for NV?</div>
+    <button class="option-btn" onclick="answer(this,'q6',false)">A. 5.80468 (the ML estimate)</button>
+    <button class="option-btn" onclick="answer(this,'q6',true)">B. Inf (the true MLE is infinite)</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">C. 1.65892 (the Firth estimate)</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">D. NA, because infinite estimates cannot be added in R</button>
+    <div class="feedback-bar" id="q6-fb"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Remedies — Ranking</div>
+    <div class="question-stem">According to the lecture, which of the following remedies for quasi-complete separation is described as "totally inappropriate"?</div>
+    <button class="option-btn" onclick="answer(this,'q7',false)">A. Using Firth's penalized likelihood</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">B. Exact logistic regression</button>
+    <button class="option-btn" onclick="answer(this,'q7',true)">C. Omitting the offending variable NV from the model</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">D. Ad hoc adjustment of cell frequencies</button>
+    <div class="feedback-bar" id="q7-fb"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · Remedies — Exact Logistic</div>
+    <div class="question-stem">Why is exact logistic regression generally not applicable when continuous predictors are present in the model?</div>
+    <button class="option-btn" onclick="answer(this,'q8',false)">A. The exact likelihood function cannot be computed for continuous data.</button>
+    <button class="option-btn" onclick="answer(this,'q8',true)">B. With continuous predictors, all sufficient statistics become degenerate (essentially all tied), making the conditional likelihood uninformative.</button>
+    <button class="option-btn" onclick="answer(this,'q8',false)">C. Exact logistic regression is only valid under the proportional hazards assumption.</button>
+    <button class="option-btn" onclick="answer(this,'q8',false)">D. The computational burden makes it infeasible for any dataset larger than n=50.</button>
+    <div class="feedback-bar" id="q8-fb"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · Firth — Modified Score</div>
+    <div class="question-stem">Firth's modified score equation is $s^*(\beta_r) = s(\beta_r) + \frac{1}{2}\,\mathrm{tr}\!\left[\mathbf{I}^{-1}(\boldsymbol\beta)\,\frac{\partial\mathbf{I}(\boldsymbol\beta)}{\partial\beta_r}\right] = 0$. What role does the additional term play?</div>
+    <button class="option-btn" onclick="answer(this,'q9',false)">A. It increases the log-likelihood to ensure convergence at a finite point.</button>
+    <button class="option-btn" onclick="answer(this,'q9',true)">B. It corresponds to the score of Jeffreys' prior penalty on the likelihood, removing the $O(n^{-1})$ bias of the MLE and guaranteeing finite solutions.</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">C. It corrects for overdispersion by adjusting the variance function.</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">D. It applies a ridge-regression-type $L_2$ penalty on the coefficients.</button>
+    <div class="feedback-bar" id="q9-fb"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · True/False — Firth Asymptotic</div>
+    <div class="question-stem">TRUE or FALSE: As the sample size $n \to \infty$, Firth's penalized likelihood estimator converges to the same estimate as the standard MLE, because the Jeffreys' prior penalty is asymptotically negligible.</div>
+    <button class="option-btn" onclick="answer(this,'q10',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">FALSE</button>
+    <div class="feedback-bar" id="q10-fb"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · Firth — Endometrial Comparison</div>
+    <div class="question-stem">Under ML, the estimate for NV in the Endometrial Cancer probit model is $\hat\beta_{NV} = 5.80$ (SE = 402.2). Under Firth's method, it is $\hat\beta_{NV} = 1.66$ (SE = 0.75). Which explanation is correct?</div>
+    <button class="option-btn" onclick="answer(this,'q11',false)">A. The Firth estimate is biased toward zero because the penalization is too strong.</button>
+    <button class="option-btn" onclick="answer(this,'q11',true)">B. The ML estimate is not a genuine MLE — it merely reflects the state of IWLS at the iteration limit. Firth's finite estimate of 1.66 is the correct estimate accounting for the separation.</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">C. The two methods differ because they use different link functions.</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">D. The Firth SE is smaller because it uses a different formula for the covariance matrix.</button>
+    <div class="feedback-bar" id="q11-fb"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · Firth — Inference</div>
+    <div class="question-stem">When running <code>Anova(modPML, test="LR", type=3)</code> in R for the Firth-fitted Endometrial model, the LRT statistic for PI is −0.27. What causes this paradoxical negative value?</div>
+    <button class="option-btn" onclick="answer(this,'q12',false)">A. A bug in the <code>car</code> package's <code>Anova</code> function when applied to Firth models.</button>
+    <button class="option-btn" onclick="answer(this,'q12',true)">B. The function computes: Deviance(ML reduced model) − Deviance(Firth full model). Mixing two different likelihood functions makes the difference meaningless; it can be negative.</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">C. Negative LRT values indicate that the reduced model fits better, so PI should be dropped.</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">D. The degrees of freedom are miscalculated, inflating the test statistic in the negative direction.</button>
+    <div class="feedback-bar" id="q12-fb"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · Computation — Firth LRT</div>
+    <div class="question-stem">Using both models fitted with <code>method="brglmFit"</code>:<br>• Full model (NV+PI+EH): Residual deviance = 57.587<br>• Reduced model (NV+EH): Residual deviance = 58.220<br>What is the correct LRT statistic for PI, and its conclusion at $\alpha=0.05$?</div>
+    <button class="option-btn" onclick="answer(this,'q13',false)">A. LRT = 57.587 − 58.220 = −0.633; p &lt; 0.05; PI is significant.</button>
+    <button class="option-btn" onclick="answer(this,'q13',true)">B. LRT = 58.220 − 57.587 = 0.633 on 1 df; p = 0.426 &gt; 0.05; PI is not significant and can be dropped.</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">C. LRT = 58.220 − 57.587 = 0.633; critical value is 3.84; since 0.633 &lt; 3.84, PI is significant.</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">D. The LRT cannot be computed because Firth deviances are not chi-squared distributed.</button>
+    <div class="feedback-bar" id="q13-fb"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Pseudo-R² — McFadden</div>
+    <div class="question-stem">TRUE or FALSE: McFadden's $R^2_{\text{McF}}$ equals the OLS coefficient of determination $R^2$ as a special case when applied to a linear regression model.</div>
+    <button class="option-btn" onclick="answer(this,'q14',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q14',true)">FALSE</button>
+    <div class="feedback-bar" id="q14-fb"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · Pseudo-R² — Cox-Snell Upper Bound</div>
+    <div class="question-stem">The Cox-Snell $R^2_{CS}$ has an upper bound strictly less than 1. What is this upper bound equal to?</div>
+    <button class="option-btn" onclick="answer(this,'q15',false)">A. $1 - L(\hat{\boldsymbol\beta})^{2/n}$</button>
+    <button class="option-btn" onclick="answer(this,'q15',true)">B. $1 - L(\hat{\boldsymbol\beta}_0)^{2/n}$</button>
+    <button class="option-btn" onclick="answer(this,'q15',false)">C. $1 - e^{-2\ell(\hat{\boldsymbol\beta}_0)/n}$</button>
+    <button class="option-btn" onclick="answer(this,'q15',false)">D. $1 - n^{-1}\log L(\hat{\boldsymbol\beta}_0)$</button>
+    <div class="feedback-bar" id="q15-fb"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · Pseudo-R² — Nagelkerke</div>
+    <div class="question-stem">Which statement about the Nagelkerke $R^2$ is most accurate?</div>
+    <button class="option-btn" onclick="answer(this,'q16',false)">A. It is identical to McFadden's $R^2$ but rescaled to the interval [0,1].</button>
+    <button class="option-btn" onclick="answer(this,'q16',true)">B. It is the Cox-Snell $R^2$ divided by its maximum possible value, which forces the range to [0,1]. It reaches 1 only when the likelihood is maximized perfectly (residual deviance = 0).</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">C. It equals OLS $R^2$ for linear models and is therefore preferred over Cox-Snell.</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">D. It always gives a higher value than Cox-Snell because the denominator correction makes it more conservative.</button>
+    <div class="feedback-bar" id="q16-fb"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · Pseudo-R² — Donner Party</div>
+    <div class="question-stem">For the Donner Party data with the polynomial interaction model, Nagelkerke R² = 0.334 vs 0.171 for the main-effects model. What is the correct interpretation?</div>
+    <button class="option-btn" onclick="answer(this,'q17',false)">A. The polynomial model explains 33.4% of the total variance in survival, which is poor fit.</button>
+    <button class="option-btn" onclick="answer(this,'q17',true)">B. The polynomial interaction model explains approximately twice as much of the variation in the outcome (on the Nagelkerke scale) as the main-effects model, suggesting the sex-stratified non-linear age effect substantially improves fit.</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">C. The difference of 0.163 between the two models is not meaningful because Nagelkerke R² cannot be used to compare nested models.</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">D. The main-effects model is preferred because simpler models always have lower pseudo-R² values.</button>
+    <div class="feedback-bar" id="q17-fb"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · Model Building — Hierarchy</div>
+    <div class="question-stem">TRUE or FALSE: According to Principle P3 (hierarchical models / principle of marginality), if a model includes the interaction term $\beta_3 X_1 X_2$, it is acceptable to omit either $X_1$ or $X_2$ as main effects if they are not individually significant.</div>
+    <button class="option-btn" onclick="answer(this,'q18',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q18',true)">FALSE</button>
+    <div class="feedback-bar" id="q18-fb"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Model Building — Stepwise</div>
+    <div class="question-stem">The lecture identifies several problems with automatic stepwise selection (P7). Which of the following is NOT listed as a problem?</div>
+    <button class="option-btn" onclick="answer(this,'q19',false)">A. Each test is conditional on the results of previous tests, violating standard distributional assumptions.</button>
+    <button class="option-btn" onclick="answer(this,'q19',false)">B. Multiple comparison problem inflates Type I error.</button>
+    <button class="option-btn" onclick="answer(this,'q19',true)">C. Stepwise selection always selects the true data-generating model in large samples (inconsistency).</button>
+    <button class="option-btn" onclick="answer(this,'q19',false)">D. No measure of model uncertainty is provided — the final model is treated as if it were the only one considered.</button>
+    <div class="feedback-bar" id="q19-fb"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · Model Building — Explanation vs Prediction</div>
+    <div class="question-stem">According to the lecture, when the study objective is <em>prediction</em> rather than explanation, what approach may be preferable to model selection?</div>
+    <button class="option-btn" onclick="answer(this,'q20',false)">A. Selecting the single model with lowest AIC and reporting its predictions only.</button>
+    <button class="option-btn" onclick="answer(this,'q20',true)">B. Model averaging — combining predictions from multiple models weighted by their evidence (e.g., Akaike weights), analogous to pooling expert opinions.</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">C. Using the largest possible model (saturated model) to minimise prediction error.</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">D. Always using the model selected by backward elimination because it retains the most predictors.</button>
+    <div class="feedback-bar" id="q20-fb"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · AIC Formula</div>
+    <div class="question-stem">A logistic regression model with 4 parameters (intercept + 3 predictors) has maximized log-likelihood $\ell_{\max} = -52$. What is its AIC?</div>
+    <button class="option-btn" onclick="answer(this,'q21',false)">A. $-2(-52) + 2(3) = 110$</button>
+    <button class="option-btn" onclick="answer(this,'q21',true)">B. $-2(-52) + 2(4) = 112$</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">C. $-2(-52) - 2(4) = 96$</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">D. $2(-52) + 2(4) = -96$</button>
+    <div class="feedback-bar" id="q21-fb"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · BIC vs AIC</div>
+    <div class="question-stem">For a dataset with $n = 100$ observations, how does the BIC penalty per additional parameter compare to the AIC penalty?</div>
+    <button class="option-btn" onclick="answer(this,'q22',false)">A. BIC penalty = 2 per parameter, same as AIC.</button>
+    <button class="option-btn" onclick="answer(this,'q22',true)">B. BIC penalty = $\log(100) = 4.61$ per parameter, which is more than AIC's penalty of 2, so BIC penalizes complexity more heavily.</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">C. BIC penalty = $\sqrt{100} = 10$ per parameter.</button>
+    <button class="option-btn" onclick="answer(this,'q22',false)">D. BIC has no fixed penalty; it depends on the likelihood values.</button>
+    <div class="feedback-bar" id="q22-fb"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Akaike Weights — Calculation</div>
+    <div class="question-stem">Three models have AIC values 42.5, 44.0, and 49.0. What are the $\Delta_i$ values?</div>
+    <button class="option-btn" onclick="answer(this,'q23',true)">A. $\Delta_1 = 0$, $\Delta_2 = 1.5$, $\Delta_3 = 6.5$</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">B. $\Delta_1 = 42.5$, $\Delta_2 = 44.0$, $\Delta_3 = 49.0$</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">C. $\Delta_1 = -3.25$, $\Delta_2 = -2.00$, $\Delta_3 = 0.0$</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">D. $\Delta_i$ cannot be computed without knowing the log-likelihoods.</button>
+    <div class="feedback-bar" id="q23-fb"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · Akaike Weights — Interpretation</div>
+    <div class="question-stem">TRUE or FALSE: An Akaike weight $w_i = 0.60$ means that model $i$ is correct with 60% probability in an absolute sense, regardless of what other models are in the candidate set.</div>
+    <button class="option-btn" onclick="answer(this,'q24',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q24',true)">FALSE</button>
+    <div class="feedback-bar" id="q24-fb"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · Animal Experiment — AIC</div>
+    <div class="question-stem">In the animal experiment model selection, the log-log link has AIC = 40.42 and the complementary log-log has AIC = 47.47. What is the Akaike weight of the complementary log-log model (using all four models in the set)?</div>
+    <button class="option-btn" onclick="answer(this,'q25',false)">A. 0.15</button>
+    <button class="option-btn" onclick="answer(this,'q25',false)">B. 0.24</button>
+    <button class="option-btn" onclick="answer(this,'q25',true)">C. 0.02</button>
+    <button class="option-btn" onclick="answer(this,'q25',false)">D. 0.60</button>
+    <div class="feedback-bar" id="q25-fb"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · Separation — Causes</div>
+    <div class="question-stem">A researcher accidentally includes the binary variable "treated" in a model predicting adverse events, when "adverse event" was itself defined as any event occurring in the untreated group. Which cause of separation does this exemplify?</div>
+    <button class="option-btn" onclick="answer(this,'q26',false)">A. Small sample size</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">B. Multicollinearity</button>
+    <button class="option-btn" onclick="answer(this,'q26',true)">C. Another version of the response included as a covariate</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">D. Missing data imputation error</button>
+    <div class="feedback-bar" id="q26-fb"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · Hessian Matrix</div>
+    <div class="question-stem">The estimated covariance matrix of $\hat{\boldsymbol\beta}$ in logistic regression is $\widehat{\mathrm{Cov}}(\hat{\boldsymbol\beta}) = (\mathbf{X}^T\hat{\mathbf{V}}\mathbf{X})^{-1}$. What happens to the diagonal elements of this matrix when quasi-complete separation occurs?</div>
+    <button class="option-btn" onclick="answer(this,'q27',false)">A. They become very small (near zero), understating uncertainty.</button>
+    <button class="option-btn" onclick="answer(this,'q27',true)">B. The diagonal element corresponding to the separating variable becomes astronomically large (→ ∞), reflecting the unbounded uncertainty in that parameter.</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">C. They remain at their usual values because IWLS is numerically stable.</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">D. The matrix becomes singular and cannot be inverted.</button>
+    <div class="feedback-bar" id="q27-fb"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · True/False — Firth Variance</div>
+    <div class="question-stem">TRUE or FALSE: Firth's bias-reduced estimator always has <em>smaller variance</em> than the maximum likelihood estimator in finite samples.</div>
+    <button class="option-btn" onclick="answer(this,'q28',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">FALSE</button>
+    <div class="feedback-bar" id="q28-fb"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · McFadden R² — Calculation</div>
+    <div class="question-stem">A logistic model has null log-likelihood $\ell_0 = -52.45$ and fitted log-likelihood $\ell = -41.81$. What is McFadden's $R^2$?</div>
+    <button class="option-btn" onclick="answer(this,'q29',false)">A. $1 - 41.81/52.45 = 0.203$</button>
+    <button class="option-btn" onclick="answer(this,'q29',true)">B. $1 - (-41.81)/(-52.45) = 1 - 41.81/52.45 = 0.203$</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">C. $(-41.81)/(-52.45) = 0.797$</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">D. $1 - e^{-2(52.45-41.81)/n}$ — this is Cox-Snell, not McFadden.</button>
+    <div class="feedback-bar" id="q29-fb"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · Model Building — P6</div>
+    <div class="question-stem">A researcher models psychological wellbeing using the five Big Five personality factors (Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism). According to Principle P6, how should these predictors be treated in model selection?</div>
+    <button class="option-btn" onclick="answer(this,'q30',false)">A. Each factor can be individually selected or dropped based on its p-value.</button>
+    <button class="option-btn" onclick="answer(this,'q30',true)">B. All five factors belong together conceptually and should move in and out of the model as a unit — not be selectively pruned based on individual significance.</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">C. Only the two most correlated factors need to be included to avoid multicollinearity.</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">D. The five factors should be combined into a single composite score before modelling.</button>
+    <div class="feedback-bar" id="q30-fb"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · True/False — Single AIC Value</div>
+    <div class="question-stem">TRUE or FALSE: A model with AIC = 85.3 is a good-fitting model.</div>
+    <button class="option-btn" onclick="answer(this,'q31',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q31',true)">FALSE</button>
+    <div class="feedback-bar" id="q31-fb"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · Donner — AIC Model Comparison</div>
+    <div class="question-stem">In the Donner Party AIC table, the model <code>Sex + Age + Age:Sex</code> has K=4 and AICc=116.95, while <code>Sex + Poly(Age,2)</code> also has K=4 and AICc=112.42. Both have the same number of parameters. What explains their different AIC values?</div>
+    <button class="option-btn" onclick="answer(this,'q32',false)">A. The polynomial model uses fewer degrees of freedom because orthogonal polynomials are more efficient.</button>
+    <button class="option-btn" onclick="answer(this,'q32',true)">B. They have different log-likelihoods. The polynomial model captures non-linearity (the quadratic age effect) that the linear interaction model cannot, yielding a higher log-likelihood and therefore lower AIC.</button>
+    <button class="option-btn" onclick="answer(this,'q32',false)">C. AICc includes a sample-size correction that penalizes models with more observations per parameter, and the models have different effective n.</button>
+    <button class="option-btn" onclick="answer(this,'q32',false)">D. The difference is due to rounding error in the AICc computation.</button>
+    <div class="feedback-bar" id="q32-fb"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · True/False — Separation in Practice</div>
+    <div class="question-stem">TRUE or FALSE: Quasi-complete separation is an extremely rare theoretical curiosity that practitioners can safely ignore in real data analysis.</div>
+    <button class="option-btn" onclick="answer(this,'q33',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q33',true)">FALSE</button>
+    <div class="feedback-bar" id="q33-fb"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · Firth Penalized Likelihood</div>
+    <div class="question-stem">The penalty function in Firth's method is $|\mathbf{I}(\boldsymbol\beta)|^{1/2}$. This has a famous Bayesian interpretation. What is it?</div>
+    <button class="option-btn" onclick="answer(this,'q34',false)">A. It is the ridge regression $L_2$ prior with a specific tuning parameter.</button>
+    <button class="option-btn" onclick="answer(this,'q34',false)">B. It is the LASSO $L_1$ prior that induces sparsity in the coefficients.</button>
+    <button class="option-btn" onclick="answer(this,'q34',true)">C. It is Jeffreys' invariant prior — the non-informative prior that is invariant under reparametrization of the model.</button>
+    <button class="option-btn" onclick="answer(this,'q34',false)">D. It is a conjugate Dirichlet prior on the probabilities $\pi_i$.</button>
+    <div class="feedback-bar" id="q34-fb"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · Mechanistic vs Empirical Models</div>
+    <div class="question-stem">A pharmacokinetics researcher uses a two-compartment differential equation model to predict drug concentration. This is best classified as:</div>
+    <button class="option-btn" onclick="answer(this,'q35',true)">A. A mechanistic model — derived from scientific theory (pharmacological laws governing drug absorption and elimination)</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">B. An empirical model — because it uses observed concentration data to estimate parameters</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">C. A saturated model — because it includes all possible drug characteristics</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">D. A non-parametric model — because the differential equations make no distributional assumptions</button>
+    <div class="feedback-bar" id="q35-fb"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Kullback-Leibler and AIC</div>
+    <div class="question-stem">AIC is motivated by Kullback-Leibler (KL) divergence. In this context, what does AIC select?</div>
+    <button class="option-btn" onclick="answer(this,'q36',false)">A. The model that is most likely to be the true data-generating process.</button>
+    <button class="option-btn" onclick="answer(this,'q36',true)">B. The model from the candidate set that minimizes the expected estimated KL divergence (cross-entropy) between the fitted model and the true distribution.</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">C. The model that produces the smallest residuals in a cross-validation sense.</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">D. The model with the highest posterior probability under a flat prior on model space.</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · True/False — Firth and Wald</div>
+    <div class="question-stem">TRUE or FALSE: After fitting a Firth-penalized model, the Wald test should be used as the primary inference tool because Firth's method produces finite, reliable standard errors.</div>
+    <button class="option-btn" onclick="answer(this,'q37',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q37',true)">FALSE</button>
+    <div class="feedback-bar" id="q37-fb"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · Toy2 R Output</div>
+    <div class="question-stem">For Toy2 (complete separation), the ML fit gives $\hat\beta_X = 4.927$ (SE = 11,071, p ≈ 1) and residual deviance ≈ 2.4×10⁻¹⁰. The Firth fit gives $\hat\beta_X = 0.329$ (SE = 0.183, p = 0.072). Which is the correct interpretation of the Firth result?</div>
+    <button class="option-btn" onclick="answer(this,'q38',false)">A. Firth confirms there is no effect of X because p &gt; 0.05.</button>
+    <button class="option-btn" onclick="answer(this,'q38',true)">B. Firth provides a meaningful finite estimate: X has a positive effect on P(Y=1), marginally non-significant at 5% but with a plausible effect size. The ML result is meaningless due to separation.</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">C. Both methods agree there is no effect because both have p &gt; 0.05.</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">D. The Firth SE of 0.183 is underestimated due to the Jeffreys prior shrinkage.</button>
+    <div class="feedback-bar" id="q38-fb"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Model Selection — Nested vs Non-nested</div>
+    <div class="question-stem">A researcher fits: Model A: logit link with predictors $\{x_1, x_2\}$ and Model B: probit link with predictors $\{x_1, x_2\}$. Can the LRT be used to compare them?</div>
+    <button class="option-btn" onclick="answer(this,'q39',false)">A. Yes, because they have the same predictors and the same number of parameters.</button>
+    <button class="option-btn" onclick="answer(this,'q39',true)">B. No. Models with different link functions are non-nested; the LRT requires one model to be a restricted version of the other. Use AIC or BIC instead.</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">C. Yes, but only if both models have the same residual deviance.</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">D. No, because probit and logit models have incomparable parameter scales.</button>
+    <div class="feedback-bar" id="q39-fb"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · True/False — BIC Consistency</div>
+    <div class="question-stem">TRUE or FALSE: Unlike AIC, the BIC is consistent — meaning that as $n \to \infty$, BIC will select the true model with probability 1, provided the true model is in the candidate set.</div>
+    <button class="option-btn" onclick="answer(this,'q40',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q40',false)">FALSE</button>
+    <div class="feedback-bar" id="q40-fb"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · Endometrial — Cross-tabulation</div>
+    <div class="question-stem">The cross-tabulation of HG × NV shows: (HG=0, NV=0)=49, (HG=1, NV=0)=17, (HG=0, NV=1)=<strong>0</strong>, (HG=1, NV=1)=13. What does the cell frequency of 0 in the (HG=0, NV=1) cell tell us about the MLE for $\beta_{NV}$?</div>
+    <button class="option-btn" onclick="answer(this,'q41',false)">A. The parameter $\beta_{NV}$ is estimable and equals $\log(13/0) = \infty$, which should be reported.</button>
+    <button class="option-btn" onclick="answer(this,'q41',true)">B. Every patient with NV=1 has HG=1 — neovasculization perfectly predicts high-grade histology in this sample. The MLE for $\beta_{NV}$ is $+\infty$ because no finite coefficient can assign probability 0 to HG=1 given NV=1 while maximizing the likelihood.</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">C. The model cannot be fitted because the data matrix is rank-deficient.</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">D. This cell of zero is a data entry error that should be corrected before fitting.</button>
+    <div class="feedback-bar" id="q41-fb"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · Akaike Weights — Weight of Evidence</div>
+    <div class="question-stem">In the animal experiment, the Akaike weight of the loglog model is 0.60 and of the logit model is 0.24. What is the evidence ratio of loglog vs logit?</div>
+    <button class="option-btn" onclick="answer(this,'q42',false)">A. $0.60 - 0.24 = 0.36$</button>
+    <button class="option-btn" onclick="answer(this,'q42',true)">B. $0.60 / 0.24 = 2.5$ — the loglog model is 2.5 times more likely than the logit to be the best KL model.</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">C. $e^{-1.85/2} = 0.40$ — this is the unnormalized weight of the logit model.</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">D. The evidence ratio cannot be computed without knowing the true model.</button>
+    <div class="feedback-bar" id="q42-fb"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · True/False — Cox-Snell and OLS R²</div>
+    <div class="question-stem">TRUE or FALSE: For linear regression with normal errors, the Cox-Snell $R^2_{CS}$ equals the classical OLS $R^2 = 1 - \text{RSS}/\text{TSS}$. This property does not hold for McFadden's $R^2$.</div>
+    <button class="option-btn" onclick="answer(this,'q43',true)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">FALSE</button>
+    <div class="feedback-bar" id="q43-fb"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Model Building — P4</div>
+    <div class="question-stem">A randomised controlled trial (RCT) assigns subjects to treatment or control, and the outcome is binary. According to Principle P4, how does this affect model building compared to an observational study?</div>
+    <button class="option-btn" onclick="answer(this,'q44',false)">A. RCTs require more complex models because randomization creates dependencies in the data.</button>
+    <button class="option-btn" onclick="answer(this,'q44',true)">B. In an RCT, the treatment assignment and design largely determine the model structure; model building is less important because the "true" model may be almost completely determined by the design (e.g., ANCOVA).</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">C. RCTs never need covariates because randomization removes all confounding.</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">D. Observational and experimental studies require identical model building strategies because both estimate causal effects.</button>
+    <div class="feedback-bar" id="q44-fb"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Akaike Weights — Sum</div>
+    <div class="question-stem">TRUE or FALSE: If you add a new, very poorly fitting model to the candidate set (AIC much larger than all others), the Akaike weights of the original models will remain unchanged.</div>
+    <button class="option-btn" onclick="answer(this,'q45',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q45',true)">FALSE</button>
+    <div class="feedback-bar" id="q45-fb"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · Separation — Fisher Scoring Iterations</div>
+    <div class="question-stem">The R output for Toy1 (complete separation) shows "Number of Fisher Scoring iterations: 24". For a well-behaved logistic model, convergence typically occurs in 4–6 iterations. What does the high iteration count signal here?</div>
+    <button class="option-btn" onclick="answer(this,'q46',false)">A. The data has an unusual distribution requiring more computation but converges to a genuine maximum.</button>
+    <button class="option-btn" onclick="answer(this,'q46',true)">B. The algorithm is chasing an infinite coefficient — the likelihood keeps increasing without bound, so it never reaches a true maximum. The algorithm hits its iteration limit and reports the last computed value.</button>
+    <button class="option-btn" onclick="answer(this,'q46',false)">C. The model has too many parameters relative to the sample size, causing slow convergence.</button>
+    <button class="option-btn" onclick="answer(this,'q46',false)">D. There are influential observations deflecting the algorithm, requiring more iterations to correct.</button>
+    <div class="feedback-bar" id="q46-fb"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · True/False — Firth in Absence of Separation</div>
+    <div class="question-stem">TRUE or FALSE: When no separation exists, using Firth's method instead of standard MLE will produce identical point estimates.</div>
+    <button class="option-btn" onclick="answer(this,'q47',false)">TRUE</button>
+    <button class="option-btn" onclick="answer(this,'q47',true)">FALSE</button>
+    <div class="feedback-bar" id="q47-fb"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · Hierarchical Models</div>
+    <div class="question-stem">A model includes $\beta_3 x^2$ but not $\beta_1 x$. This violates Principle P3. Which statement correctly describes why this is problematic?</div>
+    <button class="option-btn" onclick="answer(this,'q48',false)">A. The model is mathematically invalid because quadratic terms require the linear term to be estimable.</button>
+    <button class="option-btn" onclick="answer(this,'q48',true)">B. The interpretation of $\beta_3$ becomes scale-dependent (not invariant to location shifts of $x$): if you shift $x$ by a constant $c$, the model without the linear term is no longer equivalent to the original, changing fitted values. Hierarchical models avoid this ambiguity.</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">C. The model will always have complete separation because the quadratic term dominates at extreme values.</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">D. The AIC formula cannot be applied to non-hierarchical models.</button>
+    <div class="feedback-bar" id="q48-fb"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · Animal Experiment — Link Functions</div>
+    <div class="question-stem">In the animal experiment, Model 3 [log-log: $\log(-\log(1-P)) = \beta_0 + \beta_1\text{dose}$] and Model 4 [complementary log-log: $\log(-\log P) = \beta_0 + \beta_1\text{dose}$] have different asymmetric behaviours. Which is correct?</div>
+    <button class="option-btn" onclick="answer(this,'q49',false)">A. Model 3 approaches 1 slowly and 0 sharply; Model 4 does the opposite.</button>
+    <button class="option-btn" onclick="answer(this,'q49',true)">B. Model 3 (complementary log-log / cloglog) approaches 0 slowly but 1 sharply; Model 4 (log-log) approaches 1 slowly but 0 sharply. In the lecture notation, model 3 is cloglog and model 4 is loglog.</button>
+    <button class="option-btn" onclick="answer(this,'q49',false)">C. Both models 3 and 4 are symmetric around the median dose — they only differ in the tail behaviour.</button>
+    <button class="option-btn" onclick="answer(this,'q49',false)">D. Models 3 and 4 produce identical fitted probabilities because they are mathematical inverses of each other.</button>
+    <div class="feedback-bar" id="q49-fb"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integrative — Separation + Firth + AIC</div>
+    <div class="question-stem">A researcher fits five competing logistic models on data with quasi-complete separation in predictor $Z$. She uses standard ML for all five and ranks them by AIC. What fundamental problem does this analysis have?</div>
+    <button class="option-btn" onclick="answer(this,'q50',false)">A. None — AIC automatically adjusts for separation by penalizing the number of parameters.</button>
+    <button class="option-btn" onclick="answer(this,'q50',true)">B. The models containing $Z$ have invalid MLEs (artificially low deviances because fitted probabilities collapse to 0/1), inflating the log-likelihood and thus underestimating AIC for those models. The AIC-based ranking is corrupted, and models with $Z$ will appear artificially superior. All models containing $Z$ should be re-estimated using Firth's method before comparing via AIC.</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">C. AIC cannot be used with logistic regression — only BIC is valid for binary outcomes.</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">D. The problem is only that the standard errors are wrong; the AIC ranking itself remains valid.</button>
+    <div class="feedback-bar" id="q50-fb"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+<!-- ═══════════════════════ SHORT ANSWER ═══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer / Oral Exam Questions (10)</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · Core Concept</div>
+    <div class="question-stem">Explain the phenomenon of (quasi)complete separation in logistic regression. Why does it cause the MLE to fail? Illustrate with the toy example from the lecture.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      (Quasi)complete separation occurs when a linear combination of predictors can perfectly classify all observations into the two response categories. In the lecture's toy example, the predictor $x_1$ alone perfectly separates $y$: all observations with $x_1 \leq 3$ have $y=0$ and all with $x_1 > 3$ have $y=1$. This creates a case of quasi-complete separation (observations 3 and 4 lie exactly at the boundary).<br><br>
+      The MLE fails because the log-likelihood is a strictly increasing function of $\beta_{x_1}$ — as $\beta_{x_1} \to \infty$, the predicted probability $\hat\pi_i \to 1$ for all $y_i=1$ observations and $\hat\pi_i \to 0$ for all $y_i=0$ observations, driving the log-likelihood toward its maximum of 0. There is no finite value where the score equation $S(\beta_{x_1}) = 0$ holds. The IWLS algorithm notices this by producing astronomically large standard errors and a near-zero residual deviance — neither of which reflects genuine convergence to a maximum.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How would you distinguish complete from quasi-complete separation operationally?<br>
+        • What do we mean when we say the Wald test is completely unreliable in this setting?<br>
+        • How does SPSS's response (refusing to compute the covariance matrix) differ from R's and SAS's?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Detection Methods</div>
+    <div class="question-stem">Describe the Lesaffre-Albert (1989) procedure for detecting infinite MLEs. Apply it to the Endometrial Cancer Study output: what do you conclude about each parameter?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      The procedure works by iteratively increasing the maximum allowed IWLS iterations and at each step dividing the estimated standard errors by those from the first fit. If the sequence of ratios diverges for a particular parameter, its MLE is infinite.<br><br>
+      Applying this to the Endometrial Cancer output:<br>
+      — <strong>Intercept:</strong> ratio sequence converges to ~1.41 → finite MLE ✓<br>
+      — <strong>NV:</strong> ratio sequence is 1.0, 1.71, 5.47, 32.3, 331, 5786, 170,000, ..., 3.95×10⁷ → clearly diverges → $\hat\beta_{NV} = +\infty$ ✗<br>
+      — <strong>PI:</strong> ratio sequence converges to ~1.49 → finite MLE ✓<br>
+      — <strong>EH:</strong> ratio sequence converges to ~1.62 → finite MLE ✓<br><br>
+      Conclusion: Only NV suffers from infinite MLE, caused by the fact that no NV=1 patient has HG=0 in the data. The other three parameters have genuine finite MLEs.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How does the Konis (2007) algorithm differ from Lesaffre-Albert in its approach? What is the key advantage of being a pre-fit method?<br>
+        • Suppose the ratio for EH were also diverging — what would that imply about the design of the study?<br>
+        • Why is it important to identify which specific parameter is infinite rather than just knowing separation exists?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Firth's Procedure</div>
+    <div class="question-stem">Describe Firth's (1993) penalized likelihood approach. What is the modified score function? Why does this guarantee finite estimates, and what is the connection to Jeffreys' prior?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      Firth's approach modifies the standard score equations $S(\boldsymbol\beta) = \mathbf{0}$ by adding a correction term:
+      $$s^*(\beta_r) = s(\beta_r) + \frac{1}{2}\,\mathrm{tr}\!\left[\mathbf{I}^{-1}(\boldsymbol\beta)\frac{\partial\mathbf{I}(\boldsymbol\beta)}{\partial\beta_r}\right] = 0$$
+      This is equivalent to maximising the penalized log-likelihood $\ell^*(\boldsymbol\beta) = \ell(\boldsymbol\beta) + \frac{1}{2}\log|\mathbf{I}(\boldsymbol\beta)|$. The penalty $|\mathbf{I}(\boldsymbol\beta)|^{1/2}$ is Jeffreys' invariant prior — the reference prior that is invariant under reparametrization.<br><br>
+      <strong>Why finite estimates are guaranteed:</strong> As $\beta_r \to \infty$ under separation, the fitted probabilities approach 0 or 1, causing $\hat\pi_i(1-\hat\pi_i) \to 0$ for all observations. This makes the information matrix $\mathbf{I}(\boldsymbol\beta) \to 0$, and hence $|\mathbf{I}(\boldsymbol\beta)|^{1/2} \to 0$. The log of this term $\to -\infty$, creating a counter-force that pulls the solution back to a finite maximum of $\ell^*$.<br><br>
+      <strong>Properties:</strong> Second-order unbiased (removes the $O(n^{-1})$ MLE bias); smaller finite-sample variance than MLE; inference uses LRT and profile likelihood CIs based on $\ell^*$.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Why should we prefer LRT over Wald tests for Firth-fitted models?<br>
+        • In what sense is the Firth estimator a MAP (maximum a posteriori) estimator?<br>
+        • Does Firth's method change the estimates when there is no separation? What does this imply about always using brglmFit?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · R Output Analysis</div>
+    <div class="question-stem">A colleague runs the Endometrial Cancer probit model in R using <code>Anova(modPML, test="LR", type=3)</code> and reports that the LRT for NV gives Chi-square = 8.75 (p = 0.003) but the LRT for PI gives Chi-square = −0.27 (p = 1.00). She is confused by the negative chi-square. Explain what is happening and what she should do instead to test PI.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      The negative chi-square for PI is a tell-tale sign that <code>Anova()</code> from the <code>car</code> package is mixing two different likelihood functions. Specifically, it is computing:<br><br>
+      LRT = Deviance(reduced model fitted by <em>standard ML</em>) − Deviance(full model fitted by <em>Firth's penalized likelihood</em>)<br><br>
+      These two deviances are not computed from the same likelihood function. The ML deviance and Firth deviance are incommensurable — subtracting them can yield negative values, which have no valid chi-squared interpretation.<br><br>
+      <strong>Correct approach:</strong> Fit both the full model (NV + PI + EH) and the reduced model (NV + EH) using <code>method="brglmFit"</code>, then compute:
+<pre>modPML.nPI = glm(HG~NV+EH, family=binomial("probit"),
+                  method="brglmFit", data=endometrial)
+lrt.PI = deviance(modPML.nPI) - deviance(modPML)  # = 0.633
+pchisq(0.633, 1, lower.tail=FALSE)  # p = 0.426</pre>
+      Conclusion: PI is not significant ($p = 0.43$) and can be dropped from the model.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Would the Wald test for PI from <code>summary(modPML)</code> give a consistent conclusion? (Yes — z = −0.728, p = 0.47, consistent but less reliable than LRT.)<br>
+        • Why is the LRT generally preferred over the Wald test in logistic regression, even without separation?<br>
+        • What does it mean practically that PI is not significant here?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Pseudo-R²</div>
+    <div class="question-stem">Compare and contrast the McFadden, Cox-Snell, and Nagelkerke pseudo-R² measures. For the Donner Party data with the polynomial interaction model, the values are McFadden = 0.209, Cox-Snell = 0.249, Nagelkerke = 0.334. What do these tell us about model fit?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>McFadden:</strong> $R^2_{\text{McF}} = 1 - \ell(\hat{\boldsymbol\beta})/\ell(\hat{\boldsymbol\beta}_0)$. Measures proportional reduction in log-likelihood relative to the intercept-only model. Does <em>not</em> reduce to OLS $R^2$ for linear models. Values of 0.2–0.4 are conventionally considered excellent fit in logistic regression.<br><br>
+      <strong>Cox-Snell:</strong> $R^2_{CS} = 1 - (L_0/L)^{2/n}$. Is a genuine generalization of OLS $R^2$ (reduces to it for linear models). However, its upper bound is $1 - L_0^{2/n} < 1$, which can be as low as 0.48. This makes cross-model comparison on the [0,1] scale misleading.<br><br>
+      <strong>Nagelkerke:</strong> $R^2_{\text{Nagel}} = R^2_{CS} / (1 - L_0^{2/n})$. Forces the range to [0,1] by dividing by the maximum. Most commonly reported in software but lacks the clean theoretical interpretation of Cox-Snell.<br><br>
+      <strong>For Donner Party:</strong> McFadden = 0.209 suggests good fit (above the 0.2 threshold). Nagelkerke = 0.334 means 33% of the "explainable" variability is explained. The values are consistent with moderate predictive power — survival in the Donner Party was partly predictable from age and sex but involved substantial individual-level randomness.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Why can't $R^2$ in logistic regression reach 1.0 even with a perfectly fitting model (in the traditional sense)?<br>
+        • Mittlböck and Schemper (1996) reviewed 12 measures. Given this plurality, what does the lecture recommend regarding reliance on pseudo-R²?<br>
+        • The animal experiment gives Nagelkerke ≈ 0.9998. Is this too high to be credible?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Model Building Principles</div>
+    <div class="question-stem">Explain the principle of marginality (P3) in model building. Give two examples where violating it creates interpretational problems. Also discuss the tension between Principles P2 (include interactions based on theory) and P7 (beware automatic selection).</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Principle of Marginality (P3):</strong> A model is hierarchical if whenever it contains a higher-order term (interaction or polynomial), it also contains all lower-order terms from which it is composed. This is also called the "marginality principle" or "heredity constraint."<br><br>
+      <strong>Example 1 — Interaction without main effects:</strong> A model with $\beta_3 x_1 x_2$ but without $\beta_1 x_1$ or $\beta_2 x_2$. If you shift the origin of $x_1$ by adding a constant $c$, the interaction term becomes $\beta_3(x_1+c)x_2 = \beta_3 x_1 x_2 + \beta_3 c x_2$, which introduces a $x_2$ main effect. The model's meaning is not invariant to location shifts — a fundamental interpretational defect.<br><br>
+      <strong>Example 2 — Quadratic without linear:</strong> $\beta_2 x^2$ without $\beta_1 x$. Shifting $x \to x+c$ introduces a linear term. The fitted curve changes its location on the x-axis in a non-interpretable way.<br><br>
+      <strong>Tension P2 vs P7:</strong> P2 says interactions should be theory-driven (not exhaustively tested). P7 warns that automatic inclusion/exclusion creates cascading conditional tests. The resolution: set up candidate models a priori based on scientific reasoning (P1, P2), respect hierarchy within each candidate model (P3), and compare the pre-specified candidate models via AIC or LRT rather than using automated stepwise procedures.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • In the Donner Party analysis, the interaction model Sex×Poly(Age,2) respects hierarchy — can you confirm which lower-order terms it includes?<br>
+        • P5 states a single study is not conclusive. How does this interact with the model selection result for the Donner Party (Akaike weight 0.82 for one model)?<br>
+        • What are the post-selection inference problems alluded to in P9?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · AIC and Akaike Weights</div>
+    <div class="question-stem">Derive the Akaike weights for the animal experiment (loglog: AIC=40.42, logit: AIC=42.27, probit: AIC=43.19, cloglog: AIC=47.47). Then interpret the result scientifically, including what it implies about model uncertainty.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Step 1 — Compute $\Delta_i$:</strong> $\Delta_1=0$ (loglog), $\Delta_2=1.85$ (logit), $\Delta_3=2.76$ (probit), $\Delta_4=7.05$ (cloglog).<br><br>
+      <strong>Step 2 — Unnormalized weights:</strong>
+      $$e^{-0/2}=1.000,\quad e^{-1.85/2}=0.397,\quad e^{-2.76/2}=0.251,\quad e^{-7.05/2}=0.029$$
+      $w_T = 1.000 + 0.397 + 0.251 + 0.029 = 1.678$<br><br>
+      <strong>Step 3 — Normalized weights:</strong>
+      $$w_1 = 1.000/1.678 = 0.596 \approx 0.60$$
+      $$w_2 = 0.397/1.678 = 0.237 \approx 0.24$$
+      $$w_3 = 0.251/1.678 = 0.150 \approx 0.15$$
+      $$w_4 = 0.029/1.678 = 0.017 \approx 0.02$$<br>
+      <strong>Scientific interpretation:</strong> The log-log link has ~60% posterior probability of being the best KL model, suggesting drug-induced morbidity rises sharply at high doses (consistent with the log-log link's asymmetric shape — slow onset but rapid saturation at probability 1). The logit (24%) and probit (15%) also have non-negligible support, indicating genuine model uncertainty. Given this uncertainty, a biologically motivated choice between loglog and logit is appropriate — or model averaging over these two.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • What does it mean practically that the complementary log-log model has weight 0.02?<br>
+        • If you were to report results, would you just report the loglog model, or would you discuss uncertainty? What is the academic convention here?<br>
+        • The AICc (corrected AIC) is used in the R output. Why is AICc preferred over AIC for small samples?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Explanation vs Prediction</div>
+    <div class="question-stem">The lecture states: "Explanation is like doing scientific research. Prediction is like doing engineering development." Elaborate on this distinction. When would you choose AIC for model selection vs when would you consider model averaging? Use examples from the course.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Explanation (scientific research):</strong> The goal is to understand which predictors causally or associationally relate to the outcome, to test hypotheses, and to build scientific knowledge. Here, model selection should be guided by theory (P1), and there may legitimately be multiple "roughly equally good explanatory models" — the task is not to find "the" best model but to quantify evidence for competing scientific hypotheses. Example: In the animal experiment, both loglog and logit have biological support; the scientific discussion should address which is more mechanistically plausible.<br><br>
+      <strong>Prediction (engineering):</strong> The goal is maximizing predictive accuracy on new data. Interpretability is secondary. Model choice is evaluated on out-of-sample performance metrics (e.g., AUC, Brier score, log-loss). Example: Predicting hospital readmission — what matters is accuracy, not understanding why each predictor contributes.<br><br>
+      <strong>Model averaging for prediction:</strong> Rather than committing to one model, Akaike-weighted predictions combine the forecasts of all candidate models: $\hat{y}^{\text{avg}} = \sum_i w_i \hat{y}_i$. This typically outperforms single-model selection by accounting for model uncertainty, analogous to pooling multiple expert opinions rather than choosing one expert. This is the basis of ensemble methods in machine learning.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Could there be a setting where model averaging would be harmful (e.g., regulatory context)?<br>
+        • P9 mentions that "inference after model construction is an active research debate." What specific problems arise when you test hypotheses using a model that was selected from the data?<br>
+        • How does cross-validation fit into this framework of explanation vs prediction?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Integrative — Endometrial Cancer Complete Analysis</div>
+    <div class="question-stem">Walk through the complete analysis of the Endometrial Cancer dataset, from detecting separation to the final model. What would your conclusions be about the predictors NV, PI, and EH?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Step 1 — Detect separation:</strong> Cross-tabulation reveals (HG=0, NV=1) = 0. Run <code>detect_separation</code>: returns NV = Inf. Confirmed: quasi-complete separation for NV.<br><br>
+      <strong>Step 2 — Standard ML is invalid for NV:</strong> ML gives $\hat\beta_{NV} = 5.80$ (SE = 402, p = 0.99) — meaningless. Lesaffre-Albert confirms diverging ratio sequence for NV. Residual deviance = 56.47 with AIC = 64.47 under ML are unreliable for models containing NV.<br><br>
+      <strong>Step 3 — Apply Firth's method:</strong> <code>brglmFit</code> gives $\hat\beta_{NV} = 1.659$ (SE = 0.747, p = 0.026); $\hat\beta_{EH} = -1.380$ (SE = 0.403, p = 0.0006); $\hat\beta_{PI} = -0.015$ (SE = 0.021, p = 0.47).<br><br>
+      <strong>Step 4 — Inference via LRT (comparing two Firth models):</strong> LRT for PI: deviance difference = 0.633 on 1 df, p = 0.426 → PI is not significant, can be dropped.<br><br>
+      <strong>Conclusions:</strong> NV (neovasculization) and EH (endometrium height) are significant predictors of high-grade histology. Higher NV (present) increases probability of high-grade histology; lower EH is also associated with high-grade histology. PI (pulsatility index) does not add significant explanatory power.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • How would you report the effect of NV? (Odds ratio on probit scale requires back-transformation via normal CDF.)<br>
+        • Would dropping PI change the estimates for NV and EH substantially? Why or why not?<br>
+        • How would you communicate the separation problem to a non-statistical collaborator?
+      </div>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · Critical Thinking</div>
+    <div class="question-stem">A reviewer of your paper criticizes: "You should have used stepwise selection to find the best model rather than pre-specifying your candidate models." Using the principles from the lecture, construct a defense of the pre-specification approach and a critique of automatic stepwise selection.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model answer:</strong><br><br>
+      <strong>Defense of pre-specification:</strong><br>
+      (1) <strong>Scientific grounding (P1):</strong> Pre-specifying candidate models forces the researcher to articulate prior scientific knowledge and hypotheses. The models tested reflect biological plausibility, not data-driven chance.<br>
+      (2) <strong>Valid inference:</strong> Tests on pre-specified hypotheses maintain their nominal Type I error rate. Stepwise selection invalidates the distributional assumptions of all subsequent tests (P7).<br>
+      (3) <strong>Model uncertainty is quantifiable:</strong> Akaike weights over a pre-specified candidate set give a transparent picture of evidence distribution across plausible theories — not possible with stepwise.<br>
+      (4) <strong>Replicability (P5):</strong> Pre-specified models can be exactly replicated and updated by future studies with new data.<br><br>
+      <strong>Critique of stepwise selection:</strong><br>
+      (1) Each test is conditional on the outcome of previous tests; the joint distribution of the test sequence is not controlled.<br>
+      (2) Severe multiple testing inflation — with many predictors, spurious inclusions are common.<br>
+      (3) The "final model" from stepwise is treated as if it were the only model ever tested, providing no measure of model uncertainty.<br>
+      (4) The optimism of fit statistics (AIC, R²) for the final stepwise model is inflated — it was selected to look good on this particular dataset.<br>
+      (5) Poor external validity: stepwise models are notoriously unstable across samples — small perturbations in the data produce very different final models.
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong><br>
+        • Are there situations where stepwise selection might be considered acceptable? (E.g., purely exploratory analysis with no confirmatory inference.)<br>
+        • How does Bayesian variable selection (e.g., SSVS, spike-and-slab priors) address some of these limitations?<br>
+        • P9 states inference after model selection is an "active research debate." Can you name one methodological approach that attempts to correct for this? (E.g., selective inference / PoSI, data splitting, LASSO with debiasing.)
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+/* ── Score tracking ── */
+var total = 0, correct = 0;
+
+function answer(btn, qid, isCorrect) {
+  var card = document.getElementById(qid);
+  var btns = card.querySelectorAll('.option-btn');
+  btns.forEach(function(b) {
+    b.disabled = true;
+    if (b === btn) {
+      b.classList.add(isCorrect ? 'correct' : 'incorrect');
+    } else if (isCorrect === false && b.getAttribute('onclick').indexOf('true') !== -1) {
+      b.classList.add('reveal-correct');
+    }
+  });
+  // Find the correct button and mark it if user was wrong
+  if (!isCorrect) {
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick').includes(',true)')) {
+        b.classList.add('reveal-correct');
+      }
+    });
+  }
+  var fb = document.getElementById(qid + '-fb');
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect — see highlighted answer above.';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  total++;
+  if (isCorrect) correct++;
+  document.getElementById('score-display').textContent = 'Score: ' + correct + ' / ' + total;
+}
+
+function toggleAnswer(btn) {
+  var panel = btn.nextElementSibling;
+  if (panel.style.display === 'block') {
+    panel.style.display = 'none';
+    btn.textContent = 'Reveal Answer';
+  } else {
+    panel.style.display = 'block';
+    btn.textContent = 'Hide Answer';
+  }
+}
+
+function resetAll() {
+  total = 0; correct = 0;
+  document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  document.querySelectorAll('.option-btn').forEach(function(b) {
+    b.disabled = false;
+    b.classList.remove('correct','incorrect','reveal-correct');
+  });
+  document.querySelectorAll('.feedback-bar').forEach(function(fb) {
+    fb.textContent = '';
+    fb.className = 'feedback-bar';
+  });
+  document.querySelectorAll('.answer-panel').forEach(function(p) {
+    p.style.display = 'none';
+  });
+  document.querySelectorAll('.reveal-btn').forEach(function(b) {
+    b.textContent = 'Reveal Answer';
+  });
+}
+</script>
+</body>
+</html>

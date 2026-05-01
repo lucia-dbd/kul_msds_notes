@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generalized Linear Models – Chapter 8 Review Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    packages: {'[+]': ['ams', 'newcommand', 'configmacros', 'boldsymbol']}
+  },
+  loader: {load: ['[tex]/boldsymbol']},
+  startup: { ready: function() { MathJax.startup.defaultReady(); } }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Nunito Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px; line-height: 1.75; color: #2c2c3a;
+    max-width: 960px; margin: 0 auto; padding: 24px 16px 60px;
+  }
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff; border-radius: 14px; padding: 28px 36px;
+    margin-bottom: 24px; box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+  .nav-bar {
+    background-color: #ffffff; border: 1px solid #dde3ef;
+    padding: 10px 18px; margin-bottom: 28px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb; color: #2e6da4; border-radius: 20px;
+    padding: 4px 14px; font-size: 0.85em; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+  .notes-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px;
+    margin-top: 0; margin-bottom: 16px; font-family: 'Crimson Pro', Georgia, serif;
+  }
+  .notes-section h3 { color: #2e6da4; font-size: 1.05em; font-weight: 700; margin: 20px 0 8px; }
+  .notes-section p { margin-bottom: 10px; }
+  .key-point   { background:#eef6ff; border-left:4px solid #2e6da4; padding:12px 18px; margin:14px 0; }
+  .example-box { background:#f0f7ee; border-left:4px solid #4caf50; padding:12px 18px; margin:14px 0; }
+  .theorem-box { background:#f3f0ff; border-left:4px solid #7c4dff; padding:14px 20px; margin:16px 0; }
+  .warning-box { background:#fff8e1; border-left:4px solid #ffc107; padding:12px 18px; margin:14px 0; }
+  .formula-box { background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:14px 20px; margin:14px 0; text-align:center; overflow-x:auto; }
+  .computation-note { background:#fdf3f3; border-left:4px solid #e57373; padding:12px 18px; margin:14px 0; }
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+  pre {
+    background:#1e2435; color:#e8eaf0; border-radius:8px;
+    padding:14px 18px; font-family:'JetBrains Mono', monospace;
+    font-size:0.82em; line-height:1.6; overflow-x:auto; margin:14px 0;
+  }
+  code { font-family:'JetBrains Mono', monospace; font-size:0.88em; background:#f0f4fb; padding:1px 5px; border-radius:3px; color:#1a3a5c; }
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section > h2 { color: #92400e; font-size: 1.2em; font-weight: 700; margin-bottom: 6px; font-family: 'Crimson Pro', Georgia, serif; }
+  .score-display { background:#fff3cd; border:1px solid #ffc107; border-radius:20px; padding:5px 18px; font-weight:700; color:#856404; display:inline-block; font-size:0.95em; margin-bottom:20px; }
+  .mcq-card { background:#f9fafb; border:1px solid #e5e9f2; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .mcq-card .question-label { font-size:0.8em; font-weight:700; color:#2e6da4; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .mcq-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em; }
+  .option-btn {
+    display:block; width:100%; background:#ffffff; border:1.5px solid #d0d8ea;
+    border-radius:8px; padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.correct   { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect { background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled  { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+  .sa-section { background-color:#ffffff; border-radius:12px; padding:28px 36px; margin-bottom:28px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+  .sa-section > h2 { color:#4a148c; font-size:1.2em; font-weight:700; margin-bottom:20px; font-family:'Crimson Pro', Georgia, serif; }
+  .sa-card { background:#faf9ff; border:1px solid #e2dcf5; border-radius:10px; padding:20px 24px; margin-bottom:20px; }
+  .sa-card .question-label { color:#6f42c1; font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; margin-bottom:12px; }
+  .reveal-btn { background:#6f42c1; color:#ffffff; border:none; border-radius:20px; padding:7px 22px; font-size:0.88em; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; font-family:inherit; }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel { background:#f3f0ff; border:1px solid #d4c8f5; border-radius:8px; padding:18px 22px; margin-top:14px; font-size:0.95em; line-height:1.8; display:none; }
+  .answer-panel strong { color:#4a148c; }
+  .followup-block { background:#fff8e1; border-left:3px solid #ffc107; padding:10px 16px; margin-top:14px; border-radius:0 6px 6px 0; font-size:0.92em; }
+  .followup-block strong { color:#7c5800; }
+  .reset-btn { background:#1a3a5c; color:#fff; border:none; border-radius:20px; padding:9px 28px; font-size:0.92em; font-weight:700; cursor:pointer; margin-bottom:20px; transition:background 0.2s; font-family:inherit; }
+  .reset-btn:hover { background:#2e6da4; }
+  @media(max-width:600px){ .notes-section, .mcq-section, .sa-section { padding:18px 14px; } .page-header { padding:20px 18px; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Generalized Linear Models — Chapter 8</h1>
+  <div class="subtitle">Exponential Family · Canonical Links · Variance Functions · MLE via IWLS · Dispersion · Model Selection · Gamma GLM · Quasi-Likelihood · Sandwich Estimator · Beta-Binomial · Janka &amp; Teratology Case Studies · KU Leuven · Ariel Alonso Abad · Exam Preparation Review Notes</div>
+</div>
+
+<nav class="nav-bar">
+  <a href="#framework">GLM Framework</a>
+  <a href="#expfam">Exponential Family</a>
+  <a href="#identities">Two Identities</a>
+  <a href="#canonical">Canonical Links</a>
+  <a href="#mle">MLE &amp; IWLS</a>
+  <a href="#dispersion">Dispersion</a>
+  <a href="#modelsel">Model Selection</a>
+  <a href="#gamma">Gamma GLM</a>
+  <a href="#quasi">Quasi-Likelihood</a>
+  <a href="#sandwich">Sandwich Estimator</a>
+  <a href="#betabin">Beta-Binomial</a>
+  <a href="#janka">Janka Case Study</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T–F</a>
+  <a href="#sa" class="nav-sa">10 Oral Exam Q&amp;A</a>
+</nav>
+
+<!-- ═══════ NOTES ═══════ -->
+
+<div class="notes-section" id="framework">
+  <h2>1. The GLM Framework</h2>
+  <p>Linear regression, logistic regression, and Poisson regression share a common structure. The <strong>Generalized Linear Model (GLM)</strong> framework unifies them under a single formulation consisting of two parts:</p>
+
+  <div class="key-point">
+    <strong>Systematic part:</strong> The mean $\mu_i = E(y_i)$ is linked to the linear predictor $\eta_i = \mathbf{x}_i^T\boldsymbol\beta$ through a monotone, twice-differentiable <em>response function</em> $h$ (or equivalently its inverse, the <em>link function</em> $g = h^{-1}$):
+    $$\mu_i = h(\eta_i) \qquad \text{or} \qquad \eta_i = \mathbf{x}_i^T\boldsymbol\beta = g(\mu_i)$$
+    <strong>Distribution part:</strong> The conditional distribution of $y_i$ belongs to the <em>canonical exponential family</em>:
+    $$f(y_i \mid \theta_i) = \exp\!\left(\frac{y_i\theta_i - b(\theta_i)}{a(\phi, w_i)} + c(y_i, \phi, w_i)\right)$$
+  </div>
+
+  <p>A specific GLM is completely determined by the choice of <strong>exponential family</strong> and <strong>link function</strong>. The framework unifies computational procedures across all members.</p>
+
+  <h3>Components of the Canonical Form</h3>
+  <table>
+    <thead><tr><th>Symbol</th><th>Name</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td>$\theta$</td><td>Natural / canonical parameter</td><td>Parameter of interest — links $y$ to $b(\theta)$</td></tr>
+      <tr><td>$b(\theta)$</td><td>Cumulant / log-normaliser</td><td>Ensures the density integrates to 1; generates moments via derivatives</td></tr>
+      <tr><td>$a(\phi, w)$</td><td>Dispersion function</td><td>Usually $\phi/w$ with $\phi$ the dispersion and $w$ a known weight</td></tr>
+      <tr><td>$c(y, \phi, w)$</td><td>Normalising term</td><td>Does not depend on $\theta$; irrelevant for MLE of $\boldsymbol\beta$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Weight conventions with $a(\phi, w_i) = \phi/w_i$:</strong> $w_i = 1$ for ungrouped (individual) data; $w_i = 1/n_i$ when the response is a sum of $n_i$ observations; $w_i = n_i$ when the response is the mean of $n_i$ observations.
+  </div>
+</div>
+
+<div class="notes-section" id="expfam">
+  <h2>2. Exponential Family Members</h2>
+  <p>Most common statistical distributions belong to the canonical exponential family. The table below summarises key GLM distributions.</p>
+
+  <table>
+    <thead><tr><th>Distribution</th><th>$\theta(\mu)$</th><th>$b(\theta)$</th><th>$\phi$</th><th>$V(\mu) = b''(\theta)$</th><th>$\text{Var}(y) = V(\mu)\phi/w$</th></tr></thead>
+    <tbody>
+      <tr><td>Normal $N(\mu, \sigma^2)$</td><td>$\mu$</td><td>$\theta^2/2$</td><td>$\sigma^2$</td><td>$1$</td><td>$\sigma^2/w$</td></tr>
+      <tr><td>Bernoulli $B(1, \pi)$</td><td>$\log(\pi/(1-\pi))$</td><td>$\log(1+e^\theta)$</td><td>$1$</td><td>$\pi(1-\pi)$</td><td>$\pi(1-\pi)/w$</td></tr>
+      <tr><td>Poisson $\text{Po}(\lambda)$</td><td>$\log(\lambda)$</td><td>$e^\theta = \lambda$</td><td>$1$</td><td>$\lambda$</td><td>$\lambda/w$</td></tr>
+      <tr><td>Gamma $G(\mu, \nu)$</td><td>$-1/\mu$</td><td>$-\log(-\theta)$</td><td>$1/\nu$</td><td>$\mu^2$</td><td>$\mu^2/(\nu w)$</td></tr>
+      <tr><td>Inverse Gaussian $\text{IG}(\mu, \sigma^2)$</td><td>$-1/(2\mu^2)$</td><td>$-(-2\theta)^{1/2}$</td><td>$\sigma^2$</td><td>$\mu^3$</td><td>$\mu^3\sigma^2/w$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Not all distributions belong to the exponential family.</strong> The Weibull distribution, for example, does not — and therefore cannot be directly fitted as a GLM. The negative binomial distribution <em>does</em> belong to it; the geometric distribution is a special case of the negative binomial with $k=1$.
+  </div>
+</div>
+
+<div class="notes-section" id="identities">
+  <h2>3. Two Fundamental Identities</h2>
+  <p>By differentiating $\int f(y \mid \theta)\,dy = 1$ with respect to $\theta$, two key relationships are derived:</p>
+
+  <div class="theorem-box">
+    <strong>Identity 1 (score has zero expectation):</strong>
+    $$E\!\left(\frac{\partial\ell}{\partial\theta}\right) = 0$$
+    Combined with $\partial\ell/\partial\theta = [y - b'(\theta)]/a(\phi,w)$, this gives:
+    $$\boxed{E(y) = b'(\theta) = \mu}$$
+    <br>
+    <strong>Identity 2 (information = variance of score):</strong>
+    $$E\!\left(\frac{\partial^2\ell}{\partial\theta^2}\right) + E\!\left[\left(\frac{\partial\ell}{\partial\theta}\right)^2\right] = 0$$
+    Combined with $\partial^2\ell/\partial\theta^2 = -b''(\theta)/a(\phi,w)$, this gives:
+    $$\boxed{\text{Var}(y) = b''(\theta)\,a(\phi,w) = V(\mu)\,a(\phi,w)}$$
+  </div>
+
+  <div class="key-point">
+    <strong>Canonical link emerges naturally:</strong> Since $E(y) = b'(\theta) = \mu$, the function $g_c = b'^{-1}$ maps $\mu \mapsto \theta$. When we set $\eta = g_c(\mu) = \theta$, the link function equates the linear predictor to the natural parameter. This is the <strong>canonical link</strong>.<br><br>
+    <strong>Variance function $V(\mu) = b''(\theta)$</strong> encodes how the variance depends on the mean — a key structural feature that differs across GLM families.
+  </div>
+</div>
+
+<div class="notes-section" id="canonical">
+  <h2>4. Canonical Link Functions</h2>
+
+  <table>
+    <thead><tr><th>Distribution</th><th>Canonical Link</th><th>$g_c(\mu)$</th><th>R family call</th></tr></thead>
+    <tbody>
+      <tr><td>Normal</td><td>Identity</td><td>$\mu$</td><td><code>gaussian(link="identity")</code></td></tr>
+      <tr><td>Bernoulli / Binomial</td><td>Logit</td><td>$\log[\mu/(1-\mu)]$</td><td><code>binomial(link="logit")</code></td></tr>
+      <tr><td>Poisson</td><td>Log</td><td>$\log(\mu)$</td><td><code>poisson(link="log")</code></td></tr>
+      <tr><td>Gamma</td><td>Inverse</td><td>$-1/\mu$</td><td><code>Gamma(link="inverse")</code></td></tr>
+      <tr><td>Inverse Gaussian</td><td>Inverse squared</td><td>$-1/(2\mu^2)$</td><td><code>inverse.gaussian()</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    Non-canonical links can be used: the probit link for Bernoulli data ($\mu = \Phi(\eta)$), the log link for Gamma data ($\mu = e^\eta$, removing positivity constraints on $\boldsymbol\beta$), the identity link for Poisson ($\mu = \eta$, though this can produce negative fitted means). The choice of link affects convergence properties and interpretation.
+  </div>
+
+  <h3>Offsets</h3>
+  <p>An <strong>offset</strong> is a known constant included in the linear predictor without a coefficient to estimate. The classic example is in Poisson rate models: if $y_i \sim \text{Pois}(\mu_i)$ with $\mu_i = n_i\lambda_i$ (where $n_i$ is person-years and $\lambda_i$ is the rate), then:</p>
+  <div class="formula-box">
+    $\log(\mu_i) = \log(n_i) + \mathbf{x}_i^T\boldsymbol\beta$
+  </div>
+  <p>Here $\log(n_i)$ is the offset — it shifts the intercept without being estimated. In R: <code>glm(y ~ x + offset(log(n)), family=poisson)</code>.</p>
+</div>
+
+<div class="notes-section" id="mle">
+  <h2>5. MLE in GLMs: Score, Information, and IWLS</h2>
+
+  <p>For $N$ independent observations from a GLM with $E(y_i|\mathbf{x}_i) = \mu_i = h(\mathbf{x}_i^T\boldsymbol\beta)$, the log-likelihood is:</p>
+  <div class="formula-box">
+    $\ell(\boldsymbol\beta \mid \mathbf{X}) = \sum_{i=1}^N \frac{y_i\theta_i - b(\theta_i)}{a(\phi, w_i)} + c(y_i, \phi, w_i)$
+  </div>
+
+  <div class="theorem-box">
+    <strong>Score vector:</strong>
+    $$\mathbf{S}(\boldsymbol\beta) = \mathbf{X}^T\mathbf{D}\boldsymbol\Sigma^{-1}(\mathbf{y} - \boldsymbol\mu)$$
+    <strong>Expected Fisher information matrix:</strong>
+    $$\mathbf{I}(\boldsymbol\beta) = \mathbf{X}^T\mathbf{D}\boldsymbol\Sigma^{-1}\mathbf{D}\mathbf{X} = \mathbf{X}^T\mathbf{W}\mathbf{X}$$
+    where $\mathbf{D} = \text{diag}(h'(\eta_i))$, $\boldsymbol\Sigma = \text{diag}(\sigma_i^2)$ with $\sigma_i^2 = \text{Var}(y_i)$, and $\mathbf{W} = \mathbf{D}\boldsymbol\Sigma^{-1}\mathbf{D} = \text{diag}(h'(\eta_i)^2/\sigma_i^2)$.
+  </div>
+
+  <h3>Iterative Algorithms</h3>
+  <table>
+    <thead><tr><th>Algorithm</th><th>Update Rule</th><th>Uses</th></tr></thead>
+    <tbody>
+      <tr><td>Newton-Raphson</td><td>$\boldsymbol\beta^{k+1} \approx \boldsymbol\beta^k - \mathbf{H}(\boldsymbol\beta^k)^{-1}\mathbf{S}(\boldsymbol\beta^k)$</td><td>Observed Hessian $\mathbf{H}$</td></tr>
+      <tr><td>Fisher Scoring</td><td>$\boldsymbol\beta^{k+1} \approx \boldsymbol\beta^k + \mathbf{I}(\boldsymbol\beta^k)^{-1}\mathbf{S}(\boldsymbol\beta^k)$</td><td>Expected information $\mathbf{I}$</td></tr>
+      <tr><td>IWLS</td><td>Equivalent to Fisher scoring; solves a weighted least squares problem at each step</td><td>Same as Fisher scoring</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Canonical link advantage:</strong> For canonical link functions, the expected and observed information matrices coincide: $\mathbf{I}(\theta) = -\mathbf{H}(\theta)$, the log-likelihood is always concave, and the MLE is unique (if it exists). For non-canonical links, multiple maxima are possible.
+  </div>
+
+  <h3>Asymptotic Distribution of the MLE</h3>
+  <div class="theorem-box">
+    For canonical links, if regressors have compact support and $(\mathbf{X}_n^T\mathbf{X}_n)^{-1} \to \mathbf{0}$:
+    $$\hat{\boldsymbol\beta}_n \sim N\!\left(\boldsymbol\beta,\; (\mathbf{X}_n^T\mathbf{W}\mathbf{X}_n)^{-1}\right)$$
+    In practice, $\mathbf{W}$ is replaced by $\hat{\mathbf{W}}$ (plugging in $\hat{\boldsymbol\beta}$). For non-canonical links, additional regularity conditions are needed.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Convergence caveat:</strong> Even when $\mathbf{X}^T\mathbf{X}$ is invertible, the weighted information matrix $\mathbf{X}^T\mathbf{W}\mathbf{X}$ may fail to be invertible — for example, in logistic regression with perfect separation. For non-canonical links, convergence to a unique maximum is not guaranteed.
+  </div>
+</div>
+
+<div class="notes-section" id="dispersion">
+  <h2>6. Dispersion Parameter Estimation</h2>
+
+  <p>The dispersion parameter $\phi$ drops out of the score equations — so $\hat{\boldsymbol\beta}$ does not depend on $\phi$. Since ML estimation of $\phi$ is often impractical, it is estimated by the <strong>method of moments</strong>:</p>
+
+  <div class="theorem-box">
+    <strong>Moment estimator (Pearson-based):</strong>
+    $$\hat\phi = \frac{1}{N-p}\sum_{i=1}^N \frac{w_i(y_i - \hat\mu_i)^2}{V(\hat\mu_i)}$$
+    where $p$ is the number of regression coefficients, and $V(\mu)$ is the variance function. This estimator is valid under the assumption that the model is correctly specified and most $n_i > 1$.
+  </div>
+
+  <div class="key-point">
+    <strong>Special cases:</strong> For the normal model, $\hat\phi = s^2$ (the classical sample variance), even with $n_i = 1$. For Bernoulli and Poisson, $\phi = 1$ (no dispersion parameter). The relationship $\hat\phi = X^2/(N-p)$ connects the moment estimator to the Pearson chi-square statistic.
+  </div>
+</div>
+
+<div class="notes-section" id="modelsel">
+  <h2>7. Model Selection and Fit Criteria</h2>
+
+  <h3>Nested Models</h3>
+  <p>Use the Wald, score (Rao), or likelihood ratio test (LRT). The LRT comparing a model with $p_1$ parameters to one with $p_0 < p_1$ parameters uses $D_0 - D_1 \sim \chi^2(p_1 - p_0)$ under $H_0$.</p>
+
+  <h3>Non-Nested Models: AIC</h3>
+  <div class="formula-box">
+    $\text{AIC} = -2\ell(\hat{\boldsymbol\beta}) + 2p$
+  </div>
+  <p>Lower AIC indicates better balance of fit and complexity. AIC cannot be used for quasi-likelihood models (no proper likelihood; R reports <code>AIC: NA</code> for quasi families).</p>
+
+  <h3>Pearson Statistic and Deviance</h3>
+  <table>
+    <thead><tr><th>Criterion</th><th>Formula</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Pearson $X^2$</td><td>$\sum_i w_i(y_i - \hat\mu_i)^2/V(\hat\mu_i)$</td><td>Also gives $\hat\phi = X^2/(N-p)$</td></tr>
+      <tr><td>Deviance $D$</td><td>$-2\sum_i [\ell_i(\hat\mu_i) - \ell_i(y_i)]\,\phi$</td><td>$D=0$ iff perfect fit; analogous to SSE</td></tr>
+      <tr><td>Scaled deviance $D^*$</td><td>$D/\phi$</td><td>Independent of $\phi$; $\sim\chi^2(N-p)$ when $\phi$ known and $n_i$ large</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>⚠ Rough rule of thumb:</strong> $D^* \approx N-p$ for a good-fitting model. For small $n_i$ (especially $n_i=1$), large $X^2$ or $D$ does not necessarily imply a bad fit. Be careful using the deviance test directly in R — confirm conditions are met.
+  </div>
+</div>
+
+<div class="notes-section" id="gamma">
+  <h2>8. The Gamma GLM — Janka Hardness Case Study</h2>
+
+  <p>The Janka hardness dataset (Williams, 1959) records the hardness and density of 36 timber samples. Key data features: the relationship between density and hardness is clearly curved, and variance <em>increases</em> with density — indicating heteroscedasticity.</p>
+
+  <h3>Diagnosing the Linear Model's Failures</h3>
+  <div class="example-box">
+    A quadratic linear model ($\text{Hardness} \sim \text{Density} + \text{Density}^2$) shows significant curvature but the residuals-vs-fitted plot and Q-Q plot reveal increasing variance and right skewness. Formal tests confirm:<br>
+    NCV score test: $\chi^2 = 14.95$, $p = 0.00011$ &nbsp;|&nbsp; Breusch-Pagan: $p = 0.036$
+  </div>
+
+  <h3>Centering Warning</h3>
+  <div class="warning-box">
+    <strong>⚠ Collinearity in polynomial regression:</strong> Without centering, the intercept and linear term appear non-significant ($p > 0.5$) in the quadratic model even though both are needed. After centering (subtracting the median density), all terms become highly significant and coefficients remain stable when a cubic term is added. This illustrates that significance of lower-order terms should always be assessed in the centered form.
+  </div>
+
+  <h3>Box-Cox Analysis</h3>
+  <p>The Box-Cox transformation search gives $\hat\lambda \approx 0.47$ (close to $0.5$, i.e., square root) for the linear model, and $\hat\lambda \approx 0.15$ (close to $0$, i.e., log) for the quadratic model. This suggests two competing needs: a square-root transformation for linearity, and a log transformation for variance stabilisation. John Nelder's insight: a Gamma GLM with a <strong>square-root link</strong> achieves both simultaneously.</p>
+
+  <h3>Gamma GLM with Square-Root Link</h3>
+  <div class="theorem-box">
+    <strong>Model:</strong> $y_i \sim \text{Gamma}(\nu, \mu_i)$ with $\sqrt{\mu_i} = \beta_0 + \beta_1 x_i$ (centered density), i.e., $\mu_i = (\beta_0 + \beta_1 x_i)^2$.<br>
+    <strong>Variance function:</strong> $\text{Var}(y_i) = \mu_i^2/\nu \propto \mu_i^2$ — variance grows as the square of the mean (constant coefficient of variation).
+  </div>
+
+  <div class="example-box">
+    <strong>R output (Gamma + square-root link, centered density):</strong><br>
+    Intercept: 33.961 (SE 0.279) &nbsp;|&nbsp; Density: 0.768 (SE 0.022)<br>
+    Dispersion $\hat\phi = 0.00972$; Residual deviance = 0.329 on 34 df; $D^* = 0.329/0.00972 = 33.8 \approx 34 = N-p$ ✓<br><br>
+    The Gamma model produces virtually identical fitted values to the quadratic normal model, but provides much more appropriate — and asymmetric — prediction intervals (tighter for low-density, wider for high-density timber).
+  </div>
+
+  <h3>Gamma Distribution Properties</h3>
+  <table>
+    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Support</td><td>$y > 0$</td></tr>
+      <tr><td>$E(y)$</td><td>$\mu$</td></tr>
+      <tr><td>$\text{Var}(y)$</td><td>$\mu^2/\nu$</td></tr>
+      <tr><td>Variance function $V(\mu)$</td><td>$\mu^2$</td></tr>
+      <tr><td>Coefficient of variation</td><td>$\text{SD}/\text{mean} = 1/\sqrt{\nu} = \sqrt{\phi}$ (constant)</td></tr>
+      <tr><td>Canonical link</td><td>Inverse: $g(\mu) = -1/\mu$</td></tr>
+      <tr><td>Common alternatives</td><td>Log link ($\mu = e^\eta$), Square-root link ($\mu = \eta^2$)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="notes-section" id="quasi">
+  <h2>9. Quasi-Likelihood Models</h2>
+
+  <p>When the empirical variance does not match the GLM's assumed variance — <strong>overdispersion</strong> ($\phi > 1$) or <strong>underdispersion</strong> ($\phi < 1$) — the distribution is misspecified. Quasi-likelihood provides a principled remedy.</p>
+
+  <div class="key-point">
+    <strong>Core idea:</strong> Instead of deriving $\text{Var}(y_i)$ from a distributional assumption, <em>directly specify</em> a variance function $\text{Var}_q(y_i)$. The quasi-score equations take the same form as the GLM score equations, but with the user-specified variance:
+    $$\sum_i \frac{y_i - \mu_i}{\text{Var}_q(y_i)}\frac{\partial\mu_i}{\partial\beta_j} = 0 \quad \forall j$$
+    These are also called <strong>Generalized Estimating Equations (GEE)</strong>.
+  </div>
+
+  <h3>Log Quasi-Likelihood</h3>
+  <div class="formula-box">
+    $q_i(\mu_i) = \int_{y_i}^{\mu_i} \frac{y_i - z}{\text{Var}_q(z)}\,dz + C$
+  </div>
+  <p>The total quasi-log-likelihood $q(\boldsymbol\mu) = \sum_i q_i(\mu_i)$ behaves like a log-likelihood but requires only the variance function, not a full distributional specification.</p>
+
+  <h3>Scale Models — The Most Common Case</h3>
+  <div class="theorem-box">
+    A <strong>scale model</strong> sets $\text{Var}_q(y_i) = \phi V(\mu_i)$, where $V(\mu)$ is the variance function from the corresponding GLM. For scale models:
+    <ul style="margin:8px 0 0 20px">
+      <li>$\hat{\boldsymbol\beta}_q = \hat{\boldsymbol\beta}$ (same point estimates as the GLM)</li>
+      <li>$\text{sd}(\hat\beta_{qk}) = \sqrt{\phi}\cdot\text{sd}(\hat\beta_k)$</li>
+    </ul>
+    Examples: Quasi-binomial: $\text{Var}_q(\pi_i) = \phi\,\pi_i(1-\pi_i)/n_i$; Quasi-Poisson: $\text{Var}_q(\lambda_i) = \phi\lambda_i$.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Consequences of ignoring dispersion:</strong><br>
+    Overdispersion ($\phi > 1$): Standard errors are too <em>small</em> → inflated Type I error rate (spurious significance).<br>
+    Underdispersion ($\phi < 1$): Standard errors are too <em>large</em> → reduced power (missed true effects).
+  </div>
+
+  <div class="example-box">
+    <strong>Low-Iron Teratology Data — overdispersion detected:</strong><br>
+    Standard binomial model: Residual deviance = 168.91 on 53 df — far exceeding the df, indicating overdispersion.<br>
+    DHARMa dispersion test: ratioObsSim = 1.077, $p = 0.016$.<br>
+    Quasi-binomial fit: $\hat\phi = 2.94$ — SEs are inflated by $\sqrt{2.94} \approx 1.71$. Variables significant under the standard binomial become non-significant (e.g., <code>hb</code>: $p$ changes from 0.032 to 0.216).
+  </div>
+
+  <h3>Mean Structure Requirement</h3>
+  <div class="key-point">
+    Even in quasi-likelihood models, the mean structure $E(y_i) = \mu_i = h(\mathbf{x}_i^T\boldsymbol\beta)$ <strong>must be correctly specified</strong> for $E[\mathbf{S}_q(\boldsymbol\beta)] = 0$ and for $\hat{\boldsymbol\beta}_q$ to be a consistent estimator. Only the variance function can be misspecified (with efficiency loss but still consistency, thanks to the sandwich estimator).
+  </div>
+</div>
+
+<div class="notes-section" id="sandwich">
+  <h2>10. The Sandwich (Robust) Estimator</h2>
+
+  <p>Even if the working variance $\text{Var}_q(y_i)$ is misspecified, the quasi-MLE $\hat{\boldsymbol\beta}_q$ remains asymptotically normal. The covariance matrix must then be estimated robustly:</p>
+
+  <div class="theorem-box">
+    <strong>Sandwich estimator:</strong>
+    $$\hat{\mathbf{A}} = (\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}\hat{\mathbf{V}}_q(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$$
+    where the "meat" is:
+    $$\hat{\mathbf{V}}_q = \sum_{i=1}^n \left(\frac{\partial\mu_i}{\partial\boldsymbol\beta}\right)^T \frac{(y_i - \hat\mu_i)^2}{V_q^2(\hat\mu_i)}\left(\frac{\partial\mu_i}{\partial\boldsymbol\beta}\right)$$
+    This is a consistent estimator of the true covariance matrix of $\hat{\boldsymbol\beta}_q$, even when the working variance is wrong. If the variance is correctly specified, $\hat{\mathbf{A}} = (\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$ (the standard GLM covariance estimator).
+  </div>
+
+  <div class="key-point">
+    <strong>Why "sandwich"?</strong> The structure $(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1} \mathbf{V}_q (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}$ has the bread $(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}$ surrounding the meat $\mathbf{V}_q$. In R, <code>coeftest(model, vcov=sandwich)</code> applies this. The estimator is also called the <strong>robust estimator</strong> or the <strong>Huber-White estimator</strong>.
+  </div>
+
+  <div class="warning-box">
+    <strong>⚠ Efficiency trade-off:</strong> Even with the sandwich estimator, efficiency is lost when the working variance is far from the truth. To minimise this loss, one should choose the working variance function as close to the true variance as possible. Consistency is preserved regardless; efficiency is not.
+  </div>
+</div>
+
+<div class="notes-section" id="betabin">
+  <h2>11. Beta-Binomial Model</h2>
+
+  <p>When binary observations within a cluster are <em>correlated</em> (common in litter experiments, teratology, clustered trials), the standard binomial model underestimates variability. The Beta-Binomial provides a proper distributional alternative.</p>
+
+  <div class="theorem-box">
+    <strong>Hierarchical model:</strong> Conditional on $p$, $y_i \sim \text{Bern}(p)$ independently; $p \sim \text{Beta}(\alpha_1, \alpha_2)$. Then the marginal sum $y = \sum y_i$ has:
+    $$E(y) = m\mu, \quad \text{Var}(y) = m\mu(1-\mu)\big[1 + (m-1)\rho\big]$$
+    where $\mu = \alpha_1/(\alpha_1+\alpha_2)$ and $\rho = 1/(\alpha_1+\alpha_2+1)$ is the intraclass correlation (also the overdispersion parameter).
+  </div>
+
+  <div class="key-point">
+    <strong>Key features:</strong><br>
+    • When $\rho = 0$: reduces to the standard binomial model.<br>
+    • Variance exceeds the binomial variance by factor $[1+(m-1)\rho]$ — this is the overdispersion.<br>
+    • Has a closed-form marginal density (in terms of Gamma functions).<br>
+    • The mean $\mu_i$ can be linked to covariates via any binary link: $\text{logit}(\mu_i) = \mathbf{x}_i^T\boldsymbol\beta$.<br>
+    • The overdispersion $\rho$ can be modelled as a function of covariates or held constant.<br>
+    • The beta-binomial is <em>not</em> in the natural exponential family (even for known $\rho$) → all parameters estimated via full ML.<br>
+    • In R: <code>aod::betabin(cbind(y, n-y) ~ covariates, ~ 1)</code>.
+  </div>
+
+  <div class="example-box">
+    <strong>Teratology data comparison:</strong> The standard binomial model gives SEs that are too small. The quasi-binomial ($\hat\phi = 2.94$) inflates SEs uniformly by $\sqrt{2.94}$. The beta-binomial (homogeneous $\rho$) gives $\hat\rho = 0.236$ and SEs close to the quasi-binomial. The group-varying $\rho$ model shows that overdispersion is concentrated in the placebo group ($\hat\rho = 0.327$), while injected groups have near-zero overdispersion. AIC of group-varying beta-binomial = 195 vs. 198 for homogeneous — modest improvement.
+  </div>
+</div>
+
+<div class="notes-section" id="janka">
+  <h2>12. Summary of Case Studies</h2>
+
+  <table>
+    <thead><tr><th>Dataset</th><th>Issue</th><th>GLM Solution</th><th>Key R functions</th></tr></thead>
+    <tbody>
+      <tr><td>Janka hardness</td><td>Curvature + variance heterogeneity in a continuous response</td><td>Gamma GLM with square-root link (non-canonical)</td><td><code>glm(..., family=Gamma(link=vroot))</code></td></tr>
+      <tr><td>Low-iron teratology</td><td>Binomial response with overdispersion (litter effect)</td><td>Quasi-binomial or Beta-Binomial</td><td><code>glm(..., family=quasibinomial)</code>, <code>aod::betabin</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Model comparison across methods (teratology data):</strong> All four methods (Binomial, Binomial+Sandwich, Quasi-binomial, Beta-Binomial) give <em>identical point estimates</em> for $\boldsymbol\beta$. They differ only in standard errors. The standard binomial underestimates SEs; quasi-binomial and sandwich give similar (inflated) SEs; beta-binomial provides the most principled SE estimates with a full distributional model.
+  </div>
+</div>
+
+<!-- ═══════ MCQ ═══════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True / False — 50 Questions</h2>
+  <p style="margin-bottom:10px;font-size:0.93em;color:#555;">Click an option to check your answer. Reset to try again.</p>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Framework</div>
+    <div class="question-stem">Which two components completely specify a GLM?</div>
+    <button class="option-btn" onclick="answer(this,'q1',false)">A. The linear predictor and the design matrix</button>
+    <button class="option-btn" onclick="answer(this,'q1',true)">B. The exponential family distribution and the link function</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">C. The variance function and the response vector</button>
+    <button class="option-btn" onclick="answer(this,'q1',false)">D. The canonical parameter and the dispersion parameter</button>
+    <div class="feedback-bar" id="fb-q1"></div>
+  </div>
+
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Exponential Family</div>
+    <div class="question-stem">From the two fundamental identities, $E(y)$ equals:</div>
+    <button class="option-btn" onclick="answer(this,'q2',false)">A. $b''(\theta)$</button>
+    <button class="option-btn" onclick="answer(this,'q2',true)">B. $b'(\theta)$</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">C. $\theta / a(\phi, w)$</button>
+    <button class="option-btn" onclick="answer(this,'q2',false)">D. $c(y, \phi, w)$</button>
+    <div class="feedback-bar" id="fb-q2"></div>
+  </div>
+
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · Variance Function</div>
+    <div class="question-stem">For the Poisson distribution, the variance function $V(\mu)$ is:</div>
+    <button class="option-btn" onclick="answer(this,'q3',false)">A. $\mu^2$</button>
+    <button class="option-btn" onclick="answer(this,'q3',true)">B. $\mu$</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">C. $\mu(1-\mu)$</button>
+    <button class="option-btn" onclick="answer(this,'q3',false)">D. $1$</button>
+    <div class="feedback-bar" id="fb-q3"></div>
+  </div>
+
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Canonical Link</div>
+    <div class="question-stem">The canonical link for the Gamma distribution is:</div>
+    <button class="option-btn" onclick="answer(this,'q4',false)">A. Log link: $g(\mu) = \log(\mu)$</button>
+    <button class="option-btn" onclick="answer(this,'q4',true)">B. Inverse link: $g(\mu) = -1/\mu$</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">C. Identity link: $g(\mu) = \mu$</button>
+    <button class="option-btn" onclick="answer(this,'q4',false)">D. Square-root link: $g(\mu) = \sqrt{\mu}$</button>
+    <div class="feedback-bar" id="fb-q4"></div>
+  </div>
+
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For canonical link functions, the expected and observed information matrices coincide, making the MLE always unique if it exists.</div>
+    <button class="option-btn" onclick="answer(this,'q5',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q5',false)">False</button>
+    <div class="feedback-bar" id="fb-q5"></div>
+  </div>
+
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Dispersion</div>
+    <div class="question-stem">Which distributions have a fixed dispersion parameter $\phi = 1$ (no free dispersion)?</div>
+    <button class="option-btn" onclick="answer(this,'q6',false)">A. Normal and Gamma</button>
+    <button class="option-btn" onclick="answer(this,'q6',true)">B. Bernoulli and Poisson</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">C. Gamma and Inverse Gaussian</button>
+    <button class="option-btn" onclick="answer(this,'q6',false)">D. Normal and Bernoulli</button>
+    <div class="feedback-bar" id="fb-q6"></div>
+  </div>
+
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Estimation</div>
+    <div class="question-stem">The moment estimator of the dispersion parameter $\phi$ in a GLM is:</div>
+    <button class="option-btn" onclick="answer(this,'q7',false)">A. $\hat\phi = D / (N-1)$</button>
+    <button class="option-btn" onclick="answer(this,'q7',true)">B. $\hat\phi = \frac{1}{N-p}\sum_i \frac{w_i(y_i - \hat\mu_i)^2}{V(\hat\mu_i)}$</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">C. $\hat\phi = -2\ell(\hat{\boldsymbol\beta})/N$</button>
+    <button class="option-btn" onclick="answer(this,'q7',false)">D. $\hat\phi = \sum_i (y_i - \hat\mu_i)^2 / N$</button>
+    <div class="feedback-bar" id="fb-q7"></div>
+  </div>
+
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The dispersion parameter $\phi$ affects the MLE $\hat{\boldsymbol\beta}$ because it appears in the score equations.</div>
+    <button class="option-btn" onclick="answer(this,'q8',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q8',true)">False</button>
+    <div class="feedback-bar" id="fb-q8"></div>
+  </div>
+
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · Scaled Deviance</div>
+    <div class="question-stem">The rough rule of thumb for a well-fitting GLM model is:</div>
+    <button class="option-btn" onclick="answer(this,'q9',false)">A. $D^* \approx 0$</button>
+    <button class="option-btn" onclick="answer(this,'q9',true)">B. $D^* \approx N - p$</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">C. $D^* \approx p$</button>
+    <button class="option-btn" onclick="answer(this,'q9',false)">D. $D^* < 2$</button>
+    <div class="feedback-bar" id="fb-q9"></div>
+  </div>
+
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · R Output</div>
+    <div class="question-stem">For the Gamma GLM on the Janka data: Residual deviance = 0.329, df = 34, $\hat\phi = 0.00972$. What is the scaled deviance $D^*$?</div>
+    <button class="option-btn" onclick="answer(this,'q10',false)">A. 0.329</button>
+    <button class="option-btn" onclick="answer(this,'q10',true)">B. 33.8</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">C. 0.00972</button>
+    <button class="option-btn" onclick="answer(this,'q10',false)">D. 452.97</button>
+    <div class="feedback-bar" id="fb-q10"></div>
+  </div>
+
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · Gamma Distribution</div>
+    <div class="question-stem">The variance function $V(\mu)$ for the Gamma distribution is:</div>
+    <button class="option-btn" onclick="answer(this,'q11',false)">A. $\mu$</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">B. $\mu(1-\mu)$</button>
+    <button class="option-btn" onclick="answer(this,'q11',true)">C. $\mu^2$</button>
+    <button class="option-btn" onclick="answer(this,'q11',false)">D. $\mu^3$</button>
+    <div class="feedback-bar" id="fb-q11"></div>
+  </div>
+
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The Gamma distribution assumes a constant coefficient of variation (SD/mean), equal to $\sqrt{\phi}$.</div>
+    <button class="option-btn" onclick="answer(this,'q12',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q12',false)">False</button>
+    <div class="feedback-bar" id="fb-q12"></div>
+  </div>
+
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · Janka Case Study</div>
+    <div class="question-stem">The square-root link for the Gamma GLM was motivated by the Janka data because:</div>
+    <button class="option-btn" onclick="answer(this,'q13',false)">A. It is the canonical link for the Gamma distribution</button>
+    <button class="option-btn" onclick="answer(this,'q13',true)">B. Box-Cox analysis suggested $\lambda \approx 0.5$ to linearise the relationship; using $\sqrt{\mu} = \eta$ makes the predictor linear in density rather than quadratic</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">C. It forces all fitted values to be positive</button>
+    <button class="option-btn" onclick="answer(this,'q13',false)">D. It is equivalent to a log link for large $\mu$</button>
+    <div class="feedback-bar" id="fb-q13"></div>
+  </div>
+
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Offset</div>
+    <div class="question-stem">In a Poisson rate model with event count $y_i$, person-years $n_i$, and rate $\lambda_i$ (with $\log\lambda_i = \mathbf{x}_i^T\boldsymbol\beta$), the correct model for $\log(\mu_i)$ is:</div>
+    <button class="option-btn" onclick="answer(this,'q14',false)">A. $\log(\mu_i) = \mathbf{x}_i^T\boldsymbol\beta$</button>
+    <button class="option-btn" onclick="answer(this,'q14',true)">B. $\log(\mu_i) = \log(n_i) + \mathbf{x}_i^T\boldsymbol\beta$</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">C. $\log(\mu_i) = n_i \cdot \mathbf{x}_i^T\boldsymbol\beta$</button>
+    <button class="option-btn" onclick="answer(this,'q14',false)">D. $\log(\mu_i) = \log(n_i\mathbf{x}_i^T\boldsymbol\beta)$</button>
+    <div class="feedback-bar" id="fb-q14"></div>
+  </div>
+
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: AIC can be computed and compared across quasi-likelihood models fitted with different variance functions.</div>
+    <button class="option-btn" onclick="answer(this,'q15',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q15',true)">False</button>
+    <div class="feedback-bar" id="fb-q15"></div>
+  </div>
+
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · Quasi-Likelihood</div>
+    <div class="question-stem">In a quasi-likelihood scale model, the quasi-ML estimate $\hat{\boldsymbol\beta}_q$ compared to the standard GLM estimate $\hat{\boldsymbol\beta}$ is:</div>
+    <button class="option-btn" onclick="answer(this,'q16',true)">A. Identical in point estimates; standard errors differ by a factor of $\sqrt{\phi}$</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">B. Different in point estimates because the score equations change</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">C. Identical in both point estimates and standard errors</button>
+    <button class="option-btn" onclick="answer(this,'q16',false)">D. Different only in the intercept estimate</button>
+    <div class="feedback-bar" id="fb-q16"></div>
+  </div>
+
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · Overdispersion Consequences</div>
+    <div class="question-stem">Fitting a standard Poisson model when overdispersion ($\phi > 1$) is present will:</div>
+    <button class="option-btn" onclick="answer(this,'q17',false)">A. Bias the coefficient estimates</button>
+    <button class="option-btn" onclick="answer(this,'q17',true)">B. Produce standard errors that are too small, inflating the Type I error rate</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">C. Produce standard errors that are too large, reducing power</button>
+    <button class="option-btn" onclick="answer(this,'q17',false)">D. Have no effect on inference since $\phi$ cancels in the score equations</button>
+    <div class="feedback-bar" id="fb-q17"></div>
+  </div>
+
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · R Output — Teratology</div>
+    <div class="question-stem">For the teratology binomial model: Residual deviance = 168.91 on 53 df. The expected deviance under a well-fitting binomial model should be approximately:</div>
+    <button class="option-btn" onclick="answer(this,'q18',false)">A. 168.91 (the model fits perfectly)</button>
+    <button class="option-btn" onclick="answer(this,'q18',true)">B. 53 (equal to the degrees of freedom) — the actual deviance is more than 3× larger, indicating overdispersion</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">C. 509.43 (the null deviance)</button>
+    <button class="option-btn" onclick="answer(this,'q18',false)">D. 0 (the saturated model)</button>
+    <div class="feedback-bar" id="fb-q18"></div>
+  </div>
+
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Sandwich Estimator</div>
+    <div class="question-stem">The sandwich estimator $\hat{\mathbf{A}} = (\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}\hat{\mathbf{V}}_q(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$ reduces to the standard GLM covariance $(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$ when:</div>
+    <button class="option-btn" onclick="answer(this,'q19',false)">A. $n \to \infty$</button>
+    <button class="option-btn" onclick="answer(this,'q19',true)">B. The working variance function equals the true variance function</button>
+    <button class="option-btn" onclick="answer(this,'q19',false)">C. All observations have equal leverage</button>
+    <button class="option-btn" onclick="answer(this,'q19',false)">D. The canonical link is used</button>
+    <div class="feedback-bar" id="fb-q19"></div>
+  </div>
+
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: Even if the working variance function in a quasi-likelihood model is misspecified, $\hat{\boldsymbol\beta}_q$ remains a consistent estimator of $\boldsymbol\beta$, provided the mean structure is correctly specified.</div>
+    <button class="option-btn" onclick="answer(this,'q20',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q20',false)">False</button>
+    <div class="feedback-bar" id="fb-q20"></div>
+  </div>
+
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · Beta-Binomial</div>
+    <div class="question-stem">In the beta-binomial model, the parameter $\rho$ (intraclass correlation) has what effect on the variance of $y = \sum y_i$?</div>
+    <button class="option-btn" onclick="answer(this,'q21',false)">A. It reduces the variance below the binomial variance</button>
+    <button class="option-btn" onclick="answer(this,'q21',true)">B. It inflates the variance above the binomial variance by the factor $[1+(m-1)\rho]$</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">C. It has no effect on the marginal variance</button>
+    <button class="option-btn" onclick="answer(this,'q21',false)">D. It changes the mean of $y$</button>
+    <div class="feedback-bar" id="fb-q21"></div>
+  </div>
+
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The beta-binomial distribution belongs to the natural exponential family.</div>
+    <button class="option-btn" onclick="answer(this,'q22',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q22',true)">False</button>
+    <div class="feedback-bar" id="fb-q22"></div>
+  </div>
+
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Beta-Binomial</div>
+    <div class="question-stem">When $\rho = 0$ in the beta-binomial model, it reduces to:</div>
+    <button class="option-btn" onclick="answer(this,'q23',false)">A. The Poisson model</button>
+    <button class="option-btn" onclick="answer(this,'q23',true)">B. The standard binomial model</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">C. The normal model</button>
+    <button class="option-btn" onclick="answer(this,'q23',false)">D. The quasi-binomial model with $\phi=1$</button>
+    <div class="feedback-bar" id="fb-q23"></div>
+  </div>
+
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · IWLS</div>
+    <div class="question-stem">The Iteratively Weighted Least Squares (IWLS) algorithm for GLMs is equivalent to which iterative procedure?</div>
+    <button class="option-btn" onclick="answer(this,'q24',false)">A. Newton-Raphson using the observed Hessian</button>
+    <button class="option-btn" onclick="answer(this,'q24',true)">B. Fisher scoring using the expected information matrix</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">C. Gradient descent with a fixed step size</button>
+    <button class="option-btn" onclick="answer(this,'q24',false)">D. EM algorithm with a normal working model</button>
+    <div class="feedback-bar" id="fb-q24"></div>
+  </div>
+
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For GLMs with non-canonical links, the log-likelihood is always concave and thus the MLE is always unique.</div>
+    <button class="option-btn" onclick="answer(this,'q25',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q25',true)">False</button>
+    <div class="feedback-bar" id="fb-q25"></div>
+  </div>
+
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · Centering</div>
+    <div class="question-stem">Why did centering the Density variable (subtracting the median) improve the Janka analysis?</div>
+    <button class="option-btn" onclick="answer(this,'q26',false)">A. It changed the fitted values of the model</button>
+    <button class="option-btn" onclick="answer(this,'q26',true)">B. It reduced collinearity between Density and Density² terms, making coefficients interpretable, significant, and stable</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">C. It fixed the heteroscedasticity in residuals</button>
+    <button class="option-btn" onclick="answer(this,'q26',false)">D. It transformed the response to be normally distributed</button>
+    <div class="feedback-bar" id="fb-q26"></div>
+  </div>
+
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · R Output</div>
+    <div class="question-stem">The quasi-binomial output for the teratology data shows <code>AIC: NA</code>. This is because:</div>
+    <button class="option-btn" onclick="answer(this,'q27',false)">A. The model failed to converge</button>
+    <button class="option-btn" onclick="answer(this,'q27',true)">B. Quasi-likelihood does not correspond to a proper likelihood, so AIC is not defined</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">C. The sample size is too small to compute AIC</button>
+    <button class="option-btn" onclick="answer(this,'q27',false)">D. R does not support AIC for binomial models</button>
+    <div class="feedback-bar" id="fb-q27"></div>
+  </div>
+
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · Calculation</div>
+    <div class="question-stem">For the teratology quasi-binomial, $\hat\phi = 2.94$. By what factor are the quasi-binomial standard errors larger than the standard binomial SEs?</div>
+    <button class="option-btn" onclick="answer(this,'q28',false)">A. $2.94$</button>
+    <button class="option-btn" onclick="answer(this,'q28',true)">B. $\sqrt{2.94} \approx 1.71$</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">C. $2.94^2 = 8.64$</button>
+    <button class="option-btn" onclick="answer(this,'q28',false)">D. $1/(2.94) \approx 0.34$</button>
+    <div class="feedback-bar" id="fb-q28"></div>
+  </div>
+
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The mean structure $E(y_i) = \mu_i = h(\mathbf{x}_i^T\boldsymbol\beta)$ must be correctly specified for the quasi-ML estimator to be consistent, even if the variance function is wrong.</div>
+    <button class="option-btn" onclick="answer(this,'q29',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q29',false)">False</button>
+    <div class="feedback-bar" id="fb-q29"></div>
+  </div>
+
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · Exponential Family</div>
+    <div class="question-stem">The Weibull distribution is notable in the GLM context because:</div>
+    <button class="option-btn" onclick="answer(this,'q30',false)">A. It has the largest variance function of any distribution</button>
+    <button class="option-btn" onclick="answer(this,'q30',true)">B. It does not belong to the natural exponential family and therefore cannot be directly modelled as a GLM</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">C. It requires a log link, which is non-canonical</button>
+    <button class="option-btn" onclick="answer(this,'q30',false)">D. Its canonical parameter is undefined</button>
+    <div class="feedback-bar" id="fb-q30"></div>
+  </div>
+
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Score Equations</div>
+    <div class="question-stem">In any GLM, the score equation $\mathbf{S}(\boldsymbol\beta) = \mathbf{X}^T\mathbf{D}\boldsymbol\Sigma^{-1}(\mathbf{y} - \boldsymbol\mu) = \mathbf{0}$ shows that $\hat{\boldsymbol\beta}$ satisfies:</div>
+    <button class="option-btn" onclick="answer(this,'q31',false)">A. The residuals $y_i - \hat\mu_i$ are identically zero for all $i$</button>
+    <button class="option-btn" onclick="answer(this,'q31',true)">B. A weighted combination of residuals, weighted by the derivative of the mean and inverse variance, sums to zero for each predictor direction</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">C. The sum of squared residuals equals zero</button>
+    <button class="option-btn" onclick="answer(this,'q31',false)">D. $\hat{\boldsymbol\beta} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}$ for all GLMs</button>
+    <div class="feedback-bar" id="fb-q31"></div>
+  </div>
+
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In the GLM exponential family formulation, $c(y, \phi, w)$ depends on the canonical parameter $\theta$ and must therefore be estimated along with $\boldsymbol\beta$.</div>
+    <button class="option-btn" onclick="answer(this,'q32',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q32',true)">False</button>
+    <div class="feedback-bar" id="fb-q32"></div>
+  </div>
+
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · Deviance vs. Pearson</div>
+    <div class="question-stem">The deviance $D$ and Pearson $X^2$ statistics are both used as GOF measures in GLMs. Which statement best distinguishes them?</div>
+    <button class="option-btn" onclick="answer(this,'q33',false)">A. $D$ uses squared residuals; $X^2$ uses likelihood ratios</button>
+    <button class="option-btn" onclick="answer(this,'q33',true)">B. $D$ is based on a log-likelihood ratio comparing fitted to saturated model; $X^2$ is based on Pearson-type $(O-E)^2/E$ comparisons; both estimate $\phi$ equivalently via $X^2/(N-p)$ and $D/(N-p)$</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">C. $D$ is always smaller than $X^2$ for the same data and model</button>
+    <button class="option-btn" onclick="answer(this,'q33',false)">D. $X^2$ requires the canonical link while $D$ does not</button>
+    <div class="feedback-bar" id="fb-q33"></div>
+  </div>
+
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For the Bernoulli distribution in the canonical exponential family, $b''(\theta) = \pi(1-\pi)$ equals the variance of $y$, confirming $V(\mu) = \mu(1-\mu)$.</div>
+    <button class="option-btn" onclick="answer(this,'q34',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q34',false)">False</button>
+    <div class="feedback-bar" id="fb-q34"></div>
+  </div>
+
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · Grouped Data</div>
+    <div class="question-stem">When the response is the <em>mean</em> of $n_i$ observations in a GLM with $a(\phi, w_i) = \phi/w_i$, the appropriate weight is:</div>
+    <button class="option-btn" onclick="answer(this,'q35',false)">A. $w_i = 1$</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">B. $w_i = 1/n_i$</button>
+    <button class="option-btn" onclick="answer(this,'q35',true)">C. $w_i = n_i$</button>
+    <button class="option-btn" onclick="answer(this,'q35',false)">D. $w_i = \sqrt{n_i}$</button>
+    <div class="feedback-bar" id="fb-q35"></div>
+  </div>
+
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Inverse Gaussian</div>
+    <div class="question-stem">The variance function for the Inverse Gaussian distribution $\text{IG}(\mu, \sigma^2)$ is:</div>
+    <button class="option-btn" onclick="answer(this,'q36',false)">A. $\mu$</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">B. $\mu^2$</button>
+    <button class="option-btn" onclick="answer(this,'q36',true)">C. $\mu^3$</button>
+    <button class="option-btn" onclick="answer(this,'q36',false)">D. $1/\mu$</button>
+    <div class="feedback-bar" id="fb-q36"></div>
+  </div>
+
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: In the teratology study, all four methods (Binomial, Binomial+Sandwich, Quasi-binomial, Beta-Binomial) produced different point estimates for $\boldsymbol\beta$.</div>
+    <button class="option-btn" onclick="answer(this,'q37',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q37',true)">False</button>
+    <div class="feedback-bar" id="fb-q37"></div>
+  </div>
+
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · Quasi-Likelihood GEE</div>
+    <div class="question-stem">The quasi-score equations are also referred to as:</div>
+    <button class="option-btn" onclick="answer(this,'q38',false)">A. Empirical likelihood equations</button>
+    <button class="option-btn" onclick="answer(this,'q38',true)">B. Generalized estimating equations (GEE)</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">C. Marginal likelihood equations</button>
+    <button class="option-btn" onclick="answer(this,'q38',false)">D. Restricted maximum likelihood (REML) equations</button>
+    <div class="feedback-bar" id="fb-q38"></div>
+  </div>
+
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Gamma Link Functions</div>
+    <div class="question-stem">The exponential (log) link for the Gamma distribution $\mu_i = \exp(\mathbf{x}_i^T\boldsymbol\beta)$ has what advantage over the canonical inverse link?</div>
+    <button class="option-btn" onclick="answer(this,'q39',true)">A. It removes constraints on the regression coefficients — they can take any real value without risking negative fitted means</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">B. It guarantees a unique MLE</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">C. It makes the log-likelihood concave</button>
+    <button class="option-btn" onclick="answer(this,'q39',false)">D. It equals the canonical link in the limit</button>
+    <div class="feedback-bar" id="fb-q39"></div>
+  </div>
+
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: When the variance function in a quasi-likelihood model is misspecified, the quasi-MLE loses consistency but gains efficiency.</div>
+    <button class="option-btn" onclick="answer(this,'q40',false)">True</button>
+    <button class="option-btn" onclick="answer(this,'q40',true)">False</button>
+    <div class="feedback-bar" id="fb-q40"></div>
+  </div>
+
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · Normal GLM</div>
+    <div class="question-stem">For the normal distribution in the exponential family, $b(\theta) = \theta^2/2$. What is $b'(\theta)$?</div>
+    <button class="option-btn" onclick="answer(this,'q41',false)">A. $\theta^2$</button>
+    <button class="option-btn" onclick="answer(this,'q41',true)">B. $\theta = \mu$ — confirming the identity canonical link</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">C. $1/\theta$</button>
+    <button class="option-btn" onclick="answer(this,'q41',false)">D. $2\theta$</button>
+    <div class="feedback-bar" id="fb-q41"></div>
+  </div>
+
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · R Output Interpretation</div>
+    <div class="question-stem">In the Janka Gamma GLM output: "(Dispersion parameter for Gamma family taken to be 0.009716208)". This value $\hat\phi$ was estimated by:</div>
+    <button class="option-btn" onclick="answer(this,'q42',false)">A. Maximum likelihood</button>
+    <button class="option-btn" onclick="answer(this,'q42',true)">B. Method of moments — specifically $\hat\phi = X^2/(N-p)$ using the Pearson statistic</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">C. Profile likelihood</button>
+    <button class="option-btn" onclick="answer(this,'q42',false)">D. It is fixed at 1 for the Gamma family</button>
+    <div class="feedback-bar" id="fb-q42"></div>
+  </div>
+
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · Underdispersion</div>
+    <div class="question-stem">Fitting a standard binomial model when $\phi < 1$ (underdispersion) will:</div>
+    <button class="option-btn" onclick="answer(this,'q43',false)">A. Inflate the Type I error rate</button>
+    <button class="option-btn" onclick="answer(this,'q43',true)">B. Reduce statistical power (standard errors are too large)</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">C. Have no effect on inference</button>
+    <button class="option-btn" onclick="answer(this,'q43',false)">D. Bias the coefficient estimates toward zero</button>
+    <div class="feedback-bar" id="fb-q43"></div>
+  </div>
+
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The sandwich (robust) estimator $\hat{\mathbf{A}} = (\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}\hat{\mathbf{V}}_q(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$ provides a consistent estimate of the true covariance matrix of $\hat{\boldsymbol\beta}_q$ even when the variance function is misspecified.</div>
+    <button class="option-btn" onclick="answer(this,'q44',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q44',false)">False</button>
+    <div class="feedback-bar" id="fb-q44"></div>
+  </div>
+
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Beta-Binomial Estimation</div>
+    <div class="question-stem">The beta-binomial model parameters are estimated by:</div>
+    <button class="option-btn" onclick="answer(this,'q45',false)">A. IWLS only, since it is a GLM</button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">B. Method of moments for all parameters</button>
+    <button class="option-btn" onclick="answer(this,'q45',true)">C. Full maximum likelihood (since it is not in the natural exponential family, IWLS does not directly apply)</button>
+    <button class="option-btn" onclick="answer(this,'q45',false)">D. Profile likelihood for $\rho$ only; IWLS for $\boldsymbol\beta$</button>
+    <div class="feedback-bar" id="fb-q45"></div>
+  </div>
+
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: For the Normal distribution as a GLM member, $b''(\theta) = 1$, so the variance function $V(\mu) = 1$, meaning the variance does not depend on the mean (it depends only on $\phi = \sigma^2$).</div>
+    <button class="option-btn" onclick="answer(this,'q46',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q46',false)">False</button>
+    <div class="feedback-bar" id="fb-q46"></div>
+  </div>
+
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · Janka Box-Cox</div>
+    <div class="question-stem">The Box-Cox analysis on the Janka data gave $\hat\lambda \approx 0.15$ for the quadratic model. This is closest to what transformation?</div>
+    <button class="option-btn" onclick="answer(this,'q47',false)">A. Square root ($\lambda = 0.5$)</button>
+    <button class="option-btn" onclick="answer(this,'q47',true)">B. Log ($\lambda = 0$)</button>
+    <button class="option-btn" onclick="answer(this,'q47',false)">C. Identity ($\lambda = 1$)</button>
+    <button class="option-btn" onclick="answer(this,'q47',false)">D. Reciprocal ($\lambda = -1$)</button>
+    <div class="feedback-bar" id="fb-q47"></div>
+  </div>
+
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · Concept Integration</div>
+    <div class="question-stem">Why does the Gamma GLM with square-root link provide better prediction intervals for the Janka data than ordinary quadratic regression?</div>
+    <button class="option-btn" onclick="answer(this,'q48',false)">A. It produces smaller fitted values at high density</button>
+    <button class="option-btn" onclick="answer(this,'q48',true)">B. The Gamma variance function $V(\mu) = \mu^2$ allows prediction intervals that widen with the response level — giving tight intervals for low-density timber and wide ones for high-density, appropriately reflecting the heteroscedasticity</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">C. It uses fewer parameters than the quadratic model</button>
+    <button class="option-btn" onclick="answer(this,'q48',false)">D. It applies a log transformation to the response automatically</button>
+    <div class="feedback-bar" id="fb-q48"></div>
+  </div>
+
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · True / False</div>
+    <div class="question-stem">TRUE or FALSE: The negative binomial distribution belongs to the canonical exponential family and can be directly fit as a standard GLM.</div>
+    <button class="option-btn" onclick="answer(this,'q49',true)">True</button>
+    <button class="option-btn" onclick="answer(this,'q49',false)">False</button>
+    <div class="feedback-bar" id="fb-q49"></div>
+  </div>
+
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integrative</div>
+    <div class="question-stem">A researcher observes clustered count data with empirical variance much larger than $\hat\mu_i$ (the Poisson mean estimate). The most appropriate modeling strategy is:</div>
+    <button class="option-btn" onclick="answer(this,'q50',false)">A. Fit a standard Poisson GLM and report the deviance test</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">B. Log-transform the counts and use linear regression</button>
+    <button class="option-btn" onclick="answer(this,'q50',true)">C. Consider a quasi-Poisson (scale model), negative binomial, or mixed Poisson model; use the sandwich estimator if the variance structure is uncertain</button>
+    <button class="option-btn" onclick="answer(this,'q50',false)">D. Use a Gamma GLM with a log link, since Poisson is not appropriate for large counts</button>
+    <div class="feedback-bar" id="fb-q50"></div>
+  </div>
+
+</div><!-- end mcq -->
+
+<!-- ═══════ SHORT ANSWER ═══════ -->
+<div class="sa-section" id="sa">
+  <h2>Oral Exam Short Answer — 10 Questions</h2>
+  <p style="margin-bottom:20px;font-size:0.93em;color:#555;">Designed for oral examination with follow-up discussion. Click "Reveal Answer" to see a model response.</p>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · GLM Structure</div>
+    <div class="question-stem">Describe the two components of a GLM. How does this framework unify linear, logistic, and Poisson regression? What is the role of the canonical parameter $\theta$ and the function $b(\theta)$?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa1')">Reveal Answer</button>
+    <div class="answer-panel" id="sa1">
+      <strong>Model Answer:</strong><br>
+      A GLM has two components. The <strong>systematic part</strong> describes the mean: $\mu_i = h(\eta_i) = h(\mathbf{x}_i^T\boldsymbol\beta)$, where $h$ is the response function and $g = h^{-1}$ is the link function. The <strong>distribution part</strong> requires $y_i$ to belong to the canonical exponential family: $f(y_i|\theta_i) = \exp\{[y_i\theta_i - b(\theta_i)]/a(\phi, w_i) + c(y_i, \phi, w_i)\}$.
+      <br><br>
+      The framework unifies models by varying the family and link: linear regression uses Normal + identity link; logistic uses Bernoulli + logit link; Poisson regression uses Poisson + log link. All use the same IWLS estimation algorithm.
+      <br><br>
+      The canonical parameter $\theta$ is the "natural" parameterisation of the distribution — it is the quantity that appears linearly in the exponent. The function $b(\theta)$ is the log-normalising constant that ensures the density integrates to 1; crucially, its derivatives generate the moments: $b'(\theta) = E(y) = \mu$ and $b''(\theta) = V(\mu)$, the variance function. This makes $b(\theta)$ the central object connecting distribution, mean, and variance in the GLM framework.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>What is the difference between a canonical and a non-canonical link?</li>
+          <li>Why does the function $c(y, \phi, w)$ not need to be estimated?</li>
+          <li>Can you give an example of a GLM with a non-canonical link?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Two Fundamental Identities</div>
+    <div class="question-stem">Derive the mean and variance formulas for the exponential family from the two fundamental identities. What is the variance function and why is it important?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa2')">Reveal Answer</button>
+    <div class="answer-panel" id="sa2">
+      <strong>Model Answer:</strong><br>
+      Starting from $\int f(y|\theta)\,dy = 1$, differentiating once with respect to $\theta$ gives $E(\partial\ell/\partial\theta) = 0$ (Identity 1). Since $\partial\ell/\partial\theta = [y - b'(\theta)]/a(\phi, w)$, Identity 1 yields:
+      $$\frac{\mu - b'(\theta)}{a(\phi,w)} = 0 \implies \boxed{E(y) = \mu = b'(\theta)}$$
+      Differentiating twice gives $E(\partial^2\ell/\partial\theta^2) + E[(\partial\ell/\partial\theta)^2] = 0$ (Identity 2). Since $\partial^2\ell/\partial\theta^2 = -b''(\theta)/a(\phi,w)$:
+      $$-\frac{b''(\theta)}{a(\phi,w)} + \frac{\text{Var}(y)}{a(\phi,w)^2} = 0 \implies \boxed{\text{Var}(y) = b''(\theta)\cdot a(\phi,w)}$$
+      The <strong>variance function</strong> $V(\mu) = b''(\theta)$ captures how variance depends on the mean — a structural feature distinguishing GLM families. For Normal: $V(\mu)=1$ (constant variance); Poisson: $V(\mu)=\mu$ (variance equals mean); Binomial: $V(\mu)=\mu(1-\mu)$; Gamma: $V(\mu)=\mu^2$ (constant CV). Choosing a model involves choosing the right $V(\mu)$.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>How does the canonical link arise from $b'(\theta) = \mu$?</li>
+          <li>What happens in the normal GLM — is $b''(\theta)$ a function of $\mu$?</li>
+          <li>Why does a Poisson model assume variance equals mean? When is this violated?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · MLE and IWLS</div>
+    <div class="question-stem">Explain how the MLE for GLM regression coefficients is computed via IWLS. What are the advantages of canonical links for estimation? What can prevent convergence?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa3')">Reveal Answer</button>
+    <div class="answer-panel" id="sa3">
+      <strong>Model Answer:</strong><br>
+      The GLM log-likelihood gives score $\mathbf{S}(\boldsymbol\beta) = \mathbf{X}^T\mathbf{D}\boldsymbol\Sigma^{-1}(\mathbf{y}-\boldsymbol\mu)$ and information $\mathbf{I}(\boldsymbol\beta) = \mathbf{X}^T\mathbf{W}\mathbf{X}$ where $\mathbf{W} = \text{diag}(h'(\eta_i)^2/\sigma_i^2)$. Fisher scoring updates: $\boldsymbol\beta^{k+1} \approx \boldsymbol\beta^k + (\mathbf{X}^T\hat{\mathbf{W}}\mathbf{X})^{-1}\mathbf{X}^T\hat{\mathbf{D}}\hat{\boldsymbol\Sigma}^{-1}(\mathbf{y}-\hat{\boldsymbol\mu})$. This is identical to solving a weighted least squares problem at each step — the "working response" is $\mathbf{z} = \hat{\boldsymbol\eta} + \hat{\mathbf{D}}(\mathbf{y}-\hat{\boldsymbol\mu})\cdot\hat\sigma_i^{-2}$.
+      <br><br>
+      <strong>Canonical link advantages:</strong> (1) Expected and observed information coincide, so Fisher scoring equals Newton-Raphson exactly. (2) The log-likelihood is globally concave, guaranteeing the MLE is unique whenever $\mathbf{X}^T\mathbf{W}\mathbf{X}$ is invertible. (3) No risk of multiple local maxima.
+      <br><br>
+      <strong>Convergence failures:</strong> Even when $\mathbf{X}^T\mathbf{X}$ is invertible, $\mathbf{X}^T\mathbf{W}\mathbf{X}$ may not be — e.g., perfect separation in logistic regression drives $\hat\pi \to 0$ or $1$, making $w_i = \hat\pi_i(1-\hat\pi_i) \to 0$ for some observations. For non-canonical links, multiple maxima are possible.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>What is the "working response" in IWLS and how is it constructed?</li>
+          <li>How does the asymptotic distribution of $\hat{\boldsymbol\beta}$ follow from the Fisher information?</li>
+          <li>Why is perfect separation a problem unique to logistic (and not linear) regression?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · Dispersion Parameter</div>
+    <div class="question-stem">Why is the dispersion parameter $\phi$ not estimated via maximum likelihood in most GLMs? How is it estimated, and how does this estimation connect to model fit?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa4')">Reveal Answer</button>
+    <div class="answer-panel" id="sa4">
+      <strong>Model Answer:</strong><br>
+      In the score equations, $\phi$ appears as a common factor: $\mathbf{S}(\boldsymbol\beta) = (1/\phi)\sum_i w_i(y_i-\mu_i)/V(\mu_i)\cdot\partial\mu_i/\partial\boldsymbol\beta = \mathbf{0}$. Since $\phi > 0$ is a scalar, it cancels from the score equations entirely. Consequently, $\hat{\boldsymbol\beta}$ does not depend on $\phi$ — only the standard errors and test statistics do.
+      <br><br>
+      ML estimation of $\phi$ is often impractical due to boundary issues (e.g., the log-likelihood can be unbounded as $\phi \to 0$ for some families). Instead, the method of moments is used:
+      $$\hat\phi = \frac{X^2}{N-p} = \frac{1}{N-p}\sum_i \frac{w_i(y_i - \hat\mu_i)^2}{V(\hat\mu_i)}$$
+      This connects directly to model fit: $X^2/\phi \sim \chi^2(N-p)$ under the correct model, so $E(X^2) = (N-p)\phi$ and the moment estimator is unbiased. For the normal model, $\hat\phi = s^2$ exactly. Large $\hat\phi > 1$ signals overdispersion; small $\hat\phi < 1$ signals underdispersion.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>For Poisson and Bernoulli, $\phi=1$ is known. What does this mean for variance estimation?</li>
+          <li>How does $\hat\phi$ affect hypothesis tests about $\boldsymbol\beta$?</li>
+          <li>Why is $\hat\phi = X^2/(N-p)$ preferred over $D/(N-p)$?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Gamma GLM (Janka)</div>
+    <div class="question-stem">Walk through the statistical reasoning that led to choosing a Gamma GLM with a square-root link for the Janka hardness data. What does this model assume about the mean-variance relationship, and how does it improve upon ordinary quadratic regression?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa5')">Reveal Answer</button>
+    <div class="answer-panel" id="sa5">
+      <strong>Model Answer:</strong><br>
+      The Janka data exhibit two problems: (1) curvature — a linear model of density is inadequate; (2) heteroscedasticity — variance grows with density. A quadratic linear model addresses (1) but not (2): residuals show a clear fan shape and the Breusch-Pagan test rejects constant variance ($p = 0.036$).
+      <br><br>
+      Box-Cox analysis gives the clue: $\hat\lambda \approx 0.47$ (near $0.5$) for the linear model suggests a square-root transformation to linearise; $\hat\lambda \approx 0.15$ (near $0$) for the quadratic model suggests a log transformation to stabilise variance. These two needs conflict in a standard transformation approach.
+      <br><br>
+      John Nelder's insight: a Gamma GLM with a square-root link achieves both simultaneously. The model is $\sqrt{\mu_i} = \beta_0 + \beta_1 x_i$, or equivalently $\mu_i = (\beta_0 + \beta_1 x_i)^2$ — making $\mu$ quadratic in density while keeping the linear predictor linear. The Gamma distribution's variance function $V(\mu) = \mu^2$ implies $\text{Var}(y) \propto \mu^2$, exactly the mean-proportional variance observed. The estimated $D^* \approx 33.8 \approx 34 = N-p$ confirms good fit.
+      <br><br>
+      Advantages over quadratic regression: (1) appropriate heteroscedastic prediction intervals (tighter for low-density, wider for high-density timber); (2) principled model fit assessment via scaled deviance; (3) no violation of normality assumptions at extreme density values.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why is the square-root link non-canonical for the Gamma?</li>
+          <li>How does $V(\mu) = \mu^2$ give a constant coefficient of variation?</li>
+          <li>What is the interpretation of $\hat\nu$ (the scale parameter) in the Gamma model?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Quasi-Likelihood</div>
+    <div class="question-stem">Explain the quasi-likelihood approach. What is a scale model? What are the consequences of overdispersion for inference, and how does quasi-likelihood address them?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa6')">Reveal Answer</button>
+    <div class="answer-panel" id="sa6">
+      <strong>Model Answer:</strong><br>
+      Quasi-likelihood directly specifies a variance function $\text{Var}_q(y_i)$ without assuming a particular distribution. The quasi-score equations $\sum_i (y_i-\mu_i)/\text{Var}_q(y_i)\cdot\partial\mu_i/\partial\beta_j = 0$ (GEE) have the same form as GLM score equations. The quasi-log-likelihood $q_i(\mu_i) = \int_{y_i}^{\mu_i}(y_i-z)/\text{Var}_q(z)\,dz$ behaves like a log-likelihood but is not in general a proper likelihood.
+      <br><br>
+      A <strong>scale model</strong> sets $\text{Var}_q(y_i) = \phi V(\mu_i)$ — inflating the GLM variance by a dispersion factor $\phi$. For scale models, $\hat{\boldsymbol\beta}_q = \hat{\boldsymbol\beta}$ (point estimates unchanged) but $\text{sd}(\hat\beta_{qk}) = \sqrt{\phi}\cdot\text{sd}(\hat\beta_k)$.
+      <br><br>
+      <strong>Overdispersion consequences:</strong> If $\phi > 1$ and we ignore it (fit standard Poisson/binomial), SEs are underestimated by a factor $\sqrt{\phi}$. z-statistics are inflated, p-values are too small — inflated Type I error. In the teratology example, $\hat\phi = 2.94$: the hemoglobin variable `hb` is "significant" in the standard binomial ($p=0.032$) but non-significant in the quasi-binomial ($p=0.216$) after proper SE inflation.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>How is $\hat\phi$ estimated in the quasi-likelihood framework?</li>
+          <li>What is the difference between quasi-Poisson and negative binomial for overdispersion?</li>
+          <li>Why can't we use AIC to compare quasi-likelihood models?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · Sandwich Estimator</div>
+    <div class="question-stem">Explain the sandwich estimator of the covariance matrix. When is it needed, what does it provide, and what is its cost?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa7')">Reveal Answer</button>
+    <div class="answer-panel" id="sa7">
+      <strong>Model Answer:</strong><br>
+      When the working variance $\text{Var}_q(y_i)$ in a quasi-likelihood model may be misspecified, the naive covariance estimate $(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$ is inconsistent for the true covariance of $\hat{\boldsymbol\beta}_q$. The sandwich estimator corrects this:
+      $$\hat{\mathbf{A}} = (\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}\hat{\mathbf{V}}_q(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$$
+      where the "meat" $\hat{\mathbf{V}}_q = \sum_i (\partial\hat\mu_i/\partial\boldsymbol\beta)(y_i-\hat\mu_i)^2/V_q^2(\hat\mu_i)(\partial\hat\mu_i/\partial\boldsymbol\beta)^T$ uses the actual squared residuals.
+      <br><br>
+      <strong>When needed:</strong> Whenever we suspect the working variance structure may be misspecified (e.g., independence assumed but responses are clustered). In R: <code>coeftest(model, vcov=sandwich)</code>.
+      <br><br>
+      <strong>What it provides:</strong> Consistency — it converges to the true covariance matrix as $n \to \infty$ regardless of the working variance choice (provided the mean structure is correctly specified).
+      <br><br>
+      <strong>Cost:</strong> Efficiency is lost when the working variance is far from the true variance. If the working variance is correct, the sandwich estimator reduces to $(\mathbf{X}^T\hat{\mathbf{W}}_q\mathbf{X})^{-1}$, so there is no harm in using it when uncertain.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Why is it called a "sandwich" estimator?</li>
+          <li>Is the sandwich estimator ever biased in finite samples?</li>
+          <li>In the teratology example, how do quasi-binomial SEs compare to sandwich SEs?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Beta-Binomial</div>
+    <div class="question-stem">Describe the hierarchical construction of the beta-binomial model. How does it model overdispersion, and what is the role of $\rho$ (the intraclass correlation)?</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa8')">Reveal Answer</button>
+    <div class="answer-panel" id="sa8">
+      <strong>Model Answer:</strong><br>
+      The beta-binomial arises from a two-stage hierarchical model. At the cluster level, the success probability $p$ is not fixed but random, following $p \sim \text{Beta}(\alpha_1, \alpha_2)$. Conditional on $p$, the $m$ binary observations in the cluster are independent Bernoulli($p$). Marginalising over $p$:
+      $$E(y_i) = \mu, \quad \text{Var}(y_i) = \mu(1-\mu), \quad \text{corr}(y_i, y_j) = \rho$$
+      where $\mu = \alpha_1/(\alpha_1+\alpha_2)$ and $\rho = 1/(\alpha_1+\alpha_2+1)$.
+      <br><br>
+      For the cluster sum $y = \sum y_i$: $\text{Var}(y) = m\mu(1-\mu)[1+(m-1)\rho]$. This exceeds the binomial variance $m\mu(1-\mu)$ by the factor $[1+(m-1)\rho]$ — the overdispersion caused by within-cluster correlation. When $\rho = 0$, the model reduces to the binomial.
+      <br><br>
+      The beta-binomial is not in the natural exponential family, so standard IWLS doesn't apply — all parameters ($\boldsymbol\beta$ for the mean, $\rho$ for the overdispersion) are estimated by full ML. One can also model $\rho$ as a function of covariates (group-varying $\phi$). In the teratology example, the placebo group shows much higher overdispersion ($\hat\rho = 0.327$) than injected groups — suggesting the litter effect is strongest without iron supplementation.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>How does the beta-binomial compare to the quasi-binomial approach?</li>
+          <li>What is the marginal density of $y$ in the beta-binomial, and what role do Gamma functions play?</li>
+          <li>When would you prefer the beta-binomial over quasi-likelihood?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Canonical vs. Non-Canonical Links</div>
+    <div class="question-stem">Compare the statistical and practical differences between using a canonical link versus a non-canonical link in a GLM. Give examples where a non-canonical link is preferred.</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa9')">Reveal Answer</button>
+    <div class="answer-panel" id="sa9">
+      <strong>Model Answer:</strong><br>
+      The <strong>canonical link</strong> sets $\eta_i = g_c(\mu_i) = \theta_i$ (the natural parameter). This has mathematical advantages: the log-likelihood is globally concave (unique MLE), expected and observed information coincide (Newton-Raphson = Fisher scoring), and sufficient statistics have a simple form. Examples: logit for Binomial, log for Poisson, identity for Normal, inverse for Gamma.
+      <br><br>
+      <strong>Non-canonical links</strong> sacrifice these mathematical conveniences but may be substantively better: (1) <strong>Probit link</strong> for Binomial: arises from a latent normal variable model; more natural in some psychometric and econometric contexts. (2) <strong>Log link for Gamma</strong>: $\mu_i = e^{\mathbf{x}_i^T\boldsymbol\beta}$ removes all constraints on $\boldsymbol\beta$ (the canonical inverse link requires $\boldsymbol\beta$ to give positive $-1/\mu_i$, which can be violated during fitting). (3) <strong>Square-root link for Gamma</strong> (Janka example): makes the linear predictor linear in density, matching the physical relationship, while the Gamma variance function handles heteroscedasticity. (4) <strong>Complementary log-log for Binomial</strong>: appropriate when the probability of the event approaches 1 sharply (survival data, extreme value models).
+      <br><br>
+      The key practical consideration: with non-canonical links, convergence may be slower and multiple maxima are possible. Canonical links offer robustness during fitting; non-canonical links offer subject-matter appropriateness.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Can the log link ever be the canonical link? For which distribution?</li>
+          <li>What happens to the Fisher information matrix under a non-canonical link?</li>
+          <li>Is it possible for both canonical and non-canonical links to give the same fitted values?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · Critical Thinking</div>
+    <div class="question-stem">Critically evaluate the following statement: "If all four methods — standard binomial, binomial with sandwich, quasi-binomial, and beta-binomial — give the same point estimates for $\boldsymbol\beta$, they are essentially equivalent and the choice between them doesn't matter."</div>
+    <button class="reveal-btn" onclick="toggleAnswer('sa10')">Reveal Answer</button>
+    <div class="answer-panel" id="sa10">
+      <strong>Model Answer:</strong><br>
+      The statement is fundamentally incorrect. While the point estimates $\hat{\boldsymbol\beta}$ are identical across all four methods for scale models (the score equations have the same solution), the methods differ critically in several dimensions:
+      <br><br>
+      <strong>1. Standard errors and inference:</strong> The standard binomial SEs are too small when overdispersion is present ($\phi > 1$), inflating Type I error. The quasi-binomial, sandwich, and beta-binomial give larger, more appropriate SEs — potentially changing which predictors appear significant (as seen with `hb` in the teratology example).
+      <br><br>
+      <strong>2. Modelling assumptions and testability:</strong> The beta-binomial makes explicit distributional assumptions (Beta-distributed random probability) that can be tested and interpreted. It provides a proper likelihood — enabling LRTs to compare overdispersion models and to test whether $\rho$ varies by group. The quasi-likelihood approach makes no such distributional claim and cannot use likelihood-based model comparison.
+      <br><br>
+      <strong>3. Model selection:</strong> AIC is available for the binomial and beta-binomial (proper likelihood), not for quasi-likelihood. This matters when choosing between competing models.
+      <br><br>
+      <strong>4. Interpretation of overdispersion:</strong> The beta-binomial's $\rho$ has a clear mechanistic interpretation (within-cluster correlation due to a random effect). The quasi-binomial's $\phi$ is a phenomenological correction without mechanistic content. For scientific inference about the data-generating process, the beta-binomial provides richer information.
+      <br><br>
+      <strong>5. Finite-sample performance:</strong> The sandwich estimator is asymptotically consistent but can be biased in small samples. The quasi-likelihood estimator is always unbiased for $\hat{\boldsymbol\beta}$ when the mean is correctly specified; the beta-binomial ML estimator converges to the true parameters. In small samples, the choice of method matters for the reliability of the SEs.
+      <br><br>
+      In summary, identical point estimates mask important differences in the validity of inference, the richness of the model, and the scope for model comparison.
+
+      <div class="followup-block">
+        <strong>Likely follow-up questions:</strong>
+        <ul style="margin:6px 0 0 20px">
+          <li>Under what conditions would the four methods give different point estimates?</li>
+          <li>What would you do if quasi-binomial and beta-binomial SEs were very different?</li>
+          <li>When is the sandwich estimator preferred over the quasi-likelihood approach?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sa -->
+
+<script>
+var answered = {}, correct = {};
+
+function answer(btn, qid, isCorrect) {
+  if (answered[qid]) return;
+  answered[qid] = true; correct[qid] = isCorrect;
+  var card = document.getElementById(qid);
+  card.querySelectorAll('.option-btn').forEach(function(b) {
+    b.disabled = true;
+    if (b === btn) b.classList.add(isCorrect ? 'correct' : 'incorrect');
+    else if (b.onclick.toString().includes('true')) b.classList.add('reveal-correct');
+  });
+  var fb = document.getElementById('fb-' + qid);
+  fb.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect — the highlighted option is correct.';
+  fb.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'incorrect');
+  updateScore();
+}
+
+function updateScore() {
+  var total = Object.keys(answered).length;
+  var corr  = Object.values(correct).filter(Boolean).length;
+  document.getElementById('score-display').textContent = 'Score: ' + corr + ' / ' + total;
+}
+
+function resetAll() {
+  answered = {}; correct = {};
+  document.querySelectorAll('.option-btn').forEach(function(b) { b.disabled = false; b.className = 'option-btn'; });
+  document.querySelectorAll('.feedback-bar').forEach(function(f) { f.textContent = ''; f.className = 'feedback-bar'; });
+  document.getElementById('score-display').textContent = 'Score: 0 / 0';
+}
+
+function toggleAnswer(id) {
+  var panel = document.getElementById(id);
+  var btn = panel.previousElementSibling;
+  if (panel.style.display === 'block') { panel.style.display = 'none'; btn.textContent = 'Reveal Answer'; }
+  else { panel.style.display = 'block'; btn.textContent = 'Hide Answer'; }
+}
+</script>
+</body>
+</html>
