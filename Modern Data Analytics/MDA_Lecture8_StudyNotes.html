@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 8 – Containerisation with Docker | Modern Data Analytics</title>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* Header */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* Nav */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa { background-color: #d1ecf1; color: #0c5460; }
+
+  /* Notes Section */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin-top: 22px;
+    margin-bottom: 6px;
+  }
+
+  .key-point   { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .computation-note { background: #fdf3f3; border-left: 4px solid #e57373; padding: 12px 18px; margin: 14px 0; }
+  .formula-box {
+    background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px;
+    padding: 12px 18px; margin: 14px 0;
+    font-family: 'Courier New', monospace; font-size: 0.93em;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  /* MCQ Section */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; margin-top: 0; }
+  .score-display {
+    background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px;
+    padding: 5px 18px; font-weight: 700; color: #856404;
+    display: inline-block; font-size: 0.95em; margin-bottom: 18px;
+  }
+  .mcq-card {
+    background: #f9fafb; border: 1px solid #e5e9f2;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em; font-weight: 700; color: #2e6da4;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+
+  .option-btn {
+    display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea;
+    border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left;
+    cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; pointer-events: none; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; pointer-events: none; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; pointer-events: none; }
+  .option-btn.locked { pointer-events: none; }
+
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  /* SA Section */
+  .sa-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #3b1d6e; font-size: 1.2em; margin-top: 0; }
+  .sa-card {
+    background: #faf9ff; border: 1px solid #e2dcf5;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1; font-size: 0.8em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin: 8px 0 12px 0; }
+
+  .reveal-btn {
+    background: #6f42c1; color: #ffffff; border: none; border-radius: 20px;
+    padding: 7px 22px; font-size: 0.88em; font-weight: 600;
+    cursor: pointer; margin-top: 12px; transition: background 0.2s;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff; border: 1px solid #d4c8f5;
+    border-radius: 8px; padding: 18px 22px;
+    margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  /* Reset button */
+  .reset-btn {
+    background: #1a3a5c; color: #fff; border: none;
+    border-radius: 20px; padding: 9px 26px;
+    font-size: 0.92em; font-weight: 700; cursor: pointer;
+    margin-bottom: 18px; transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  code { background: #eef2fb; border-radius: 4px; padding: 1px 6px; font-size: 0.92em; color: #1a3a5c; }
+  ul, ol { margin: 8px 0 8px 20px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <h1>Lecture 8 – Containerisation with Docker</h1>
+  <div class="subtitle">Modern Data Analytics (GOZ39A) &nbsp;|&nbsp; Docker &amp; Kubernetes &nbsp;|&nbsp; Exam Review Notes</div>
+</div>
+
+<!-- ── NAV ── -->
+<div class="nav-bar">
+  <a href="#what-is-docker">What is Docker?</a>
+  <a href="#components">Key Components</a>
+  <a href="#dockerfile">Dockerfile</a>
+  <a href="#storage">Storage &amp; Volumes</a>
+  <a href="#networking">Networking</a>
+  <a href="#compose">Docker Compose</a>
+  <a href="#kubernetes">Kubernetes</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STUDY NOTES
+══════════════════════════════════════════ -->
+
+<!-- 1. What is Docker? -->
+<div class="notes-section" id="what-is-docker">
+  <h2>1. What is Docker &amp; Why Does It Matter?</h2>
+
+  <div class="key-point">
+    <strong>Docker</strong> is a container-based platform for <em>developing, shipping, and running</em> applications inside lightweight, isolated environments called <strong>containers</strong>. It solves the classic "works on my machine" problem by packaging code together with all its dependencies.
+  </div>
+
+  <h3>The Core Problem</h3>
+  <p>A data scientist trains a model locally, shares the code, and teammates cannot reproduce the results — different OS versions, library mismatches, missing environment variables, etc. Docker solves this by bundling everything needed into a single portable unit.</p>
+
+  <div class="example-box">
+    <strong>Lunchbox analogy:</strong> A container is like a sealed lunchbox. You pack your meal (code + dependencies) inside. No matter which kitchen (Windows, Mac, Linux) you open it in, the contents are the same.
+  </div>
+
+  <h3>Benefits for Data Science</h3>
+  <table>
+    <thead><tr><th>Benefit</th><th>What it means in practice</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Reproducibility</strong></td><td>Identical environment every time — replicating ML experiments across machines</td></tr>
+      <tr><td><strong>Portability</strong></td><td>Run the same container on a laptop, a server, or the cloud without changes</td></tr>
+      <tr><td><strong>Scalability</strong></td><td>Lightweight containers can be spun up or torn down quickly to match demand</td></tr>
+      <tr><td><strong>Collaboration</strong></td><td>Share a Docker image instead of lengthy "setup" instructions</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Container vs. Virtual Machine</h3>
+  <div class="theorem-box">
+    A <strong>VM</strong> virtualises an entire OS (heavy — GBs, slow boot). A <strong>container</strong> shares the host OS kernel and only packages the application layer (lightweight — MBs, starts in seconds). Containers are faster and cheaper to run, but share the host kernel so they are less isolated than VMs.
+  </div>
+</div>
+
+<!-- 2. Key Docker Components -->
+<div class="notes-section" id="components">
+  <h2>2. Key Docker Components</h2>
+
+  <table>
+    <thead><tr><th>Component</th><th>Role</th><th>Analogy</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Dockerfile</strong></td><td>Text file with instructions to <em>build</em> an image</td><td>Recipe card</td></tr>
+      <tr><td><strong>Docker Image</strong></td><td>Read-only template created from a Dockerfile; static and persisted</td><td>Snapshot / blueprint</td></tr>
+      <tr><td><strong>Docker Container</strong></td><td>Running instance of an image; writable, ephemeral by default</td><td>Running process from the blueprint</td></tr>
+      <tr><td><strong>Docker Registry</strong></td><td>Repository that stores and distributes images (e.g., Docker Hub)</td><td>App store for images</td></tr>
+      <tr><td><strong>Docker Daemon</strong></td><td>Background service that manages containers and images on the host</td><td>The engine behind the scenes</td></tr>
+      <tr><td><strong>Docker CLI</strong></td><td>Command-line tool to interact with the daemon</td><td>Steering wheel</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>Workflow:</strong> <code>Dockerfile</code> → <strong>build</strong> → <code>Image</code> → <strong>run</strong> → <code>Container</code>. Separately, images can be <strong>pushed</strong> to a registry and <strong>pulled</strong> by others.
+  </div>
+
+  <h3>Essential CLI Commands</h3>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>docker run &lt;image&gt;</code></td><td>Start a container from an image (pulls if not local)</td></tr>
+      <tr><td><code>docker pull &lt;image&gt;</code></td><td>Fetch image from registry without running it</td></tr>
+      <tr><td><code>docker build -t name:tag .</code></td><td>Build image from Dockerfile in current directory</td></tr>
+      <tr><td><code>docker push &lt;image&gt;</code></td><td>Upload image to a registry</td></tr>
+      <tr><td><code>docker images</code></td><td>List locally stored images</td></tr>
+      <tr><td><code>docker ps</code> / <code>docker ps -a</code></td><td>List running / all containers</td></tr>
+      <tr><td><code>docker stop / start / restart</code></td><td>Lifecycle management of containers</td></tr>
+      <tr><td><code>docker rm &lt;container&gt;</code></td><td>Delete a stopped container</td></tr>
+      <tr><td><code>docker rmi &lt;image&gt;</code></td><td>Delete an image (must remove containers first)</td></tr>
+      <tr><td><code>docker exec -it &lt;c&gt; bash</code></td><td>Open interactive shell inside a running container</td></tr>
+      <tr><td><code>docker --version</code></td><td>Verify installation and check CLI availability</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>Order matters when deleting:</strong> You cannot remove an image that has running or stopped containers based on it. Always <code>docker rm</code> the containers first, then <code>docker rmi</code> the image.
+  </div>
+</div>
+
+<!-- 3. Dockerfile -->
+<div class="notes-section" id="dockerfile">
+  <h2>3. Writing a Dockerfile</h2>
+
+  <p>A Dockerfile is a plain-text script Docker reads top-to-bottom. Each instruction creates a new <strong>read-only layer</strong> in the image.</p>
+
+  <h3>Core Instructions</h3>
+  <table>
+    <thead><tr><th>Instruction</th><th>Purpose</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>FROM</code></td><td>Declare base image (must be first)</td><td><code>FROM python:3.9</code></td></tr>
+      <tr><td><code>WORKDIR</code></td><td>Set working directory for subsequent commands</td><td><code>WORKDIR /app</code></td></tr>
+      <tr><td><code>COPY &lt;src&gt; &lt;dest&gt;</code></td><td>Copy files from host into image</td><td><code>COPY requirements.txt /tmp</code></td></tr>
+      <tr><td><code>RUN</code></td><td>Execute a shell command during build; result is committed as a new layer</td><td><code>RUN pip install -r /tmp/requirements.txt</code></td></tr>
+      <tr><td><code>ENV</code></td><td>Set environment variables</td><td><code>ENV DEBUG=false</code></td></tr>
+      <tr><td><code>EXPOSE</code></td><td>Document which port the app listens on (does not actually open it)</td><td><code>EXPOSE 8888</code></td></tr>
+      <tr><td><code>CMD</code></td><td>Default command run when container starts; only the last <code>CMD</code> takes effect</td><td><code>CMD ["python", "app.py"]</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Minimal data science Dockerfile:</strong>
+    <div class="formula-box">
+      FROM python:3.9<br>
+      COPY requirements.txt /tmp<br>
+      RUN pip install -r /tmp/requirements.txt
+    </div>
+    Running <code>docker build . -t docker-for-ds:1.0.0</code> creates the image. Then <code>docker run docker-for-ds:1.0.0 python --version</code> confirms Python 3.9 is available.
+  </div>
+
+  <h3>Layer Caching</h3>
+  <div class="theorem-box">
+    Docker caches each layer. If a layer's instruction and its inputs haven't changed, Docker reuses the cached layer — dramatically speeding up rebuilds. This is why it's best practice to copy <code>requirements.txt</code> and run <code>pip install</code> <em>before</em> copying the rest of the source code: dependency layers rarely change and stay cached.
+  </div>
+
+  <h3>Image Layers (Read-Only) vs Container Layer (Read-Write)</h3>
+  <p>An image is a stack of read-only layers (one per Dockerfile instruction). When you <code>docker run</code> an image, Docker adds a thin <strong>writable container layer</strong> on top. All runtime file writes go there. When the container is deleted, this layer is lost.</p>
+
+  <div class="warning-box">
+    <strong>Key exam point:</strong> <code>EXPOSE</code> is documentation only — it does NOT open a port on the host. To actually make a port accessible you must publish it at runtime with <code>-p &lt;host-port&gt;:&lt;container-port&gt;</code>.
+  </div>
+
+  <h3>VS Code Docker Extension Shortcut</h3>
+  <p>Instead of writing a Dockerfile manually, use <strong>Ctrl+Shift+P → Docker: Add Docker Files to Workspace</strong>. VS Code prompts for platform (Python, Node.js, etc.) and port, then auto-generates a valid Dockerfile and optional Compose file.</p>
+</div>
+
+<!-- 4. Storage & Volumes -->
+<div class="notes-section" id="storage">
+  <h2>4. Storing and Sharing Data</h2>
+
+  <div class="key-point">
+    By default, data written inside a container lives only in its <strong>writable container layer</strong> and is <strong>lost when the container is removed</strong>. To persist data, store it outside this layer using a mount.
+  </div>
+
+  <h3>The Three Mount Types</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Where data lives</th><th>Managed by</th><th>Best use case</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Volume</strong></td><td>Docker-managed area on host filesystem (<code>/var/lib/docker/volumes/</code>)</td><td>Docker</td><td>Persistent data across container restarts; sharing data between containers</td></tr>
+      <tr><td><strong>Bind mount</strong></td><td>Any path on the host filesystem</td><td>Host OS</td><td>Local dev — edit code on host, test inside container simultaneously</td></tr>
+      <tr><td><strong>tmpfs mount</strong></td><td>Host RAM only (never touches disk)</td><td>Host kernel</td><td>Sensitive/temporary data; fast in-memory scratch space</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Volumes in Practice</h3>
+  <div class="formula-box">
+    # Create<br>
+    docker volume create my-vol<br><br>
+    # Mount when running a container<br>
+    docker run -d -v my-vol:/app/data my-image<br><br>
+    # Inspect<br>
+    docker volume inspect my-vol<br><br>
+    # List / Remove<br>
+    docker volume ls<br>
+    docker volume rm my-vol
+  </div>
+
+  <div class="theorem-box">
+    <strong>Volumes vs. Bind mounts isolation:</strong> Volumes are fully managed and isolated by Docker — the host OS can't easily interfere. Bind mounts expose the host path directly; both host processes and container processes can write simultaneously, which is useful for development but less safe in production.
+  </div>
+
+  <h3>Bind Mounts in Practice</h3>
+  <div class="formula-box">
+    # ${PWD} = current working directory on the host<br>
+    docker run -v ${PWD}:/app/data my-image
+  </div>
+
+  <h3>tmpfs Mounts in Practice</h3>
+  <div class="formula-box">
+    docker run --tmpfs /app/logs my-image
+  </div>
+  <p>Everything written to <code>/app/logs</code> is stored in RAM. It disappears when the container stops — ideal for credentials, session tokens, or intermediate ML results that should never touch disk.</p>
+
+  <div class="warning-box">
+    <strong>tmpfs</strong> mounts are only available on Linux hosts. On Docker Desktop for Windows/Mac they are silently ignored or emulated.
+  </div>
+</div>
+
+<!-- 5. Networking -->
+<div class="notes-section" id="networking">
+  <h2>5. Docker Networking</h2>
+
+  <p>Each container runs in isolation. Without networking, containers cannot communicate with each other or the outside world. Docker networking provides the "wiring" between containers and the external network.</p>
+
+  <div class="example-box">
+    <strong>House analogy:</strong> Containers are rooms; the Docker host is the house. Network types define what kind of hallways and doors connect the rooms.
+  </div>
+
+  <h3>Network Types Compared</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Isolation</th><th>Typical use</th><th>Syntax highlight</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Bridge</strong> (default)</td><td>Private virtual network on a single host; containers can communicate by name on same bridge</td><td>Local multi-container apps; most common</td><td><code>docker run --network my-bridge ...</code></td></tr>
+      <tr><td><strong>Host</strong></td><td>No isolation — container shares host IP &amp; ports directly</td><td>Maximum performance; avoid in production</td><td><code>docker run --network host ...</code></td></tr>
+      <tr><td><strong>None</strong></td><td>Complete isolation — no network access at all</td><td>Security-critical offline processing</td><td><code>docker run --network none ...</code></td></tr>
+      <tr><td><strong>Overlay</strong></td><td>Cross-host private network (Docker Swarm)</td><td>Production clusters spanning multiple machines</td><td>Configured via Docker Swarm / Compose</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Publishing Ports (Bridge Network)</h3>
+  <div class="formula-box">
+    # Syntax: -p &lt;host-port&gt;:&lt;container-port&gt;<br>
+    docker run -p 8888:80 my-image
+  </div>
+  <p>This opens port 8888 on the host; requests to <code>localhost:8888</code> are forwarded to port 80 inside the container. Without <code>-p</code>, no traffic from outside can reach the container even on a bridge network.</p>
+
+  <div class="key-point">
+    On a <strong>custom bridge network</strong> (as opposed to the default bridge), containers can resolve each other by <strong>container name</strong> (DNS). On the default bridge, they can only communicate by IP address.
+  </div>
+
+  <h3>Creating a Custom Bridge Network</h3>
+  <div class="formula-box">
+    docker network create my-bridge<br>
+    docker run -d --name jupyter --network my-bridge jupyter/base-notebook<br>
+    docker run -d --name db     --network my-bridge postgres<br>
+    # jupyter can now reach postgres at hostname "db"
+  </div>
+
+  <div class="warning-box">
+    The default bridge network is created automatically when Docker is installed. However, it does <em>not</em> support DNS-based container name resolution — that is only available on user-defined bridge networks.
+  </div>
+</div>
+
+<!-- 6. Docker Compose -->
+<div class="notes-section" id="compose">
+  <h2>6. Docker Compose — Managing Multi-Container Apps</h2>
+
+  <div class="key-point">
+    <strong>Docker Compose</strong> lets you define an entire multi-container application in a single <code>docker-compose.yml</code> file and launch everything with one command: <code>docker-compose up</code>.
+  </div>
+
+  <h3>Why Compose?</h3>
+  <p>As a project grows (Jupyter + database + backend API), manually running long <code>docker run</code> commands becomes error-prone. Compose declaratively describes every service, its image, ports, volumes, environment variables, and dependencies.</p>
+
+  <h3>Core Compose Commands</h3>
+  <table>
+    <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>docker-compose up</code></td><td>Build (if needed) and start all services</td></tr>
+      <tr><td><code>docker-compose up -d</code></td><td>Start in detached (background) mode</td></tr>
+      <tr><td><code>docker-compose down</code></td><td>Stop and remove all containers defined in the file</td></tr>
+      <tr><td><code>docker-compose build</code></td><td>Re-build images without starting containers</td></tr>
+      <tr><td><code>docker-compose logs</code></td><td>Stream logs from all services</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Example: Jupyter + PostgreSQL</h3>
+  <div class="formula-box">
+    version: '3'<br>
+    services:<br>
+    &nbsp;&nbsp;jupyter:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;build: .<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;ports:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- "8888:8888"<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;volumes:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ./notebooks:/home/jovyan/work<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;depends_on:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- db<br>
+    &nbsp;&nbsp;db:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;image: postgres<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;restart: always<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;environment:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_USER: user<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_PASSWORD: password<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_DB: mydb<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;ports:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- "5432:5432"
+  </div>
+
+  <div class="theorem-box">
+    <strong><code>depends_on</code></strong> controls <em>start order</em> only — it does not wait for the database to be fully ready before starting the dependent service. For true readiness checks, healthchecks or tools like <em>wait-for-it</em> are needed.
+  </div>
+
+  <h3>Compose Benefits</h3>
+  <ul>
+    <li><strong>Reproducibility</strong> — the same YAML produces identical setups anywhere</li>
+    <li><strong>Collaboration</strong> — new team members run one command to get started</li>
+    <li><strong>Scalability</strong> — easily add more services without rewriting infra</li>
+  </ul>
+
+  <div class="warning-box">
+    Docker Compose creates services on a shared default network automatically, so containers within the same Compose file can reach each other by service name without explicit network configuration.
+  </div>
+</div>
+
+<!-- 7. Kubernetes -->
+<div class="notes-section" id="kubernetes">
+  <h2>7. Introduction to Kubernetes</h2>
+
+  <div class="key-point">
+    <strong>Kubernetes (K8s)</strong> is a container orchestration system that manages containers across <em>multiple machines (hosts)</em>. While Docker Compose handles multi-container apps on a single host, Kubernetes scales this to hundreds of machines in production.
+  </div>
+
+  <h3>Docker Compose vs Kubernetes</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>Docker Compose</th><th>Kubernetes</th></tr></thead>
+    <tbody>
+      <tr><td>Scale</td><td>Single machine</td><td>Multi-machine, production-ready</td></tr>
+      <tr><td>Complexity</td><td>Simple, easy to set up</td><td>Complex but powerful</td></tr>
+      <tr><td>Use case</td><td>Local dev &amp; testing</td><td>Production, large-scale systems</td></tr>
+      <tr><td>Configuration</td><td>One YAML file</td><td>Many YAML files (pods, services, etc.)</td></tr>
+      <tr><td>Self-healing</td><td>No automatic recovery</td><td>Automatically restarts crashed containers</td></tr>
+      <tr><td>Ecosystem</td><td>Basic networking &amp; volumes</td><td>Full orchestration: load balancing, autoscaling</td></tr>
+    </tbody>
+  </table>
+
+  <h3>When Kubernetes Shines</h3>
+  <ul>
+    <li>You need to run hundreds of containers across many servers</li>
+    <li>Automatic restart of crashed containers (self-healing)</li>
+    <li>Rolling updates with zero downtime</li>
+    <li>Automatic scaling (scale up under load, scale down when idle)</li>
+    <li>Load balancing across container replicas</li>
+  </ul>
+
+  <div class="theorem-box">
+    <strong>Mental model:</strong> Docker Compose = recipe for building a meal at home. Kubernetes = industrial kitchen management system for a chain of restaurants. Docker is the runtime; Kubernetes is the orchestrator that decides where, when, and how many Docker containers to run.
+  </div>
+
+  <div class="computation-note">
+    <strong>Practical note:</strong> Setting up Kubernetes from scratch is non-trivial. In practice, managed services (Google GKE, Amazon EKS, Azure AKS) abstract away much of the complexity. For the exam, focus on the conceptual differences between Compose and Kubernetes.
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     MCQ SECTION
+══════════════════════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False — 50 Questions</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Concept</div>
+    <div class="question-stem">Which problem does Docker primarily solve in a data science team context?</div>
+    <button class="option-btn" onclick="answer('q1',this,false)">A. Slow Python execution speed</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">B. Lack of version control for notebooks</button>
+    <button class="option-btn" onclick="answer('q1',this,true)">C. Inconsistent environments across team members' machines</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">D. Inability to run GPU workloads</button>
+    <div class="feedback-bar" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Components</div>
+    <div class="question-stem">What is the correct relationship between a Dockerfile, a Docker Image, and a Docker Container?</div>
+    <button class="option-btn" onclick="answer('q2',this,false)">A. Image → build → Dockerfile → run → Container</button>
+    <button class="option-btn" onclick="answer('q2',this,true)">B. Dockerfile → build → Image → run → Container</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">C. Container → build → Image → compile → Dockerfile</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">D. Dockerfile → run → Container → commit → Image</button>
+    <div class="feedback-bar" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · CLI</div>
+    <div class="question-stem">You want to download an image from Docker Hub without immediately starting a container. Which command do you use?</div>
+    <button class="option-btn" onclick="answer('q3',this,false)">A. <code>docker run</code></button>
+    <button class="option-btn" onclick="answer('q3',this,true)">B. <code>docker pull</code></button>
+    <button class="option-btn" onclick="answer('q3',this,false)">C. <code>docker fetch</code></button>
+    <button class="option-btn" onclick="answer('q3',this,false)">D. <code>docker get</code></button>
+    <div class="feedback-bar" id="q3-fb"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Dockerfile</div>
+    <div class="question-stem">In a Dockerfile, only the <em>last</em> occurrence of which instruction is executed when the container starts?</div>
+    <button class="option-btn" onclick="answer('q4',this,false)">A. <code>RUN</code></button>
+    <button class="option-btn" onclick="answer('q4',this,false)">B. <code>EXPOSE</code></button>
+    <button class="option-btn" onclick="answer('q4',this,true)">C. <code>CMD</code></button>
+    <button class="option-btn" onclick="answer('q4',this,false)">D. <code>COPY</code></button>
+    <div class="feedback-bar" id="q4-fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · True/False</div>
+    <div class="question-stem">True or False: The <code>EXPOSE</code> instruction in a Dockerfile automatically makes the specified port accessible from the host machine.</div>
+    <button class="option-btn" onclick="answer('q5',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q5',this,true)">False</button>
+    <div class="feedback-bar" id="q5-fb"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Storage</div>
+    <div class="question-stem">Which storage mount type stores data in the host machine's RAM and loses it when the container stops?</div>
+    <button class="option-btn" onclick="answer('q6',this,false)">A. Volume</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">B. Bind mount</button>
+    <button class="option-btn" onclick="answer('q6',this,true)">C. tmpfs mount</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">D. Overlay mount</button>
+    <div class="feedback-bar" id="q6-fb"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Storage</div>
+    <div class="question-stem">A data scientist wants to edit Python scripts on their host machine and have changes immediately reflected inside the running container. Which mount type is most appropriate?</div>
+    <button class="option-btn" onclick="answer('q7',this,false)">A. Volume</button>
+    <button class="option-btn" onclick="answer('q7',this,true)">B. Bind mount</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">C. tmpfs mount</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">D. Named pipe</button>
+    <div class="feedback-bar" id="q7-fb"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · Networking</div>
+    <div class="question-stem">What is the default network type assigned to a container when no <code>--network</code> flag is specified?</div>
+    <button class="option-btn" onclick="answer('q8',this,true)">A. Bridge</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">B. Host</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">C. None</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">D. Overlay</button>
+    <div class="feedback-bar" id="q8-fb"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · Networking</div>
+    <div class="question-stem">Which Docker network type provides <em>no</em> network access whatsoever to the container?</div>
+    <button class="option-btn" onclick="answer('q9',this,false)">A. Bridge</button>
+    <button class="option-btn" onclick="answer('q9',this,false)">B. Host</button>
+    <button class="option-btn" onclick="answer('q9',this,true)">C. None</button>
+    <button class="option-btn" onclick="answer('q9',this,false)">D. Isolated</button>
+    <div class="feedback-bar" id="q9-fb"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · True/False</div>
+    <div class="question-stem">True or False: On the default bridge network, containers can resolve each other by container name using DNS.</div>
+    <button class="option-btn" onclick="answer('q10',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q10',this,true)">False</button>
+    <div class="feedback-bar" id="q10-fb"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · Compose</div>
+    <div class="question-stem">What single command starts all services defined in a <code>docker-compose.yml</code> file?</div>
+    <button class="option-btn" onclick="answer('q11',this,false)">A. <code>docker start all</code></button>
+    <button class="option-btn" onclick="answer('q11',this,true)">B. <code>docker-compose up</code></button>
+    <button class="option-btn" onclick="answer('q11',this,false)">C. <code>docker run --all</code></button>
+    <button class="option-btn" onclick="answer('q11',this,false)">D. <code>docker-compose launch</code></button>
+    <div class="feedback-bar" id="q11-fb"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · Compose</div>
+    <div class="question-stem">In a Docker Compose file, <code>depends_on: [db]</code> guarantees that:</div>
+    <button class="option-btn" onclick="answer('q12',this,false)">A. The <code>db</code> service is fully ready and accepting connections before the dependent service starts</button>
+    <button class="option-btn" onclick="answer('q12',this,true)">B. The <code>db</code> service container is <em>started</em> before the dependent service, but readiness is not guaranteed</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">C. The <code>db</code> service cannot be stopped until the dependent service shuts down</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">D. Both services share the same image</button>
+    <div class="feedback-bar" id="q12-fb"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · Kubernetes</div>
+    <div class="question-stem">Which statement best describes the relationship between Docker Compose and Kubernetes?</div>
+    <button class="option-btn" onclick="answer('q13',this,false)">A. Kubernetes replaces Docker entirely</button>
+    <button class="option-btn" onclick="answer('q13',this,false)">B. Docker Compose is used in production; Kubernetes is used in development</button>
+    <button class="option-btn" onclick="answer('q13',this,true)">C. Docker Compose manages multi-container apps on one host; Kubernetes orchestrates containers across many machines</button>
+    <button class="option-btn" onclick="answer('q13',this,false)">D. Kubernetes is a plugin for Docker Compose</button>
+    <div class="feedback-bar" id="q13-fb"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · True/False</div>
+    <div class="question-stem">True or False: A Docker container is a read-only snapshot that cannot be modified at runtime.</div>
+    <button class="option-btn" onclick="answer('q14',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q14',this,true)">False</button>
+    <div class="feedback-bar" id="q14-fb"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · Layers</div>
+    <div class="question-stem">Which layer in Docker's storage model is read-write and unique to each running container?</div>
+    <button class="option-btn" onclick="answer('q15',this,false)">A. Base layer</button>
+    <button class="option-btn" onclick="answer('q15',this,false)">B. Image layer</button>
+    <button class="option-btn" onclick="answer('q15',this,true)">C. Writable container layer</button>
+    <button class="option-btn" onclick="answer('q15',this,false)">D. Registry layer</button>
+    <div class="feedback-bar" id="q15-fb"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · CLI</div>
+    <div class="question-stem">You want to open an interactive Bash shell inside a currently running container named <code>myapp</code>. Which command is correct?</div>
+    <button class="option-btn" onclick="answer('q16',this,false)">A. <code>docker run -it myapp bash</code></button>
+    <button class="option-btn" onclick="answer('q16',this,true)">B. <code>docker exec -it myapp bash</code></button>
+    <button class="option-btn" onclick="answer('q16',this,false)">C. <code>docker attach myapp</code></button>
+    <button class="option-btn" onclick="answer('q16',this,false)">D. <code>docker shell myapp</code></button>
+    <div class="feedback-bar" id="q16-fb"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · True/False</div>
+    <div class="question-stem">True or False: Docker images store a complete copy of the filesystem for every committed version, similar to saving a full zip file each time.</div>
+    <button class="option-btn" onclick="answer('q17',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q17',this,true)">False</button>
+    <div class="feedback-bar" id="q17-fb"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · Dockerfile</div>
+    <div class="question-stem">In the Dockerfile instruction <code>COPY requirements.txt /tmp</code>, what does <code>/tmp</code> refer to?</div>
+    <button class="option-btn" onclick="answer('q18',this,false)">A. A temporary folder on the Docker host</button>
+    <button class="option-btn" onclick="answer('q18',this,true)">B. The destination path inside the container image</button>
+    <button class="option-btn" onclick="answer('q18',this,false)">C. The Docker registry upload folder</button>
+    <button class="option-btn" onclick="answer('q18',this,false)">D. The source path on the host to copy from</button>
+    <div class="feedback-bar" id="q18-fb"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Networking</div>
+    <div class="question-stem">A container is run with <code>docker run -p 8888:80 my-image</code>. What does this mean?</div>
+    <button class="option-btn" onclick="answer('q19',this,false)">A. Port 80 on the host forwards to port 8888 inside the container</button>
+    <button class="option-btn" onclick="answer('q19',this,true)">B. Port 8888 on the host forwards to port 80 inside the container</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">C. Both ports 8888 and 80 are opened on the host</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">D. The container listens on port 8888 internally</button>
+    <div class="feedback-bar" id="q19-fb"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · True/False</div>
+    <div class="question-stem">True or False: Docker containers virtualise a complete operating system kernel, making them equivalent to full Virtual Machines in terms of isolation.</div>
+    <button class="option-btn" onclick="answer('q20',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q20',this,true)">False</button>
+    <div class="feedback-bar" id="q20-fb"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · Volume</div>
+    <div class="question-stem">Which command correctly mounts a named volume <code>my-vol</code> to the path <code>/app/data</code> inside a container using image <code>my-image</code>?</div>
+    <button class="option-btn" onclick="answer('q21',this,false)">A. <code>docker run -v /app/data:my-vol my-image</code></button>
+    <button class="option-btn" onclick="answer('q21',this,true)">B. <code>docker run -v my-vol:/app/data my-image</code></button>
+    <button class="option-btn" onclick="answer('q21',this,false)">C. <code>docker run --mount my-vol /app/data my-image</code></button>
+    <button class="option-btn" onclick="answer('q21',this,false)">D. <code>docker run -d my-vol my-image /app/data</code></button>
+    <div class="feedback-bar" id="q21-fb"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · Dockerfile</div>
+    <div class="question-stem">Why is it best practice to copy <code>requirements.txt</code> and run <code>pip install</code> <em>before</em> copying the rest of the application source code in a Dockerfile?</div>
+    <button class="option-btn" onclick="answer('q22',this,false)">A. Because <code>pip install</code> must always be the first command</button>
+    <button class="option-btn" onclick="answer('q22',this,true)">B. To maximise Docker layer caching — dependency layers rarely change and are reused on subsequent builds</button>
+    <button class="option-btn" onclick="answer('q22',this,false)">C. Because <code>COPY</code> cannot run after <code>RUN</code></button>
+    <button class="option-btn" onclick="answer('q22',this,false)">D. To reduce the size of the final image</button>
+    <div class="feedback-bar" id="q22-fb"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Kubernetes</div>
+    <div class="question-stem">Which capability does Kubernetes offer that Docker Compose does NOT?</div>
+    <button class="option-btn" onclick="answer('q23',this,false)">A. Running multiple containers</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">B. Defining environment variables</button>
+    <button class="option-btn" onclick="answer('q23',this,true)">C. Automatically restarting crashed containers across a multi-machine cluster</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">D. Mounting volumes</button>
+    <div class="feedback-bar" id="q23-fb"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · True/False</div>
+    <div class="question-stem">True or False: Services in the same <code>docker-compose.yml</code> file can communicate with each other using the service name as a hostname without any extra network configuration.</div>
+    <button class="option-btn" onclick="answer('q24',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q24',this,false)">False</button>
+    <div class="feedback-bar" id="q24-fb"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · Networking</div>
+    <div class="question-stem">Which Docker network type is used by Docker Swarm to connect containers across multiple hosts?</div>
+    <button class="option-btn" onclick="answer('q25',this,false)">A. Bridge</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">B. Host</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">C. None</button>
+    <button class="option-btn" onclick="answer('q25',this,true)">D. Overlay</button>
+    <div class="feedback-bar" id="q25-fb"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · CLI Ordering</div>
+    <div class="question-stem">You try to remove an image with <code>docker rmi my-image</code> but get an error. What is the most likely cause?</div>
+    <button class="option-btn" onclick="answer('q26',this,false)">A. The image was never built locally</button>
+    <button class="option-btn" onclick="answer('q26',this,true)">B. One or more containers (running or stopped) are based on this image</button>
+    <button class="option-btn" onclick="answer('q26',this,false)">C. You need to use <code>docker image delete</code> instead</button>
+    <button class="option-btn" onclick="answer('q26',this,false)">D. The Docker daemon is not running</button>
+    <div class="feedback-bar" id="q26-fb"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · True/False</div>
+    <div class="question-stem">True or False: A Docker volume persists data even after the container that created it is deleted.</div>
+    <button class="option-btn" onclick="answer('q27',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q27',this,false)">False</button>
+    <div class="feedback-bar" id="q27-fb"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · VS Code</div>
+    <div class="question-stem">In VS Code with the Docker extension, what keyboard shortcut opens the Command Palette to access Docker commands?</div>
+    <button class="option-btn" onclick="answer('q28',this,false)">A. Ctrl + Alt + D</button>
+    <button class="option-btn" onclick="answer('q28',this,true)">B. Ctrl + Shift + P</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">C. Ctrl + Shift + D</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">D. F5</button>
+    <div class="feedback-bar" id="q28-fb"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · Dockerfile</div>
+    <div class="question-stem">The <code>WORKDIR /app</code> instruction affects which subsequent Dockerfile instructions?</div>
+    <button class="option-btn" onclick="answer('q29',this,false)">A. Only the next <code>RUN</code> instruction</button>
+    <button class="option-btn" onclick="answer('q29',this,true)">B. All subsequent <code>RUN</code>, <code>CMD</code>, <code>ENTRYPOINT</code>, <code>COPY</code>, and <code>ADD</code> instructions</button>
+    <button class="option-btn" onclick="answer('q29',this,false)">C. Only <code>CMD</code> instructions</button>
+    <button class="option-btn" onclick="answer('q29',this,false)">D. No other instructions — it only affects runtime</button>
+    <div class="feedback-bar" id="q29-fb"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · True/False</div>
+    <div class="question-stem">True or False: The host network type in Docker provides the fastest network performance because it bypasses Docker's virtual network layer.</div>
+    <button class="option-btn" onclick="answer('q30',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">False</button>
+    <div class="feedback-bar" id="q30-fb"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Concepts</div>
+    <div class="question-stem">Docker Hub serves as which component of the Docker ecosystem?</div>
+    <button class="option-btn" onclick="answer('q31',this,false)">A. Docker Daemon</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">B. Docker CLI</button>
+    <button class="option-btn" onclick="answer('q31',this,true)">C. Docker Registry</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">D. Docker Compose</button>
+    <div class="feedback-bar" id="q31-fb"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · Bind Mount</div>
+    <div class="question-stem">In the bind mount command <code>docker run -v ${PWD}:/app/data my-image</code>, what does <code>${PWD}</code> represent?</div>
+    <button class="option-btn" onclick="answer('q32',this,false)">A. The Docker volume named "PWD"</button>
+    <button class="option-btn" onclick="answer('q32',this,true)">B. The current working directory on the host machine</button>
+    <button class="option-btn" onclick="answer('q32',this,false)">C. The container's home directory</button>
+    <button class="option-btn" onclick="answer('q32',this,false)">D. A Docker environment variable set in the Dockerfile</button>
+    <div class="feedback-bar" id="q32-fb"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · True/False</div>
+    <div class="question-stem">True or False: <code>docker ps</code> shows only currently running containers, while <code>docker ps -a</code> shows all containers including stopped ones.</div>
+    <button class="option-btn" onclick="answer('q33',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q33',this,false)">False</button>
+    <div class="feedback-bar" id="q33-fb"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · Compose Scenario</div>
+    <div class="question-stem">In Project 2 of the lecture (Jupyter + PostgreSQL), the Compose file sets <code>restart: always</code> on the <code>db</code> service. What does this accomplish?</div>
+    <button class="option-btn" onclick="answer('q34',this,false)">A. The database is restarted every hour to free memory</button>
+    <button class="option-btn" onclick="answer('q34',this,true)">B. Docker automatically restarts the database container if it crashes or the host reboots</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">C. The database service restarts before every query</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">D. All services in the file will restart when <code>db</code> restarts</button>
+    <div class="feedback-bar" id="q34-fb"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · True/False</div>
+    <div class="question-stem">True or False: Docker Compose automatically creates a shared network for all services defined in the same <code>docker-compose.yml</code>, allowing them to reach each other by service name.</div>
+    <button class="option-btn" onclick="answer('q35',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q35',this,false)">False</button>
+    <div class="feedback-bar" id="q35-fb"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Deep Concept</div>
+    <div class="question-stem">A team stores ML training data in a Docker container's writable layer and deletes the container after training. What happens to the data?</div>
+    <button class="option-btn" onclick="answer('q36',this,false)">A. The data is automatically backed up to Docker Hub</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">B. The data persists in the image layer</button>
+    <button class="option-btn" onclick="answer('q36',this,true)">C. The data is permanently lost</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">D. The data moves to the Docker volume store</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · Dockerfile</div>
+    <div class="question-stem">What is the mandatory first instruction in any valid Dockerfile?</div>
+    <button class="option-btn" onclick="answer('q37',this,false)">A. <code>RUN</code></button>
+    <button class="option-btn" onclick="answer('q37',this,true)">B. <code>FROM</code></button>
+    <button class="option-btn" onclick="answer('q37',this,false)">C. <code>CMD</code></button>
+    <button class="option-btn" onclick="answer('q37',this,false)">D. <code>WORKDIR</code></button>
+    <div class="feedback-bar" id="q37-fb"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · True/False</div>
+    <div class="question-stem">True or False: Kubernetes is primarily designed for single-machine local development workflows.</div>
+    <button class="option-btn" onclick="answer('q38',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q38',this,true)">False</button>
+    <div class="feedback-bar" id="q38-fb"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Security</div>
+    <div class="question-stem">A data pipeline must handle sensitive API credentials during processing but must never write them to disk. Which Docker storage solution is most appropriate?</div>
+    <button class="option-btn" onclick="answer('q39',this,false)">A. A named Docker volume</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">B. A bind mount to a host directory</button>
+    <button class="option-btn" onclick="answer('q39',this,true)">C. A tmpfs mount</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">D. Storing them in the image via <code>ENV</code></button>
+    <div class="feedback-bar" id="q39-fb"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · True/False</div>
+    <div class="question-stem">True or False: Running <code>docker run hello-world</code> without specifying a network explicitly places the container on the default bridge network.</div>
+    <button class="option-btn" onclick="answer('q40',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q40',this,false)">False</button>
+    <div class="feedback-bar" id="q40-fb"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · Applied Scenario</div>
+    <div class="question-stem">A colleague says "I just trained my model inside a container and got 94% accuracy, but when I shared the image and you ran it, you got different results." What is the most likely explanation?</div>
+    <button class="option-btn" onclick="answer('q41',this,false)">A. Docker images are platform-specific and produce different results on different CPUs</button>
+    <button class="option-btn" onclick="answer('q41',this,true)">B. The training data was stored in the container's writable layer and was not included in the image that was shared</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">C. The Python random seed changes automatically when an image is shared</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">D. Docker Compose was not used, which is required for reproducibility</button>
+    <div class="feedback-bar" id="q41-fb"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · Compose File</div>
+    <div class="question-stem">In a Compose service definition, <code>build: .</code> means:</div>
+    <button class="option-btn" onclick="answer('q42',this,false)">A. Pull the image tagged "." from Docker Hub</button>
+    <button class="option-btn" onclick="answer('q42',this,true)">B. Build the image using the Dockerfile found in the current directory</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">C. Run the container in the current directory</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">D. Mount the current directory into the container</button>
+    <div class="feedback-bar" id="q42-fb"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · True/False</div>
+    <div class="question-stem">True or False: The <code>RUN</code> instruction in a Dockerfile executes a command at container startup (runtime).</div>
+    <button class="option-btn" onclick="answer('q43',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q43',this,true)">False</button>
+    <div class="feedback-bar" id="q43-fb"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Volume Management</div>
+    <div class="question-stem">Which command displays detailed metadata about a Docker volume named <code>my-vol</code>, including its mount point on the host?</div>
+    <button class="option-btn" onclick="answer('q44',this,false)">A. <code>docker volume ls my-vol</code></button>
+    <button class="option-btn" onclick="answer('q44',this,false)">B. <code>docker volume show my-vol</code></button>
+    <button class="option-btn" onclick="answer('q44',this,true)">C. <code>docker volume inspect my-vol</code></button>
+    <button class="option-btn" onclick="answer('q44',this,false)">D. <code>docker inspect volume my-vol</code></button>
+    <div class="feedback-bar" id="q44-fb"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Concepts</div>
+    <div class="question-stem">Which component is responsible for managing all Docker objects (containers, images, networks, volumes) on a host machine?</div>
+    <button class="option-btn" onclick="answer('q45',this,false)">A. Docker CLI</button>
+    <button class="option-btn" onclick="answer('q45',this,true)">B. Docker Daemon</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">C. Docker Registry</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">D. Docker Compose</button>
+    <div class="feedback-bar" id="q45-fb"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · True/False</div>
+    <div class="question-stem">True or False: On a user-defined bridge network, containers can communicate using container names as hostnames.</div>
+    <button class="option-btn" onclick="answer('q46',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q46',this,false)">False</button>
+    <div class="feedback-bar" id="q46-fb"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · Applied</div>
+    <div class="question-stem">You are running a Jupyter notebook inside a Docker container and want to access it at <code>localhost:8888</code> from your browser. Your Dockerfile has <code>EXPOSE 8888</code>. What additional step is required?</div>
+    <button class="option-btn" onclick="answer('q47',this,false)">A. Nothing — <code>EXPOSE 8888</code> is sufficient</button>
+    <button class="option-btn" onclick="answer('q47',this,true)">B. Add <code>-p 8888:8888</code> to the <code>docker run</code> command to publish the port</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">C. Add <code>--open-port 8888</code> to the Dockerfile</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">D. Use the host network so no port mapping is needed</button>
+    <div class="feedback-bar" id="q47-fb"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · True/False</div>
+    <div class="question-stem">True or False: Docker Compose automatically rebuilds images when source code changes; no extra flag is needed with <code>docker-compose up</code>.</div>
+    <button class="option-btn" onclick="answer('q48',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q48',this,true)">False</button>
+    <div class="feedback-bar" id="q48-fb"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · Naming</div>
+    <div class="question-stem">In the command <code>docker build . -t docker-for-ds:1.0.0</code>, what does <code>1.0.0</code> represent?</div>
+    <button class="option-btn" onclick="answer('q49',this,false)">A. The Docker engine version required</button>
+    <button class="option-btn" onclick="answer('q49',this,false)">B. The Python version inside the image</button>
+    <button class="option-btn" onclick="answer('q49',this,true)">C. The image tag (version identifier)</button>
+    <button class="option-btn" onclick="answer('q49',this,false)">D. The number of layers in the image</button>
+    <div class="feedback-bar" id="q49-fb"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integration</div>
+    <div class="question-stem">A data science team wants to: (1) use Jupyter notebooks, (2) persist notebooks between sessions, (3) connect to a PostgreSQL database, and (4) start everything with one command. Which approach best satisfies all four requirements?</div>
+    <button class="option-btn" onclick="answer('q50',this,false)">A. A single Dockerfile with all services baked in</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">B. Two separate docker run commands with bind mounts</button>
+    <button class="option-btn" onclick="answer('q50',this,true)">C. A Docker Compose file with a Jupyter service (using volumes) and a PostgreSQL service with <code>depends_on</code></button>
+    <button class="option-btn" onclick="answer('q50',this,false)">D. Kubernetes with a single pod containing both containers</button>
+    <div class="feedback-bar" id="q50-fb"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+
+<!-- ══════════════════════════════════════════
+     SHORT ANSWER SECTION
+══════════════════════════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer — 10 Questions (Oral Exam Style)</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · Architecture</div>
+    <div class="question-stem">Explain the difference between a Docker Image and a Docker Container. What is the role of the writable container layer, and what happens to it when the container is stopped and removed?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> A <em>Docker Image</em> is a read-only, layered template created from a Dockerfile. It is static and can be stored in a registry. A <em>Docker Container</em> is a running instance of an image — it adds a thin, writable container layer on top of the image's read-only layers. Any files written at runtime (logs, model outputs, etc.) go into this writable layer, which is unique to that container instance. When the container is <strong>stopped</strong>, the writable layer is preserved on disk (the container still exists as a stopped object). When the container is <strong>removed</strong> (<code>docker rm</code>), the writable layer is permanently deleted — all data written inside the container that was not persisted via a volume or bind mount is lost.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How would you preserve data written inside a container across restarts?</li>
+        <li>Why is it a bad idea to store production database files in a container's writable layer?</li>
+        <li>Can multiple containers run from the same image simultaneously? What do they share?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Dockerfile Design</div>
+    <div class="question-stem">Walk through the purpose of each instruction in the following Dockerfile and explain the rationale for the ordering chosen:<br><br><code>FROM python:3.9 &nbsp;/ COPY requirements.txt /tmp &nbsp;/ RUN pip install -r /tmp/requirements.txt &nbsp;/ WORKDIR /app &nbsp;/ COPY . . &nbsp;/ CMD ["python", "main.py"]</code></div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <ul>
+        <li><strong>FROM python:3.9</strong> — declares the base image (official Python 3.9). Must be the first instruction; it forms the foundation layer.</li>
+        <li><strong>COPY requirements.txt /tmp</strong> — copies only the dependency file into the image. Doing this before copying all source code exploits Docker's layer cache: if <code>requirements.txt</code> hasn't changed, the next layer is reused.</li>
+        <li><strong>RUN pip install -r /tmp/requirements.txt</strong> — installs dependencies as a committed read-only layer. Because it follows only the requirements copy, it is cached as long as requirements don't change, even if app code changes.</li>
+        <li><strong>WORKDIR /app</strong> — sets the default working directory for all subsequent instructions and for the container's runtime shell.</li>
+        <li><strong>COPY . .</strong> — copies the rest of the application source code. Placed after dependency installation so code changes don't invalidate the expensive pip install layer.</li>
+        <li><strong>CMD ["python", "main.py"]</strong> — sets the default command to run on container start. Only the last CMD in a Dockerfile takes effect.</li>
+      </ul>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What would happen if you put <code>COPY . .</code> before the pip install step in terms of caching?</li>
+        <li>What is the difference between <code>CMD</code> and <code>RUN</code>?</li>
+        <li>How would you override the CMD at runtime without modifying the Dockerfile?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Storage</div>
+    <div class="question-stem">Compare Docker Volumes, Bind Mounts, and tmpfs Mounts. For each, describe the use case where it is the most appropriate choice in a data science context.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong><br>
+      <strong>Docker Volume:</strong> Managed entirely by Docker in a Docker-reserved area of the host filesystem. Data persists independently of the container lifecycle. Best for: storing trained model weights, databases (PostgreSQL data directory), or any data that must survive container restarts and be shared across multiple containers.<br><br>
+      <strong>Bind Mount:</strong> Maps a specific host directory directly into the container. Both host and container can read/write simultaneously. Best for: local development — editing Jupyter notebooks or Python scripts on the host while the container immediately sees the changes without rebuilding.<br><br>
+      <strong>tmpfs Mount:</strong> Stores files exclusively in host RAM; never written to disk; data lost when the container stops. Best for: sensitive data (API keys, credentials) that must not be logged or persisted, or for fast temporary scratch space (intermediate ML computations).<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What are the security implications of using a bind mount vs. a volume in production?</li>
+        <li>Can two containers share the same Docker volume? What are the concurrency risks?</li>
+        <li>Why might you choose a tmpfs mount over simply storing credentials as environment variables?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · Networking</div>
+    <div class="question-stem">Describe Docker's four main network types (bridge, host, none, overlay). For each, state whether containers get network isolation and in which scenario a data scientist might use it.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong><br>
+      <strong>Bridge (default):</strong> Creates a private virtual network on the host. Containers are isolated from each other and the external network by default, but can communicate within the same bridge and be exposed externally via port publishing (<code>-p</code>). User-defined bridge networks additionally support DNS name resolution between containers. <em>Data science use</em>: connecting a Jupyter container to a database container on the same machine.<br><br>
+      <strong>Host:</strong> The container shares the host's network interface directly — no virtual network layer. Fastest performance but no network isolation. <em>Data science use</em>: high-throughput data ingestion pipelines on Linux where the overhead of virtual networking is measurable.<br><br>
+      <strong>None:</strong> Container has no network interfaces whatsoever. Completely isolated. <em>Data science use</em>: running a sensitive offline ML training job on private data that must have no outbound connectivity.<br><br>
+      <strong>Overlay:</strong> Creates a virtual network spanning multiple Docker hosts, used with Docker Swarm. <em>Data science use</em>: distributed training or serving pipelines across a cluster of machines.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Why does the default bridge network not support container name DNS resolution, while a user-defined bridge does?</li>
+        <li>If you use the host network on Windows or macOS Docker Desktop, what happens?</li>
+        <li>How would you verify which network a running container is attached to?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · Docker Compose</div>
+    <div class="question-stem">Explain the purpose of the <code>depends_on</code> field in Docker Compose. What does it guarantee, and what important limitation does it have? How can this limitation be addressed?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> <code>depends_on</code> declares a startup ordering dependency between Compose services. For example, <code>depends_on: [db]</code> on the <code>jupyter</code> service tells Compose to <em>start</em> the <code>db</code> container before the <code>jupyter</code> container.<br><br>
+      <strong>Limitation:</strong> It only guarantees that the <code>db</code> container has <em>started</em>, not that it is <em>ready</em> to accept connections. A PostgreSQL container may take several seconds after its process starts before it is actually ready to accept queries. If the Jupyter service attempts to connect during that window, it will fail.<br><br>
+      <strong>Solution:</strong> Use health checks (<code>healthcheck</code> in the Compose file) combined with <code>condition: service_healthy</code> in the <code>depends_on</code> block (available in Compose v3.4+). Alternatively, use external tools like <em>wait-for-it.sh</em> or application-level retry logic.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What happens when you run <code>docker-compose down</code>? Does it remove volumes?</li>
+        <li>How would you scale a specific service to 3 replicas in Docker Compose?</li>
+        <li>If you change the Dockerfile but run <code>docker-compose up</code> without <code>--build</code>, will the image be rebuilt?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Layer Caching &amp; Build Optimisation</div>
+    <div class="question-stem">Explain Docker's layer caching mechanism. How does the order of Dockerfile instructions affect build performance, and what are the practical consequences of a poorly ordered Dockerfile in a team that rebuilds images frequently?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Each Dockerfile instruction creates a read-only layer. Docker caches each layer keyed by the instruction and its inputs. On a subsequent <code>docker build</code>, if a layer's instruction and its inputs are identical to the cached version, Docker reuses the cached layer and does not re-execute it. However, once any layer is invalidated (i.e., its inputs change), all subsequent layers must be rebuilt too — they cannot be reused.<br><br>
+      <strong>Practical consequences of bad ordering:</strong> If <code>COPY . .</code> (all source code) appears before <code>RUN pip install</code>, then every trivial code change — fixing a typo, renaming a variable — invalidates the COPY layer, forcing pip install to re-run from scratch. In a team rebuilding multiple times per day, this wastes minutes per build and can slow the development cycle significantly.<br><br>
+      <strong>Best practice:</strong> Place the slowest, least frequently changing steps (base image pull, dependency installation) early, and the most frequently changing steps (application code copy) late.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How can you force Docker to ignore the cache for a specific build?</li>
+        <li>What is a multi-stage build and how does it help reduce final image size?</li>
+        <li>If you add a new Python library to <code>requirements.txt</code>, which layers are invalidated?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · Containers vs. Virtual Machines</div>
+    <div class="question-stem">Compare Docker containers and Virtual Machines in terms of isolation, resource consumption, and startup time. In what scenario might you prefer a VM over a container for a data science workload?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <table style="margin:8px 0;">
+        <thead><tr><th>Aspect</th><th>Container</th><th>Virtual Machine</th></tr></thead>
+        <tbody>
+          <tr><td>Kernel</td><td>Shares host OS kernel</td><td>Has its own full OS kernel</td></tr>
+          <tr><td>Isolation</td><td>Process-level — lower isolation</td><td>Hardware-level — stronger isolation</td></tr>
+          <tr><td>Size</td><td>MBs</td><td>GBs</td></tr>
+          <tr><td>Startup</td><td>Seconds or less</td><td>Minutes</td></tr>
+          <tr><td>Overhead</td><td>Very low</td><td>Higher (hypervisor layer)</td></tr>
+        </tbody>
+      </table>
+      <strong>When a VM is preferable:</strong> When you need strong security isolation (e.g., running untrusted third-party ML code that could exploit kernel vulnerabilities), when you need to run a different OS entirely (e.g., a Windows-only tool on a Linux host), or in regulated environments (finance, healthcare) where process-level isolation is insufficient for compliance.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Can Docker run on a VM? What is the performance implication?</li>
+        <li>Why does Docker on macOS and Windows actually run containers inside a Linux VM internally?</li>
+        <li>What is a "container escape" vulnerability and why is it more concerning for containers than VMs?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Reproducibility in ML</div>
+    <div class="question-stem">A data scientist claims that "using Docker guarantees full reproducibility of ML experiments." Do you agree? What does Docker solve, and what reproducibility challenges remain even when using Docker?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Docker solves a significant subset of reproducibility issues — it eliminates environment-level variance by fixing the OS, Python version, library versions, system dependencies, and configuration. This is a major improvement over sharing only code and requirements files.<br><br>
+      <strong>However, Docker alone does not guarantee full ML reproducibility:</strong>
+      <ul>
+        <li><strong>Random seeds:</strong> If not set explicitly, operations involving randomness (weight initialisation, data shuffling, dropout) produce different results each run.</li>
+        <li><strong>Data versioning:</strong> Docker packages code, not data. If the training dataset changes (new records, preprocessing updates), results differ.</li>
+        <li><strong>Hardware non-determinism:</strong> GPU floating-point operations can be non-deterministic across different GPU models or driver versions, even with fixed seeds.</li>
+        <li><strong>External dependencies:</strong> API calls, database queries, or network-fetched data inside the container can return different results over time.</li>
+        <li><strong>Build-time vs. runtime:</strong> <code>FROM python:3.9</code> without pinning to a specific digest may resolve to a different base image over time.</li>
+      </ul>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How would you pin a Docker base image to ensure the exact same image is always used?</li>
+        <li>What tools complement Docker for full ML reproducibility? (e.g., MLflow, DVC, seeds)</li>
+        <li>Is it sufficient to use the same image on different hardware to guarantee identical results?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Kubernetes vs. Docker Compose</div>
+    <div class="question-stem">Explain when a data science team should transition from Docker Compose to Kubernetes. What specific operational challenges trigger this transition, and what is the main trade-off?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Docker Compose is appropriate when all services fit on a single machine and the team primarily needs local development or simple single-host deployment. The transition to Kubernetes is triggered by:<br><br>
+      <ul>
+        <li><strong>Scale:</strong> The workload outgrows a single machine and must be distributed across multiple servers (e.g., a model serving API receiving thousands of requests per second).</li>
+        <li><strong>High availability:</strong> The application must survive machine failures. Docker Compose has no self-healing; Kubernetes automatically restarts failed containers and reschedules them on healthy nodes.</li>
+        <li><strong>Auto-scaling:</strong> Traffic patterns are variable. Kubernetes can automatically spin up more container replicas under load and scale down when demand drops.</li>
+        <li><strong>Rolling deployments:</strong> The team needs zero-downtime updates — Kubernetes supports rolling updates and rollback strategies.</li>
+        <li><strong>Resource management:</strong> In a shared cluster, Kubernetes enforces CPU/memory limits and schedules containers onto nodes with available resources.</li>
+      </ul>
+      <strong>Main trade-off:</strong> Kubernetes has significant operational complexity — it requires understanding pods, deployments, services, ingress controllers, and more. Setup and maintenance are non-trivial. Managed cloud services (GKE, EKS, AKS) reduce this burden.<br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What is a Kubernetes Pod, and how does it relate to a Docker container?</li>
+        <li>Can Docker Compose files be converted to Kubernetes manifests? What tools exist for this?</li>
+        <li>What does "self-healing" mean concretely in Kubernetes?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · Design Scenario</div>
+    <div class="question-stem">Design a Dockerised data science environment for a team working on a customer churn prediction model. The environment needs: a Jupyter notebook server with scikit-learn and XGBoost, a PostgreSQL database for raw data, and persistence of notebooks and database data between sessions. Sketch the Docker Compose structure and justify your design choices.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer — Proposed Structure:</strong>
+      <div class="formula-box">
+        version: '3'<br>
+        services:<br>
+        &nbsp;&nbsp;notebook:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;build: .  # Dockerfile based on jupyter/scipy-notebook<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;ports: ["8888:8888"]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;volumes:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ./notebooks:/home/jovyan/work  # bind mount<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;depends_on: [db]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;environment:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DB_HOST: db<br>
+        &nbsp;&nbsp;db:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;image: postgres:15<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;restart: always<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;volumes:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- pg_data:/var/lib/postgresql/data  # named volume<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;environment:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_USER: analyst<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_PASSWORD: secret<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;POSTGRES_DB: churn<br>
+        volumes:<br>
+        &nbsp;&nbsp;pg_data:
+      </div>
+      <strong>Design justifications:</strong>
+      <ul>
+        <li><strong>Notebook bind mount</strong> (<code>./notebooks:/home/jovyan/work</code>): allows analysts to use their host editor (VS Code, etc.) to edit notebooks while they run inside the container. Changes are immediately reflected.</li>
+        <li><strong>Named volume for PostgreSQL</strong> (<code>pg_data</code>): database files are managed by Docker, persisting across container removals. A bind mount would work but volumes are preferred for database data as Docker manages permissions correctly.</li>
+        <li><strong>Service name as hostname</strong>: by using <code>DB_HOST: db</code>, the notebook can connect to PostgreSQL at hostname <code>db</code> — Compose's built-in DNS handles resolution.</li>
+        <li><strong>restart: always on db</strong>: ensures the database comes back automatically if it crashes, without requiring developer intervention.</li>
+        <li><strong>depends_on</strong>: guarantees the database container starts before the notebook. (Would add healthcheck for production.)</li>
+      </ul>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How would a new team member start the entire environment on their machine?</li>
+        <li>What would happen to the database data if you ran <code>docker-compose down -v</code>?</li>
+        <li>How would you add a model serving API (e.g., Flask) as a third service?</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+  let answered = {};
+
+  function answer(qId, btn, isCorrect) {
+    if (answered[qId]) return;
+    answered[qId] = true;
+
+    const card = document.getElementById(qId);
+    const allBtns = card.querySelectorAll('.option-btn');
+    const fb = document.getElementById(qId + '-fb');
+
+    allBtns.forEach(b => {
+      b.classList.add('locked');
+    });
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      fb.textContent = '✅ Correct!';
+      fb.className = 'feedback-bar correct';
+    } else {
+      btn.classList.add('incorrect');
+      fb.textContent = '❌ Incorrect — review the notes above.';
+      fb.className = 'feedback-bar incorrect';
+      // reveal correct answer
+      allBtns.forEach(b => {
+        const handler = b.getAttribute('onclick');
+        if (handler && handler.includes('true')) {
+          b.classList.add('reveal-correct');
+        }
+      });
+    }
+
+    updateScore();
+  }
+
+  function updateScore() {
+    const total = document.querySelectorAll('.mcq-card').length;
+    const correct = document.querySelectorAll('.option-btn.correct').length;
+    const attempted = Object.keys(answered).length;
+    document.getElementById('score-display').textContent =
+      'Score: ' + correct + ' / ' + attempted + ' answered (of ' + total + ')';
+  }
+
+  function resetAll() {
+    answered = {};
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.className = 'option-btn';
+    });
+    document.querySelectorAll('.feedback-bar').forEach(fb => {
+      fb.textContent = '';
+      fb.className = 'feedback-bar';
+    });
+    document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  }
+
+  function toggleAnswer(btn) {
+    const panel = btn.nextElementSibling;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      btn.textContent = 'Reveal Answer';
+    } else {
+      panel.style.display = 'block';
+      btn.textContent = 'Hide Answer';
+    }
+  }
+</script>
+
+</body>
+</html>

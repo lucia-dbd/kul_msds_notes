@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 9 – Cloud Computing | Modern Data Analytics</title>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4; font-size: 1.05em; font-weight: 700;
+    margin-top: 22px; margin-bottom: 6px;
+  }
+
+  .key-point        { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box      { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box      { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box      { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .computation-note { background: #fdf3f3; border-left: 4px solid #e57373; padding: 12px 18px; margin: 14px 0; }
+  .formula-box {
+    background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px;
+    padding: 12px 18px; margin: 14px 0;
+    font-family: 'Courier New', monospace; font-size: 0.92em; line-height: 1.6;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; margin-top: 0; }
+  .score-display {
+    background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px;
+    padding: 5px 18px; font-weight: 700; color: #856404;
+    display: inline-block; font-size: 0.95em; margin-bottom: 18px;
+  }
+  .mcq-card {
+    background: #f9fafb; border: 1px solid #e5e9f2;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em; font-weight: 700; color: #2e6da4;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+
+  .option-btn {
+    display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea;
+    border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left;
+    cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected  { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct   { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; pointer-events: none; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; pointer-events: none; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; pointer-events: none; }
+  .option-btn.locked { pointer-events: none; }
+
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+  .sa-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #3b1d6e; font-size: 1.2em; margin-top: 0; }
+  .sa-card {
+    background: #faf9ff; border: 1px solid #e2dcf5;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1; font-size: 0.8em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin: 8px 0 12px 0; }
+
+  .reveal-btn {
+    background: #6f42c1; color: #ffffff; border: none; border-radius: 20px;
+    padding: 7px 22px; font-size: 0.88em; font-weight: 600;
+    cursor: pointer; margin-top: 12px; transition: background 0.2s;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff; border: 1px solid #d4c8f5;
+    border-radius: 8px; padding: 18px 22px;
+    margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  .reset-btn {
+    background: #1a3a5c; color: #fff; border: none;
+    border-radius: 20px; padding: 9px 26px;
+    font-size: 0.92em; font-weight: 700; cursor: pointer;
+    margin-bottom: 18px; transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  code { background: #eef2fb; border-radius: 4px; padding: 1px 6px; font-size: 0.92em; color: #1a3a5c; }
+  ul, ol { margin: 8px 0 8px 20px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Lecture 9 – Cloud Computing</h1>
+  <div class="subtitle">Modern Data Analytics (GOZ39A) &nbsp;|&nbsp; AWS · Service Models · End-to-End DS Project &nbsp;|&nbsp; Exam Review Notes</div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <a href="#overview">Cloud Overview</a>
+  <a href="#providers">Providers</a>
+  <a href="#models">Service Models</a>
+  <a href="#services">Cloud Services</a>
+  <a href="#aws-setup">AWS Setup</a>
+  <a href="#aws-access">AWS Access</a>
+  <a href="#project">End-to-End Project</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa"  class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ══════════════════════
+     STUDY NOTES
+══════════════════════ -->
+
+<!-- 1. Cloud Overview -->
+<div class="notes-section" id="overview">
+  <h2>1. What is Cloud Computing?</h2>
+
+  <div class="key-point">
+    <strong>Cloud computing</strong> is on-demand access to computing resources (compute, storage, databases, analytics, AI tools, and more) delivered over the internet, typically on a <em>pay-per-use</em> basis. It is foundational to modern data science and MLOps.
+  </div>
+
+  <h3>Historical Evolution</h3>
+  <table>
+    <thead><tr><th>Era</th><th>Model</th><th>Key characteristic</th></tr></thead>
+    <tbody>
+      <tr><td>1980s–1990s</td><td>On-premises data centers</td><td>Servers privately owned &amp; maintained by the company; physical access required</td></tr>
+      <tr><td>1990s–2000s</td><td>Internet / web-based hosting</td><td>Access via browser over internet; but still own maintenance; no physical proximity needed</td></tr>
+      <tr><td>2000s–2010s</td><td>Virtualization &amp; cloud</td><td>Amazon, Microsoft, Google build massive data centers; companies rent virtualized resources on demand; focus on core business, not IT management</td></tr>
+    </tbody>
+  </table>
+
+  <div class="example-box">
+    <strong>Motivating example:</strong> Training a large ML model locally takes 10 hours. The same training job on AWS (e.g., a GPU-equipped EC2 instance) can take 30 minutes — a 20× speedup without buying any hardware.
+  </div>
+
+  <h3>Key Benefits for Data Science</h3>
+  <table>
+    <thead><tr><th>Benefit</th><th>What it means in practice</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Scalability</strong></td><td>Increase compute power on demand for large training jobs, then scale back down</td></tr>
+      <tr><td><strong>Flexibility</strong></td><td>Run notebooks, pipelines, and models from anywhere in the world</td></tr>
+      <tr><td><strong>Cost efficiency</strong></td><td>Pay only for the resources you actually use — no capital expenditure on hardware</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Common Data Science Use Cases</h3>
+  <ul>
+    <li>Storing and querying large datasets (e.g., S3, BigQuery)</li>
+    <li>ML training at scale (e.g., SageMaker, Vertex AI)</li>
+    <li>Data engineering and ETL pipelines (e.g., AWS Glue, Dataflow)</li>
+    <li>Model deployment and monitoring (e.g., Lambda + API Gateway)</li>
+    <li>Real-time analytics (e.g., Kinesis, Pub/Sub)</li>
+  </ul>
+</div>
+
+<!-- 2. Cloud Providers -->
+<div class="notes-section" id="providers">
+  <h2>2. Cloud Service Providers</h2>
+
+  <div class="key-point">
+    Cloud service providers offer on-demand computing resources (servers, storage, databases, AI tools) over the internet. They differ in specialisation, pricing, ecosystem, and geographic reach.
+  </div>
+
+  <h3>The "Big Three" Compared</h3>
+  <table>
+    <thead><tr><th>Provider</th><th>Founded</th><th>Strengths</th><th>Key Data Science Services</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>AWS</strong></td>
+        <td>2006</td>
+        <td>Largest provider; 200+ services; broadest AI/ML tooling; $80B+ revenue (2022)</td>
+        <td>EC2, S3, Lambda, SageMaker</td>
+      </tr>
+      <tr>
+        <td><strong>Microsoft Azure</strong></td>
+        <td>2010</td>
+        <td>Seamless integration with Microsoft ecosystem; strong hybrid cloud; enterprise security &amp; compliance</td>
+        <td>Azure VMs, Azure ML, Azure Functions</td>
+      </tr>
+      <tr>
+        <td><strong>GCP</strong></td>
+        <td>2011</td>
+        <td>Best-in-class for AI/data analytics &amp; Kubernetes; developer-friendly; Google's global infrastructure</td>
+        <td>Compute Engine, Cloud Storage, Vertex AI, BigQuery</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Other Notable Providers</h3>
+  <table>
+    <thead><tr><th>Provider</th><th>Niche</th></tr></thead>
+    <tbody>
+      <tr><td>IBM Cloud</td><td>Strong in AI and hybrid cloud; regulated industries</td></tr>
+      <tr><td>Oracle Cloud</td><td>Optimised for databases and Oracle enterprise software</td></tr>
+      <tr><td>Alibaba Cloud</td><td>Leader in China and Asia; e-commerce and global markets</td></tr>
+      <tr><td>DigitalOcean</td><td>Developer-friendly, simple, cost-effective; ideal for small teams and startups</td></tr>
+      <tr><td>Heroku</td><td>Simple PaaS; quick deployments; great for prototypes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Choosing a provider</strong> depends on budget, data science workflow, integration with existing tools, performance requirements, and compliance/regulation constraints. There is no universally "best" provider — context determines the right fit.
+  </div>
+
+  <h3>How to Access a Cloud Provider's Resources</h3>
+  <p>Most providers offer three access modes (illustrated for AWS):</p>
+  <ul>
+    <li><strong>Management Console</strong> — web-based GUI; easiest for beginners and manual setup</li>
+    <li><strong>CLI (Command-Line Interface)</strong> — text commands in terminal; fast for batch tasks and scripting</li>
+    <li><strong>SDK (Software Development Kit)</strong> — language libraries (e.g., Python's <code>boto3</code>); best for automation and integration into code</li>
+  </ul>
+</div>
+
+<!-- 3. Service Models -->
+<div class="notes-section" id="models">
+  <h2>3. Cloud Service Models</h2>
+
+  <div class="key-point">
+    Cloud service models define the <em>level of control and responsibility</em> the user has. The further up the stack, the less you manage — but also the less flexibility you have.
+  </div>
+
+  <h3>The Five Models Side-by-Side</h3>
+  <table>
+    <thead><tr><th>Model</th><th>Full name</th><th>What the cloud manages</th><th>What you manage</th><th>Analogy</th></tr></thead>
+    <tbody>
+      <tr><td><strong>IaaS</strong></td><td>Infrastructure as a Service</td><td>Hardware, networking, virtualisation</td><td>OS, runtime, apps, data</td><td>Renting a raw kitchen with equipment — you cook from scratch</td></tr>
+      <tr><td><strong>PaaS</strong></td><td>Platform as a Service</td><td>Hardware + OS + runtime + middleware</td><td>Your code and data</td><td>Renting a kitchen with chef tools and pre-set ingredients — you just follow the recipe</td></tr>
+      <tr><td><strong>SaaS</strong></td><td>Software as a Service</td><td>Everything</td><td>Just your data &amp; usage</td><td>Going to a restaurant — food is ready, you just eat</td></tr>
+      <tr><td><strong>FaaS</strong></td><td>Function as a Service</td><td>Servers, scaling, execution environment</td><td>Just your function code</td><td>Motion-sensor light — turns on only when triggered; off (and free) otherwise</td></tr>
+      <tr><td><strong>CaaS</strong></td><td>Container as a Service</td><td>Container orchestration infrastructure</td><td>Your container image</td><td>Shipping containers on a managed port — you pack the box, port manages logistics</td></tr>
+    </tbody>
+  </table>
+
+  <h3>IaaS — Infrastructure as a Service</h3>
+  <div class="example-box">
+    <strong>DS scenario:</strong> Your laptop is too slow to train a model on a huge dataset. With IaaS (e.g., AWS EC2), you rent a GPU-powered VM, install Python/Jupyter/scikit-learn, train the model, then shut it down. You pay only for those hours — no hardware purchase.
+  </div>
+  <p><strong>Advantages:</strong> Full control over environment; any software can be installed. <strong>Disadvantages:</strong> More management overhead (OS patching, security).</p>
+  <p>Examples: EC2 (AWS), Azure Virtual Machine, Google Compute Engine — all IaaS.</p>
+
+  <h3>PaaS — Platform as a Service</h3>
+  <div class="example-box">
+    <strong>DS scenario:</strong> You built a web app exposing your ML model. With PaaS (e.g., Google App Engine), upload your code; the platform runs it, scales it, and keeps it secure — you never touch a server.
+  </div>
+  <p><strong>Advantages:</strong> Fast deployment; no infrastructure management. <strong>Disadvantages:</strong> Less flexibility than IaaS.</p>
+  <p>Examples: AWS Elastic Beanstalk, Google App Engine, Azure App Services.</p>
+
+  <h3>SaaS — Software as a Service</h3>
+  <div class="example-box">
+    <strong>DS scenario:</strong> You want to train a model without writing infrastructure code. Use Google Colab, DataRobot, or BigML — upload data, click to train, download results. Zero setup.
+  </div>
+  <p><strong>Advantages:</strong> No setup or maintenance; accessible from anywhere. <strong>Disadvantages:</strong> Minimal customisation.</p>
+  <p>Examples: Google Workspace, Tableau Online, Salesforce, Google Colab.</p>
+
+  <h3>FaaS — Function as a Service (Serverless)</h3>
+  <div class="example-box">
+    <strong>DS scenario:</strong> Serve a trained model. Deploy a <code>predict(input_data)</code> function via AWS Lambda. When a user submits data, the cloud runs the function and returns the prediction. When idle: nothing runs, nothing is billed.
+  </div>
+  <p><strong>Advantages:</strong> Cost-efficient for intermittent workloads; auto-scales. <strong>Disadvantages:</strong> Cold start latency; limited max runtime duration.</p>
+  <p>Examples: AWS Lambda, Google Cloud Functions, Azure Functions.</p>
+
+  <h3>CaaS — Container as a Service</h3>
+  <div class="example-box">
+    <strong>DS scenario:</strong> Your model depends on a specific version of pandas and scikit-learn. Package it all in a Docker container, then deploy to AWS Fargate or Google Cloud Run. The platform runs and scales the container without you managing servers.
+  </div>
+  <p><strong>Advantages:</strong> Flexible, portable, easy migration between platforms. <strong>Disadvantages:</strong> Requires container orchestration knowledge.</p>
+  <p>Examples: AWS ECS/Fargate, Google Kubernetes Engine (GKE), Azure Kubernetes Service (AKS).</p>
+
+  <div class="warning-box">
+    <strong>Key exam distinction:</strong> CaaS combines benefits of IaaS (you control the container environment) and PaaS (the cloud manages the execution/scaling). It bridges the gap between full control and managed convenience.
+  </div>
+</div>
+
+<!-- 4. Cloud Services by Category -->
+<div class="notes-section" id="services">
+  <h2>4. Cloud Services by Category</h2>
+
+  <p>Within each service model, providers offer specialised services grouped by function.</p>
+
+  <table>
+    <thead><tr><th>Category</th><th>AWS</th><th>Azure</th><th>GCP</th><th>Model</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Virtual Machines</strong></td><td>EC2</td><td>Azure Virtual Machines</td><td>Compute Engine</td><td>IaaS</td></tr>
+      <tr><td><strong>Serverless Functions</strong></td><td>Lambda</td><td>Azure Functions</td><td>Cloud Functions</td><td>FaaS</td></tr>
+      <tr><td><strong>Container Services</strong></td><td>ECS / Fargate</td><td>Azure Container Instances</td><td>Cloud Run</td><td>CaaS</td></tr>
+      <tr><td><strong>Object Storage</strong></td><td>S3</td><td>Azure Blob Storage</td><td>Cloud Storage</td><td>IaaS/PaaS</td></tr>
+      <tr><td><strong>Block Storage</strong></td><td>EBS</td><td>Azure Disk Storage</td><td>Persistent Disks</td><td>IaaS</td></tr>
+      <tr><td><strong>SQL Database</strong></td><td>RDS</td><td>Azure SQL Database</td><td>Cloud SQL</td><td>PaaS</td></tr>
+      <tr><td><strong>NoSQL Database</strong></td><td>DynamoDB</td><td>Cosmos DB</td><td>Firestore</td><td>PaaS</td></tr>
+      <tr><td><strong>ML Platform</strong></td><td>SageMaker</td><td>Azure ML</td><td>Vertex AI</td><td>PaaS</td></tr>
+      <tr><td><strong>AutoML</strong></td><td>SageMaker Autopilot</td><td>Azure AutoML</td><td>AutoML</td><td>PaaS</td></tr>
+      <tr><td><strong>AI APIs</strong></td><td>Comprehend</td><td>Cognitive Services</td><td>Cloud Vision / NLP API</td><td>SaaS/PaaS</td></tr>
+      <tr><td><strong>Data Warehouse</strong></td><td>Redshift</td><td>Synapse Analytics</td><td>BigQuery</td><td>PaaS</td></tr>
+      <tr><td><strong>ETL</strong></td><td>Glue</td><td>Data Factory</td><td>Cloud Data Fusion</td><td>PaaS</td></tr>
+      <tr><td><strong>BI / Dashboards</strong></td><td>QuickSight</td><td>Power BI</td><td>Looker</td><td>SaaS</td></tr>
+      <tr><td><strong>CI/CD Pipelines</strong></td><td>CodePipeline</td><td>Azure Pipelines</td><td>Cloud Build</td><td>PaaS</td></tr>
+      <tr><td><strong>Container Registry</strong></td><td>ECR</td><td>Azure Container Registry</td><td>Artifact Registry</td><td>PaaS</td></tr>
+      <tr><td><strong>VPC / Networking</strong></td><td>Amazon VPC</td><td>Azure VNET</td><td>Virtual Private Cloud</td><td>IaaS</td></tr>
+      <tr><td><strong>IAM</strong></td><td>AWS IAM</td><td>Azure Active Directory</td><td>IAM / Cloud Identity</td><td>IaaS/PaaS</td></tr>
+      <tr><td><strong>Encryption / KMS</strong></td><td>AWS KMS</td><td>Azure Key Vault</td><td>Cloud KMS</td><td>PaaS</td></tr>
+    </tbody>
+  </table>
+
+  <div class="key-point">
+    <strong>S3 (Simple Storage Service)</strong> is the most commonly referenced AWS service for data science. It is object storage — ideal for datasets, model artefacts, images, and logs. Think of an S3 bucket as a cloud-based folder.
+  </div>
+</div>
+
+<!-- 5. AWS Setup -->
+<div class="notes-section" id="aws-setup">
+  <h2>5. AWS Account Setup &amp; Security (IAM)</h2>
+
+  <h3>AWS Free Tier — Three Types</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Duration</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Always Free</strong></td><td>Indefinitely, all accounts</td><td>AWS Lambda: 1M requests/month; DynamoDB: 5 GB storage</td></tr>
+      <tr><td><strong>12-Month Free Tier</strong></td><td>First 12 months after signup</td><td>S3: 5 GB standard storage; EC2: 750 hrs/month t2.micro or t3.micro; RDS: 750 hrs/month db.t2.micro</td></tr>
+      <tr><td><strong>Short-term Trials</strong></td><td>Limited period once activated</td><td>Some AI service trials</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>Critical:</strong> Billing alerts are NOT enabled by default. You must manually enable them. They only warn you — they do not stop usage. Set one up immediately after creating your account to avoid surprise charges.
+  </div>
+
+  <h3>IAM — Identity and Access Management</h3>
+  <div class="key-point">
+    <strong>IAM</strong> is AWS's authentication and authorisation service. It controls <em>who</em> (authentication) can access AWS services in your account and <em>what</em> they are permitted to do (authorisation).
+  </div>
+
+  <h3>5-Step AWS Security Wizard</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Action</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Access IAM service</td><td>Central security management hub</td></tr>
+      <tr><td>2</td><td><strong>Activate MFA on root account</strong></td><td>Root account is linked to your credit card — secure it immediately with an authenticator app (e.g., Google Authenticator)</td></tr>
+      <tr><td>3</td><td><strong>Create IAM user</strong></td><td>Best practice: do NOT use root for daily tasks; create a separate user</td></tr>
+      <tr><td>4</td><td><strong>Create group &amp; assign permissions</strong></td><td>Create "aws-admins" group, attach Administrator Access policy; assign user to group</td></tr>
+      <tr><td>5</td><td>Create a password policy</td><td>Enforce minimum complexity for all IAM users</td></tr>
+    </tbody>
+  </table>
+
+  <div class="computation-note">
+    <strong>Security best practice:</strong> Never use your AWS root account for day-to-day work. Create an IAM user with appropriate permissions and use that instead. Download and safely store the CSV with access key ID + secret access key when creating an IAM user.
+  </div>
+
+  <h3>Setting Up Billing Alarms (CloudWatch)</h3>
+  <p>To monitor costs and avoid overage on the Free Tier:</p>
+  <ol>
+    <li>Go to <em>Billing and Cost Management</em> → <em>Billing Preferences</em> → enable <strong>CloudWatch Billing Alerts</strong></li>
+    <li>Set region to <strong>US East (N. Virginia)</strong> — billing metric data is only stored here</li>
+    <li>Create a CloudWatch alarm: Billing → Total Estimated Charge → set threshold (e.g., $1) → link to SNS topic for email notification</li>
+  </ol>
+
+  <div class="warning-box">
+    The billing alarm only <em>notifies</em> you when the threshold is exceeded — it does NOT stop or pause your usage automatically.
+  </div>
+</div>
+
+<!-- 6. AWS Access Methods -->
+<div class="notes-section" id="aws-access">
+  <h2>6. Accessing AWS: Console · CLI · SDK</h2>
+
+  <h3>1. Management Console</h3>
+  <p>Web-based GUI at <code>aws.amazon.com</code>. Best for beginners, manual setup, and visual exploration of services. Actions include drag-and-drop S3 uploads, clicking through SageMaker to launch notebooks, or creating Lambda functions via wizard.</p>
+
+  <h3>2. CLI — Command-Line Interface</h3>
+  <p>Text-based terminal tool. Fast for batch tasks and scripting. Must be installed locally and configured with credentials.</p>
+  <div class="formula-box">
+    # Configure CLI with your IAM credentials<br>
+    aws configure<br>
+    # → Enter: Access Key ID, Secret Access Key, Region, Output format<br><br>
+    # Example: copy a file to S3<br>
+    aws s3 cp myfile.csv s3://my-bucket/<br><br>
+    # Create an S3 bucket<br>
+    aws s3api create-bucket --bucket my-bucket --region eu-central-1 \<br>
+    &nbsp;&nbsp;--create-bucket-configuration LocationConstraint=eu-central-1
+  </div>
+
+  <h3>3. SDK — boto3 (Python)</h3>
+  <p>Programming library for interacting with AWS in Python code. Best for automation, custom workflows, and integration into data science pipelines.</p>
+  <div class="formula-box">
+    import boto3<br><br>
+    # Create S3 client (credentials via environment variables — safer than hard-coding)<br>
+    s3 = boto3.client('s3')<br><br>
+    # Upload a file<br>
+    s3.upload_file('train.csv', 'my-bucket', 'train.csv')<br><br>
+    # Read directly into pandas<br>
+    import pandas as pd<br>
+    df = pd.read_csv('s3://my-bucket/train.csv')
+  </div>
+
+  <div class="warning-box">
+    <strong>Never hard-code AWS credentials in Python scripts</strong> that are shared or version-controlled. Use environment variables (<code>export AWS_ACCESS_KEY_ID=...</code>) or IAM roles instead. boto3 automatically reads these.
+  </div>
+
+  <div class="theorem-box">
+    <strong>S3 access control:</strong> By default, all S3 buckets and objects are <em>NOT publicly accessible</em>. To make objects public, you must explicitly disable "Block Public Access" settings and adjust bucket/object permissions. This is a deliberate security default.
+  </div>
+</div>
+
+<!-- 7. End-to-End Project -->
+<div class="notes-section" id="project">
+  <h2>7. End-to-End Data Science Project on AWS</h2>
+
+  <div class="key-point">
+    <strong>Project objective:</strong> Train a logistic regression model predicting Titanic survivors using scikit-learn, with AWS Free Tier services for storage (S3), compute (SageMaker), and deployment (Lambda + API Gateway).
+  </div>
+
+  <h3>Architecture Overview</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Task</th><th>AWS Service</th><th>Access method shown</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Create storage bucket</td><td>S3</td><td>Console, CLI, SDK</td></tr>
+      <tr><td>2</td><td>Upload dataset (train.csv, test.csv)</td><td>S3</td><td>Console, CLI, SDK</td></tr>
+      <tr><td>3</td><td>Launch notebook environment</td><td>SageMaker Studio / Notebook Instance</td><td>Console, CLI, SDK</td></tr>
+      <tr><td>4</td><td>Train logistic regression model</td><td>SageMaker (Jupyter)</td><td>Python (scikit-learn)</td></tr>
+      <tr><td>5</td><td>Serialise &amp; upload model</td><td>S3 (model.pkl via joblib)</td><td>Console, CLI, SDK</td></tr>
+      <tr><td>6</td><td>Deploy model as a function</td><td>AWS Lambda</td><td>Console, CLI, SDK</td></tr>
+      <tr><td>7</td><td>Expose model via HTTP API</td><td>API Gateway</td><td>Console, CLI, SDK</td></tr>
+    </tbody>
+  </table>
+
+  <h3>AWS Lambda — Key Concepts</h3>
+  <div class="key-point">
+    AWS Lambda lets you run code (Python, Java, Node.js, etc.) without provisioning servers. Code runs in response to <em>events</em> (e.g., HTTP requests, S3 uploads). You pay only for execution time.
+  </div>
+
+  <p><strong>Lambda function structure:</strong></p>
+  <div class="formula-box">
+    def lambda_handler(event, context):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;# event: input data (e.g., JSON body of HTTP request)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;# context: metadata (function name, timeout, etc.)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;input_data = pd.DataFrame([event['features']])<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;prediction = model.predict(input_data)[0]<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;return {'statusCode': 200, 'body': json.dumps({'prediction': int(prediction)})}
+  </div>
+
+  <p><strong>Three Lambda cost drivers:</strong> number of executions/month · memory allocated · execution time (ms). Free tier: 1 million requests/month + 400,000 GB-seconds of compute/month.</p>
+
+  <div class="warning-box">
+    Lambda requires permission to read from S3. Attach an IAM policy granting <code>s3:GetObject</code> on the relevant bucket ARN to the Lambda execution role.
+  </div>
+
+  <h3>API Gateway — Key Concepts</h3>
+  <div class="key-point">
+    API Gateway acts as the "front door" for your deployed model. It receives HTTP requests (from browsers, apps, Postman), forwards them to the Lambda function, and returns the response — without the caller ever touching Lambda or S3 directly.
+  </div>
+
+  <div class="example-box">
+    <strong>Request flow:</strong><br>
+    User sends: <code>POST https://&lt;api-id&gt;.execute-api.us-east-1.amazonaws.com/prod/predict</code><br>
+    with body <code>{"features": [22, 1, 7.25, 1, 0, 0, 1, 0, 0]}</code><br>
+    → API Gateway → Lambda loads model from S3, runs prediction → returns <code>{"prediction": 0}</code>
+  </div>
+
+  <p><strong>API Gateway advantages:</strong> user-friendly interface for your model · API key / token security · handles thousands of concurrent requests · built-in monitoring (request count, latency).</p>
+
+  <h3>Model Serialisation with joblib</h3>
+  <div class="formula-box">
+    import joblib<br><br>
+    # Save (serialise)<br>
+    joblib.dump(model, 'model.pkl')<br><br>
+    # Load (deserialise)<br>
+    model = joblib.load('model.pkl')
+  </div>
+  <p><strong>Serialisation</strong> converts a Python object (trained model) into a binary file that can be saved and uploaded to the cloud. <strong>Deserialisation</strong> reconstructs the model object from that binary file — as done inside the Lambda function.</p>
+</div>
+
+
+<!-- ══════════════════════
+     MCQ SECTION
+══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False — 50 Questions</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Concept</div>
+    <div class="question-stem">Which of the following best defines cloud computing?</div>
+    <button class="option-btn" onclick="answer('q1',this,false)">A. Owning and maintaining your own physical servers in a company data centre</button>
+    <button class="option-btn" onclick="answer('q1',this,true)">B. On-demand access to computing resources (compute, storage, databases) over the internet, typically on a pay-per-use basis</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">C. Running software exclusively on a local laptop without internet connectivity</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">D. Storing all company data on USB drives distributed across teams</button>
+    <div class="feedback-bar" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · History</div>
+    <div class="question-stem">In which decade did major cloud computing platforms (Amazon, Microsoft, Google) emerge?</div>
+    <button class="option-btn" onclick="answer('q2',this,false)">A. 1980s</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">B. 1990s</button>
+    <button class="option-btn" onclick="answer('q2',this,true)">C. 2000s–2010s</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">D. 2020s</button>
+    <div class="feedback-bar" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · Providers</div>
+    <div class="question-stem">Which cloud provider is known as the largest by market share, having launched in 2006 with over 200 services?</div>
+    <button class="option-btn" onclick="answer('q3',this,true)">A. Amazon Web Services (AWS)</button>
+    <button class="option-btn" onclick="answer('q3',this,false)">B. Microsoft Azure</button>
+    <button class="option-btn" onclick="answer('q3',this,false)">C. Google Cloud Platform</button>
+    <button class="option-btn" onclick="answer('q3',this,false)">D. IBM Cloud</button>
+    <div class="feedback-bar" id="q3-fb"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Providers</div>
+    <div class="question-stem">Which cloud provider is particularly strong in hybrid cloud environments and integrates seamlessly with Windows and Office 365?</div>
+    <button class="option-btn" onclick="answer('q4',this,false)">A. AWS</button>
+    <button class="option-btn" onclick="answer('q4',this,true)">B. Microsoft Azure</button>
+    <button class="option-btn" onclick="answer('q4',this,false)">C. Google Cloud Platform</button>
+    <button class="option-btn" onclick="answer('q4',this,false)">D. Alibaba Cloud</button>
+    <div class="feedback-bar" id="q4-fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · True/False</div>
+    <div class="question-stem">True or False: Google Cloud Platform is considered best-in-class for AI, data analytics, and Kubernetes.</div>
+    <button class="option-btn" onclick="answer('q5',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q5',this,false)">False</button>
+    <div class="feedback-bar" id="q5-fb"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Service Models</div>
+    <div class="question-stem">In the IaaS model, which of the following is the user's responsibility?</div>
+    <button class="option-btn" onclick="answer('q6',this,false)">A. Physical hardware maintenance</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">B. Network infrastructure</button>
+    <button class="option-btn" onclick="answer('q6',this,true)">C. Operating system, runtime, and application configuration</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">D. Everything is managed by the cloud provider</button>
+    <div class="feedback-bar" id="q6-fb"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Service Models</div>
+    <div class="question-stem">A data scientist uploads code for a Flask web app and the cloud provider automatically handles running, scaling, and updating the app. Which service model is this?</div>
+    <button class="option-btn" onclick="answer('q7',this,false)">A. IaaS</button>
+    <button class="option-btn" onclick="answer('q7',this,true)">B. PaaS</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">C. SaaS</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">D. FaaS</button>
+    <div class="feedback-bar" id="q7-fb"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · FaaS</div>
+    <div class="question-stem">What is the key characteristic of the Function as a Service (FaaS) model?</div>
+    <button class="option-btn" onclick="answer('q8',this,false)">A. You manage a fleet of persistent virtual machines</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">B. The cloud provider manages your database schema</button>
+    <button class="option-btn" onclick="answer('q8',this,true)">C. Code runs only in response to events; no servers are provisioned or billed when idle</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">D. You deploy pre-trained models without writing any code</button>
+    <div class="feedback-bar" id="q8-fb"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · True/False</div>
+    <div class="question-stem">True or False: SaaS (Software as a Service) gives the user maximum control over the underlying infrastructure and operating system.</div>
+    <button class="option-btn" onclick="answer('q9',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q9',this,true)">False</button>
+    <div class="feedback-bar" id="q9-fb"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · CaaS</div>
+    <div class="question-stem">Which service model is described as combining the benefits of IaaS and PaaS by allowing users to deploy containerised applications without managing the underlying orchestration infrastructure?</div>
+    <button class="option-btn" onclick="answer('q10',this,false)">A. IaaS</button>
+    <button class="option-btn" onclick="answer('q10',this,false)">B. PaaS</button>
+    <button class="option-btn" onclick="answer('q10',this,false)">C. SaaS</button>
+    <button class="option-btn" onclick="answer('q10',this,true)">D. CaaS</button>
+    <div class="feedback-bar" id="q10-fb"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · AWS Services</div>
+    <div class="question-stem">What is Amazon S3 used for?</div>
+    <button class="option-btn" onclick="answer('q11',this,false)">A. Running virtual machine instances</button>
+    <button class="option-btn" onclick="answer('q11',this,true)">B. Storing and retrieving unstructured data objects (files, datasets, model artefacts)</button>
+    <button class="option-btn" onclick="answer('q11',this,false)">C. Training machine learning models with managed compute</button>
+    <button class="option-btn" onclick="answer('q11',this,false)">D. Creating serverless functions triggered by HTTP events</button>
+    <div class="feedback-bar" id="q11-fb"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · AWS Services</div>
+    <div class="question-stem">Which AWS service is a managed ML platform that provides Jupyter notebooks, training, and deployment infrastructure?</div>
+    <button class="option-btn" onclick="answer('q12',this,false)">A. AWS Glue</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">B. Amazon EC2</button>
+    <button class="option-btn" onclick="answer('q12',this,true)">C. Amazon SageMaker</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">D. Amazon Redshift</button>
+    <div class="feedback-bar" id="q12-fb"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · True/False</div>
+    <div class="question-stem">True or False: AWS Lambda is a virtual machine service where you manage the operating system and install software.</div>
+    <button class="option-btn" onclick="answer('q13',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q13',this,true)">False</button>
+    <div class="feedback-bar" id="q13-fb"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Free Tier</div>
+    <div class="question-stem">Which type of AWS Free Tier benefit is available indefinitely to ALL AWS accounts, not just new ones?</div>
+    <button class="option-btn" onclick="answer('q14',this,true)">A. Always Free</button>
+    <button class="option-btn" onclick="answer('q14',this,false)">B. 12-Month Free Tier</button>
+    <button class="option-btn" onclick="answer('q14',this,false)">C. Short-term Trials</button>
+    <button class="option-btn" onclick="answer('q14',this,false)">D. Educational Free Credits</button>
+    <div class="feedback-bar" id="q14-fb"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · True/False</div>
+    <div class="question-stem">True or False: Billing alerts in AWS automatically stop your usage when your bill exceeds the defined threshold.</div>
+    <button class="option-btn" onclick="answer('q15',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q15',this,true)">False</button>
+    <div class="feedback-bar" id="q15-fb"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · IAM</div>
+    <div class="question-stem">What does IAM stand for, and what is its primary function in AWS?</div>
+    <button class="option-btn" onclick="answer('q16',this,false)">A. Infrastructure And Monitoring — tracking cloud resource usage</button>
+    <button class="option-btn" onclick="answer('q16',this,true)">B. Identity and Access Management — controlling who can access AWS services and what they can do</button>
+    <button class="option-btn" onclick="answer('q16',this,false)">C. Integrated Application Management — deploying web applications</button>
+    <button class="option-btn" onclick="answer('q16',this,false)">D. Instance and Autoscaling Manager — managing EC2 instance fleets</button>
+    <div class="feedback-bar" id="q16-fb"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · Security Best Practice</div>
+    <div class="question-stem">Why should you NOT perform daily AWS tasks using your root account?</div>
+    <button class="option-btn" onclick="answer('q17',this,false)">A. The root account does not have access to all services</button>
+    <button class="option-btn" onclick="answer('q17',this,true)">B. The root account is linked to your payment method and has unrestricted access — compromising it has the highest possible impact</button>
+    <button class="option-btn" onclick="answer('q17',this,false)">C. The root account has lower performance than IAM users</button>
+    <button class="option-btn" onclick="answer('q17',this,false)">D. Root accounts cannot use the CLI</button>
+    <div class="feedback-bar" id="q17-fb"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · True/False</div>
+    <div class="question-stem">True or False: AWS billing metric data used to create CloudWatch billing alarms is available in all AWS regions.</div>
+    <button class="option-btn" onclick="answer('q18',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q18',this,true)">False</button>
+    <div class="feedback-bar" id="q18-fb"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Access Methods</div>
+    <div class="question-stem">Which AWS access method is best suited for a data scientist who wants to automate S3 uploads and trigger SageMaker jobs from within a Python script?</div>
+    <button class="option-btn" onclick="answer('q19',this,false)">A. Management Console</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">B. CLI</button>
+    <button class="option-btn" onclick="answer('q19',this,true)">C. SDK (boto3)</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">D. AWS Email API</button>
+    <div class="feedback-bar" id="q19-fb"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · boto3</div>
+    <div class="question-stem">What is boto3?</div>
+    <button class="option-btn" onclick="answer('q20',this,false)">A. A command-line tool shipped with Python</button>
+    <button class="option-btn" onclick="answer('q20',this,true)">B. The official AWS SDK for Python, allowing programmatic access to AWS services</button>
+    <button class="option-btn" onclick="answer('q20',this,false)">C. A Docker extension for AWS container deployment</button>
+    <button class="option-btn" onclick="answer('q20',this,false)">D. A machine learning library built on top of scikit-learn</button>
+    <div class="feedback-bar" id="q20-fb"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · Security</div>
+    <div class="question-stem">A data scientist hard-codes their <code>AWS_ACCESS_KEY_ID</code> in a Python script and pushes it to a public GitHub repo. What is the most critical risk?</div>
+    <button class="option-btn" onclick="answer('q21',this,false)">A. The script will fail to connect to AWS</button>
+    <button class="option-btn" onclick="answer('q21',this,false)">B. The script will run slower due to authentication overhead</button>
+    <button class="option-btn" onclick="answer('q21',this,true)">C. Malicious actors can find the credentials and use them to incur AWS charges or steal data</button>
+    <button class="option-btn" onclick="answer('q21',this,false)">D. GitHub will automatically encrypt the credentials</button>
+    <div class="feedback-bar" id="q21-fb"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · True/False</div>
+    <div class="question-stem">True or False: By default, all objects stored in an Amazon S3 bucket are publicly accessible on the internet.</div>
+    <button class="option-btn" onclick="answer('q22',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q22',this,true)">False</button>
+    <div class="feedback-bar" id="q22-fb"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Lambda</div>
+    <div class="question-stem">In an AWS Lambda function, what does the <code>event</code> parameter contain?</div>
+    <button class="option-btn" onclick="answer('q23',this,true)">A. The input data that triggered the function (e.g., the JSON body of an HTTP request)</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">B. Metadata about the Lambda function itself, such as function name and timeout</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">C. The return value from a previous Lambda invocation</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">D. AWS credentials for accessing other services</button>
+    <div class="feedback-bar" id="q23-fb"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · Lambda</div>
+    <div class="question-stem">Which of the following is NOT one of the three cost drivers for AWS Lambda?</div>
+    <button class="option-btn" onclick="answer('q24',this,false)">A. Number of executions per month</button>
+    <button class="option-btn" onclick="answer('q24',this,false)">B. Memory allocated</button>
+    <button class="option-btn" onclick="answer('q24',this,false)">C. Execution time in milliseconds</button>
+    <button class="option-btn" onclick="answer('q24',this,true)">D. Storage size of the function's deployment package</button>
+    <div class="feedback-bar" id="q24-fb"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · API Gateway</div>
+    <div class="question-stem">What role does AWS API Gateway play in a model deployment scenario?</div>
+    <button class="option-btn" onclick="answer('q25',this,false)">A. It trains the machine learning model</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">B. It stores the model weights in a database</button>
+    <button class="option-btn" onclick="answer('q25',this,true)">C. It acts as a "front door" — receiving HTTP requests and forwarding them to the Lambda function, then returning the response to the caller</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">D. It manages IAM permissions for the Lambda function</button>
+    <div class="feedback-bar" id="q25-fb"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · True/False</div>
+    <div class="question-stem">True or False: AWS Lambda requires you to provision and manage virtual machine instances to run your function code.</div>
+    <button class="option-btn" onclick="answer('q26',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q26',this,true)">False</button>
+    <div class="feedback-bar" id="q26-fb"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · Serialisation</div>
+    <div class="question-stem">In the end-to-end Titanic project, joblib is used to save and load the trained model. What is the term for converting a Python model object into a binary file?</div>
+    <button class="option-btn" onclick="answer('q27',this,false)">A. Containerisation</button>
+    <button class="option-btn" onclick="answer('q27',this,false)">B. Virtualisation</button>
+    <button class="option-btn" onclick="answer('q27',this,true)">C. Serialisation</button>
+    <button class="option-btn" onclick="answer('q27',this,false)">D. Compilation</button>
+    <div class="feedback-bar" id="q27-fb"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · Services Mapping</div>
+    <div class="question-stem">Which of the following correctly maps an AWS service to a GCP equivalent?</div>
+    <button class="option-btn" onclick="answer('q28',this,false)">A. AWS Lambda → Google BigQuery</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">B. Amazon S3 → Google Kubernetes Engine</button>
+    <button class="option-btn" onclick="answer('q28',this,true)">C. Amazon SageMaker → Google Vertex AI</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">D. Amazon EC2 → Google Cloud Functions</button>
+    <div class="feedback-bar" id="q28-fb"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · True/False</div>
+    <div class="question-stem">True or False: DigitalOcean is considered the best cloud provider for enterprise-grade regulated industries requiring strict compliance certifications.</div>
+    <button class="option-btn" onclick="answer('q29',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q29',this,true)">False</button>
+    <div class="feedback-bar" id="q29-fb"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · FaaS Disadvantage</div>
+    <div class="question-stem">A deployed Lambda model consistently takes 3–4 seconds to return the first prediction after a period of inactivity. What phenomenon is this?</div>
+    <button class="option-btn" onclick="answer('q30',this,false)">A. Network throttling</button>
+    <button class="option-btn" onclick="answer('q30',this,true)">B. Cold start latency</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">C. Memory leak</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">D. API Gateway timeout</button>
+    <div class="feedback-bar" id="q30-fb"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Cloud Benefits</div>
+    <div class="question-stem">A startup data team has highly variable compute demands — heavy training jobs weekly, minimal usage otherwise. Which cloud benefit is most relevant to justify their cloud adoption over buying hardware?</div>
+    <button class="option-btn" onclick="answer('q31',this,false)">A. Flexibility to run on any OS</button>
+    <button class="option-btn" onclick="answer('q31',this,true)">B. Cost efficiency — pay only for what you use, with no upfront hardware investment</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">C. Better network security than on-premises</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">D. Faster Python execution speed</button>
+    <div class="feedback-bar" id="q31-fb"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · AWS CLI</div>
+    <div class="question-stem">What is the correct CLI command to upload a local file <code>train.csv</code> to an S3 bucket named <code>my-bucket</code>?</div>
+    <button class="option-btn" onclick="answer('q32',this,false)">A. <code>aws s3 upload train.csv my-bucket</code></button>
+    <button class="option-btn" onclick="answer('q32',this,true)">B. <code>aws s3 cp train.csv s3://my-bucket/train.csv</code></button>
+    <button class="option-btn" onclick="answer('q32',this,false)">C. <code>aws s3 push train.csv s3://my-bucket</code></button>
+    <button class="option-btn" onclick="answer('q32',this,false)">D. <code>aws upload train.csv --bucket my-bucket</code></button>
+    <div class="feedback-bar" id="q32-fb"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · True/False</div>
+    <div class="question-stem">True or False: The AWS Free Tier's 12-month EC2 offer provides 750 hours/month of t2.micro or t3.micro instance time — enough to run one instance continuously.</div>
+    <button class="option-btn" onclick="answer('q33',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q33',this,false)">False</button>
+    <div class="feedback-bar" id="q33-fb"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · Data Warehousing</div>
+    <div class="question-stem">Which AWS service is the managed data warehouse solution for large-scale columnar SQL analytics?</div>
+    <button class="option-btn" onclick="answer('q34',this,false)">A. RDS</button>
+    <button class="option-btn" onclick="answer('q34',this,true)">B. Redshift</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">C. DynamoDB</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">D. Glue</button>
+    <div class="feedback-bar" id="q34-fb"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · True/False</div>
+    <div class="question-stem">True or False: Amazon EC2 is classified as an Infrastructure as a Service (IaaS) offering.</div>
+    <button class="option-btn" onclick="answer('q35',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q35',this,false)">False</button>
+    <div class="feedback-bar" id="q35-fb"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Applied Scenario</div>
+    <div class="question-stem">Your team wants to train a logistic regression on the Titanic dataset but your laptops are underpowered. You want to pay only for the hours used, install your own Python environment, and shut everything down after training. Which AWS service and model best fits?</div>
+    <button class="option-btn" onclick="answer('q36',this,false)">A. S3 (IaaS) — store the data and compute locally</button>
+    <button class="option-btn" onclick="answer('q36',this,true)">B. EC2 (IaaS) — rent a powerful VM, install tools, train, then terminate</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">C. Lambda (FaaS) — run training as a function triggered by a timer</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">D. QuickSight (SaaS) — visualise the training progress</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · Lambda Handler</div>
+    <div class="question-stem">When deploying a Lambda function named <code>predict</code> in a file <code>app.py</code>, what should the handler be configured as?</div>
+    <button class="option-btn" onclick="answer('q37',this,false)">A. <code>predict.app</code></button>
+    <button class="option-btn" onclick="answer('q37',this,true)">B. <code>app.predict</code></button>
+    <button class="option-btn" onclick="answer('q37',this,false)">C. <code>lambda.handler</code></button>
+    <button class="option-btn" onclick="answer('q37',this,false)">D. <code>handler.app.predict</code></button>
+    <div class="feedback-bar" id="q37-fb"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · True/False</div>
+    <div class="question-stem">True or False: In AWS, you must set the region to US East (N. Virginia) when creating CloudWatch billing alarms because billing metric data is only stored in that region.</div>
+    <button class="option-btn" onclick="answer('q38',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q38',this,false)">False</button>
+    <div class="feedback-bar" id="q38-fb"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · ETL Services</div>
+    <div class="question-stem">Which AWS service is specifically designed for ETL (Extract, Transform, Load) data pipeline workflows?</div>
+    <button class="option-btn" onclick="answer('q39',this,false)">A. Amazon Kinesis</button>
+    <button class="option-btn" onclick="answer('q39',this,true)">B. AWS Glue</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">C. Amazon RDS</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">D. AWS CloudTrail</button>
+    <div class="feedback-bar" id="q39-fb"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · True/False</div>
+    <div class="question-stem">True or False: Google BigQuery is classified as a SaaS product, not a PaaS, because users write no code at all to use it.</div>
+    <button class="option-btn" onclick="answer('q40',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q40',this,true)">False</button>
+    <div class="feedback-bar" id="q40-fb"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · IAM Groups</div>
+    <div class="question-stem">In the AWS IAM security setup, what is the recommended way to assign permissions to an IAM user?</div>
+    <button class="option-btn" onclick="answer('q41',this,false)">A. Attach policies directly to each user individually</button>
+    <button class="option-btn" onclick="answer('q41',this,true)">B. Create a group with the appropriate policies, then add the user to the group</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">C. Give every user Administrator Access by default</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">D. Use the root account to grant permissions interactively each session</button>
+    <div class="feedback-bar" id="q41-fb"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · Project Architecture</div>
+    <div class="question-stem">In the end-to-end Titanic project, which service is responsible for <em>serving</em> model predictions via HTTP to end users?</div>
+    <button class="option-btn" onclick="answer('q42',this,false)">A. Amazon S3</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">B. SageMaker Studio</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">C. AWS Lambda alone</button>
+    <button class="option-btn" onclick="answer('q42',this,true)">D. API Gateway (front door) + Lambda (logic)</button>
+    <div class="feedback-bar" id="q42-fb"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · True/False</div>
+    <div class="question-stem">True or False: The AWS Management Console is a command-line tool, while the CLI is a web-based graphical interface.</div>
+    <button class="option-btn" onclick="answer('q43',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q43',this,true)">False</button>
+    <div class="feedback-bar" id="q43-fb"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Service Model Applied</div>
+    <div class="question-stem">A data scientist uses Google Colab to train a model, uploads data, and downloads results without installing any software. Which service model does this represent?</div>
+    <button class="option-btn" onclick="answer('q44',this,false)">A. IaaS</button>
+    <button class="option-btn" onclick="answer('q44',this,false)">B. PaaS</button>
+    <button class="option-btn" onclick="answer('q44',this,true)">C. SaaS</button>
+    <button class="option-btn" onclick="answer('q44',this,false)">D. FaaS</button>
+    <div class="feedback-bar" id="q44-fb"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Networking</div>
+    <div class="question-stem">What is a Virtual Private Cloud (VPC) in the context of cloud computing?</div>
+    <button class="option-btn" onclick="answer('q45',this,false)">A. A type of virtual machine with enhanced GPU support</button>
+    <button class="option-btn" onclick="answer('q45',this,true)">B. An isolated, private network within the cloud provider's infrastructure for organising and securing resources</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">C. A special EC2 instance type for networking workloads</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">D. A managed database service with private access</button>
+    <div class="feedback-bar" id="q45-fb"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · True/False</div>
+    <div class="question-stem">True or False: MFA (Multi-Factor Authentication) should be enabled on the AWS root account as a first priority after account creation, because the root account is linked to billing.</div>
+    <button class="option-btn" onclick="answer('q46',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q46',this,false)">False</button>
+    <div class="feedback-bar" id="q46-fb"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · Lambda Permissions</div>
+    <div class="question-stem">A Lambda function needs to load a model file from S3 but gets an "Access Denied" error. What is the most likely fix?</div>
+    <button class="option-btn" onclick="answer('q47',this,false)">A. Increase the Lambda function's memory allocation</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">B. Redeploy the function with a new ZIP file</button>
+    <button class="option-btn" onclick="answer('q47',this,true)">C. Attach an IAM policy granting <code>s3:GetObject</code> permission on the relevant S3 bucket to the Lambda execution role</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">D. Switch from Python 3.9 to Python 3.11 runtime</button>
+    <div class="feedback-bar" id="q47-fb"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · True/False</div>
+    <div class="question-stem">True or False: AWS Free Tier usage limits reset every month.</div>
+    <button class="option-btn" onclick="answer('q48',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q48',this,false)">False</button>
+    <div class="feedback-bar" id="q48-fb"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · S3 Pandas Integration</div>
+    <div class="question-stem">After making an S3 bucket's objects publicly accessible, which Pandas syntax correctly reads a CSV from S3?</div>
+    <button class="option-btn" onclick="answer('q49',this,false)">A. <code>pd.read_csv('aws://my-bucket/data.csv')</code></button>
+    <button class="option-btn" onclick="answer('q49',this,true)">B. <code>pd.read_csv('s3://my-bucket/data.csv')</code></button>
+    <button class="option-btn" onclick="answer('q49',this,false)">C. <code>pd.read_s3('my-bucket', 'data.csv')</code></button>
+    <button class="option-btn" onclick="answer('q49',this,false)">D. <code>pd.from_cloud('s3', 'my-bucket/data.csv')</code></button>
+    <div class="feedback-bar" id="q49-fb"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Integration Scenario</div>
+    <div class="question-stem">A team trains a churn prediction model, serialises it with joblib, uploads it to S3, and wants to expose it for real-time predictions via a REST API — all within the AWS Free Tier. Which combination of services matches the lecture's recommended approach?</div>
+    <button class="option-btn" onclick="answer('q50',this,false)">A. EC2 + RDS + CloudWatch</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">B. SageMaker Endpoint + Redshift + QuickSight</button>
+    <button class="option-btn" onclick="answer('q50',this,true)">C. S3 (storage) + SageMaker (training) + Lambda (serving) + API Gateway (HTTP endpoint)</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">D. ECS + DynamoDB + Kinesis</button>
+    <div class="feedback-bar" id="q50-fb"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+
+<!-- ══════════════════════
+     SHORT ANSWER SECTION
+══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer — 10 Questions (Oral Exam Style)</h2>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · Concept</div>
+    <div class="question-stem">Explain the evolution from on-premises data centres to cloud computing. What limitations of earlier models drove organisations to adopt cloud infrastructure?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      In the 1980s–1990s, organisations ran on-premises data centres — privately owned servers managed entirely by the company. Physical access was required; if a developer needed to use the server, they had to be in the same building. This model was capital-intensive and inflexible.
+      <br><br>
+      The 1990s–2000s introduced internet/web-based hosting, eliminating the need for physical proximity — apps were deployed on servers accessible over the internet via browsers. However, companies still owned and maintained the infrastructure.
+      <br><br>
+      The 2000s–2010s marked the cloud revolution: Amazon, Microsoft, and Google built massive shared data centres. Virtualisation technology allowed multiple organisations to share the same physical hardware in isolated environments, billed on a pay-per-use basis. Key drivers of adoption were: eliminating hardware capital expenditure, outsourcing IT management to focus on core business, elastic scalability (scale up for peaks, down for troughs), and global accessibility.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What specific problems does cloud computing create that on-premises did not have?</li>
+        <li>When might a company still prefer on-premises over cloud for data science?</li>
+        <li>What is the difference between a public cloud, private cloud, and hybrid cloud?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Service Models</div>
+    <div class="question-stem">Compare IaaS, PaaS, and FaaS using a concrete data science scenario for each. What is the key trade-off between control and convenience across these models?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>IaaS (Infrastructure as a Service):</strong> A data scientist rents an AWS EC2 GPU instance to train a deep learning model. They install CUDA, Python, PyTorch, and custom libraries. After training, they terminate the instance. Full control over the environment — but responsible for OS, security patches, and configuration. Trade-off: maximum flexibility, maximum management overhead.
+      <br><br>
+      <strong>PaaS (Platform as a Service):</strong> A team deploys a Flask API exposing their model predictions on Google App Engine. They upload code; the platform manages servers, scaling, and updates. Trade-off: fast deployment, no server management — but limited to the runtimes and configurations the platform supports.
+      <br><br>
+      <strong>FaaS (Function as a Service):</strong> A team deploys a single predict() function on AWS Lambda, triggered by HTTP requests via API Gateway. When no requests come in, nothing runs and nothing is billed. Trade-off: extremely cost-efficient for intermittent workloads, fully managed — but limited runtime duration and cold start latency can be problematic for time-sensitive inference.
+      <br><br>
+      <strong>Core trade-off:</strong> Moving from IaaS → PaaS → FaaS reduces management burden but also reduces control and flexibility. IaaS is right for complex custom environments; FaaS is right when you just want to run a function without thinking about infrastructure at all.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Where does SaaS fit in this spectrum, and can a data scientist use SaaS for model training?</li>
+        <li>What is a "cold start" in FaaS and how can it be mitigated?</li>
+        <li>Why might CaaS be preferred over pure FaaS for a complex ML pipeline?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Providers</div>
+    <div class="question-stem">Compare AWS, Azure, and GCP from a data science perspective. In what scenarios might you choose each, and what factors should drive the decision?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>AWS</strong> is the largest provider with the broadest ecosystem (200+ services). It excels in breadth — EC2 for compute, S3 for storage, SageMaker for end-to-end ML, Lambda for serverless. Choose AWS when: your team has existing AWS expertise, you need the widest service catalogue, or you're running an end-to-end ML pipeline (the lecture's own project uses AWS). The Free Tier is also generous for learning.
+      <br><br>
+      <strong>Microsoft Azure</strong> shines for organisations already in the Microsoft ecosystem (Windows, Office 365, Active Directory). Its hybrid cloud capabilities make it strong for enterprises that need to connect on-premises systems to cloud workloads. Azure ML supports Jupyter notebooks, containers, and Kubernetes. Preferred in regulated industries (government, healthcare, finance) for its compliance certifications.
+      <br><br>
+      <strong>GCP</strong> is considered best-in-class for data analytics and AI. BigQuery (data warehouse) and Vertex AI (ML platform) are widely regarded as leading services. GCP's Kubernetes tooling is top-tier (it created Kubernetes). Preferred when your primary workloads are large-scale data analytics or you rely heavily on Kubernetes.
+      <br><br>
+      <strong>Key decision factors:</strong> existing tools and integrations; team familiarity; budget; compliance requirements; specific service quality (e.g., data warehouse → BigQuery wins); geographic availability.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Can a team use multiple cloud providers simultaneously (multi-cloud)? What are the trade-offs?</li>
+        <li>Why might a startup choose DigitalOcean or Heroku over AWS?</li>
+        <li>How do pricing models differ between AWS, Azure, and GCP?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · AWS IAM &amp; Security</div>
+    <div class="question-stem">Describe the five-step AWS security setup recommended in the lecture. Why is each step important, and what risks do they collectively mitigate?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <ol>
+        <li><strong>Access IAM service:</strong> Centralises all security management. IAM is both the authentication (verifying identity) and authorisation (defining permissions) layer for all AWS services.</li>
+        <li><strong>Activate MFA on the root account:</strong> The root account has unrestricted access to everything and is linked to your credit card. Enabling MFA (e.g., Google Authenticator) means even if someone obtains your password, they cannot log in without the second factor. This is the single most impactful security step.</li>
+        <li><strong>Create an IAM user:</strong> Best practice is to never use the root account for daily tasks. An IAM user has only the permissions explicitly granted, limiting the blast radius of any compromise.</li>
+        <li><strong>Create a group and assign permissions:</strong> Grouping users with shared roles (e.g., "aws-admins") makes permission management scalable. Policies attached to the group apply to all members — no need to update each user individually.</li>
+        <li><strong>Create a password policy:</strong> Enforces minimum complexity (length, special characters, rotation) for all IAM users, reducing the risk of brute-force attacks.</li>
+      </ol>
+      Collectively, these steps enforce the <em>principle of least privilege</em> — each entity has only the minimum permissions required — and add defence-in-depth layers against account compromise.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What is the difference between an IAM user, an IAM role, and an IAM group?</li>
+        <li>What happens if you lose your MFA device after enabling it on your root account?</li>
+        <li>How do IAM roles differ from access keys, and which should be preferred for Lambda functions?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · boto3 vs CLI vs Console</div>
+    <div class="question-stem">Explain the three ways to access AWS services and give a concrete example of when each is the most appropriate choice for a data science team.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>Management Console (web GUI):</strong> Best for exploration, learning, and one-off manual tasks. A new data scientist sets up their first S3 bucket, drags and drops training data, and clicks through SageMaker to spin up a notebook — no code needed. Downsides: not reproducible; slow for repeated tasks.
+      <br><br>
+      <strong>CLI (Command-Line Interface):</strong> Best for scripting, batch operations, and CI/CD pipelines. A data engineer writes a shell script that runs nightly to copy new data files to S3 with <code>aws s3 sync</code>, then triggers a SageMaker training job. Fast and reproducible, but requires installation and credential configuration.
+      <br><br>
+      <strong>SDK / boto3 (Python):</strong> Best for integration into Python data science workflows. A data scientist writes a pipeline that loads training data from S3 with <code>pd.read_csv('s3://...')</code>, trains a model, serialises it with joblib, then uploads the artefact to S3 — all within a single Python script, fully automated and version-controlled. Most powerful and programmable option; requires IAM credentials setup.
+      <br><br>
+      <strong>Security note:</strong> Never hard-code credentials in Python scripts. Use environment variables or IAM roles so credentials are not exposed in version-controlled code.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Can you use the CLI and boto3 together in the same workflow?</li>
+        <li>How would you set AWS credentials as environment variables on Linux/Mac?</li>
+        <li>What is the difference between programmatic access and console access when creating an IAM user?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · AWS Lambda</div>
+    <div class="question-stem">Explain how AWS Lambda works, including its pricing model, the structure of the handler function, and its advantages and disadvantages for serving machine learning model predictions.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      AWS Lambda is a <em>serverless, event-driven</em> compute service. You upload function code (Python, Java, Node.js, etc.) and specify the handler. AWS runs the function in response to triggers — HTTP requests (via API Gateway), S3 events, scheduled timers, etc. — and scales automatically. When idle, nothing runs and nothing is billed.
+      <br><br>
+      <strong>Handler structure:</strong>
+      <div class="formula-box">def lambda_handler(event, context):<br>&nbsp;&nbsp;# event: input data (e.g., JSON from HTTP request)<br>&nbsp;&nbsp;# context: metadata (function name, timeout remaining)<br>&nbsp;&nbsp;prediction = model.predict(...)<br>&nbsp;&nbsp;return {'statusCode': 200, 'body': json.dumps({'prediction': int(prediction)})}</div>
+      <strong>Pricing:</strong> Three cost drivers — (1) number of executions/month, (2) memory allocated, (3) execution time in milliseconds. Free tier: 1M requests + 400,000 GB-seconds/month.
+      <br><br>
+      <strong>ML serving advantages:</strong> No server management; auto-scales with traffic; extremely cost-efficient for sporadic/low-volume prediction requests; pairs naturally with API Gateway for a complete REST endpoint.
+      <br><br>
+      <strong>Disadvantages:</strong> Cold start latency (first invocation after idle period takes seconds while the execution environment initialises); limited max runtime (15 min); limited storage; large ML libraries (PyTorch, TensorFlow) may exceed deployment package size limits — use Lambda Layers or container images instead.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How would you add additional Python packages (like scikit-learn) to a Lambda function?</li>
+        <li>What is the maximum execution time for a Lambda function?</li>
+        <li>When would a persistent SageMaker endpoint be better than Lambda for model serving?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · S3 and Data Management</div>
+    <div class="question-stem">Describe Amazon S3's role in a data science workflow. Explain what object storage is, how S3 access control works by default, and how a data scientist can read an S3 file directly into a pandas DataFrame.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      Amazon S3 (Simple Storage Service) is the primary cloud storage layer for data science on AWS. It is <em>object storage</em> — data is stored as flat objects (files) in buckets, identified by a key (path). Unlike block storage (virtual hard drives) or file storage (shared filesystems), object storage is highly scalable, durable, and inexpensive — ideal for datasets, model artefacts, logs, and backups of any size.
+      <br><br>
+      <strong>Role in a DS workflow:</strong> S3 serves as the central data lake. Raw data is uploaded → SageMaker or EC2 reads from S3 for training → trained models are serialised (e.g., <code>model.pkl</code>) and uploaded to S3 → Lambda loads the model from S3 at prediction time.
+      <br><br>
+      <strong>Access control:</strong> By default, all buckets and objects are <em>private</em> — not accessible by anyone except the account owner. To allow public access, you must explicitly disable "Block Public Access" settings and configure bucket/object ACLs or policies. This is a deliberate security default to prevent accidental data exposure.
+      <br><br>
+      <strong>Reading into pandas:</strong>
+      <div class="formula-box">
+        # Route 1: HTTPS URL (requires public access enabled)<br>
+        df = pd.read_csv('https://mybucket.s3.eu-central-1.amazonaws.com/data.csv')<br><br>
+        # Route 2: S3 URI (requires boto3 + s3fs configured, or IAM credentials)<br>
+        df = pd.read_csv('s3://mybucket/data.csv')
+      </div>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What is the difference between S3 and EBS (Elastic Block Store)?</li>
+        <li>How would you restrict S3 access so only your Lambda function can read a specific bucket?</li>
+        <li>What is an S3 presigned URL and when would you use it?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · API Gateway + Lambda Architecture</div>
+    <div class="question-stem">Explain the full request-response flow when a user sends a prediction request through an API Gateway + Lambda architecture (as in the Titanic project). What does each component do, and why is this architecture preferable to exposing Lambda directly?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>Full flow:</strong>
+      <ol>
+        <li>User sends <code>POST https://&lt;api-id&gt;.execute-api.amazonaws.com/prod/predict</code> with JSON body <code>{"features": [22, 1, 7.25, ...]}</code></li>
+        <li>API Gateway receives the HTTP request and validates it (optionally checks API keys or auth tokens)</li>
+        <li>API Gateway forwards the request body to the configured Lambda function (AWS_PROXY integration)</li>
+        <li>Lambda's <code>lambda_handler(event, context)</code> receives the event, loads the model from S3 (or uses a cached copy from <code>/tmp/</code>), runs inference, and returns a response dict with a status code and body</li>
+        <li>API Gateway packages the Lambda response as an HTTP response and sends it back to the user</li>
+        <li>User receives <code>{"prediction": 0}</code></li>
+      </ol>
+      <strong>Why not expose Lambda directly?</strong> Lambda functions are not HTTP endpoints — they have no URL by default. API Gateway adds the HTTP layer, and with it: authentication/authorisation (API keys, OAuth), rate limiting, request/response transformation, monitoring dashboards (latency, error rate), SSL/TLS termination, and CORS handling. It also decouples the caller from the backend, so Lambda can be swapped for another implementation without changing the public API.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What is the difference between REST API and HTTP API in API Gateway?</li>
+        <li>How would you add authentication to the API so only authorised users can call /predict?</li>
+        <li>How would you test the API endpoint from the command line?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Cost Management</div>
+    <div class="question-stem">Describe the AWS Free Tier in detail and explain the complete process for setting up billing alarms. Why are billing controls especially important for students or data scientists learning AWS?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>AWS Free Tier types:</strong>
+      <ul>
+        <li><em>Always Free</em> — available to all accounts indefinitely. Examples: Lambda (1M requests/month, 400K GB-seconds); DynamoDB (5 GB storage).</li>
+        <li><em>12-Month Free</em> — for new accounts, valid 12 months from signup. Examples: EC2 (750 hrs/month t2.micro), S3 (5 GB standard storage), RDS (750 hrs/month db.t2.micro).</li>
+        <li><em>Short-term Trials</em> — some services offer a limited free trial period once activated.</li>
+      </ul>
+      <strong>Billing alarm setup:</strong>
+      <ol>
+        <li>Go to Billing and Cost Management → Billing Preferences → enable "Receive CloudWatch Billing Alerts"</li>
+        <li>Switch AWS region to <strong>US East (N. Virginia)</strong> — billing data is only stored here</li>
+        <li>In CloudWatch: Alarms → Create Alarm → Billing → Total Estimated Charge → set threshold (e.g., $1 USD) → configure SNS topic for email notification → name and create alarm</li>
+      </ol>
+      <strong>Critical nuance:</strong> The alarm only sends a notification — it does NOT stop or pause usage. It is the user's responsibility to stop services manually after receiving the alert.
+      <br><br>
+      <strong>Why important for students:</strong> Leaving a SageMaker notebook instance, EC2 instance, or RDS database running unintentionally can rapidly accrue charges. A GPU EC2 instance can cost $0.90–$3+/hour. A student who forgets to shut down for a weekend could incur $50–$200 in unexpected charges. Billing alerts provide an early warning; understanding the free tier limits prevents accidental overage.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What happens when the 12-month free tier period expires?</li>
+        <li>How can you see a breakdown of which services are consuming your free tier allowance?</li>
+        <li>Is there a way to set a hard spending cap in AWS? (Trick: No — AWS does not provide hard caps; only alerts.)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · End-to-End Design</div>
+    <div class="question-stem">Walk through the architecture of the complete end-to-end Titanic prediction project from the lecture. For each step, name the AWS service used, explain its role, and justify why it was chosen over alternatives. What would you change to make this production-ready?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <table>
+        <thead><tr><th>Step</th><th>Service</th><th>Role &amp; Justification</th></tr></thead>
+        <tbody>
+          <tr><td>Data storage</td><td>S3</td><td>Object storage for train.csv and model.pkl. Chosen because it is highly scalable, cheap, durable, and integrates natively with SageMaker, Lambda, and pandas (via s3:// URI). Alternative: EBS — but EBS is block storage attached to a VM, not suitable for sharing across services.</td></tr>
+          <tr><td>Compute / notebook</td><td>SageMaker Studio / Notebook Instance</td><td>Managed Jupyter environment. Eliminates OS/hardware setup; has built-in IAM roles for S3 access. Alternative: EC2 — more control but requires manual Jupyter setup and OS management.</td></tr>
+          <tr><td>Training</td><td>Python (scikit-learn) inside SageMaker</td><td>Logistic regression is lightweight; SageMaker's Jupyter provides enough compute. For large-scale models, SageMaker Training Jobs would be used instead.</td></tr>
+          <tr><td>Model serialisation</td><td>joblib → S3</td><td>joblib efficiently serialises scikit-learn models. Uploading to S3 makes the model accessible to Lambda without re-training.</td></tr>
+          <tr><td>Serving</td><td>Lambda</td><td>FaaS — loads model from S3, runs prediction. Free tier covers 1M requests/month. No server management. Alternative: SageMaker Endpoint — better for high-volume, low-latency production serving; Lambda has cold start.</td></tr>
+          <tr><td>HTTP endpoint</td><td>API Gateway</td><td>Exposes Lambda as a REST API. Adds security (API keys), monitoring, rate limiting. Users interact only with the HTTP endpoint, never directly with Lambda or S3.</td></tr>
+        </tbody>
+      </table>
+      <strong>Production improvements:</strong>
+      <ul>
+        <li>Use a SageMaker Endpoint instead of Lambda for consistent low-latency serving</li>
+        <li>Add API Gateway authentication (API keys, Cognito)</li>
+        <li>Implement model monitoring (data drift detection)</li>
+        <li>Add CI/CD pipeline (CodePipeline) to automatically retrain and redeploy on new data</li>
+        <li>Use Lambda Layers or container images for large ML dependencies instead of ZIP packages</li>
+        <li>Enable S3 versioning to track model artefact history</li>
+      </ul>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>How would you retrain the model automatically when new data arrives in S3?</li>
+        <li>How would you handle the Lambda cold start problem in a production scenario?</li>
+        <li>What monitoring would you add to detect when the model's predictions are degrading?</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+  let answered = {};
+
+  function answer(qId, btn, isCorrect) {
+    if (answered[qId]) return;
+    answered[qId] = true;
+
+    const card = document.getElementById(qId);
+    const allBtns = card.querySelectorAll('.option-btn');
+    const fb = document.getElementById(qId + '-fb');
+
+    allBtns.forEach(b => b.classList.add('locked'));
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      fb.textContent = '✅ Correct!';
+      fb.className = 'feedback-bar correct';
+    } else {
+      btn.classList.add('incorrect');
+      fb.textContent = '❌ Incorrect — review the notes above.';
+      fb.className = 'feedback-bar incorrect';
+      allBtns.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes('true')) {
+          b.classList.add('reveal-correct');
+        }
+      });
+    }
+    updateScore();
+  }
+
+  function updateScore() {
+    const total    = document.querySelectorAll('.mcq-card').length;
+    const correct  = document.querySelectorAll('.option-btn.correct').length;
+    const attempted = Object.keys(answered).length;
+    document.getElementById('score-display').textContent =
+      'Score: ' + correct + ' / ' + attempted + ' answered (of ' + total + ')';
+  }
+
+  function resetAll() {
+    answered = {};
+    document.querySelectorAll('.option-btn').forEach(btn => { btn.className = 'option-btn'; });
+    document.querySelectorAll('.feedback-bar').forEach(fb => { fb.textContent = ''; fb.className = 'feedback-bar'; });
+    document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  }
+
+  function toggleAnswer(btn) {
+    const panel = btn.nextElementSibling;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      btn.textContent = 'Reveal Answer';
+    } else {
+      panel.style.display = 'block';
+      btn.textContent = 'Hide Answer';
+    }
+  }
+</script>
+
+</body>
+</html>
