@@ -4,7 +4,7 @@
   <title>Modern Data Analytics · KUL MSDS Notes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -210,6 +210,7 @@
       letter-spacing: 1px;
       padding: 5px 14px;
       border-radius: 20px;
+      white-space: nowrap;
     }
     .badge-part1 { background: #fce7f3; color: #be185d; }
     .badge-part2 { background: #fef9c3; color: #a16207; }
@@ -306,6 +307,9 @@
     .tag-ml          { background: #ede9fe; color: #7c3aed; }
     .tag-dashboard   { background: #fce7f3; color: #be185d; }
     .tag-infra       { background: #e0f2fe; color: #0369a1; }
+    .tag-git         { background: #fef3c7; color: #92400e; }
+    .tag-docker      { background: #dbeafe; color: #1e40af; }
+    .tag-cloud       { background: #d1fae5; color: #065f46; }
 
     .chapter-arrow {
       width: 28px; height: 28px;
@@ -363,7 +367,7 @@
     <p>Lecture notes covering Python for data science, machine learning pipelines, dashboarding, and analytics infrastructure.</p>
     <div class="stats-bar">
       <div class="stat-item">
-        <span class="stat-value">6</span>
+        <span class="stat-value">9</span>
         <span class="stat-label">Sessions</span>
       </div>
       <div class="stat-divider"></div>
@@ -381,7 +385,7 @@
 
   <!-- Sessions -->
   <main>
-    <div class="section-label">3 Parts · 6 Sessions</div>
+    <div class="section-label">3 Parts · 9 Sessions</div>
 
     <!-- Part 1 -->
     <div class="part-group">
@@ -465,6 +469,36 @@
         </div>
         <div class="chapter-arrow">→</div>
       </a>
+
+      <a class="chapter-card" href="MDA_Lecture7_StudyNotes.html">
+        <div class="chapter-num"><span>3-2</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Part 3 · Session 2</div>
+          <div class="chapter-title">Code Repositories</div>
+          <span class="chapter-tag tag-git">GitHub · Hugging Face</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="MDA_Lecture8_StudyNotes.html">
+        <div class="chapter-num"><span>3-3</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Part 3 · Session 3</div>
+          <div class="chapter-title">Containerisation with Docker</div>
+          <span class="chapter-tag tag-docker">Docker · Kubernetes</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
+
+      <a class="chapter-card" href="MDA_Lecture9_StudyNotes.html">
+        <div class="chapter-num"><span>3-4</span></div>
+        <div class="chapter-info">
+          <div class="chapter-label">Part 3 · Session 4</div>
+          <div class="chapter-title">Cloud Computing</div>
+          <span class="chapter-tag tag-cloud">AWS · Azure · GCP</span>
+        </div>
+        <div class="chapter-arrow">→</div>
+      </a>
     </div>
 
   </main>
@@ -472,7 +506,5 @@
   <footer>
     KUL MSDS Notes &nbsp;·&nbsp; Hosted on <a href="https://pages.github.com" target="_blank">GitHub Pages</a>
   </footer>
-
-
 
 </body></html>
