@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 8 – Deep Learning III: Graphs | Advanced Analytics Review</title>
+<style>
+  /* ── Global ── */
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  /* ── Nav Bar ── */
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  /* ── Notes Section ── */
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c;
+    font-size: 1.25em;
+    font-weight: 700;
+    border-bottom: 2px solid #eef2fb;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4;
+    font-size: 1.05em;
+    font-weight: 700;
+    margin-top: 22px;
+    margin-bottom: 6px;
+  }
+
+  /* ── Content boxes ── */
+  .key-point  { background:#eef6ff; border-left:4px solid #2e6da4; border-radius:0; padding:12px 18px; margin:14px 0; }
+  .formula-box{ background:#f8f9ff; border:1px solid #c8d4f0; border-radius:8px; padding:12px 18px; margin:14px 0; font-family: 'Courier New', monospace; font-size:0.94em; }
+  .example-box{ background:#f0f7ee; border-left:4px solid #4caf50; border-radius:0; padding:12px 18px; margin:14px 0; }
+  .warning-box{ background:#fff8e1; border-left:4px solid #ffc107; border-radius:0; padding:12px 18px; margin:14px 0; }
+  .theorem-box{ background:#f3f0ff; border-left:4px solid #7c4dff; border-radius:0; padding:14px 20px; margin:16px 0; }
+  .compute-box{ background:#fdf3f3; border-left:4px solid #e57373; border-radius:0; padding:12px 18px; margin:14px 0; }
+
+  /* ── Tables ── */
+  table { width:100%; border-collapse:collapse; margin:18px 0; font-size:0.93em; box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color:#2e6da4; color:#ffffff; font-weight:600; text-align:left; }
+  tbody tr:nth-child(even) { background-color:#f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color:#ffffff; }
+  tbody tr:hover { background-color:#dce8f8; }
+  th, td { padding:10px 14px; border-bottom:1px solid #e2e8f4; }
+
+  /* ── MCQ Section ── */
+  .mcq-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color:#92400e; font-size:1.2em; margin-top:0; }
+  .score-display {
+    background:#fff3cd; border:1px solid #ffc107; border-radius:20px;
+    padding:5px 18px; font-weight:700; color:#856404;
+    display:inline-block; font-size:0.95em; margin-bottom:18px;
+  }
+  .mcq-card {
+    background:#f9fafb; border:1px solid #e5e9f2;
+    border-radius:10px; padding:20px 24px; margin-bottom:20px;
+  }
+  .mcq-card .question-label {
+    font-size:0.8em; font-weight:700; color:#2e6da4;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .mcq-card .question-stem {
+    font-weight:600; color:#1a1a2e; margin-bottom:14px; font-size:1.0em;
+  }
+  .option-btn {
+    display:block; width:100%; background:#ffffff;
+    border:1.5px solid #d0d8ea; border-radius:8px;
+    padding:10px 16px; margin:6px 0; text-align:left;
+    cursor:pointer; font-size:0.95em; color:#2c2c3a;
+    transition:all 0.18s; font-family:inherit;
+  }
+  .option-btn:hover { background:#eef2fb; border-color:#2e6da4; }
+  .option-btn.selected { background:#dce8f8; border-color:#2e6da4; color:#1a3a5c; font-weight:600; }
+  .option-btn.correct  { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; }
+  .option-btn.incorrect{ background:#f8d7da; border-color:#dc3545; color:#721c24; font-weight:600; }
+  .option-btn.reveal-correct { background:#d4edda; border-color:#28a745; color:#155724; font-weight:700; opacity:0.85; }
+  .option-btn:disabled { cursor:default; }
+  .feedback-bar { border-radius:6px; padding:8px 14px; margin-top:10px; font-size:0.9em; font-weight:600; }
+  .feedback-bar.correct   { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+  .feedback-bar.incorrect { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+
+  /* ── Short Answer Section ── */
+  .sa-section {
+    background-color:#ffffff; border-radius:12px;
+    padding:28px 36px; margin-bottom:28px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color:#3d0c6b; font-size:1.2em; margin-top:0; }
+  .sa-card {
+    background:#faf9ff; border:1px solid #e2dcf5;
+    border-radius:10px; padding:20px 24px; margin-bottom:20px;
+  }
+  .sa-card .question-label {
+    color:#6f42c1; font-size:0.8em; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px;
+  }
+  .sa-card .question-stem { font-weight:600; color:#1a1a2e; font-size:1.0em; margin-bottom:10px; }
+  .followup-list { color:#4a148c; font-size:0.92em; margin-top:6px; padding-left:20px; }
+  .reveal-btn {
+    background:#6f42c1; color:#ffffff; border:none;
+    border-radius:20px; padding:7px 22px; font-size:0.88em;
+    font-weight:600; cursor:pointer; margin-top:12px;
+    transition:background 0.2s;
+  }
+  .reveal-btn:hover { background:#5a32a3; }
+  .answer-panel {
+    background:#f3f0ff; border:1px solid #d4c8f5;
+    border-radius:8px; padding:18px 22px; margin-top:14px;
+    font-size:0.95em; line-height:1.8; display:none;
+  }
+  .answer-panel strong { color:#4a148c; }
+  .answer-panel.visible { display:block; }
+
+  /* ── Submit / Reset ── */
+  .submit-btn {
+    background:#2e6da4; color:#ffffff; border:none;
+    border-radius:20px; padding:9px 28px; font-size:0.95em;
+    font-weight:700; cursor:pointer; margin-top:8px;
+    transition:background 0.2s;
+  }
+  .submit-btn:hover { background:#1a3a5c; }
+  .reset-btn {
+    background:#ffffff; color:#2e6da4; border:2px solid #2e6da4;
+    border-radius:20px; padding:7px 22px; font-size:0.9em;
+    font-weight:600; cursor:pointer; margin-top:8px; margin-left:10px;
+    transition:all 0.2s;
+  }
+  .reset-btn:hover { background:#eef2fb; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<div class="page-header">
+  <h1>Chapter 8 — Deep Learning III: Graphs</h1>
+  <div class="subtitle">Advanced Analytics in Business · Big Data Platforms &amp; Technologies · Exam Preparation Notes</div>
+</div>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<div class="nav-bar">
+  <a href="#graph-construction">Graph Construction</a>
+  <a href="#graph-metrics">Graph Metrics</a>
+  <a href="#community-mining">Community Mining</a>
+  <a href="#featurization">Featurization</a>
+  <a href="#validation">Validation</a>
+  <a href="#gnns">Graph Neural Networks</a>
+  <a href="#tooling">Tooling</a>
+  <a href="#graph-databases">Graph Databases</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#short-answer" class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ═══════════════════ STUDY NOTES ═══════════════════ -->
+
+<!-- 8.1 Graphs are Everywhere -->
+<div class="notes-section" id="graph-intro">
+  <h2>8.1 Why Graphs?</h2>
+  <p>Graphs capture <strong>relational structure</strong> that tabular feature vectors cannot express. Real-world networks include hyperlink graphs, email traffic, citation networks, financial transactions, social platforms (LinkedIn, Facebook, Twitter), and epidemiological contact maps.</p>
+  <div class="key-point">
+    <strong>Key insight:</strong> The same business problem (e.g., churn, fraud) can be formulated in many different ways depending on how the network is constructed. Network design choices directly affect analytical outcomes.
+  </div>
+  <p>Applications: web community mining, fraud detection, terrorism suspicion scoring, product recommendations, churn detection, epidemic spread modeling.</p>
+  <div class="warning-box">
+    Graphs are <em>semi-structured</em>: no direct feature-vector representation exists. Featurization requires non-trivial wrangling, and the network construction step itself must be driven by the intended analytical objective.
+  </div>
+</div>
+
+<!-- 8.2 Graph Construction -->
+<div class="notes-section" id="graph-construction">
+  <h2>8.2 Graph Construction &amp; Terminology</h2>
+  <h3>Core Concepts</h3>
+  <table>
+    <thead><tr><th>Element</th><th>Also Called</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Node</strong></td><td>Vertex, point</td><td>Person, company, credit card, webpage</td></tr>
+      <tr><td><strong>Edge</strong></td><td>Link, arc, line</td><td>Friendship, transaction, co-authorship</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Node Considerations</h3>
+  <div class="key-point">
+    <strong>Homogeneous</strong> graphs: all nodes represent the same entity type.<br>
+    <strong>Heterogeneous</strong> graphs: multiple node types (e.g., customers <em>and</em> products).
+    Node features can include attributes like age, gender, address — or a single node weight.
+  </div>
+
+  <h3>Edge Considerations</h3>
+  <ul>
+    <li><strong>Directionality:</strong> directed vs. undirected edges; self-edges; reciprocal edges.</li>
+    <li><strong>Cardinality:</strong> binary vs. weighted; duplicated edges; hyperedges (involving &gt;2 nodes).</li>
+    <li><strong>Edge type:</strong> homogeneous vs. heterogeneous edge types (e.g., "friend" vs. "colleague").</li>
+  </ul>
+
+  <h3>Network Representation</h3>
+  <div class="theorem-box">
+    <strong>Adjacency matrix</strong> (node × node): entry A<sub>ij</sub> = 1 (or weight) if edge (i,j) exists.<br>
+    <strong>Incidence matrix</strong> (node × edge): maps nodes to the edges they participate in.<br>
+    Both can provide structural insight without any predictive modeling.
+  </div>
+
+  <div class="example-box">
+    <strong>Transformation to unipartite graphs:</strong> heterogeneous networks are often simplified.
+    Techniques: binary projection, common-neighborhood weighting, Jaccard weighting.<br>
+    <strong>Recency-based edge weights:</strong> more recent interactions receive higher weight, useful in dynamic networks.
+  </div>
+
+  <div class="key-point">
+    <strong>Practical starting point (Oskarsdóttir 2018):</strong> begin with a non-directional, unweighted, binary, single-node-type graph. Add pseudo-edges to ensure sufficient density before introducing complexity.
+  </div>
+
+  <h3>Data Sources</h3>
+  <ul>
+    <li>Graph databases (though re-construction may still be needed)</li>
+    <li>Traditional flat / relational / transactional data</li>
+  </ul>
+</div>
+
+<!-- 8.3 Graph Metrics -->
+<div class="notes-section" id="graph-metrics">
+  <h2>8.3 Graph Metrics &amp; Centrality</h2>
+  <p>Centrality measures identify <em>important</em> nodes — most influential, key infrastructure, super-spreaders.</p>
+
+  <table>
+    <thead><tr><th>Measure</th><th>Intuition</th><th>Formula / Key Idea</th><th>Application</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Degree centrality</strong></td>
+        <td>Local connectivity: number of edges</td>
+        <td>deg(v) / (n−1) for normalized; in-degree vs. out-degree in directed graphs</td>
+        <td>Identifies hubs, connectors, deal-makers</td>
+      </tr>
+      <tr>
+        <td><strong>Closeness centrality</strong></td>
+        <td>Geographic proximity to all other nodes</td>
+        <td>C(x) = (N−1) / Σ |geod(x,y)|</td>
+        <td>High visibility; quick access to information</td>
+      </tr>
+      <tr>
+        <td><strong>Betweenness centrality</strong></td>
+        <td>Frequency of lying on shortest paths</td>
+        <td>Count of geodesics passing through node</td>
+        <td>Gatekeepers; control over information flow</td>
+      </tr>
+      <tr>
+        <td><strong>Eigenvector centrality / PageRank</strong></td>
+        <td>Influence weighted by neighbor importance</td>
+        <td>Iterative: x = Ax / λ; PageRank adds teleportation</td>
+        <td>Google web ranking; authority scoring</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Geodesic path:</strong> the shortest path between two nodes (may use edge weights or unit weights).<br>
+    <strong>Graph theoretic center:</strong> argmin<sub>n∈N</sub> ( max { |geod(n,m)| : m∈N } ) — the node(s) with the smallest maximum distance to all others.
+  </div>
+
+  <div class="warning-box">
+    <strong>Degree ≠ Influence:</strong> a high-degree node connected mostly to low-degree nodes may have less real influence than a moderate-degree node connected to hubs. Eigenvector centrality captures this nuance.
+  </div>
+
+  <div class="key-point">
+    Centrality values can be used as <em>features</em> in downstream predictive models, not just for exploratory visualization.
+    Practical uses: blocking viral effects, targeting viral marketing, identifying physical infrastructure bottlenecks.
+  </div>
+</div>
+
+<!-- 8.4 Community Mining -->
+<div class="notes-section" id="community-mining">
+  <h2>8.4 Community Mining</h2>
+  <p>A <strong>community</strong> is a subgraph with dense internal edges and sparse external edges. Communities arise naturally in the web, telecom, academic, and social networks.</p>
+
+  <h3>Key Algorithms</h3>
+  <div class="theorem-box">
+    <strong>Girvan-Newman:</strong> divisive approach. Iteratively remove the edge with the highest betweenness centrality, recalculate betweenness after each removal. Computationally expensive: O(m²n) on sparse graphs.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Min-cut variants:</strong>
+    <ul>
+      <li><em>Min cut:</em> minimize total weight of cut edges.</li>
+      <li><em>Min-max cut:</em> balances cut sizes between communities.</li>
+      <li><em>Min ratio cut:</em> accounts for within-community edge density.</li>
+    </ul>
+  </div>
+
+  <div class="theorem-box">
+    <strong>Louvain algorithm (Blondel et al.):</strong> greedy modularity optimization.
+    <ol>
+      <li>Initialize: each node is its own community.</li>
+      <li>Move each node to the neighbor-community that maximizes modularity gain; repeat until no improvement.</li>
+      <li>Collapse communities into supernodes; rebuild graph. Repeat until convergence.</li>
+    </ol>
+    <em>Modularity Q</em> measures relative internal vs. external edge density.
+  </div>
+
+  <h3>Cliques and k-cores</h3>
+  <div class="key-point">
+    <strong>Clique:</strong> every node connected to every other node.<br>
+    <strong>Maximal clique:</strong> not a subset of any larger clique. (Finding all maximal cliques is NP-hard.)<br>
+    <strong>k-core:</strong> maximal subgraph where every node has at least k neighbors within the subgraph — a computationally tractable near-clique.
+  </div>
+
+  <div class="warning-box">
+    Most community mining algorithms assume the <em>full</em> network structure is known. Detecting overlapping communities is significantly harder. Always question what the found communities mean substantively.
+  </div>
+
+  <p><strong>Applications:</strong> targeted/viral marketing, churn prevention, segmentation analysis, community labels as additional features for prediction.</p>
+</div>
+
+<!-- 8.5 Featurization -->
+<div class="notes-section" id="featurization">
+  <h2>8.5 Featurization &amp; Network-Based Inference</h2>
+
+  <h3>Two Paradigms</h3>
+  <table>
+    <thead><tr><th>Approach</th><th>Description</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Network learning</strong></td><td>Directly use network structure for inference</td><td>Relational Neighbor Classifier, Label Propagation, Personalized PageRank</td></tr>
+      <tr><td><strong>Featurization</strong></td><td>Extract features from the graph for any downstream model</td><td>Centrality metrics, community labels, egonet features, embedding vectors</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Homophily</h3>
+  <div class="theorem-box">
+    <strong>Homophily ("birds of a feather"):</strong> connected nodes tend to share the same label.
+    Formally, intra-group edges dominate inter-group edges.
+    <br><br>
+    <em>Examples:</em> fraudsters cluster and share resources; churners influence neighbors to churn; income-similar people call each other.
+    <br>Basis for the <em>guilt-by-association</em> inference principle.
+  </div>
+
+  <div class="warning-box">
+    Homophily is often assumed but not always valid. Always verify empirically whether the label distribution among neighbors deviates from random.
+  </div>
+
+  <h3>Relational Learners</h3>
+  <div class="key-point">
+    <strong>Markov property assumption:</strong> a node's outcome depends only on its <em>first-order neighbors</em>.
+    <br><br>
+    <strong>Relational Neighbor Classifier (RNC):</strong> estimates P(Y=class | node) by counting the class labels of direct neighbors. Simple but a useful baseline.
+  </div>
+
+  <h3>Propagation-Based Methods</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Key Idea</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Personalized PageRank</strong></td><td>Biased random walk: teleport probability α directed toward known positive nodes (seeds). Resulting scores reflect proximity to positives in the graph.</td></tr>
+      <tr><td><strong>Label Propagation (Zhu &amp; Ghahramani, 2002)</strong></td><td>Iteratively propagate soft labels from labeled nodes to neighbors; converges to a smooth labeling consistent with the graph structure.</td></tr>
+      <tr><td><strong>Label Spreading</strong></td><td>Variant with regularization; allows labeled nodes to partially change their labels. More robust to noisy labels.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Relational Logistic Regression (Lu &amp; Getoor, 2003)</h3>
+  <div class="example-box">
+    Combines <em>local attributes</em> (age, income, RFM) with <em>network attributes</em>:
+    <ul>
+      <li><strong>Mode-link:</strong> most frequent class label among neighbors.</li>
+      <li><strong>Count-link:</strong> frequency of each class label among neighbors.</li>
+      <li><strong>Binary-link:</strong> binary indicator for presence of each class among neighbors.</li>
+    </ul>
+    Any classifier can replace logistic regression. Add centrality values and propagation scores as additional features.
+  </div>
+
+  <h3>Featurization Best Practices</h3>
+  <div class="key-point">
+    Keep the base graph simple. Add domain-driven features at the egonet level. Include Personalized PageRank as a global network signal. Use community labels as additional features. Combine with standard tabular features in any off-the-shelf classifier.
+  </div>
+</div>
+
+<!-- 8.6 Validation -->
+<div class="notes-section" id="validation">
+  <h2>8.6 Validation — Why It's Hard with Networks</h2>
+
+  <div class="warning-box">
+    <strong>Core problem:</strong> standard train/test splitting is insufficient. Even if features are computed separately for train and test, the underlying graph is shared — introducing <em>structural data leakage</em>.
+    Node labels and graph structure both change over time.
+  </div>
+
+  <h3>Sources of Leakage</h3>
+  <ul>
+    <li>Network features computed on the <em>whole</em> graph are contaminated by test-set labels.</li>
+    <li>Personalized PageRank explicitly uses label information; centrality metrics do not — but they still encode test-set topology.</li>
+    <li>Transductive GNN evaluation: masked nodes still message-pass to training nodes.</li>
+  </ul>
+
+  <h3>Mitigation Strategies</h3>
+  <div class="key-point">
+    <ul>
+      <li>Use temporal splits where possible (train on past, test on future); ensure a large enough time gap.</li>
+      <li>Randomly <em>censor</em> positive labels in the training graph during feature generation.</li>
+      <li>Test at multiple time points to ensure robustness.</li>
+      <li>Domain-driven features based on neighbor attributes (not labels) are less problematic.</li>
+    </ul>
+  </div>
+
+  <div class="warning-box">
+    <strong>Shchur et al. (2018):</strong> "existing evaluation strategies for GNN models have serious shortcomings." No strategy is perfect; large overlap between train and test network structure remains.
+    At deployment time, the model needs the <em>up-to-date</em> state of the network — a stringent data requirement.
+  </div>
+</div>
+
+<!-- 8.7 GNNs -->
+<div class="notes-section" id="gnns">
+  <h2>8.7 Graph Neural Networks</h2>
+
+  <h3>From Random Walks to Embeddings</h3>
+  <div class="key-point">
+    <strong>Random walk:</strong> a process that starts at a vertex and moves to a uniformly (or proportionally in weighted graphs) chosen neighbor at each step. Foundation for DeepWalk and Node2vec.
+  </div>
+
+  <table>
+    <thead><tr><th>Method</th><th>Idea</th><th>Limitation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DeepWalk</strong> (Perozzi et al. 2014)</td><td>Random walks + skip-gram (Word2Vec) to learn node embeddings</td><td>No node/edge features; no generalization to unseen nodes</td></tr>
+      <tr><td><strong>Node2vec</strong> (Grover &amp; Leskovec 2016)</td><td>Biased 2nd-order random walk with parameters p, q: BFS-like (community) vs. DFS-like (structural) embeddings</td><td>Same as DeepWalk; encoder parameters grow linearly with nodes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>Drawbacks of random-walk embeddings:</strong> no parameter sharing across nodes; cannot incorporate node/edge features; cannot generalize to dynamic graphs (new nodes at inference time).
+  </div>
+
+  <h3>GNN Fundamentals</h3>
+  <div class="theorem-box">
+    <strong>Graph input types:</strong> node features, edge features, global features, connectivity.<br>
+    <strong>Connectivity representation:</strong> adjacency matrix (sparse; not permutation-invariant) vs. <em>adjacency list</em> (memory-efficient tuples (i,j) describing edge k between nodes i and j).
+  </div>
+
+  <h3>Core GNN Operations</h3>
+  <div class="key-point">
+    <strong>Pooling:</strong> aggregate embeddings from one type (e.g., edges) and pass to another type (e.g., nodes) for prediction. Analogous to global average pooling in CNNs for graph-level tasks.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Message Passing (generic form):</strong>
+    <div class="formula-box">
+      x_i^k = γ^k( x_i^(k-1), AGG_{j∈N(i)} φ^k( x_i^(k-1), x_j^(k-1), e_{j,i} ) )
+    </div>
+    φ = gather/message function &nbsp;|&nbsp; AGG = aggregator (sum or mean) &nbsp;|&nbsp; γ = update function (MLP)
+  </div>
+
+  <div class="key-point">
+    Message passing is equivalent to <em>convolution in irregular domains</em>. Stacking k layers expands the effective "receptive field" to k-hop neighborhoods.
+  </div>
+
+  <h3>Spatial GNN Architectures</h3>
+  <table>
+    <thead><tr><th>Architecture</th><th>Key Mechanism</th><th>Reference</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>GCN</strong></td>
+        <td>Symmetric degree-normalized aggregation: x_i' = Θᵀ Σ_{j∈N(i)∪{i}} e_{j,i} x_j / √(d̂_j · d̂_i)</td>
+        <td>Kipf &amp; Welling, 2016</td>
+      </tr>
+      <tr>
+        <td><strong>GraphSAGE</strong></td>
+        <td>Sample neighbors + aggregate (mean/LSTM/max pooling); inductive — handles new nodes</td>
+        <td>Hamilton et al., 2017</td>
+      </tr>
+      <tr>
+        <td><strong>GAT</strong></td>
+        <td>Attention-weighted neighbor aggregation; learns which neighbors matter most</td>
+        <td>Veličković et al., 2017</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Spectral vs. Spatial</h3>
+  <table>
+    <thead><tr><th>Dimension</th><th>Spatial</th><th>Spectral</th></tr></thead>
+    <tbody>
+      <tr><td>Basis</td><td>Neighborhood structure</td><td>Spectral graph theory / Laplacian</td></tr>
+      <tr><td>Convolution</td><td>Message passing between neighbors</td><td>Polynomial filter on graph Laplacian</td></tr>
+      <tr><td>Information scope</td><td>Local around a node</td><td>Global graph information</td></tr>
+      <tr><td>Scalability</td><td>More flexible, scalable</td><td>Expensive for large graphs</td></tr>
+      <tr><td>Interpretability</td><td>More intuitive</td><td>Less intuitive</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Learning Tasks &amp; Inductive vs. Transductive</h3>
+  <div class="key-point">
+    <strong>Node-level tasks:</strong> classification, regression, clustering per node.<br>
+    <strong>Edge-level tasks:</strong> link prediction, edge label classification.<br>
+    <strong>Graph-level tasks:</strong> graph classification or topology learning.
+  </div>
+
+  <div class="theorem-box">
+    <strong>Transductive learning:</strong> train and test on the <em>same</em> graph; mask loss for test nodes but they still message-pass → structural leakage. Widely used in practice but flawed.<br><br>
+    <strong>Inductive learning:</strong> train on one graph, test on separate unseen graphs/nodes. Requires GNN units independent of node/edge count. Splitting one graph into train/test is non-trivial: cutting edges removes information.
+  </div>
+</div>
+
+<!-- 8.8 Tooling -->
+<div class="notes-section" id="tooling">
+  <h2>8.8 Tooling Landscape</h2>
+  <table>
+    <thead><tr><th>Category</th><th>Tools</th></tr></thead>
+    <tbody>
+      <tr><td>Python graph analytics</td><td>NetworkX, igraph, pyvis, jaal, gravis</td></tr>
+      <tr><td>R graph analytics</td><td>igraph, ggraph, ggnet2, sna, tidygraph</td></tr>
+      <tr><td>Visualization</td><td>Gephi, CytoScape, Graphviz, D3.js</td></tr>
+      <tr><td>Spark</td><td>GraphX (RDD-based), GraphFrames (DataFrame-based)</td></tr>
+      <tr><td>Deep learning on graphs</td><td>PyTorch Geometric (PyG), DGL, Spektral</td></tr>
+      <tr><td>Graph databases</td><td>Neo4j, Memgraph, EdgeDB, AllegroGraph</td></tr>
+      <tr><td>Embeddings</td><td>GEM, GraphSAGE (standalone), Node2vec</td></tr>
+    </tbody>
+  </table>
+  <div class="warning-box">
+    GraphFrames (Spark) "never really took off." GraphX is the mature option for distributed Spark graph computation.
+    Avoid "graph hairballs" in visualization by using appropriate layout algorithms.
+  </div>
+</div>
+
+<!-- 8.9 Graph Databases -->
+<div class="notes-section" id="graph-databases">
+  <h2>8.9 Graph Databases &amp; NoSQL</h2>
+
+  <h3>Why Not RDBMS?</h3>
+  <div class="key-point">
+    Relational databases require formal schema, guarantee ACID consistency, but struggle with:
+    highly dynamic data, flexible structures, massive horizontal scalability, and traversal-heavy queries (e.g., friend-of-a-friend).
+  </div>
+
+  <h3>NoSQL Landscape</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Model</th><th>Examples</th></tr></thead>
+    <tbody>
+      <tr><td>Key-value</td><td>Hash map</td><td>Redis, DynamoDB</td></tr>
+      <tr><td>Document</td><td>JSON/BSON documents</td><td>MongoDB, CouchDB</td></tr>
+      <tr><td>Column-family</td><td>Wide columns</td><td>Cassandra, HBase</td></tr>
+      <tr><td>Graph</td><td>Nodes + typed edges + properties</td><td>Neo4j, Memgraph, EdgeDB</td></tr>
+      <tr><td>Time series</td><td>Timestamped records</td><td>InfluxDB, TimescaleDB, Kdb+</td></tr>
+      <tr><td>Geospatial</td><td>Spatial objects</td><td>PostgreSQL+PostGIS, ESRI</td></tr>
+    </tbody>
+  </table>
+
+  <div class="theorem-box">
+    <strong>Eventual consistency:</strong> NoSQL databases often sacrifice continuous consistency for availability and partition tolerance. Data replicas <em>will</em> converge, but may be transiently inconsistent. This is the trade-off encoded in the CAP theorem.
+  </div>
+
+  <h3>Cypher Query Language (Neo4j)</h3>
+  <div class="key-point">
+    Declarative, pattern-matching language for graph databases. Nodes written as <code>(n:Label)</code>; directed edges as <code>-[:RELATION]-&gt;</code>.
+  </div>
+
+  <div class="example-box">
+    <strong>Basic match:</strong>
+    <div class="formula-box">MATCH (b:Book) RETURN b ORDER BY b.price DESC LIMIT 20;</div>
+    <strong>Multi-hop traversal (friend-of-a-friend):</strong>
+    <div class="formula-box">MATCH (b:Book)-[:IN_GENRE]->(:Genre)-[:PARENT*0..]-(tg:Genre)
+WHERE tg.name = "Programming"
+RETURN b.title;</div>
+    The <code>*0..</code> wildcard traverses hierarchies of arbitrary depth — trivially in Cypher, complex in SQL even with recursive CTEs.
+  </div>
+
+  <div class="key-point">
+    <strong>Graph databases as hyper-relational databases:</strong> JOIN tables are replaced by semantically meaningful, traversable relationships. Many-to-many relations are first-class citizens, not cross-tables.
+  </div>
+
+  <div class="warning-box">
+    Neo4j is optimized for OLTP, not OLAP. For analytical workloads, use the Graph Data Science Library (GDS). Memgraph offers MAGE for graph algorithms.
+    Early NoSQL adopters (Digg, Twitter, HealthCare.gov) experienced serious issues with lack of consistency and complex queries — "NoSQL" was not always the right choice.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MCQ ═══════════════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>📝 Multiple Choice &amp; True/False Questions</h2>
+  <div class="score-display" id="score-display">Score: 0 / 50</div>
+  <p style="color:#6b7280;font-size:0.9em;">Select an answer, then click <strong>Check</strong>. Reset to try again.</p>
+
+  <!-- Q1 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 1 · Graph Construction</div>
+    <div class="question-stem">You are modeling customer churn in a telecom network. Two customers share several phone calls. Which graph design choice introduces the MOST additional analytical information that binary edge presence alone cannot provide?</div>
+    <button class="option-btn" data-opt="A">A. Using directed edges to indicate call initiator vs. receiver</button>
+    <button class="option-btn" data-opt="B">B. Assigning recency-weighted edge weights reflecting call volume over time</button>
+    <button class="option-btn" data-opt="C">C. Converting the bipartite call graph to a unipartite graph using binary projection</button>
+    <button class="option-btn" data-opt="D">D. Adding self-edges to nodes representing high-value customers</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 2 · Graph Metrics</div>
+    <div class="question-stem">Node A has the highest degree in the network but all its neighbors are leaf nodes (degree = 1). Node B has moderate degree but is connected to the most central nodes. Which statement is most accurate?</div>
+    <button class="option-btn" data-opt="A">A. Node A will have higher eigenvector centrality than Node B</button>
+    <button class="option-btn" data-opt="B">B. Both nodes will have similar closeness centrality</button>
+    <button class="option-btn" data-opt="C">C. Node B will have higher eigenvector centrality than Node A</button>
+    <button class="option-btn" data-opt="D">D. Node A will have higher betweenness centrality than Node B</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 3 · Community Mining</div>
+    <div class="question-stem">The Louvain algorithm optimizes modularity. Which scenario would cause the Louvain algorithm to FAIL to detect meaningful communities?</div>
+    <button class="option-btn" data-opt="A">A. A network with overlapping communities</button>
+    <button class="option-btn" data-opt="B">B. A very large network with millions of nodes</button>
+    <button class="option-btn" data-opt="C">C. Communities of very different sizes</button>
+    <button class="option-btn" data-opt="D">D. A fully random Erdős–Rényi graph with no community structure</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 4 · Validation</div>
+    <div class="question-stem">You compute Personalized PageRank (PPR) scores on the full graph and include them as features for both training and test sets. What validation problem does this introduce?</div>
+    <button class="option-btn" data-opt="A">A. Class imbalance bias</button>
+    <button class="option-btn" data-opt="B">B. Structural data leakage, because PPR uses label information embedded in the full graph topology</button>
+    <button class="option-btn" data-opt="C">C. Overfitting due to high feature dimensionality</button>
+    <button class="option-btn" data-opt="D">D. Concept drift, as the graph structure changes over time</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 5 · GNNs</div>
+    <div class="question-stem">Why is representing graph connectivity with an adjacency matrix problematic for deep learning?</div>
+    <button class="option-btn" data-opt="A">A. It is very sparse and not permutation-invariant, meaning different orderings of nodes produce different matrix representations of the same graph</button>
+    <button class="option-btn" data-opt="B">B. It cannot represent directed edges</button>
+    <button class="option-btn" data-opt="C">C. It requires O(n³) computation for every forward pass</button>
+    <button class="option-btn" data-opt="D">D. It cannot encode edge weights</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 6 · Graph Databases</div>
+    <div class="question-stem">In Cypher, the query <code>MATCH (a)-[:KNOWS*1..3]->(b) RETURN b</code> returns:</div>
+    <button class="option-btn" data-opt="A">A. All nodes exactly 3 hops away from a</button>
+    <button class="option-btn" data-opt="B">B. Only direct friends of a</button>
+    <button class="option-btn" data-opt="C">C. All nodes reachable from a via 1, 2, or 3 KNOWS relationships</button>
+    <button class="option-btn" data-opt="D">D. The 3 nodes with the highest degree connected to a</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 7 · Featurization</div>
+    <div class="question-stem">You have a fraud detection dataset with very few confirmed fraudsters. You apply a Relational Neighbor Classifier (RNC). Its core limitation in this setting is:</div>
+    <button class="option-btn" data-opt="A">A. It cannot handle undirected graphs</button>
+    <button class="option-btn" data-opt="B">B. With very few labeled positives, most neighborhoods will have no labeled fraudsters, producing uninformative probability estimates</button>
+    <button class="option-btn" data-opt="C">C. It requires node features to be continuous</button>
+    <button class="option-btn" data-opt="D">D. It only works with bipartite graphs</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q8 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 8 · True / False · Homophily</div>
+    <div class="question-stem">True or False: Homophily in a fraud network means that fraudsters are equally likely to connect to legitimate users as to other fraudsters.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 9 · Node2vec</div>
+    <div class="question-stem">In Node2vec, setting parameter p low and q high steers the random walk to:</div>
+    <button class="option-btn" data-opt="A">A. Explore the graph globally, capturing structural equivalence</button>
+    <button class="option-btn" data-opt="B">B. Walk uniformly at random, equivalent to DeepWalk</button>
+    <button class="option-btn" data-opt="C">C. Stay close to the starting node, capturing local community structure — BFS-like</button>
+    <button class="option-btn" data-opt="D">D. Walk outward exploring distant parts of the graph — DFS-like, capturing structural roles</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q10 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 10 · True / False · GCN</div>
+    <div class="question-stem">True or False: In a Graph Convolutional Network (GCN), the degree normalization term √(d̂_i · d̂_j) prevents high-degree nodes from dominating the aggregation.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 11 · Graph Metrics</div>
+    <div class="question-stem">A consultant is removed from the email network. Information flow within a project team slows significantly despite other team members remaining connected. This is best explained by the consultant having high:</div>
+    <button class="option-btn" data-opt="A">A. Degree centrality</button>
+    <button class="option-btn" data-opt="B">B. Closeness centrality</button>
+    <button class="option-btn" data-opt="C">C. Betweenness centrality</button>
+    <button class="option-btn" data-opt="D">D. Eigenvector centrality</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 12 · NoSQL</div>
+    <div class="question-stem">Which property distinguishes a graph database from other NoSQL databases architecturally?</div>
+    <button class="option-btn" data-opt="A">A. It stores data in flexible JSON documents without a fixed schema</button>
+    <button class="option-btn" data-opt="B">B. It moves toward <em>more</em> relational modeling rather than away from it, treating relationships as first-class citizens</button>
+    <button class="option-btn" data-opt="C">C. It prioritizes availability over consistency using eventual consistency</button>
+    <button class="option-btn" data-opt="D">D. It uses columnar storage for analytical workloads</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 13 · Message Passing</div>
+    <div class="question-stem">Stacking multiple message-passing layers in a GNN is analogous to:</div>
+    <button class="option-btn" data-opt="A">A. Expanding the receptive field in a CNN, allowing the model to incorporate information from increasingly distant neighborhoods</button>
+    <button class="option-btn" data-opt="B">B. Adding more hidden units to a standard MLP</button>
+    <button class="option-btn" data-opt="C">C. Increasing the number of attention heads in a Transformer</button>
+    <button class="option-btn" data-opt="D">D. Running multiple independent random walks and averaging</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q14 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 14 · True / False · GraphSAGE</div>
+    <div class="question-stem">True or False: GraphSAGE is a transductive method that cannot make predictions on nodes not seen during training.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 15 · Community Mining</div>
+    <div class="question-stem">Compared to the Girvan-Newman algorithm, the Louvain algorithm's main advantage is:</div>
+    <button class="option-btn" data-opt="A">A. It produces non-overlapping communities only</button>
+    <button class="option-btn" data-opt="B">B. It uses a spectral decomposition of the Laplacian</button>
+    <button class="option-btn" data-opt="C">C. It requires fewer hyperparameters</button>
+    <button class="option-btn" data-opt="D">D. It scales much better to large networks through greedy modularity optimization rather than iterative edge removal</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 16 · Personalized PageRank</div>
+    <div class="question-stem">In Personalized PageRank for fraud detection, the teleport probability α is directed toward known fraud seeds. Increasing α (toward 1.0) would:</div>
+    <button class="option-btn" data-opt="A">A. Allow the walk to explore the graph more globally</button>
+    <button class="option-btn" data-opt="B">B. Make all nodes receive equal propagated scores</button>
+    <button class="option-btn" data-opt="C">C. Concentrate scores near the seed nodes, reducing propagation to distant nodes</button>
+    <button class="option-btn" data-opt="D">D. Convert PPR to standard (non-personalized) PageRank</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q17 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 17 · True / False · Cypher</div>
+    <div class="question-stem">True or False: Cypher, like SQL, is an imperative query language that requires users to specify HOW to traverse the graph step by step.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — Cypher is declarative; users specify WHAT pattern to find, not HOW to traverse</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 18 · Graph Construction</div>
+    <div class="question-stem">When building a customer churn prediction model using a social graph, the choice of whether to use directed or undirected edges primarily affects:</div>
+    <button class="option-btn" data-opt="A">A. The computational complexity of the Louvain community detection algorithm</button>
+    <button class="option-btn" data-opt="B">B. The asymmetry of influence captured — e.g., whether a churner influences the person they called vs. the person who called them</button>
+    <button class="option-btn" data-opt="C">C. The type of NoSQL database required to store the graph</button>
+    <button class="option-btn" data-opt="D">D. The choice of message-passing aggregation function (sum vs. mean)</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 19 · Label Propagation</div>
+    <div class="question-stem">Label Propagation and Label Spreading differ in that Label Spreading:</div>
+    <button class="option-btn" data-opt="A">A. Allows labeled nodes to partially revise their own labels, making it more robust to noisy ground truth</button>
+    <button class="option-btn" data-opt="B">B. Uses a directed graph for propagation while Label Propagation requires undirected graphs</button>
+    <button class="option-btn" data-opt="C">C. Can only be used for binary classification tasks</button>
+    <button class="option-btn" data-opt="D">D. Does not require any labeled nodes as seeds</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q20 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 20 · True / False · Betweenness</div>
+    <div class="question-stem">True or False: Betweenness centrality can be calculated for edges as well as nodes.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 21 · GNNs — Tasks</div>
+    <div class="question-stem">Predicting whether a new drug molecule will bind to a target protein is best framed as which GNN learning task?</div>
+    <button class="option-btn" data-opt="A">A. Node classification</button>
+    <button class="option-btn" data-opt="B">B. Link prediction</button>
+    <button class="option-btn" data-opt="C">C. Graph-level classification</button>
+    <button class="option-btn" data-opt="D">D. Edge regression</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 22 · NoSQL Trade-offs</div>
+    <div class="question-stem">The HealthCare.gov and early MongoDB failures illustrated that NoSQL databases can fail in production because:</div>
+    <button class="option-btn" data-opt="A">A. They cannot store large volumes of data</button>
+    <button class="option-btn" data-opt="B">B. They do not support any query language</button>
+    <button class="option-btn" data-opt="C">C. They are incompatible with Python and Java applications</button>
+    <button class="option-btn" data-opt="D">D. Eventual consistency and limited query expressiveness make them a poor fit for use cases requiring strong consistency and complex aggregations</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q23 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 23 · True / False · DeepWalk</div>
+    <div class="question-stem">True or False: DeepWalk embeddings can naturally incorporate node attribute features (e.g., customer age, product category) into the learned representations.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — DeepWalk is purely structure-based; it does not use node features</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 24 · Featurization</div>
+    <div class="question-stem">In Relational Logistic Regression, "count-link" features capture:</div>
+    <button class="option-btn" data-opt="A">A. The binary presence of each class label among a node's neighbors</button>
+    <button class="option-btn" data-opt="B">B. The frequency (count or proportion) of each class label among a node's neighbors</button>
+    <button class="option-btn" data-opt="C">C. The most frequently occurring class label among a node's neighbors</button>
+    <button class="option-btn" data-opt="D">D. The total number of neighbors regardless of their label</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 25 · GAT</div>
+    <div class="question-stem">Graph Attention Networks (GAT) improve upon GCN by:</div>
+    <button class="option-btn" data-opt="A">A. Replacing message passing with spectral convolution</button>
+    <button class="option-btn" data-opt="B">B. Sampling a fixed number of neighbors to reduce computation</button>
+    <button class="option-btn" data-opt="C">C. Learning different attention weights for each neighbor, so more relevant neighbors contribute more to the node update</button>
+    <button class="option-btn" data-opt="D">D. Using recurrent units to process the sequence of neighbors in order</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q26 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 26 · True / False · Cliques</div>
+    <div class="question-stem">True or False: A k-core is a relaxed alternative to a clique that requires each node to be connected to at least k others within the subgraph, but does not require every node to be connected to every other node.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 27 · Validation</div>
+    <div class="question-stem">Which network feature is LEAST susceptible to structural data leakage when computed on the full graph before train/test split?</div>
+    <button class="option-btn" data-opt="A">A. Personalized PageRank score seeded by known fraud labels</button>
+    <button class="option-btn" data-opt="B">B. Community label assigned by Louvain algorithm on the full graph</button>
+    <button class="option-btn" data-opt="C">C. Relational Neighbor Classifier probability based on neighbor labels</button>
+    <button class="option-btn" data-opt="D">D. Degree centrality computed on the full graph</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 28 · Graph Databases</div>
+    <div class="question-stem">FlockDB (Twitter) was designed to only support a simplified directed graph as a list of edges with source, destination, state, and position. This design choice prioritizes:</div>
+    <button class="option-btn" data-opt="A">A. Rich semantic relationships and complex traversal queries</button>
+    <button class="option-btn" data-opt="B">B. Speed and scalability at the expense of data expressiveness</button>
+    <button class="option-btn" data-opt="C">C. ACID transaction guarantees for financial integrity</button>
+    <button class="option-btn" data-opt="D">D. Full Cypher query language compatibility</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q29 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 29 · True / False · Transductive GNNs</div>
+    <div class="question-stem">True or False: In transductive GNN training, test nodes are completely isolated from the training computation graph, so no data leakage occurs.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — masked test nodes still participate in message passing, leaking structural information to training nodes</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 30 · Community Mining Applications</div>
+    <div class="question-stem">A telecom operator wants to stop churn from spreading socially. The MOST relevant application of community mining in this context is:</div>
+    <button class="option-btn" data-opt="A">A. Identifying densely connected groups so that targeted retention offers can prevent churn cascades within communities</button>
+    <button class="option-btn" data-opt="B">B. Detecting fraudulent billing clusters</button>
+    <button class="option-btn" data-opt="C">C. Compressing the graph for faster query performance</button>
+    <button class="option-btn" data-opt="D">D. Generating node embeddings for downstream classification</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 31 · Pooling in GNNs</div>
+    <div class="question-stem">In a GNN designed for graph-level classification, the global pooling step (e.g., global mean pooling) serves to:</div>
+    <button class="option-btn" data-opt="A">A. Reduce the number of message-passing layers needed</button>
+    <button class="option-btn" data-opt="B">B. Normalize node embeddings to unit length</button>
+    <button class="option-btn" data-opt="C">C. Aggregate all node embeddings into a single fixed-size graph representation, regardless of the number of nodes</button>
+    <button class="option-btn" data-opt="D">D. Enforce permutation invariance at the edge level</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q32 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 32 · True / False · Girvan-Newman</div>
+    <div class="question-stem">True or False: The Girvan-Newman algorithm adds edges iteratively to form communities, similar to agglomerative hierarchical clustering.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — it is divisive: it removes the edge with the highest betweenness centrality at each step</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 33 · Heterogeneous Graphs</div>
+    <div class="question-stem">A credit card fraud detection graph has credit card nodes and merchant nodes, with edges representing transactions. This is best described as:</div>
+    <button class="option-btn" data-opt="A">A. A k-core graph</button>
+    <button class="option-btn" data-opt="B">B. A unipartite weighted graph</button>
+    <button class="option-btn" data-opt="C">C. A hypergraph</button>
+    <button class="option-btn" data-opt="D">D. A heterogeneous bipartite graph</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 34 · NewSQL</div>
+    <div class="question-stem">The "NewSQL" movement represents:</div>
+    <button class="option-btn" data-opt="A">A. A complete replacement of SQL with graph query languages</button>
+    <button class="option-btn" data-opt="B">B. Database systems that combine horizontal scalability and flexible schemas of NoSQL with the strong querying capabilities and consistency of relational databases</button>
+    <button class="option-btn" data-opt="C">C. Databases optimized exclusively for time-series data</button>
+    <button class="option-btn" data-opt="D">D. A rebranding of traditional RDBMS to compete with NoSQL marketing</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q35 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 35 · True / False · Markov Property</div>
+    <div class="question-stem">True or False: The Markov property assumption in network-based inference states that a node's label depends only on its immediate (first-order) neighbors, not on distant nodes.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 36 · Spectral vs. Spatial GNNs</div>
+    <div class="question-stem">A key practical disadvantage of spectral GNN methods compared to spatial methods for large-scale industry graphs is:</div>
+    <button class="option-btn" data-opt="A">A. They cannot be implemented in PyTorch</button>
+    <button class="option-btn" data-opt="B">B. They produce worse embeddings for node classification</button>
+    <button class="option-btn" data-opt="C">C. They require computing the full graph Laplacian, which is computationally expensive and memory-intensive for large graphs</button>
+    <button class="option-btn" data-opt="D">D. They cannot handle edge features</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 37 · Graph Construction Strategy</div>
+    <div class="question-stem">The slide recommends starting with a simple graph construction (undirected, unweighted, binary, single node type). The primary rationale for this is:</div>
+    <button class="option-btn" data-opt="A">A. To establish a simple baseline that can be progressively enriched; complexity should be justified by the objective, not added by default</button>
+    <button class="option-btn" data-opt="B">B. Graph databases only support this simplified representation</button>
+    <button class="option-btn" data-opt="C">C. Directed and weighted graphs are incompatible with GNNs</button>
+    <button class="option-btn" data-opt="D">D. Community mining algorithms require undirected graphs</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q38 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 38 · True / False · GraphSAGE Sampling</div>
+    <div class="question-stem">True or False: In GraphSAGE, the model aggregates embeddings from ALL neighbors of each node, making it computationally identical to standard GCN for dense graphs.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — GraphSAGE samples a fixed-size subset of neighbors, making it scalable even for high-degree nodes</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 39 · Graph Metrics — PageRank</div>
+    <div class="question-stem">PageRank is considered a variant of eigenvector centrality. The key modification PageRank introduces to handle dangling links and disconnected components is:</div>
+    <button class="option-btn" data-opt="A">A. Normalizing by in-degree</button>
+    <button class="option-btn" data-opt="B">B. Using a directed adjacency matrix instead of symmetric</button>
+    <button class="option-btn" data-opt="C">C. Weighting edges by publication date</button>
+    <button class="option-btn" data-opt="D">D. A teleportation (damping) factor that allows the random walker to jump to a random node with small probability, ensuring convergence on all graph types</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q40 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 40 · True / False · GraphX</div>
+    <div class="question-stem">True or False: GraphX extends Spark's RDD abstraction by introducing a Graph abstraction — a directed multigraph with properties on vertices and edges.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 41 · Egonet Features</div>
+    <div class="question-stem">Domain-driven egonet features are considered preferable to propagation-based features from a validation standpoint because:</div>
+    <button class="option-btn" data-opt="A">A. They produce higher AUC on benchmark datasets</button>
+    <button class="option-btn" data-opt="B">B. They are based on neighbor attributes or structural properties rather than neighbor labels, avoiding direct label-based leakage</button>
+    <button class="option-btn" data-opt="C">C. They are computed in constant time regardless of graph size</button>
+    <button class="option-btn" data-opt="D">D. They do not require the graph to be connected</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 42 · Cypher JOIN equivalent</div>
+    <div class="question-stem">In Cypher, the equivalent of a SQL JOIN between tables is expressed by:</div>
+    <button class="option-btn" data-opt="A">A. Using a WHERE clause with equality predicates on node IDs</button>
+    <button class="option-btn" data-opt="B">B. Creating a cross-reference node type similar to a junction table</button>
+    <button class="option-btn" data-opt="C">C. Specifying relationship patterns directly in the MATCH clause, traversing edges between node types</button>
+    <button class="option-btn" data-opt="D">D. Using the JOIN keyword introduced in Cypher 5</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q43 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 43 · True / False · Line Graph</div>
+    <div class="question-stem">True or False: If you want to predict a label on edges rather than nodes, one approach is to re-encode edges as nodes in a "line graph" transformation, then apply node-level prediction techniques.</div>
+    <button class="option-btn" data-opt="A">A. False</button>
+    <button class="option-btn" data-opt="B">B. True</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" data-correct="D">
+    <div class="question-label">Question 44 · One-class Classification</div>
+    <div class="question-stem">Label Propagation is noted as "not always straightforward in a one-class setting." The core difficulty is:</div>
+    <button class="option-btn" data-opt="A">A. The algorithm requires a perfectly balanced class distribution to converge</button>
+    <button class="option-btn" data-opt="B">B. One-class problems cannot be represented as graphs</button>
+    <button class="option-btn" data-opt="C">C. Label Propagation requires GPU computation for one-class tasks</button>
+    <button class="option-btn" data-opt="D">D. With only one observed class (positives), there are no negative label seeds to propagate, making convergence and meaningful probability estimation difficult</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q45 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 45 · True / False · Eventual Consistency</div>
+    <div class="question-stem">True or False: "Eventual consistency" means that data and its replicas will become consistent at some point after each transaction, but continuous consistency is not guaranteed.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 46 · Node2vec Parameters</div>
+    <div class="question-stem">Two analysts use Node2vec on the same citation network. Analyst A sets p=0.5, q=2. Analyst B sets p=2, q=0.5. If both cluster the resulting embeddings for community detection, which analyst's embeddings are BETTER suited to find research communities?</div>
+    <button class="option-btn" data-opt="A">A. Analyst A — low p encourages staying near the source node, capturing local community structure</button>
+    <button class="option-btn" data-opt="B">B. Analyst A — with low p and high q, the walk stays local (BFS-like), capturing community membership rather than structural role</button>
+    <button class="option-btn" data-opt="C">C. Analyst B — high p and low q explores the graph broadly, producing richer community representations</button>
+    <button class="option-btn" data-opt="D">D. Both produce identical embeddings since the citation network is undirected</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q47 T/F -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 47 · True / False · Adjacency List</div>
+    <div class="question-stem">True or False: Representing graph connectivity as adjacency lists (tuples of edge-connected node pairs) is more memory-efficient than using a full adjacency matrix for sparse graphs.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" data-correct="C">
+    <div class="question-label">Question 48 · Closeness Centrality</div>
+    <div class="question-stem">In an epidemiological contact network, a public health official wants to identify "super-spreaders" who can reach other individuals most quickly. The most relevant centrality measure is:</div>
+    <button class="option-btn" data-opt="A">A. Degree centrality</button>
+    <button class="option-btn" data-opt="B">B. Betweenness centrality</button>
+    <button class="option-btn" data-opt="C">C. Closeness centrality</button>
+    <button class="option-btn" data-opt="D">D. Eigenvector centrality</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q49 T/F -->
+  <div class="mcq-card" data-correct="B">
+    <div class="question-label">Question 49 · True / False · Graph Databases vs. RDBMS</div>
+    <div class="question-stem">True or False: In a graph database, a many-to-many relationship between books and authors is modeled using a junction/cross-reference table, exactly as in a relational database.</div>
+    <button class="option-btn" data-opt="A">A. True</button>
+    <button class="option-btn" data-opt="B">B. False — graph databases model many-to-many relationships directly as edges between node types, eliminating the need for junction tables</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" data-correct="A">
+    <div class="question-label">Question 50 · Integration</div>
+    <div class="question-stem">A data science team builds a churn model. They compute degree centrality, community labels, Personalized PageRank scores, and RFM features, then train a gradient boosted tree. This approach is BEST described as:</div>
+    <button class="option-btn" data-opt="A">A. Relational logistic regression generalized: combining local node attributes with network-derived features in a standard off-the-shelf classifier</button>
+    <button class="option-btn" data-opt="B">B. A pure Graph Neural Network using message passing</button>
+    <button class="option-btn" data-opt="C">C. Transductive learning, since the entire graph is used</button>
+    <button class="option-btn" data-opt="D">D. An unsupervised graph embedding approach</button>
+    <button class="submit-btn" onclick="checkAnswer(this)">Check</button>
+    <button class="reset-btn" onclick="resetCard(this)">Reset</button>
+    <div class="feedback-bar" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ SHORT ANSWER ═══════════════════════════════ -->
+<div class="sa-section" id="short-answer">
+  <h2>💬 Short Answer Questions — Oral Exam Style</h2>
+  <p style="color:#6b7280;font-size:0.9em;">Click <strong>Reveal Answer</strong> to see a model answer. Italic text shows likely follow-up questions.</p>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1</div>
+    <div class="question-stem">Explain why network construction choices matter as much as analytical technique choices, and give a concrete example where two different network constructions of the same data lead to qualitatively different conclusions.</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Network construction is a design decision that encodes domain assumptions: which entities are nodes, what constitutes a link, whether edges are directed, weighted, or binary. These choices determine what structure the algorithm sees. For example, in a telecom churn scenario, constructing an undirected binary graph (any shared call = edge) versus a directed recency-weighted graph (recent calls carry higher weight, direction captures who initiates contact) will produce different community structures and different centrality rankings. A churner who initiated most calls may appear differently in degree and betweenness centrality depending on whether directionality is captured. The wrong construction can obscure the homophily signal or mis-identify hubs.
+      <br><br>
+      <em>Follow-ups: How would you validate that one network construction is better suited to your objective? What is the relationship between network construction and feature leakage in validation?</em>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2</div>
+    <div class="question-stem">Compare betweenness centrality and closeness centrality. In which real-world scenarios would you prefer each, and what are their computational limitations for large graphs?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Betweenness centrality counts how often a node appears on shortest paths between all other pairs — it identifies gatekeepers who control information or resource flow (e.g., a consultant bridging departments, a router in a network). Closeness centrality measures how quickly a node can reach all others (inverse of average geodesic distance) — it identifies efficient broadcasters or early adopters of information. In epidemic modeling, closeness identifies who spreads disease fastest; in organizational network analysis, betweenness identifies key brokers whose removal fragments the network. Both require computing all-pairs shortest paths: O(V·E) with BFS for unweighted graphs, making them expensive for very large networks (millions of nodes). Approximation algorithms (e.g., Brandes for betweenness) mitigate this.
+      <br><br>
+      <em>Follow-ups: How do you handle disconnected graphs when computing closeness? Can betweenness be computed for edges and why would that be useful?</em>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3</div>
+    <div class="question-stem">Explain the concept of homophily and its role in network-based inference for fraud detection. Under what conditions might homophily not hold, and what are the consequences for your model?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Homophily ("birds of a feather") means that connected nodes are more likely to share the same class label than expected by random chance. In fraud detection, fraudsters tend to cluster — they share merchants, use the same resources, or are part of organized rings — so edges between fraudsters are more common than edges between fraudsters and legitimate users. This enables "guilt-by-association": a node's neighbors' labels are informative about its own label. Homophily may NOT hold if fraudsters deliberately target legitimate users (e.g., phishing), if the graph is a bipartite customer-merchant graph where no direct fraudster-to-fraudster edges exist, or if the graph topology is dominated by random noise. When homophily is absent, propagation-based methods and relational neighbor classifiers will perform at or below chance and may actually introduce negative transfer. Always empirically verify homophily by measuring the fraction of same-class edges vs. a random baseline.
+      <br><br>
+      <em>Follow-ups: How would you test for homophily statistically? What if there is heterophily (connected nodes tend to have different labels)?</em>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4</div>
+    <div class="question-stem">Describe the message-passing paradigm in GNNs. How does it relate to convolution? What are the roles of the message function φ, the aggregator AGG, and the update function γ?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Message passing updates a node's embedding by (1) generating messages from each neighbor using a message function φ(x_i, x_j, e_{ij}), (2) aggregating all incoming messages with AGG (typically sum or mean — must be permutation-invariant since neighbor order is arbitrary), and (3) updating the node's own representation with an update function γ (typically an MLP) that combines the aggregated messages with the node's current embedding. This mirrors convolution in that it applies a shared, local operation (a "filter") over a neighborhood — but on irregular graph topology rather than a regular grid. The connection to convolution is formal: the neighborhood-weighted sum in GCN is equivalent to a convolution in the graph spectral domain with a polynomial filter. Stacking k message-passing layers effectively gives each node access to its k-hop neighborhood, analogous to a CNN with a large receptive field.
+      <br><br>
+      <em>Follow-ups: Why must the aggregator be permutation-invariant? What happens to the receptive field as you add more GNN layers? What is over-smoothing?</em>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5</div>
+    <div class="question-stem">Explain the difference between transductive and inductive GNN learning. What are the advantages and pitfalls of each approach in a real business deployment scenario?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> In transductive learning, the model is trained and evaluated on the same graph — test nodes are present during training but their labels are masked out of the loss function. This is simple but introduces leakage: masked test nodes still message-pass information to training nodes, meaning the model has indirectly "seen" the test topology. In inductive learning, the model is trained on one set of graphs/nodes and evaluated on entirely new, unseen ones. This is more realistic for deployment (new customers join the network) but requires GNN units whose operations are independent of graph size, and splitting a single graph into train/test is non-trivial — cutting edges removes structural information. In business practice, temporal splits (train on historical graph, test on future graph) are the most defensible approach, assuming a sufficient time gap so there is minimal overlap between train and test structural features.
+      <br><br>
+      <em>Follow-ups: Which published GNN models are inductive by design? Why did Shchur et al. (2018) criticize standard GNN evaluation? How does temporal splitting relate to the concept of data leakage in standard ML?</em>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6</div>
+    <div class="question-stem">What is modularity in the context of community mining, and why is maximizing modularity not always the right objective? Discuss at least one known failure mode.</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Modularity Q measures the fraction of edges within communities minus the expected fraction if edges were placed randomly (preserving degree distribution). Maximizing Q finds partitions with denser intra-community edges than expected by chance. However, modularity maximization has a well-known resolution limit: for large networks with many small communities, modularity optimization will merge small communities into larger ones even if they are internally well-connected, because small communities contribute too little to Q to be individually detectable. Additionally, Q has a "plateau" problem: many partitions can achieve similar Q values, making the solution non-unique. Modularity also depends on the choice of null model and can be sensitive to the network's density. In practice, multiple community detection runs with different algorithms and parameters, followed by stability analysis, gives more reliable results than blindly maximizing modularity.
+      <br><br>
+      <em>Follow-ups: How does the Louvain algorithm avoid some of these pitfalls? What is the Leiden algorithm, and how does it improve on Louvain?</em>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7</div>
+    <div class="question-stem">Compare graph databases (e.g., Neo4j) and relational databases for a many-to-many relationship query with multi-level hierarchy traversal. When does the graph database approach offer a fundamental — not just ergonomic — advantage?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> In a relational database, a many-to-many relationship between, say, products and categories requires a junction table, and traversing a hierarchical category tree (e.g., "all products in Programming or any of its subcategories") requires recursive CTEs or repeated self-joins — expensive and hard to express. In Neo4j/Cypher, this is a single MATCH clause with a variable-length path pattern like [:PARENT*0..] — the database engine traverses graph edges natively. The fundamental advantage is in traversal-heavy, relationship-centric queries where the depth is unknown in advance: friend-of-a-friend queries, shortest path, reachability. These are O(depth) in a graph database using adjacency-list-based index-free adjacency, but can require O(n·JOIN) operations in SQL. For simple lookups or aggregate analytics (summing sales by region), relational databases with indexes are equally fast or faster. The right choice depends on query patterns, not just data structure.
+      <br><br>
+      <em>Follow-ups: What is "index-free adjacency" in Neo4j? When would you use GraphQL vs. Cypher? What trade-offs does Neo4j make to achieve traversal speed?</em>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8</div>
+    <div class="question-stem">Explain Personalized PageRank (PPR) and how it differs from standard PageRank. How would you use PPR to score fraud risk for unlabeled nodes, and what hyperparameter governs the spread of the signal?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Standard PageRank models a random walker who, at each step, either follows a random edge (probability 1−α) or teleports to a uniformly random node (probability α). Personalized PageRank replaces the uniform teleport distribution with a personalized one — for fraud detection, the teleport distribution is concentrated on known fraud seeds (confirmed fraudsters). The resulting stationary distribution assigns higher scores to nodes that are topologically close to the seeds in the graph. The hyperparameter α (teleport probability) controls locality: high α keeps scores tightly concentrated near seeds; low α allows the signal to diffuse broadly. In practice, PPR scores for each unlabeled node become a real-valued feature in a downstream classifier. The approach is semi-supervised: it uses the few labeled positives to spread a signal across the graph consistent with the homophily assumption.
+      <br><br>
+      <em>Follow-ups: How does PPR relate to label propagation? What computational tricks allow PPR to scale to billion-node graphs? How would you set α in practice?</em>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9</div>
+    <div class="question-stem">You are designing a validation strategy for a GNN-based fraud detection model on a single large transaction graph. Walk through the main challenges and your proposed approach.</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> The main challenges are: (1) Standard random train/test split cuts edges, destroying topology and leaking structural information; (2) Transductive GNN evaluation leaks test-node topology through message passing during training; (3) Network features (PPR, community labels) computed on the full graph incorporate test labels; (4) Node labels change over time, creating temporal inconsistency. Proposed approach: use a temporal split — train on the graph state at time T₁, validate at T₂, test at T₃, ensuring sufficient gaps (e.g., months) between windows to minimize structural overlap. For network features, compute them using only the training-window graph. For the GNN itself, use a transductive setup with temporal node masking, but acknowledge and report the residual leakage. Additionally, randomly censor a fraction of known positive labels during feature computation as a sensitivity check. Test at multiple time points to assess robustness. Report AUC with confidence intervals across multiple time windows, not a single holdout.
+      <br><br>
+      <em>Follow-ups: How would you handle class imbalance in this setting? What if the graph is dynamic and new edges appear continuously? How do you evaluate link prediction tasks temporally?</em>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10</div>
+    <div class="question-stem">Why did the "NoSQL movement" not entirely deliver on its promises, and how did the industry respond? What does this tell us about the trade-offs at the heart of distributed database design?</div>
+    <button class="reveal-btn" onclick="revealAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong> Early NoSQL systems sacrificed consistency (ACID guarantees) and query expressiveness for horizontal scalability and flexible schemas. In practice, many applications (healthcare.gov, early Digg, Twitter) found that eventual consistency led to data corruption bugs, and that MapReduce interfaces were harder to use than SQL for complex analytics. The industry responded with two movements: (1) NoSQL vendors adding stronger consistency models and better query languages (moving toward SQL-like capabilities), and (2) the NewSQL movement — systems like CockroachDB, Google Spanner, and YugabyteDB that achieve horizontal scalability while maintaining ACID guarantees. This convergence illustrates the CAP theorem: distributed systems must choose between consistency, availability, and partition tolerance — not all three simultaneously. The key insight is that the optimal trade-off depends on the use case: financial transactions require consistency; social media feeds tolerate eventual consistency. There is no universally superior architecture.
+      <br><br>
+      <em>Follow-ups: What is the CAP theorem formally? Where does Neo4j sit on the consistency-availability spectrum? How do time-series and geospatial databases fit into this landscape?</em>
+    </div>
+  </div>
+</div>
+
+<script>
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+  const totalQuestions = 50;
+
+  function checkAnswer(btn) {
+    const card = btn.closest('.mcq-card');
+    if (card.dataset.answered === 'true') return;
+
+    const correctOpt = card.dataset.correct;
+    const selectedBtn = card.querySelector('.option-btn.selected');
+    if (!selectedBtn) { return; }
+
+    card.dataset.answered = 'true';
+    const selectedOpt = selectedBtn.dataset.opt;
+    const feedback = card.querySelector('.feedback-bar');
+
+    card.querySelectorAll('.option-btn').forEach(ob => {
+      ob.disabled = true;
+      if (ob.dataset.opt === correctOpt) {
+        ob.classList.add(selectedOpt === correctOpt ? 'correct' : 'reveal-correct');
+      }
+    });
+
+    if (selectedOpt === correctOpt) {
+      selectedBtn.classList.remove('selected');
+      selectedBtn.classList.add('correct');
+      feedback.className = 'feedback-bar correct';
+      feedback.textContent = '✅ Correct!';
+      totalCorrect++;
+    } else {
+      selectedBtn.classList.remove('selected');
+      selectedBtn.classList.add('incorrect');
+      feedback.className = 'feedback-bar incorrect';
+      feedback.textContent = '❌ Incorrect. The correct answer is ' + correctOpt + '.';
+    }
+    feedback.style.display = 'block';
+    totalAnswered++;
+    document.getElementById('score-display').textContent = `Score: ${totalCorrect} / ${totalAnswered} answered`;
+    btn.style.display = 'none';
+  }
+
+  function resetCard(btn) {
+    const card = btn.closest('.mcq-card');
+    if (card.dataset.answered === 'true') {
+      totalAnswered--;
+      const correctOpt = card.dataset.correct;
+      const wasCorrect = card.querySelector('.option-btn.correct');
+      if (wasCorrect && wasCorrect.dataset.opt === correctOpt) totalCorrect--;
+    }
+    card.dataset.answered = 'false';
+    card.querySelectorAll('.option-btn').forEach(ob => {
+      ob.disabled = false;
+      ob.className = 'option-btn';
+    });
+    card.querySelector('.feedback-bar').style.display = 'none';
+    card.querySelector('.submit-btn').style.display = 'inline-block';
+    document.getElementById('score-display').textContent = `Score: ${totalCorrect} / ${totalAnswered} answered`;
+  }
+
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const card = this.closest('.mcq-card');
+      if (card.dataset.answered === 'true') return;
+      card.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      this.classList.add('selected');
+    });
+  });
+
+  function revealAnswer(btn) {
+    const panel = btn.nextElementSibling;
+    if (panel.classList.contains('visible')) {
+      panel.classList.remove('visible');
+      btn.textContent = 'Reveal Answer';
+    } else {
+      panel.classList.add('visible');
+      btn.textContent = 'Hide Answer';
+    }
+  }
+</script>
+</body>
+</html>
