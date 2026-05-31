@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 10 – Scalability &amp; Wrap-up | Modern Data Analytics</title>
+<style>
+  body {
+    background-color: #f5f6fa;
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #2c2c3a;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    background: linear-gradient(135deg, #1a3a5c, #2e6da4);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 18px rgba(30,80,140,0.18);
+  }
+  .page-header h1 { font-size: 1.8em; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 6px 0; }
+  .page-header .subtitle { font-size: 0.92em; opacity: 0.82; font-weight: 400; }
+
+  .nav-bar {
+    background-color: #ffffff;
+    border: 1px solid #dde3ef;
+    padding: 10px 18px;
+    margin-bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .nav-bar a {
+    background-color: #eef2fb;
+    color: #2e6da4;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-bar a:hover { background-color: #2e6da4; color: #ffffff; }
+  .nav-bar a.nav-mcq { background-color: #fff3cd; color: #856404; }
+  .nav-bar a.nav-sa  { background-color: #d1ecf1; color: #0c5460; }
+
+  .notes-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 28px 36px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .notes-section h2 {
+    color: #1a3a5c; font-size: 1.25em; font-weight: 700;
+    border-bottom: 2px solid #eef2fb; padding-bottom: 8px; margin-top: 0;
+  }
+  .notes-section h3 {
+    color: #2e6da4; font-size: 1.05em; font-weight: 700;
+    margin-top: 22px; margin-bottom: 6px;
+  }
+
+  .key-point        { background: #eef6ff; border-left: 4px solid #2e6da4; padding: 12px 18px; margin: 14px 0; }
+  .example-box      { background: #f0f7ee; border-left: 4px solid #4caf50; padding: 12px 18px; margin: 14px 0; }
+  .theorem-box      { background: #f3f0ff; border-left: 4px solid #7c4dff; padding: 14px 20px; margin: 16px 0; }
+  .warning-box      { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 18px; margin: 14px 0; }
+  .computation-note { background: #fdf3f3; border-left: 4px solid #e57373; padding: 12px 18px; margin: 14px 0; }
+  .formula-box {
+    background: #f8f9ff; border: 1px solid #c8d4f0; border-radius: 8px;
+    padding: 12px 18px; margin: 14px 0;
+    font-family: 'Courier New', monospace; font-size: 0.92em; line-height: 1.6;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.93em; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  thead tr { background-color: #2e6da4; color: #ffffff; font-weight: 600; text-align: left; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:nth-child(odd)  { background-color: #ffffff; }
+  tbody tr:hover { background-color: #dce8f8; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid #e2e8f4; }
+
+  .mcq-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .mcq-section h2 { color: #92400e; font-size: 1.2em; margin-top: 0; }
+  .score-display {
+    background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px;
+    padding: 5px 18px; font-weight: 700; color: #856404;
+    display: inline-block; font-size: 0.95em; margin-bottom: 18px;
+  }
+  .mcq-card {
+    background: #f9fafb; border: 1px solid #e5e9f2;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .mcq-card .question-label {
+    font-size: 0.8em; font-weight: 700; color: #2e6da4;
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;
+  }
+  .mcq-card .question-stem { font-weight: 600; color: #1a1a2e; margin-bottom: 14px; font-size: 1.0em; }
+
+  .option-btn {
+    display: block; width: 100%; background: #ffffff; border: 1.5px solid #d0d8ea;
+    border-radius: 8px; padding: 10px 16px; margin: 6px 0; text-align: left;
+    cursor: pointer; font-size: 0.95em; color: #2c2c3a; transition: all 0.18s;
+  }
+  .option-btn:hover { background: #eef2fb; border-color: #2e6da4; }
+  .option-btn.selected  { background: #dce8f8; border-color: #2e6da4; color: #1a3a5c; font-weight: 600; }
+  .option-btn.correct   { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; pointer-events: none; }
+  .option-btn.incorrect { background: #f8d7da; border-color: #dc3545; color: #721c24; font-weight: 600; pointer-events: none; }
+  .option-btn.reveal-correct { background: #d4edda; border-color: #28a745; color: #155724; font-weight: 700; opacity: 0.85; pointer-events: none; }
+  .option-btn.locked { pointer-events: none; }
+
+  .feedback-bar { border-radius: 6px; padding: 8px 14px; margin-top: 10px; font-size: 0.9em; font-weight: 600; display: none; }
+  .feedback-bar.correct   { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; display: block; }
+  .feedback-bar.incorrect { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; display: block; }
+  .feedback-bar .explain { display: block; font-weight: 400; margin-top: 6px; color: #2c2c3a; }
+
+  .sa-section {
+    background-color: #ffffff; border-radius: 12px;
+    padding: 28px 36px; margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+  .sa-section h2 { color: #3b1d6e; font-size: 1.2em; margin-top: 0; }
+  .sa-card {
+    background: #faf9ff; border: 1px solid #e2dcf5;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 20px;
+  }
+  .sa-card .question-label {
+    color: #6f42c1; font-size: 0.8em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .sa-card .question-stem { font-weight: 600; color: #1a1a2e; margin: 8px 0 12px 0; }
+
+  .reveal-btn {
+    background: #6f42c1; color: #ffffff; border: none; border-radius: 20px;
+    padding: 7px 22px; font-size: 0.88em; font-weight: 600;
+    cursor: pointer; margin-top: 12px; transition: background 0.2s;
+  }
+  .reveal-btn:hover { background: #5a32a3; }
+  .answer-panel {
+    background: #f3f0ff; border: 1px solid #d4c8f5;
+    border-radius: 8px; padding: 18px 22px;
+    margin-top: 14px; font-size: 0.95em; line-height: 1.8; display: none;
+  }
+  .answer-panel strong { color: #4a148c; }
+
+  .reset-btn {
+    background: #1a3a5c; color: #fff; border: none;
+    border-radius: 20px; padding: 9px 26px;
+    font-size: 0.92em; font-weight: 700; cursor: pointer;
+    margin-bottom: 18px; transition: background 0.2s;
+  }
+  .reset-btn:hover { background: #2e6da4; }
+
+  code { background: #eef2fb; border-radius: 4px; padding: 1px 6px; font-size: 0.92em; color: #1a3a5c; }
+  ul, ol { margin: 8px 0 8px 20px; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>Lecture 10 – Scalability &amp; Wrap-up</h1>
+  <div class="subtitle">Modern Data Analytics (GOZ39A) &nbsp;|&nbsp; Batch vs Stream · Apache Spark / PySpark · Lazy Evaluation · Catalyst · Parquet · Apache Kafka &nbsp;|&nbsp; Exam Review Notes</div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <a href="#scalability">Scalability &amp; Pipeline</a>
+  <a href="#inmemory">In-Memory Limits</a>
+  <a href="#spark-arch">Spark Architecture</a>
+  <a href="#spark-exec">Execution Walkthrough</a>
+  <a href="#dataframes">DataFrames</a>
+  <a href="#lazy">Lazy Evaluation</a>
+  <a href="#catalyst">Logical Plan / Catalyst</a>
+  <a href="#parquet">Parquet &amp; Pushdown</a>
+  <a href="#bestpractice">Caching &amp; Pandas-on-Spark</a>
+  <a href="#kafka">Apache Kafka</a>
+  <a href="#mcq" class="nav-mcq">50 MCQ / T-F</a>
+  <a href="#sa"  class="nav-sa">10 Short Answer</a>
+</div>
+
+<!-- ══════════════════════
+     STUDY NOTES
+══════════════════════ -->
+
+<!-- 1. Scalability & Pipeline -->
+<div class="notes-section" id="scalability">
+  <h2>1. Scalability and the Data Science Pipeline</h2>
+
+  <div class="key-point">
+    <strong>Scalability</strong> is the use of different tools and architectures to scale data science applications so that they keep working as the volume of data — or the volume of requests — grows beyond what a single machine can handle.
+  </div>
+
+  <h3>Where scalability bites in the pipeline</h3>
+  <p>The typical data science pipeline runs in three phases: <strong>Data engineering</strong> (wrangling → cleansing → preparation) → <strong>Machine learning</strong> (model learning ↔ model validation) → <strong>Operations</strong> (model deployment → data visualisation). Scalability concerns surface at two distinct points, and the lecture frames them as two separate questions:</p>
+  <table>
+    <thead><tr><th>Question</th><th>Where in the pipeline</th><th>Tool emphasised</th></tr></thead>
+    <tbody>
+      <tr><td>How can we handle large <em>amounts</em> of incoming data?</td><td>Data engineering / ingestion</td><td>Apache Spark (processing) · Apache Kafka (streaming ingestion)</td></tr>
+      <tr><td>How can we deploy our model so it handles large <em>volumes of requests</em>?</td><td>Operations / serving</td><td>Distributed / serverless deployment (cf. Lecture 9)</td></tr>
+    </tbody>
+  </table>
+  <p>The key insight is that "scalability" is not one problem — scaling the <em>data throughput</em> (Spark/Kafka) is a different engineering challenge from scaling the <em>serving layer</em> (the request side).</p>
+
+  <h3>Batch vs Stream processing</h3>
+  <table>
+    <thead><tr><th></th><th>Batch processing</th><th>Stream processing</th></tr></thead>
+    <tbody>
+      <tr><td>Timing</td><td>Data collected over a period, then processed once enough has accumulated / a time window passes</td><td>Data processed in (near) real-time; no waiting for a batch to fill</td></tr>
+      <tr><td>Volume</td><td>Often very large amounts processed at once</td><td>Continuous, smaller increments</td></tr>
+      <tr><td>Complexity</td><td>Simpler — a failed task can simply be retried</td><td>More complex — the system must be <strong>fault tolerant</strong> so data is not lost mid-stream</td></tr>
+      <tr><td>Canonical tool</td><td>Apache Spark</td><td>Apache Kafka</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <strong>Why is streaming "more complex"?</strong> In batch, if a job crashes you re-run it over the same stored chunk — the data is still sitting there. In a stream there is no convenient stored chunk to re-run; the system itself must guarantee (through acknowledgements, replication, and re-delivery) that an in-flight message is not lost when a consumer fails. Fault tolerance is therefore a <em>design requirement</em> of streaming, not an afterthought.
+  </div>
+</div>
+
+<!-- 2. In-memory limits -->
+<div class="notes-section" id="inmemory">
+  <h2>2. In-Memory Processing and Its Limits</h2>
+
+  <div class="key-point">
+    Pandas stores a DataFrame <strong>in the RAM of a single machine</strong>. The most common criticism of pandas is that it does not work well for large amounts of data, because typical computers do not have the capacity to hold large DataFrames in memory.
+  </div>
+
+  <h3>What limits how much pandas can hold?</h3>
+  <ul>
+    <li><strong>Available memory (RAM):</strong> pandas operates in memory, so the data it can handle is directly proportional to the system's RAM.</li>
+    <li><strong>Data types:</strong> different dtypes consume different amounts of memory; this <em>can be optimised</em> in pandas (e.g., downcasting <code>float64</code>→<code>float32</code>, using <code>category</code>).</li>
+    <li><strong>Complexity of operations:</strong> simple operations are less memory-intensive than complex ones (e.g., a large <code>groupby</code>), and system architecture itself affects how much memory is free for the operation.</li>
+  </ul>
+  <div class="example-box">
+    <strong>Rule of thumb:</strong> on a 16 GB computer, pandas starts hitting performance issues at roughly <strong>±1 million rows</strong>. This is a heuristic about <em>memory pressure</em>, not a hard limit — the real ceiling depends on dtypes and the operations you run.
+  </div>
+
+  <h3>Single-machine alternatives (still in-memory)</h3>
+  <table>
+    <thead><tr><th>Tool</th><th>Idea</th><th>What problem it solves</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Modin</strong></td><td>Drop-in replacement for pandas (<code>import modin.pandas as pd</code>). Pandas is single-threaded; Modin scales pandas to use <em>all CPU cores</em>.</td><td>Under-utilised cores on one machine (CPU-bound, not memory-bound)</td></tr>
+      <tr><td><strong>Polars</strong></td><td>A faster pandas replacement that has grown increasingly popular; built for speed on a single machine.</td><td>Throughput on a single node</td></tr>
+      <tr><td><strong>Apache Spark</strong></td><td>Distributes data <em>and</em> computation across many machines (a cluster).</td><td>Data too large for any single machine's RAM</td></tr>
+    </tbody>
+  </table>
+  <div class="theorem-box">
+    <strong>Key distinction to keep straight:</strong> Modin and Polars still run on a <em>single machine</em> — they make better use of that machine. Spark is fundamentally different: it spreads both the data and the work across a <em>cluster</em>, which is what lets it exceed any one machine's memory.
+  </div>
+</div>
+
+<!-- 3. Spark Architecture -->
+<div class="notes-section" id="spark-arch">
+  <h2>3. Apache Spark — Architecture</h2>
+
+  <div class="key-point">
+    <strong>Spark</strong> is an engine for large-scale processing that supports both single-node machines and clusters of machines. It has become the de facto standard for big data processing. Its core property: it allows both <em>computations and data</em> to be divided across different machines (workers / nodes).
+  </div>
+
+  <h3>The three roles</h3>
+  <table>
+    <thead><tr><th>Component</th><th>What it is</th><th>Responsibility</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Driver node</strong></td><td>A single machine running the <em>driver program</em>, which holds the <code>SparkSession</code></td><td>Manages the Spark application: builds the logical plan, decides how work is split, sends instructions to workers, aggregates the final result</td></tr>
+      <tr><td><strong>Cluster manager</strong></td><td>The resource broker between driver and workers</td><td>Manages worker resources; assigns tasks to the available workers</td></tr>
+      <tr><td><strong>Worker nodes</strong></td><td>Machines each running an <em>Executor</em> (with a Cache) that runs <em>Tasks</em></td><td>Do the actual data processing on their partition; cache intermediate data; return results to the driver</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Where the data lives</h3>
+  <p>A Spark project typically starts with a dataset that resides in <strong>distributed storage</strong> — e.g., <strong>HDFS</strong> or <strong>AWS S3</strong> — rather than on the driver's local disk. The motivating example in the lecture: a database of <em>hundreds of millions of financial transactions</em> from which you want to extract key statistics.</p>
+
+  <div class="computation-note">
+    <strong>Mental model:</strong> the driver is the "brain" that plans and coordinates but does <em>not</em> hold the data; the workers are the "hands" that touch the data; the cluster manager is the "scheduler" that hands work to whichever hands are free. The local machine you type on is separate again — it sends requests to the driver.
+  </div>
+</div>
+
+<!-- 4. Execution Walkthrough -->
+<div class="notes-section" id="spark-exec">
+  <h2>4. The Spark Execution Walkthrough</h2>
+
+  <p>The lecture walks a single query — <em>group financial transactions by type and count them</em> — through the full lifecycle.</p>
+  <div class="formula-box">
+    from pyspark.sql import SparkSession<br><br>
+    spark = SparkSession.builder.appName("FirstSession").getOrCreate()<br>
+    df = spark.read.parquet("data/financial_transactions.parquet")<br>
+    print(df.groupby("type").count().show())
+  </div>
+
+  <h3>Step 1 — Establish a SparkSession</h3>
+  <p>The <code>SparkSession</code> is the <strong>entry point</strong> to any Spark application. <code>SparkSession.builder.getOrCreate()</code> creates (or reuses) it; configurations can be specified here.</p>
+
+  <h3>Step 2 — Link to the data (no data is read yet!)</h3>
+  <div class="warning-box">
+    When you call <code>spark.read.parquet("s3://...")</code>, the driver establishes a <strong>logical plan</strong> — it stores the <em>location</em> and the <em>schema</em> of the data. <strong>No actual data has been read</strong>, despite the method being named <code>read</code>. This is the single most counter-intuitive point in the lecture.
+  </div>
+
+  <h3>Step 3 — Perform an action</h3>
+  <p>Calling an action (here <code>show()</code>) triggers the real work:</p>
+  <ol>
+    <li>The local machine sends a request to the driver, which already has a connection to the data.</li>
+    <li>The driver sends each executor (assume 2 workers) specific instructions: <strong>(1) the operation(s)</strong> to perform and <strong>(2) information on the data partition</strong> — <em>not the actual data</em>.</li>
+    <li>Workers obtain the partitions they need. In AWS S3, a parquet file is automatically divided into <strong>blocks</strong> (assume 6 blocks); the blocks are split among the workers (e.g., blocks 1–3 to worker 1, blocks 4–6 to worker 2).</li>
+    <li>Each worker performs its action separately, producing partial results (Result 1, Result 2).</li>
+    <li>The driver <strong>aggregates</strong> the workers' results and sends the final result back to the local machine.</li>
+  </ol>
+  <div class="key-point">
+    All of partitioning, distribution, parallel execution, and aggregation is <strong>handled by Spark</strong> — the developer just writes DataFrame code. The output of the example was a small table of counts (e.g., credit 33371, transfer 33331, debit 33298) returned to the laptop.
+  </div>
+</div>
+
+<!-- 5. DataFrames -->
+<div class="notes-section" id="dataframes">
+  <h2>5. Spark DataFrames</h2>
+
+  <div class="key-point">
+    Spark DataFrames are <em>similar</em> to pandas DataFrames and expose built-in functions to make life easier for the developer — but they are designed for distributed, structured data.
+  </div>
+
+  <h3>What distinguishes a Spark DataFrame</h3>
+  <ul>
+    <li><strong>Optimised for processing structured (tabular) data.</strong></li>
+    <li><strong>Built-in data-type protection through schema enforcement</strong> — the schema is known and enforced, which is also what lets Spark plan and optimise before touching data.</li>
+    <li><strong>Named columns.</strong></li>
+  </ul>
+  <div class="example-box">
+    <strong>Example — largest transaction of Alice:</strong>
+    <div class="formula-box">
+      data = [("Alice",500),("Bob",300),("Alice",700),("Cathy",400),("Alice",200)]<br>
+      columns = ["client","transaction"]<br>
+      df = spark.createDataFrame(data, columns)<br><br>
+      largest = (df.filter(df.client == "Alice")<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.agg({"transaction":"max"})<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.collect()[0][0])
+    </div>
+    Note that <code>filter</code> and <code>agg</code> build the plan; <code>collect()</code> is the action that actually executes it.
+  </div>
+</div>
+
+<!-- 6. Lazy Evaluation -->
+<div class="notes-section" id="lazy">
+  <h2>6. Lazy Evaluation</h2>
+
+  <div class="key-point">
+    Because Spark can handle very large data, individual operations can take a long time. Spark therefore uses <strong>lazy evaluation</strong>: it does <em>not</em> perform any data operations until the results are actually used.
+  </div>
+
+  <h3>Worked example — total debit amount per date</h3>
+  <table>
+    <thead><tr><th>Step</th><th>Code</th><th>Type</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>1 Load</td><td><code>df = spark.read.parquet(...)</code></td><td>—</td><td>Driver builds a <em>logical</em> representation (DF 1) holding the schema; <strong>Data: None</strong></td></tr>
+      <tr><td>2 Filter</td><td><code>df_f = df.filter(df.type=="debit")</code></td><td>Transformation</td><td>Logical plan updated (DF 1 → DF 2). Operation is "performed" but never collected/shown; still no data loaded</td></tr>
+      <tr><td>3 Group + aggregate</td><td><code>df_g = df_f.groupby("date").sum("amount")</code></td><td>Transformation</td><td>Plan updated (DF 2 → DF 3 → DF 4). Plan now represents the full query; still no data loaded</td></tr>
+      <tr><td>4 Show</td><td><code>df_g.show()</code></td><td>Action</td><td>Triggers execution: driver sends the logical plan + partition info to workers, workers obtain blocks, perform DF 1→DF 4, return results</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Transformations vs Actions</h3>
+  <table>
+    <thead><tr><th></th><th>Transformations</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td>Trigger execution?</td><td><strong>No</strong> — only the logical plan is updated</td><td><strong>Yes</strong> — execution of data operations</td></tr>
+      <tr><td>Examples</td><td><code>filter</code>, <code>groupby</code>, <code>select</code>, <code>sum</code> (within a plan)</td><td><code>collect()</code>, <code>show()</code>, <code>count()</code>, <code>first()</code>, <code>take()</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Why lazy evaluation is beneficial</h3>
+  <ol>
+    <li><strong>Prevents unnecessary operations</strong> from being performed → saves execution time.</li>
+    <li><strong>Allows more informed caching</strong> — Spark knows the whole plan before running it.</li>
+    <li><strong>Enables optimisations</strong> (see Catalyst, next section).</li>
+  </ol>
+  <div class="computation-note">
+    <strong>Exam trap:</strong> "the filter ran but nothing happened" is exactly the point. A transformation describes <em>what</em> you want; nothing is computed until an <em>action</em> demands a concrete result. This is why a script can chain ten transformations instantly and then "hang" on the first <code>show()</code>.
+  </div>
+</div>
+
+<!-- 7. Catalyst -->
+<div class="notes-section" id="catalyst">
+  <h2>7. Logical Plan Optimisation (Catalyst)</h2>
+
+  <div class="key-point">
+    Spark does <em>not</em> simply execute the logical plan as the user wrote it. The <strong>Catalyst</strong> optimiser rewrites the plan using heuristics before execution. You can inspect this with <code>explain(True)</code>, which prints both the <em>Parsed Logical Plan</em> and the <em>Optimised Logical Plan</em>.
+  </div>
+
+  <h3>Reading the plan</h3>
+  <p>Logical plans are read <strong>bottom to top</strong>: the bottom is the <code>Relation</code> (the raw parquet source), and each line above is an operation applied to the result below it. In the lecture's example, the user wrote <em>Selection → Grouping → Summing → Filtering</em> (DF1→DF5), but the optimised plan <strong>moved the filter down</strong> next to the relation and added <code>isnotnull(type)</code>.</p>
+  <div class="formula-box">
+    == Optimised Logical Plan ==<br>
+    Aggregate [type], [type, sum(amount) AS sum(amount)]<br>
+    +- Project [type, amount]<br>
+    &nbsp;&nbsp;+- Filter (isnotnull(type) AND (type = "debit"))   &larr; pushed DOWN, null check added<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;+- Relation [...] parquet
+  </div>
+
+  <h3>Catalyst heuristics</h3>
+  <table>
+    <thead><tr><th>Heuristic</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Predicate pushdown</strong></td><td>Moves filters as close to the data source as possible, reducing the amount of data read</td></tr>
+      <tr><td><strong>Projection pushdown</strong></td><td>Moves <code>SELECT</code> operations close to the source, retrieving only the necessary columns</td></tr>
+      <tr><td><strong>Constant folding</strong></td><td>Simplifies constant expressions at compile time (e.g., <code>1 + 2</code> → <code>3</code>)</td></tr>
+      <tr><td><strong>Reordering joins</strong></td><td>Reorders joins to improve efficiency, especially in complex queries</td></tr>
+      <tr><td><strong>Null elimination</strong></td><td>Eliminates unnecessary null checks based on data types</td></tr>
+      <tr><td><strong>Join reordering / elimination</strong></td><td>Changes a join's direction to reduce data transferred across partitions, and tries to remove unnecessary joins</td></tr>
+    </tbody>
+  </table>
+  <div class="theorem-box">
+    <strong>Why "why?":</strong> filtering <em>before</em> grouping means far fewer rows enter the expensive aggregation, and pushing the filter to the source means fewer rows are ever read into memory. Lazy evaluation is what <em>makes this legal</em> — because nothing has executed yet, Catalyst is free to reorder the whole plan.
+  </div>
+</div>
+
+<!-- 8. Parquet & Pushdown -->
+<div class="notes-section" id="parquet">
+  <h2>8. Parquet Format &amp; Pushdown Optimisations</h2>
+
+  <div class="key-point">
+    <strong>Parquet</strong> is a popular file format for PySpark and other big-data platforms because it is a <strong>columnar storage format</strong>: values of the same column are stored contiguously, rather than row by row.
+  </div>
+
+  <h3>What parquet stores beyond the data</h3>
+  <ul>
+    <li>The <strong>schema</strong> of the data.</li>
+    <li><strong>Summary statistics</strong> — mean, max, min, number of missing, etc. — both for the <em>entire dataset</em> and per <strong>row group</strong>.</li>
+  </ul>
+  <p>This metadata is precisely what enables the pushdown optimisations.</p>
+
+  <h3>Predicate &amp; projection pushdown with parquet</h3>
+  <p>Whenever Spark does a filter (predicate) or a column selection (projection), it tries to <strong>push that operation down toward data loading</strong>, which can dramatically reduce data stored on disk or in memory.</p>
+  <div class="example-box">
+    <strong>Example — filtering on a category:</strong> For each row group, Spark reads the stored statistics first.
+    <ul>
+      <li>If the <em>count</em> of the wanted category in that row group is <strong>0</strong> → Spark <strong>never loads</strong> that row group into memory at all.</li>
+      <li>If the count is <strong>&gt; 0</strong> → Spark loads the row group, then applies the filter afterwards.</li>
+    </ul>
+    Projection pushdown is the columnar complement: because columns are stored separately, Spark can read <em>only</em> the columns the query needs and skip the rest entirely.
+  </div>
+  <div class="computation-note">
+    <strong>Connect the dots:</strong> columnar layout + per-row-group statistics is the physical mechanism; predicate/projection pushdown is the logical optimisation Catalyst chooses; lazy evaluation is what lets Catalyst plan it. The three layers reinforce each other.
+  </div>
+</div>
+
+<!-- 9. Caching & Pandas-on-Spark -->
+<div class="notes-section" id="bestpractice">
+  <h2>9. Other Optimisations &amp; Best Practices</h2>
+
+  <h3>Other optimisations (FYI)</h3>
+  <ul>
+    <li><strong>Persistence and caching</strong> — keeping a reused intermediate DataFrame in worker memory (the Executor's Cache) so it is not recomputed. Lazy evaluation lets Spark cache more intelligently because it sees the whole plan.</li>
+    <li><strong>Logical plan optimisation</strong> — the Catalyst rewriting covered above.</li>
+  </ul>
+
+  <h3>Pandas API on PySpark</h3>
+  <div class="key-point">
+    The Pandas API on PySpark (<code>pyspark.pandas</code>) is a high-level API that closely mimics the functionality and interface of pandas. It works best with datasets that are <em>larger than pandas can handle but not as large as typical big-data workloads.</em>
+  </div>
+  <ul>
+    <li>Not as heavily optimised as the PySpark SQL API.</li>
+    <li>Does not (yet) have the same breadth of functions available.</li>
+    <li><strong>When to use it:</strong> when you need a quick translation of an existing pandas workload and optimisation is not critical.</li>
+  </ul>
+  <div class="theorem-box">
+    <strong>The scaling spectrum, ordered:</strong> pandas (single machine, single thread) → Modin / Polars (single machine, many cores) → Pandas-on-Spark (cluster, easy port, less optimised) → PySpark SQL API (cluster, fully optimised). Pick the leftmost tool that fits your data size and performance needs.
+  </div>
+</div>
+
+<!-- 10. Kafka -->
+<div class="notes-section" id="kafka">
+  <h2>10. Apache Kafka</h2>
+
+  <div class="key-point">
+    <strong>Apache Kafka</strong> is an open-source distributed <strong>event streaming</strong> platform. Where Spark is the canonical <em>batch</em> tool, Kafka is the canonical <em>stream</em> tool.
+  </div>
+
+  <h3>Messaging systems: batch vs stream</h3>
+  <p>In a <strong>batch</strong> job, the consumer of the data (the processing engine) checks at <em>predefined times</em> whether new data is available and processes whatever is there. As we move toward real-time applications this polling becomes inefficient. In <strong>stream</strong> processing, consumers are <strong>notified when new data is available</strong>. The commonly used model is the <strong>publish-subscribe</strong> model:</p>
+  <div class="formula-box">
+    Publisher → Input channel → Message Broker → Output channel → Subscriber(s)
+  </div>
+
+  <h3>The broker</h3>
+  <p>The message broker:</p>
+  <ul>
+    <li>Acts as an <strong>intermediary</strong> between producers and consumers of data.</li>
+    <li>Creates <strong>backlogs of data (queues)</strong>.</li>
+    <li>Handles new subscriptions and producers, as well as failures.</li>
+    <li>Introduces <strong>asynchronous</strong> functionality (producers and consumers need not be active at the same time).</li>
+    <li>Allows <strong>load balancing</strong>.</li>
+  </ul>
+
+  <h3>Delivery patterns: load balancing vs fan-out</h3>
+  <table>
+    <thead><tr><th>Pattern</th><th>How messages are distributed</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Load balancing</strong></td><td>Each message goes to <em>exactly one</em> consumer (e.g., m1→Consumer 2, m2→Consumer 1, m3→Consumer 2…). Work is split across consumers.</td><td>Parallelise heavy processing across a consumer group</td></tr>
+      <tr><td><strong>Fan-out</strong></td><td><em>Every</em> consumer receives <em>every</em> message (all consumers see m1, m2, m3…).</td><td>Independent subscribers each needing the full stream</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Acknowledgements &amp; fault tolerance</h3>
+  <div class="warning-box">
+    Consumers send an <strong>acknowledgement (ack)</strong> to the broker once a message is successfully processed. If a consumer <strong>crashes</strong> before acking (e.g., Consumer 2 takes m3, then crashes), the broker has <em>not</em> received the ack, so it <strong>re-delivers that message to another consumer</strong> (m3 is reassigned to Consumer 1). This is the concrete mechanism that makes streaming fault tolerant — and exactly the complexity that batch processing avoids by simply re-running a stored chunk.
+  </div>
+
+  <div class="example-box">
+    <strong>Putting it together (wrap-up):</strong> Kafka ingests and buffers high-velocity event data reliably; Spark processes large data (batch or micro-batch) with lazy, Catalyst-optimised, pushdown-aware execution over distributed storage. Together they answer the two opening questions — handling large incoming data, and feeding scalable downstream analytics/serving.
+  </div>
+</div>
+
+<!-- ══════════════════════
+     MCQ SECTION
+══════════════════════ -->
+<div class="mcq-section" id="mcq">
+  <h2>Multiple Choice &amp; True/False — 50 Questions</h2>
+  <div class="score-display" id="score-display">Score: 0 / 0</div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All Questions</button>
+
+  <!-- Q1 -->
+  <div class="mcq-card" id="q1">
+    <div class="question-label">Question 1 · Reasoning</div>
+    <div class="question-stem">A colleague says "our 16 GB laptop choked at 1.2 million rows, so pandas can never exceed ~1 million rows." What is the most accurate critique?</div>
+    <button class="option-btn" onclick="answer('q1',this,false)">A. They are exactly right; 1 million is a hard architectural limit in pandas</button>
+    <button class="option-btn" onclick="answer('q1',this,true)">B. The 1M figure is only a rule of thumb tied to RAM, dtypes, and operation complexity — not a fixed limit</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">C. pandas has no relationship to RAM, so row count is irrelevant</button>
+    <button class="option-btn" onclick="answer('q1',this,false)">D. The limit depends only on the number of columns, never the rows</button>
+    <div class="feedback-bar" id="q1-fb"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="mcq-card" id="q2">
+    <div class="question-label">Question 2 · Diagnosis</div>
+    <div class="question-stem">Your pandas job is slow but the data comfortably fits in RAM, and you notice only 1 of 8 CPU cores is busy. Which tool most directly targets this bottleneck with minimal code change?</div>
+    <button class="option-btn" onclick="answer('q2',this,false)">A. Apache Spark on a cluster</button>
+    <button class="option-btn" onclick="answer('q2',this,true)">B. Modin (drop-in replacement that uses all cores)</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">C. Apache Kafka</button>
+    <button class="option-btn" onclick="answer('q2',this,false)">D. Switching from parquet to CSV</button>
+    <div class="feedback-bar" id="q2-fb"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="mcq-card" id="q3">
+    <div class="question-label">Question 3 · Distinction</div>
+    <div class="question-stem">What is the fundamental difference between Polars/Modin and Spark for handling large data?</div>
+    <button class="option-btn" onclick="answer('q3',this,false)">A. Polars/Modin run on a cluster; Spark runs on one machine</button>
+    <button class="option-btn" onclick="answer('q3',this,true)">B. Polars/Modin still run on a single machine; Spark distributes data and computation across a cluster</button>
+    <button class="option-btn" onclick="answer('q3',this,false)">C. They are identical in architecture, differing only in syntax</button>
+    <button class="option-btn" onclick="answer('q3',this,false)">D. Spark is single-threaded while Polars/Modin are distributed</button>
+    <div class="feedback-bar" id="q3-fb"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="mcq-card" id="q4">
+    <div class="question-label">Question 4 · Scenario</div>
+    <div class="question-stem">Fraud-detection scores must update within seconds of each card swipe. Which processing paradigm and tool fit best?</div>
+    <button class="option-btn" onclick="answer('q4',this,false)">A. Batch processing with Spark, run once per night</button>
+    <button class="option-btn" onclick="answer('q4',this,true)">B. Stream processing (e.g., Kafka), because consumers are notified as data arrives</button>
+    <button class="option-btn" onclick="answer('q4',this,false)">C. In-memory pandas on a single laptop</button>
+    <button class="option-btn" onclick="answer('q4',this,false)">D. Storing everything in CSV and emailing reports weekly</button>
+    <div class="feedback-bar" id="q4-fb"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="mcq-card" id="q5">
+    <div class="question-label">Question 5 · True/False</div>
+    <div class="question-stem">True or False: Stream processing is considered more complex than batch primarily because it must be fault tolerant to avoid losing in-flight data, whereas a failed batch task can simply be retried.</div>
+    <button class="option-btn" onclick="answer('q5',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q5',this,false)">False</button>
+    <div class="feedback-bar" id="q5-fb"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="mcq-card" id="q6">
+    <div class="question-label">Question 6 · Architecture</div>
+    <div class="question-stem">In Spark, which statement about the driver node is correct?</div>
+    <button class="option-btn" onclick="answer('q6',this,false)">A. It stores all of the dataset in its own memory and processes it directly</button>
+    <button class="option-btn" onclick="answer('q6',this,true)">B. It runs the driver program / SparkSession, plans the work, coordinates workers, and aggregates results — but does not hold the bulk data</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">C. It is the same machine as every worker node</button>
+    <button class="option-btn" onclick="answer('q6',this,false)">D. It only exists in streaming jobs, not batch jobs</button>
+    <div class="feedback-bar" id="q6-fb"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="mcq-card" id="q7">
+    <div class="question-label">Question 7 · Architecture</div>
+    <div class="question-stem">What is the role of the cluster manager?</div>
+    <button class="option-btn" onclick="answer('q7',this,false)">A. It writes the user's PySpark code</button>
+    <button class="option-btn" onclick="answer('q7',this,true)">B. It manages worker resources and assigns tasks to available workers</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">C. It stores the parquet files</button>
+    <button class="option-btn" onclick="answer('q7',this,false)">D. It replaces the SparkSession</button>
+    <div class="feedback-bar" id="q7-fb"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="mcq-card" id="q8">
+    <div class="question-label">Question 8 · Architecture</div>
+    <div class="question-stem">Within a worker node, what does the Executor's <em>Cache</em> serve to do?</div>
+    <button class="option-btn" onclick="answer('q8',this,false)">A. Store user credentials for S3</button>
+    <button class="option-btn" onclick="answer('q8',this,true)">B. Hold intermediate/reused data in worker memory so it need not be recomputed or re-read</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">C. Permanently replace distributed storage like HDFS</button>
+    <button class="option-btn" onclick="answer('q8',this,false)">D. Generate the logical plan</button>
+    <div class="feedback-bar" id="q8-fb"></div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="mcq-card" id="q9">
+    <div class="question-label">Question 9 · The big trap</div>
+    <div class="question-stem">After running <code>df = spark.read.parquet("s3://.../tx.parquet")</code>, what has actually happened?</div>
+    <button class="option-btn" onclick="answer('q9',this,false)">A. The full dataset is now loaded into the driver's RAM</button>
+    <button class="option-btn" onclick="answer('q9',this,false)">B. The data is loaded onto every worker immediately</button>
+    <button class="option-btn" onclick="answer('q9',this,true)">C. Only a logical plan (location + schema) is established; no data is read despite the name "read"</button>
+    <button class="option-btn" onclick="answer('q9',this,false)">D. The data is copied to the local laptop</button>
+    <div class="feedback-bar" id="q9-fb"></div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="mcq-card" id="q10">
+    <div class="question-label">Question 10 · Execution</div>
+    <div class="question-stem">When an action triggers execution, what does the driver send to each executor?</div>
+    <button class="option-btn" onclick="answer('q10',this,false)">A. The complete dataset so each worker has a full copy</button>
+    <button class="option-btn" onclick="answer('q10',this,true)">B. The operation(s) to perform plus information about which data partition to handle — not the actual data</button>
+    <button class="option-btn" onclick="answer('q10',this,false)">C. Nothing; workers decide independently what to compute</button>
+    <button class="option-btn" onclick="answer('q10',this,false)">D. Only the final answer</button>
+    <div class="feedback-bar" id="q10-fb"></div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="mcq-card" id="q11">
+    <div class="question-label">Question 11 · Partitioning</div>
+    <div class="question-stem">In the lecture's example a parquet file in S3 is split into 6 blocks across 2 workers. What does this illustrate?</div>
+    <button class="option-btn" onclick="answer('q11',this,false)">A. Each worker must process all 6 blocks for correctness</button>
+    <button class="option-btn" onclick="answer('q11',this,true)">B. Data is partitioned, and each worker obtains only the partition(s) it is responsible for, enabling parallelism</button>
+    <button class="option-btn" onclick="answer('q11',this,false)">C. Parquet files cannot be split, so one worker idles</button>
+    <button class="option-btn" onclick="answer('q11',this,false)">D. The driver processes the blocks while workers wait</button>
+    <div class="feedback-bar" id="q11-fb"></div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="mcq-card" id="q12">
+    <div class="question-label">Question 12 · Aggregation</div>
+    <div class="question-stem">Why must the driver aggregate "Result 1" and "Result 2" from the two workers at the end of a <code>groupby().count()</code>?</div>
+    <button class="option-btn" onclick="answer('q12',this,false)">A. Because each worker already computed the global answer independently</button>
+    <button class="option-btn" onclick="answer('q12',this,true)">B. Because each worker only saw its own partition, so partial results must be combined into the global result</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">C. To translate the result into parquet format</button>
+    <button class="option-btn" onclick="answer('q12',this,false)">D. The driver does not aggregate; the laptop does</button>
+    <div class="feedback-bar" id="q12-fb"></div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="mcq-card" id="q13">
+    <div class="question-label">Question 13 · DataFrames</div>
+    <div class="question-stem">Which property of Spark DataFrames is most directly responsible for enabling planning/optimisation <em>before</em> any data is touched?</div>
+    <button class="option-btn" onclick="answer('q13',this,true)">A. Schema enforcement (the schema is known up front)</button>
+    <button class="option-btn" onclick="answer('q13',this,false)">B. The use of unnamed positional columns</button>
+    <button class="option-btn" onclick="answer('q13',this,false)">C. The fact they store data on the local laptop</button>
+    <button class="option-btn" onclick="answer('q13',this,false)">D. They are limited to a single core</button>
+    <div class="feedback-bar" id="q13-fb"></div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="mcq-card" id="q14">
+    <div class="question-label">Question 14 · Lazy evaluation</div>
+    <div class="question-stem">Which is the best definition of lazy evaluation in Spark?</div>
+    <button class="option-btn" onclick="answer('q14',this,false)">A. Spark runs each operation immediately but slowly</button>
+    <button class="option-btn" onclick="answer('q14',this,true)">B. Spark does not perform data operations until the results are actually used (an action is called)</button>
+    <button class="option-btn" onclick="answer('q14',this,false)">C. Spark caches everything to disk before starting</button>
+    <button class="option-btn" onclick="answer('q14',this,false)">D. Spark only evaluates the first row of every DataFrame</button>
+    <div class="feedback-bar" id="q14-fb"></div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="mcq-card" id="q15">
+    <div class="question-label">Question 15 · Classify</div>
+    <div class="question-stem">Which of the following is a <em>transformation</em> (does NOT trigger execution)?</div>
+    <button class="option-btn" onclick="answer('q15',this,false)">A. <code>df.collect()</code></button>
+    <button class="option-btn" onclick="answer('q15',this,false)">B. <code>df.show()</code></button>
+    <button class="option-btn" onclick="answer('q15',this,true)">C. <code>df.filter(df.type=="debit")</code></button>
+    <button class="option-btn" onclick="answer('q15',this,false)">D. <code>df.count()</code></button>
+    <div class="feedback-bar" id="q15-fb"></div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="mcq-card" id="q16">
+    <div class="question-label">Question 16 · Classify</div>
+    <div class="question-stem">Which of the following is an <em>action</em> (triggers execution)?</div>
+    <button class="option-btn" onclick="answer('q16',this,false)">A. <code>groupby("date")</code></button>
+    <button class="option-btn" onclick="answer('q16',this,false)">B. <code>select("amount")</code></button>
+    <button class="option-btn" onclick="answer('q16',this,true)">C. <code>first()</code></button>
+    <button class="option-btn" onclick="answer('q16',this,false)">D. <code>sum("amount")</code> within a chained plan</button>
+    <div class="feedback-bar" id="q16-fb"></div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="mcq-card" id="q17">
+    <div class="question-label">Question 17 · Behaviour</div>
+    <div class="question-stem">A student chains <code>filter → groupby → sum</code> and the script returns instantly, but the later <code>.show()</code> "hangs" for 40 seconds. What explains this?</div>
+    <button class="option-btn" onclick="answer('q17',this,false)">A. The earlier lines had a bug that was silently ignored</button>
+    <button class="option-btn" onclick="answer('q17',this,true)">B. The transformations only built the plan; <code>show()</code> is the action that finally executes all of them</button>
+    <button class="option-btn" onclick="answer('q17',this,false)">C. <code>show()</code> re-downloads Spark from the internet</button>
+    <button class="option-btn" onclick="answer('q17',this,false)">D. The cluster manager crashed and restarted</button>
+    <div class="feedback-bar" id="q17-fb"></div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="mcq-card" id="q18">
+    <div class="question-label">Question 18 · Why lazy?</div>
+    <div class="question-stem">Which is NOT listed as a benefit of lazy evaluation?</div>
+    <button class="option-btn" onclick="answer('q18',this,false)">A. Prevents unnecessary operations, saving execution time</button>
+    <button class="option-btn" onclick="answer('q18',this,false)">B. Allows more informed caching</button>
+    <button class="option-btn" onclick="answer('q18',this,false)">C. Enables plan optimisations</button>
+    <button class="option-btn" onclick="answer('q18',this,true)">D. Guarantees results are always shown to the user automatically</button>
+    <div class="feedback-bar" id="q18-fb"></div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="mcq-card" id="q19">
+    <div class="question-label">Question 19 · Dependency</div>
+    <div class="question-stem">Why does lazy evaluation <em>enable</em> Catalyst's plan reordering?</div>
+    <button class="option-btn" onclick="answer('q19',this,true)">A. Because nothing has executed yet, Spark sees the whole plan and is free to rewrite it before running</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">B. Because lazy evaluation forces immediate execution, leaving a log to optimise</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">C. They are unrelated features</button>
+    <button class="option-btn" onclick="answer('q19',this,false)">D. Because it disables schema enforcement</button>
+    <div class="feedback-bar" id="q19-fb"></div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="mcq-card" id="q20">
+    <div class="question-label">Question 20 · Catalyst</div>
+    <div class="question-stem">What does <code>explain(True)</code> let you observe?</div>
+    <button class="option-btn" onclick="answer('q20',this,false)">A. The contents of every row in the dataset</button>
+    <button class="option-btn" onclick="answer('q20',this,true)">B. Both the parsed (user) logical plan and the optimised logical plan Spark will actually run</button>
+    <button class="option-btn" onclick="answer('q20',this,false)">C. The S3 access credentials</button>
+    <button class="option-btn" onclick="answer('q20',this,false)">D. The number of CPU cores in the cluster</button>
+    <div class="feedback-bar" id="q20-fb"></div>
+  </div>
+
+  <!-- Q21 -->
+  <div class="mcq-card" id="q21">
+    <div class="question-label">Question 21 · True/False</div>
+    <div class="question-stem">True or False: Spark logical plans are read from bottom to top, with the data source (Relation) at the bottom.</div>
+    <button class="option-btn" onclick="answer('q21',this,true)">True</button>
+    <button class="option-btn" onclick="answer('q21',this,false)">False</button>
+    <div class="feedback-bar" id="q21-fb"></div>
+  </div>
+
+  <!-- Q22 -->
+  <div class="mcq-card" id="q22">
+    <div class="question-label">Question 22 · Pushdown</div>
+    <div class="question-stem">In the optimised plan, the filter that the user wrote <em>last</em> appeared near the <em>bottom</em>, next to the relation. Which heuristic is this, and why does it help?</div>
+    <button class="option-btn" onclick="answer('q22',this,true)">A. Predicate pushdown — filtering near the source means fewer rows are read and fewer rows enter later operations</button>
+    <button class="option-btn" onclick="answer('q22',this,false)">B. Constant folding — it pre-computes constants</button>
+    <button class="option-btn" onclick="answer('q22',this,false)">C. Join reordering — it changes join direction</button>
+    <button class="option-btn" onclick="answer('q22',this,false)">D. It is a bug; filters should never move</button>
+    <div class="feedback-bar" id="q22-fb"></div>
+  </div>
+
+  <!-- Q23 -->
+  <div class="mcq-card" id="q23">
+    <div class="question-label">Question 23 · Pushdown</div>
+    <div class="question-stem">A query needs only 2 of a table's 40 columns. Which optimisation retrieves only those 2 columns from storage?</div>
+    <button class="option-btn" onclick="answer('q23',this,false)">A. Predicate pushdown</button>
+    <button class="option-btn" onclick="answer('q23',this,true)">B. Projection pushdown</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">C. Constant folding</button>
+    <button class="option-btn" onclick="answer('q23',this,false)">D. Null elimination</button>
+    <div class="feedback-bar" id="q23-fb"></div>
+  </div>
+
+  <!-- Q24 -->
+  <div class="mcq-card" id="q24">
+    <div class="question-label">Question 24 · Catalyst</div>
+    <div class="question-stem">Turning the expression <code>WHERE x = 1 + 2</code> into <code>WHERE x = 3</code> at compile time is an example of:</div>
+    <button class="option-btn" onclick="answer('q24',this,false)">A. Predicate pushdown</button>
+    <button class="option-btn" onclick="answer('q24',this,true)">B. Constant folding</button>
+    <button class="option-btn" onclick="answer('q24',this,false)">C. Projection pushdown</button>
+    <button class="option-btn" onclick="answer('q24',this,false)">D. Fan-out</button>
+    <div class="feedback-bar" id="q24-fb"></div>
+  </div>
+
+  <!-- Q25 -->
+  <div class="mcq-card" id="q25">
+    <div class="question-label">Question 25 · Catalyst</div>
+    <div class="question-stem">The optimised plan added <code>isnotnull(type)</code> that the user never wrote. Which heuristic family does this belong to, and what is the benefit?</div>
+    <button class="option-btn" onclick="answer('q25',this,true)">A. Null elimination / handling — it removes rows that cannot match before expensive work</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">B. Join reordering — it merges two tables</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">C. Caching — it persists nulls</button>
+    <button class="option-btn" onclick="answer('q25',this,false)">D. It is random noise with no purpose</button>
+    <div class="feedback-bar" id="q25-fb"></div>
+  </div>
+
+  <!-- Q26 -->
+  <div class="mcq-card" id="q26">
+    <div class="question-label">Question 26 · Parquet</div>
+    <div class="question-stem">Why is parquet's <em>columnar</em> layout particularly well suited to projection pushdown?</div>
+    <button class="option-btn" onclick="answer('q26',this,true)">A. Values of one column are stored contiguously, so unneeded columns can be skipped entirely when reading</button>
+    <button class="option-btn" onclick="answer('q26',this,false)">B. Rows are stored together, so whole rows must always be read</button>
+    <button class="option-btn" onclick="answer('q26',this,false)">C. It stores no schema, forcing a full scan</button>
+    <button class="option-btn" onclick="answer('q26',this,false)">D. It compresses by deleting columns permanently</button>
+    <div class="feedback-bar" id="q26-fb"></div>
+  </div>
+
+  <!-- Q27 -->
+  <div class="mcq-card" id="q27">
+    <div class="question-label">Question 27 · Parquet</div>
+    <div class="question-stem">Which metadata does parquet store that makes predicate pushdown effective?</div>
+    <button class="option-btn" onclick="answer('q27',this,false)">A. Only the file name</button>
+    <button class="option-btn" onclick="answer('q27',this,true)">B. Schema plus summary statistics (min, max, mean, missing count) for the whole dataset and per row group</button>
+    <button class="option-btn" onclick="answer('q27',this,false)">C. The user's AWS password</button>
+    <button class="option-btn" onclick="answer('q27',this,false)">D. A copy of the entire dataset duplicated three times</button>
+    <div class="feedback-bar" id="q27-fb"></div>
+  </div>
+
+  <!-- Q28 -->
+  <div class="mcq-card" id="q28">
+    <div class="question-label">Question 28 · Parquet</div>
+    <div class="question-stem">Filtering for category "X", a row group's statistics show count of "X" = 0. What does Spark do?</div>
+    <button class="option-btn" onclick="answer('q28',this,true)">A. It never loads that row group into memory</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">B. It loads the whole row group, then deletes it</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">C. It loads it twice for safety</button>
+    <button class="option-btn" onclick="answer('q28',this,false)">D. It crashes because the count is zero</button>
+    <div class="feedback-bar" id="q28-fb"></div>
+  </div>
+
+  <!-- Q29 -->
+  <div class="mcq-card" id="q29">
+    <div class="question-label">Question 29 · Parquet</div>
+    <div class="question-stem">For a row group where the wanted category's count &gt; 0, the lecture says Spark will:</div>
+    <button class="option-btn" onclick="answer('q29',this,true)">A. Load the data into memory and then apply the filter</button>
+    <button class="option-btn" onclick="answer('q29',this,false)">B. Skip it because filtering happens only at the dataset level</button>
+    <button class="option-btn" onclick="answer('q29',this,false)">C. Send it unfiltered to the laptop</button>
+    <button class="option-btn" onclick="answer('q29',this,false)">D. Convert it to CSV first</button>
+    <div class="feedback-bar" id="q29-fb"></div>
+  </div>
+
+  <!-- Q30 -->
+  <div class="mcq-card" id="q30">
+    <div class="question-label">Question 30 · Layers</div>
+    <div class="question-stem">Order the three "layers" that make pushdown work, from physical mechanism to what makes the optimisation possible.</div>
+    <button class="option-btn" onclick="answer('q30',this,true)">A. Columnar storage + per-row-group stats → Catalyst chooses pushdown → lazy evaluation lets it plan first</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">B. Lazy evaluation stores data → CSV format → eager execution</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">C. Kafka broker → fan-out → acknowledgements</button>
+    <button class="option-btn" onclick="answer('q30',this,false)">D. Driver downloads all data → workers idle → laptop aggregates</button>
+    <div class="feedback-bar" id="q30-fb"></div>
+  </div>
+
+  <!-- Q31 -->
+  <div class="mcq-card" id="q31">
+    <div class="question-label">Question 31 · Caching</div>
+    <div class="question-stem">Why does lazy evaluation allow "more informed" caching decisions?</div>
+    <button class="option-btn" onclick="answer('q31',this,true)">A. Because Spark sees the entire plan before running, it can identify which intermediate results are reused and worth caching</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">B. Because caching is disabled under lazy evaluation</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">C. Because it caches the laptop's screen</button>
+    <button class="option-btn" onclick="answer('q31',this,false)">D. Because it executes each step eagerly and logs it</button>
+    <div class="feedback-bar" id="q31-fb"></div>
+  </div>
+
+  <!-- Q32 -->
+  <div class="mcq-card" id="q32">
+    <div class="question-label">Question 32 · Pandas-on-Spark</div>
+    <div class="question-stem">When is the Pandas API on PySpark (<code>pyspark.pandas</code>) the most appropriate choice?</div>
+    <button class="option-btn" onclick="answer('q32',this,true)">A. When quickly porting an existing pandas workload to a larger-than-pandas dataset and peak optimisation is not critical</button>
+    <button class="option-btn" onclick="answer('q32',this,false)">B. When you need the most optimised possible execution at huge scale</button>
+    <button class="option-btn" onclick="answer('q32',this,false)">C. When the data fits comfortably in pandas already</button>
+    <button class="option-btn" onclick="answer('q32',this,false)">D. When you want to avoid Spark entirely</button>
+    <div class="feedback-bar" id="q32-fb"></div>
+  </div>
+
+  <!-- Q33 -->
+  <div class="mcq-card" id="q33">
+    <div class="question-label">Question 33 · True/False</div>
+    <div class="question-stem">True or False: The Pandas API on PySpark is as fully optimised as, and has the same breadth of functions as, the PySpark SQL API.</div>
+    <button class="option-btn" onclick="answer('q33',this,false)">True</button>
+    <button class="option-btn" onclick="answer('q33',this,true)">False</button>
+    <div class="feedback-bar" id="q33-fb"></div>
+  </div>
+
+  <!-- Q34 -->
+  <div class="mcq-card" id="q34">
+    <div class="question-label">Question 34 · Spectrum</div>
+    <div class="question-stem">A team's dataset just exceeded single-machine RAM, but they have a large legacy pandas codebase and a tight deadline. Which is the most pragmatic first step?</div>
+    <button class="option-btn" onclick="answer('q34',this,true)">A. Pandas API on PySpark for a fast port, optimise to the SQL API later if needed</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">B. Rewrite everything in low-level RDDs immediately</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">C. Switch to Kafka</button>
+    <button class="option-btn" onclick="answer('q34',this,false)">D. Buy a bigger laptop and stay on pandas forever</button>
+    <div class="feedback-bar" id="q34-fb"></div>
+  </div>
+
+  <!-- Q35 -->
+  <div class="mcq-card" id="q35">
+    <div class="question-label">Question 35 · Kafka</div>
+    <div class="question-stem">Apache Kafka is best described as:</div>
+    <button class="option-btn" onclick="answer('q35',this,false)">A. A columnar file format</button>
+    <button class="option-btn" onclick="answer('q35',this,false)">B. A single-machine pandas replacement</button>
+    <button class="option-btn" onclick="answer('q35',this,true)">C. An open-source distributed event streaming platform</button>
+    <button class="option-btn" onclick="answer('q35',this,false)">D. A query optimiser inside Spark</button>
+    <div class="feedback-bar" id="q35-fb"></div>
+  </div>
+
+  <!-- Q36 -->
+  <div class="mcq-card" id="q36">
+    <div class="question-label">Question 36 · Batch vs stream messaging</div>
+    <div class="question-stem">What is the core behavioural difference between batch and stream messaging?</div>
+    <button class="option-btn" onclick="answer('q36',this,true)">A. In batch the consumer polls for new data at predefined times; in stream the consumer is notified when new data is available</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">B. In stream the consumer polls; in batch it is notified</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">C. Neither uses consumers</button>
+    <button class="option-btn" onclick="answer('q36',this,false)">D. Batch is always faster than stream for real-time data</button>
+    <div class="feedback-bar" id="q36-fb"></div>
+  </div>
+
+  <!-- Q37 -->
+  <div class="mcq-card" id="q37">
+    <div class="question-label">Question 37 · Pub-sub</div>
+    <div class="question-stem">In the publish-subscribe model, what sits between publishers and subscribers?</div>
+    <button class="option-btn" onclick="answer('q37',this,false)">A. The driver node</button>
+    <button class="option-btn" onclick="answer('q37',this,true)">B. A message broker (via input and output channels)</button>
+    <button class="option-btn" onclick="answer('q37',this,false)">C. A parquet file</button>
+    <button class="option-btn" onclick="answer('q37',this,false)">D. The Catalyst optimiser</button>
+    <div class="feedback-bar" id="q37-fb"></div>
+  </div>
+
+  <!-- Q38 -->
+  <div class="mcq-card" id="q38">
+    <div class="question-label">Question 38 · Broker</div>
+    <div class="question-stem">Which of the following is NOT a stated responsibility of the message broker?</div>
+    <button class="option-btn" onclick="answer('q38',this,false)">A. Acting as an intermediary and creating queues (backlogs)</button>
+    <button class="option-btn" onclick="answer('q38',this,false)">B. Handling new subscriptions/producers and failures</button>
+    <button class="option-btn" onclick="answer('q38',this,false)">C. Introducing asynchronous functionality and load balancing</button>
+    <button class="option-btn" onclick="answer('q38',this,true)">D. Training machine learning models on the messages</button>
+    <div class="feedback-bar" id="q38-fb"></div>
+  </div>
+
+  <!-- Q39 -->
+  <div class="mcq-card" id="q39">
+    <div class="question-label">Question 39 · Async</div>
+    <div class="question-stem">Why is the broker's "asynchronous functionality" valuable?</div>
+    <button class="option-btn" onclick="answer('q39',this,true)">A. Producers and consumers need not be active at the same time; the broker buffers messages in between</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">B. It forces producers and consumers to run in perfect lockstep</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">C. It deletes messages before any consumer reads them</button>
+    <button class="option-btn" onclick="answer('q39',this,false)">D. It guarantees zero latency under all loads</button>
+    <div class="feedback-bar" id="q39-fb"></div>
+  </div>
+
+  <!-- Q40 -->
+  <div class="mcq-card" id="q40">
+    <div class="question-label">Question 40 · Patterns</div>
+    <div class="question-stem">In <em>load balancing</em>, how are messages distributed across consumers?</div>
+    <button class="option-btn" onclick="answer('q40',this,true)">A. Each message is delivered to exactly one consumer, splitting the work</button>
+    <button class="option-btn" onclick="answer('q40',this,false)">B. Every consumer receives every message</button>
+    <button class="option-btn" onclick="answer('q40',this,false)">C. Messages are never delivered</button>
+    <button class="option-btn" onclick="answer('q40',this,false)">D. Only the broker processes the messages</button>
+    <div class="feedback-bar" id="q40-fb"></div>
+  </div>
+
+  <!-- Q41 -->
+  <div class="mcq-card" id="q41">
+    <div class="question-label">Question 41 · Patterns</div>
+    <div class="question-stem">In <em>fan-out</em>, how are messages distributed?</div>
+    <button class="option-btn" onclick="answer('q41',this,false)">A. Each message goes to exactly one consumer</button>
+    <button class="option-btn" onclick="answer('q41',this,true)">B. Every consumer receives every message (each gets the full stream)</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">C. Messages are randomly dropped</button>
+    <button class="option-btn" onclick="answer('q41',this,false)">D. Only one consumer ever exists</button>
+    <div class="feedback-bar" id="q41-fb"></div>
+  </div>
+
+  <!-- Q42 -->
+  <div class="mcq-card" id="q42">
+    <div class="question-label">Question 42 · Choose a pattern</div>
+    <div class="question-stem">Three independent services (billing, analytics, fraud) each need to see <em>every</em> transaction event. Which pattern fits?</div>
+    <button class="option-btn" onclick="answer('q42',this,false)">A. Load balancing</button>
+    <button class="option-btn" onclick="answer('q42',this,true)">B. Fan-out</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">C. Neither — use batch CSV exports</button>
+    <button class="option-btn" onclick="answer('q42',this,false)">D. Predicate pushdown</button>
+    <div class="feedback-bar" id="q42-fb"></div>
+  </div>
+
+  <!-- Q43 -->
+  <div class="mcq-card" id="q43">
+    <div class="question-label">Question 43 · Acks</div>
+    <div class="question-stem">What is the purpose of a consumer acknowledgement (ack)?</div>
+    <button class="option-btn" onclick="answer('q43',this,true)">A. To tell the broker a message was successfully processed, so it need not be re-delivered</button>
+    <button class="option-btn" onclick="answer('q43',this,false)">B. To request more CPU cores</button>
+    <button class="option-btn" onclick="answer('q43',this,false)">C. To delete the producer</button>
+    <button class="option-btn" onclick="answer('q43',this,false)">D. To convert the message to parquet</button>
+    <div class="feedback-bar" id="q43-fb"></div>
+  </div>
+
+  <!-- Q44 -->
+  <div class="mcq-card" id="q44">
+    <div class="question-label">Question 44 · Fault tolerance</div>
+    <div class="question-stem">Consumer 2 receives m3 and crashes before sending an ack. What does the broker do, and why?</div>
+    <button class="option-btn" onclick="answer('q44',this,true)">A. Re-delivers m3 to another consumer (e.g., Consumer 1) because no ack was received, preventing data loss</button>
+    <button class="option-btn" onclick="answer('q44',this,false)">B. Permanently discards m3</button>
+    <button class="option-btn" onclick="answer('q44',this,false)">C. Shuts down all producers</button>
+    <button class="option-btn" onclick="answer('q44',this,false)">D. Sends m3 back to the producer for re-creation</button>
+    <div class="feedback-bar" id="q44-fb"></div>
+  </div>
+
+  <!-- Q45 -->
+  <div class="mcq-card" id="q45">
+    <div class="question-label">Question 45 · Connect concepts</div>
+    <div class="question-stem">How does the crash-and-redeliver mechanism relate to why "streaming is more complex than batch"?</div>
+    <button class="option-btn" onclick="answer('q45',this,true)">A. It is the concrete fault-tolerance machinery streaming needs; batch avoids this by re-running a stored chunk</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">B. It is unrelated; both paradigms are equally simple</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">C. It proves batch is more complex than streaming</button>
+    <button class="option-btn" onclick="answer('q45',this,false)">D. It only matters for parquet files</button>
+    <div class="feedback-bar" id="q45-fb"></div>
+  </div>
+
+  <!-- Q46 -->
+  <div class="mcq-card" id="q46">
+    <div class="question-label">Question 46 · Storage</div>
+    <div class="question-stem">Why does a Spark job typically read from distributed storage (HDFS/S3) rather than the driver's local disk?</div>
+    <button class="option-btn" onclick="answer('q46',this,true)">A. Distributed storage holds data too large for one machine and lets many workers read partitions in parallel</button>
+    <button class="option-btn" onclick="answer('q46',this,false)">B. Local disk is always faster and larger than any cloud storage</button>
+    <button class="option-btn" onclick="answer('q46',this,false)">C. Spark cannot read local files at all</button>
+    <button class="option-btn" onclick="answer('q46',this,false)">D. Because the driver must hold all the data anyway</button>
+    <div class="feedback-bar" id="q46-fb"></div>
+  </div>
+
+  <!-- Q47 -->
+  <div class="mcq-card" id="q47">
+    <div class="question-label">Question 47 · Synthesis</div>
+    <div class="question-stem">In one sentence, why does Spark scale to data that pandas cannot handle?</div>
+    <button class="option-btn" onclick="answer('q47',this,false)">A. Spark uses a faster single CPU core than pandas</button>
+    <button class="option-btn" onclick="answer('q47',this,true)">B. Spark distributes both data and computation across a cluster, instead of holding everything in one machine's RAM</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">C. Spark compresses data so it always fits in 16 GB</button>
+    <button class="option-btn" onclick="answer('q47',this,false)">D. Spark avoids reading data entirely, forever</button>
+    <div class="feedback-bar" id="q47-fb"></div>
+  </div>
+
+  <!-- Q48 -->
+  <div class="mcq-card" id="q48">
+    <div class="question-label">Question 48 · Applied plan</div>
+    <div class="question-stem">For <code>df.select("amount","type").filter(type=="debit").groupby("type").sum("amount").show()</code>, which two optimisations is Catalyst most likely to apply at the parquet source?</div>
+    <button class="option-btn" onclick="answer('q48',this,true)">A. Predicate pushdown (filter on type) and projection pushdown (read only amount &amp; type)</button>
+    <button class="option-btn" onclick="answer('q48',this,false)">B. Fan-out and load balancing</button>
+    <button class="option-btn" onclick="answer('q48',this,false)">C. Acknowledgements and re-delivery</button>
+    <button class="option-btn" onclick="answer('q48',this,false)">D. None — Catalyst cannot optimise grouped queries</button>
+    <div class="feedback-bar" id="q48-fb"></div>
+  </div>
+
+  <!-- Q49 -->
+  <div class="mcq-card" id="q49">
+    <div class="question-label">Question 49 · Applied reasoning</div>
+    <div class="question-stem">Two logically equivalent scripts differ only in that one filters before grouping and the other groups before filtering. After Catalyst optimisation, how do their execution plans most likely compare?</div>
+    <button class="option-btn" onclick="answer('q49',this,true)">A. Likely similar — Catalyst can push the filter down regardless of the order the user wrote it</button>
+    <button class="option-btn" onclick="answer('q49',this,false)">B. The group-first version is always far faster after optimisation</button>
+    <button class="option-btn" onclick="answer('q49',this,false)">C. Catalyst refuses to optimise either</button>
+    <button class="option-btn" onclick="answer('q49',this,false)">D. They cannot be compared because plans are random</button>
+    <div class="feedback-bar" id="q49-fb"></div>
+  </div>
+
+  <!-- Q50 -->
+  <div class="mcq-card" id="q50">
+    <div class="question-label">Question 50 · Tool selection</div>
+    <div class="question-stem">Match the need to the tool: (i) use all cores on one machine for a pandas workload, (ii) process terabytes across a cluster, (iii) reliably ingest a high-velocity event stream.</div>
+    <button class="option-btn" onclick="answer('q50',this,true)">A. (i) Modin, (ii) Spark, (iii) Kafka</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">B. (i) Kafka, (ii) Modin, (iii) Spark</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">C. (i) Spark, (ii) Kafka, (iii) Modin</button>
+    <button class="option-btn" onclick="answer('q50',this,false)">D. (i) Parquet, (ii) Polars, (iii) Catalyst</button>
+    <div class="feedback-bar" id="q50-fb"></div>
+  </div>
+
+</div><!-- end mcq-section -->
+
+<!-- ══════════════════════
+     SHORT ANSWER SECTION
+══════════════════════ -->
+<div class="sa-section" id="sa">
+  <h2>Short Answer / Oral Exam — 10 Questions</h2>
+  <p style="font-size:0.92em;color:#555;">These are framed for an oral exam: give a structured answer, then anticipate the follow-up probes listed under each model answer.</p>
+
+  <!-- SA1 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 1 · Spark execution lifecycle</div>
+    <div class="question-stem">Walk me through what happens, end to end, when you run <code>spark.read.parquet(...).groupby("type").count().show()</code> on a cluster. Be explicit about which component does what, and where the data is at each stage.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <ol>
+        <li><strong>SparkSession / read:</strong> The driver's SparkSession registers the source. <code>read.parquet</code> only builds a <em>logical plan</em> — it records the location and schema. <em>No data is read yet.</em></li>
+        <li><strong>Transformations:</strong> <code>groupby("type").count()</code> further updates the logical plan. Still nothing executes.</li>
+        <li><strong>Action (<code>show()</code>):</strong> This triggers execution. The local machine requests the result from the driver.</li>
+        <li><strong>Distribution:</strong> The driver, via the cluster manager, sends each executor the operations to perform and the partition information — not the data itself. The parquet file in S3 is split into blocks (e.g., 6 blocks across 2 workers).</li>
+        <li><strong>Parallel execution:</strong> Each worker reads only its partitions into its executor memory and computes a partial count (Result 1, Result 2).</li>
+        <li><strong>Aggregation:</strong> The driver combines the partial results into the global count table and returns it to the laptop.</li>
+      </ol>
+      <strong>Key emphasis:</strong> the driver plans and aggregates but never holds the bulk data; the workers touch the data; the cluster manager schedules; the data lives in distributed storage.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Which steps were transformations and which was the action?</li>
+        <li>If you replaced <code>show()</code> with another transformation, would any data be read? (No.)</li>
+        <li>Why can't a single worker just compute the final count alone?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA2 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 2 · Lazy evaluation</div>
+    <div class="question-stem">Define lazy evaluation. Distinguish transformations from actions with examples, and explain the three benefits. Why is <code>filter()</code> fundamentally different from <code>show()</code>?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      Lazy evaluation means Spark performs no data operations until the results are actually needed. <strong>Transformations</strong> (<code>filter</code>, <code>groupby</code>, <code>select</code>, <code>sum</code>) only update the logical plan and trigger nothing. <strong>Actions</strong> (<code>collect</code>, <code>show</code>, <code>count</code>, <code>first</code>, <code>take</code>) trigger execution of the accumulated plan.
+      <br><br>
+      <strong>Three benefits:</strong> (1) prevents unnecessary operations, saving execution time; (2) allows more informed caching, since Spark sees the whole plan; (3) enables optimisations (Catalyst).
+      <br><br>
+      <code>filter()</code> describes <em>what</em> data you want and returns a new (still un-computed) DataFrame; <code>show()</code> is an action that forces Spark to actually read partitions and produce concrete output. That is why chaining transformations is instantaneous while the first action does the heavy lifting.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Give an example where lazy evaluation saves work that an eager engine would have wasted.</li>
+        <li>If you call two actions on the same DataFrame, is the data read twice? How would caching change that?</li>
+        <li>Is <code>count()</code> a transformation or an action — and why does that matter for debugging timing?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA3 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 3 · Catalyst &amp; logical plans</div>
+    <div class="question-stem">A user writes selection → grouping → summing → filtering. After <code>explain(True)</code> the optimised plan has moved the filter down to the source and added an <code>isnotnull</code> check. Explain what happened and which heuristics were used. How do you read the plan?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      Spark does not run the user's plan verbatim. The <strong>Catalyst</strong> optimiser rewrites it. <code>explain(True)</code> shows the <em>parsed</em> (user) plan and the <em>optimised</em> plan. Plans are read <strong>bottom to top</strong>: the bottom is the parquet <code>Relation</code>, and operations stack upward.
+      <br><br>
+      Catalyst applied <strong>predicate pushdown</strong> — moving the filter next to the relation so fewer rows are read and fewer rows enter the expensive aggregation. The added <code>isnotnull(type)</code> reflects <strong>null elimination / handling</strong>, removing rows that can't match before doing work. This rewrite is legal precisely because of lazy evaluation: nothing executed, so Spark could reorder the whole plan.
+      <br><br>
+      <strong>Other heuristics to mention:</strong> projection pushdown (read only needed columns), constant folding (<code>1+2→3</code>), reordering joins, join reordering/elimination.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Why is filtering before aggregating cheaper?</li>
+        <li>What would the plan look like if the query selected only 2 of 50 columns?</li>
+        <li>Could Catalyst do this if Spark were eager rather than lazy? Why not?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA4 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 4 · Parquet &amp; pushdown</div>
+    <div class="question-stem">Explain why parquet is so well suited to Spark. Cover columnar storage, the metadata it keeps, and walk through the "filtering on a category" example to show how predicate pushdown actually avoids loading data.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      Parquet is a <strong>columnar storage format</strong>: each column's values are stored together. It also stores <strong>metadata</strong> — the schema and summary statistics (min, max, mean, missing count) for the whole dataset and per <strong>row group</strong>.
+      <br><br>
+      <strong>Predicate pushdown example:</strong> filtering for a category, Spark first reads each row group's stored statistics. If the category's count in a row group is <strong>0</strong>, Spark <em>never loads that row group</em> into memory. If the count is <strong>&gt; 0</strong>, it loads the row group and applies the filter afterwards. <strong>Projection pushdown</strong> is the columnar complement: because columns are stored separately, Spark reads only the columns the query needs.
+      <br><br>
+      The payoff is far less data read from disk and held in memory — which is exactly the scaling bottleneck.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Why would a row-oriented format (e.g., CSV) make projection pushdown ineffective?</li>
+        <li>What metadata makes the count check possible without scanning the rows?</li>
+        <li>Which Catalyst heuristic does the category example correspond to?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA5 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 5 · The scaling spectrum</div>
+    <div class="question-stem">A team's data is growing. Describe the spectrum of tools from pandas upward and explain, with the decisive factor each time, when you would move from one to the next.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <table>
+        <thead><tr><th>Tool</th><th>Scope</th><th>Move here when…</th></tr></thead>
+        <tbody>
+          <tr><td>pandas</td><td>Single machine, single thread</td><td>Data fits in RAM (≈≤1M rows on 16 GB rule of thumb)</td></tr>
+          <tr><td>Modin / Polars</td><td>Single machine, many cores</td><td>CPU-bound on one machine; cores under-utilised but data still fits in RAM</td></tr>
+          <tr><td>Pandas API on Spark</td><td>Cluster, easy port</td><td>Data exceeds one machine's RAM but isn't full big-data; need a quick pandas-like port, optimisation not critical</td></tr>
+          <tr><td>PySpark SQL API</td><td>Cluster, fully optimised</td><td>True big-data scale and you need maximum optimisation (Catalyst, pushdown)</td></tr>
+        </tbody>
+      </table>
+      <strong>Decisive factors:</strong> RAM ceiling (pandas→Modin/Polars is about cores, not memory); single machine vs cluster (→ Spark); ease of porting vs raw performance (Pandas-on-Spark vs SQL API). The guiding rule is to pick the <em>leftmost</em> (simplest) tool that meets the data-size and performance need.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Modin vs Spark: what is the architectural difference?</li>
+        <li>What do you sacrifice by choosing the Pandas API on Spark over the SQL API?</li>
+        <li>Could a faster Polars query remove the need for a cluster? Under what condition?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA6 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 6 · Batch vs stream</div>
+    <div class="question-stem">Compare batch and stream processing across timing, complexity, and fault handling. Map each to its canonical tool, and explain precisely <em>why</em> streaming is the more complex paradigm.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>Batch:</strong> data accumulates over time and is processed once a window passes or enough data is available; often very large volumes at once; canonical tool <strong>Spark</strong>. Failure handling is simple — re-run the task over the stored chunk.
+      <br><br>
+      <strong>Stream:</strong> data processed in (near) real-time with no waiting; consumers are notified as data arrives; canonical tool <strong>Kafka</strong>. It is more complex because the system must be <strong>fault tolerant</strong> — there is no convenient stored chunk to re-run, so the system itself must guarantee (via acks, queuing, re-delivery, replication) that in-flight data is not lost when a consumer fails.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Give a use case that clearly demands streaming over batch, and one that prefers batch.</li>
+        <li>What concrete mechanism makes Kafka fault tolerant?</li>
+        <li>Why does polling become inefficient as you approach real-time?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA7 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 7 · The broker &amp; pub-sub</div>
+    <div class="question-stem">Describe the publish-subscribe model and the responsibilities of the message broker. Why does inserting a broker between producers and consumers improve a system's scalability and robustness?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      In publish-subscribe, a <strong>publisher</strong> sends to an input channel → <strong>message broker</strong> → output channel → <strong>subscriber(s)</strong>. The broker: acts as an <strong>intermediary</strong> between producers and consumers; creates <strong>queues/backlogs</strong>; handles new subscriptions, new producers, and failures; introduces <strong>asynchronous</strong> functionality; and allows <strong>load balancing</strong>.
+      <br><br>
+      <strong>Why it helps:</strong> the broker <em>decouples</em> producers from consumers. Producers don't need to know who consumes, how many consumers there are, or whether they're currently online — they just publish. The broker buffers messages (so a slow or temporarily offline consumer doesn't block producers), absorbs bursts, and lets you add/remove consumers freely. That decoupling is what makes the system scalable (add consumers for more throughput) and robust (failures are isolated and recoverable).
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>What would break if producers wrote directly to consumers with no broker?</li>
+        <li>How does the queue help during a sudden burst of events?</li>
+        <li>How does the broker enable load balancing specifically?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA8 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 8 · Delivery patterns &amp; fault tolerance</div>
+    <div class="question-stem">Contrast load balancing and fan-out delivery. Then explain acknowledgements and walk through what happens when a consumer crashes mid-message. How does this deliver the fault tolerance streaming requires?</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <strong>Load balancing:</strong> each message is delivered to exactly one consumer, splitting the workload across a consumer group (e.g., m1→C2, m2→C1, m3→C2…). <strong>Fan-out:</strong> every consumer receives every message — used when independent subscribers each need the full stream.
+      <br><br>
+      <strong>Acknowledgements:</strong> a consumer sends an <em>ack</em> once it has successfully processed a message; the broker then knows it can be considered done. <strong>Crash scenario:</strong> if Consumer 2 takes m3 and crashes before acking, the broker has no ack, so it <strong>re-delivers m3 to another consumer</strong> (e.g., Consumer 1). No message is lost.
+      <br><br>
+      This re-delivery on missing-ack is precisely the fault-tolerance machinery that makes streaming reliable — and the complexity that batch sidesteps by simply re-running a stored chunk.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Could a message be processed twice under this scheme? What does that imply for consumer design (idempotency)?</li>
+        <li>When would you choose fan-out over load balancing in a data pipeline?</li>
+        <li>How does this connect back to "streaming is more complex than batch"?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA9 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 9 · Why Spark scales</div>
+    <div class="question-stem">A student asks: "If pandas just runs out of RAM, why doesn't Spark?" Give a complete, architecturally grounded answer.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      pandas is in-memory and single-machine: the DataFrame must fit in one computer's RAM, so its capacity is bounded by that machine. Spark is fundamentally different — it distributes <strong>both data and computation across a cluster</strong>. The <strong>driver</strong> plans the work and coordinates but holds no bulk data; the <strong>cluster manager</strong> schedules; the <strong>workers</strong> each load and process only their <em>partition</em> of the data in their own executor memory and caches.
+      <br><br>
+      So the dataset never needs to fit in any single machine; it is split into blocks (in distributed storage like HDFS/S3) and processed in parallel. Add lazy evaluation, Catalyst optimisation, and parquet pushdown, and Spark also reads far less data than a naïve scan would. That combination — horizontal distribution plus read-minimisation — is why Spark scales where pandas cannot.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Where does the data physically reside during a Spark job?</li>
+        <li>Does the driver ever hold the whole dataset? (No.)</li>
+        <li>Name two ways Spark reduces the volume of data it actually reads.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SA10 -->
+  <div class="sa-card">
+    <div class="question-label">Short Answer 10 · End-to-end design</div>
+    <div class="question-stem">Design a scalable pipeline: hundreds of millions of financial transactions stream in continuously, and the business wants daily total debit amounts per date, exposed to downstream consumers. Name the tools, justify each choice, explain how lazy evaluation and pushdown help, and note what makes it production-ready.</div>
+    <button class="reveal-btn" onclick="toggleAnswer(this)">Reveal Answer</button>
+    <div class="answer-panel">
+      <strong>Model Answer:</strong>
+      <table>
+        <thead><tr><th>Stage</th><th>Tool</th><th>Justification</th></tr></thead>
+        <tbody>
+          <tr><td>Ingestion</td><td><strong>Kafka</strong></td><td>Transactions arrive as a high-velocity event stream; the broker decouples producers from consumers, buffers bursts in queues, and provides fault tolerance via acks/re-delivery so no event is lost.</td></tr>
+          <tr><td>Storage</td><td><strong>S3/HDFS in parquet</strong></td><td>Distributed storage holds data far beyond one machine; columnar parquet + per-row-group stats enable predicate &amp; projection pushdown.</td></tr>
+          <tr><td>Processing</td><td><strong>Spark (PySpark SQL API)</strong></td><td>Distributes data &amp; computation across workers. The query <code>filter(type=="debit").groupby("date").sum("amount")</code> is built as transformations; <code>show()</code>/write is the action.</td></tr>
+          <tr><td>Serving</td><td>Scalable deployment (cf. Lecture 9 — e.g., serverless/API layer)</td><td>To handle large volumes of downstream requests for the computed aggregates.</td></tr>
+        </tbody>
+      </table>
+      <strong>How lazy evaluation + pushdown help:</strong> Spark builds the full plan before executing, so Catalyst pushes the <code>debit</code> filter down to the parquet source (skipping row groups with no debits) and reads only the <code>type</code>, <code>date</code>, and <code>amount</code> columns. Far less data is read and far fewer rows reach the aggregation.
+      <br><br>
+      <strong>Production-readiness:</strong> partition the parquet by date for pruning; cache reused intermediates; monitor the Kafka consumer lag; make consumers idempotent (messages can be re-delivered); schedule the daily batch (or use micro-batch/structured streaming); add alerting and schema validation.
+      <br><br>
+      <strong>Likely follow-up questions:</strong>
+      <ul>
+        <li>Why Kafka for ingestion but Spark for the heavy aggregation?</li>
+        <li>Which columns and row groups would the parquet source actually read for this query?</li>
+        <li>Re-delivery means a transaction event could arrive twice — how do you keep the daily total correct?</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end sa-section -->
+
+<script>
+  let answered = {};
+
+  function answer(qId, btn, isCorrect) {
+    if (answered[qId]) return;
+    answered[qId] = true;
+
+    const card = document.getElementById(qId);
+    const allBtns = card.querySelectorAll('.option-btn');
+    const fb = document.getElementById(qId + '-fb');
+
+    allBtns.forEach(b => b.classList.add('locked'));
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      fb.textContent = '✅ Correct!';
+      fb.className = 'feedback-bar correct';
+    } else {
+      btn.classList.add('incorrect');
+      fb.textContent = '❌ Incorrect — the highlighted option is correct. Review the notes above.';
+      fb.className = 'feedback-bar incorrect';
+      allBtns.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes('true')) {
+          b.classList.add('reveal-correct');
+        }
+      });
+    }
+    updateScore();
+  }
+
+  function updateScore() {
+    const total     = document.querySelectorAll('.mcq-card').length;
+    const correct   = document.querySelectorAll('.option-btn.correct').length;
+    const attempted = Object.keys(answered).length;
+    document.getElementById('score-display').textContent =
+      'Score: ' + correct + ' / ' + attempted + ' answered (of ' + total + ')';
+  }
+
+  function resetAll() {
+    answered = {};
+    document.querySelectorAll('.option-btn').forEach(btn => { btn.className = 'option-btn'; });
+    document.querySelectorAll('.feedback-bar').forEach(fb => { fb.textContent = ''; fb.className = 'feedback-bar'; });
+    document.getElementById('score-display').textContent = 'Score: 0 / 0';
+  }
+
+  function toggleAnswer(btn) {
+    const panel = btn.nextElementSibling;
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+      btn.textContent = 'Reveal Answer';
+    } else {
+      panel.style.display = 'block';
+      btn.textContent = 'Hide Answer';
+    }
+  }
+</script>
+
+</body>
+</html>
